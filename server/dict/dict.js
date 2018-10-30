@@ -1,6 +1,6 @@
 //export {Dict};
 var md5 = require('md5');
-
+var urlencode = require('urlencode');
 module.exports = class Dict {
 
     constructor(data){

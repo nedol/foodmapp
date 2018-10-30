@@ -1,0 +1,162 @@
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ru">
+<head>
+    <meta content="width=device-width, minimum-scale=1, maximum-scale=3" name="viewport">
+    <!--<meta http-equiv-'X-UA-Compatible' content= ">-->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
+    <meta name="author" content="InfoDesk" />
+    <!--base target="https://telegram.me/joinchat/C6197we1gLwO39Cx10yrIw"/-->
+    <title>timeline</title>
+
+</head>
+
+<style>
+    html{
+        /*overflow: auto;*/
+    }
+
+
+    #scroll_div_right{
+        /*border:thin dotted rgba(192,192,192,0.3);*/
+        display:block;
+        position: absolute;
+        z-index:5;
+        /*background-color:rgba(192,192,192,0.3);*/
+        background: linear-gradient(to left, rgba(183,233,255,0.3), rgba(255,255,255,0));
+        right: 0px;
+        width:7%;
+        height: 100vh;
+    }
+
+    #scroll_div_left{
+        /*border:thin dotted gray;*/
+        display:block;
+        position: absolute;
+        z-index:5;
+        background: linear-gradient(to right, rgba(183,233,255,0.3), rgba(255,255,255,0));
+        left: 0px;
+        width:7%;
+        height: 100vh;
+        -webkit-transform-style: preserve-3d;
+        -moz-transform-style: preserve-3d;
+        transform-style: preserve-3d;
+    }
+
+    #prev{
+        position: relative;
+        top: 50%;
+        transform: translateY(-50%);
+        padding-right: 5px;
+    }
+
+
+    .div_img{
+        position: relative;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.6);
+        padding-top: 0%;
+        padding-bottom: 0%;
+        border-top: solid 2px black;
+        /*white-space: pre-wrap;*/
+        border: solid 1px grey;
+        vertical-align: middle;
+
+    }
+
+    .title_div{
+        display:inline-block;
+        /*border: solid 1px darkgrey;*/
+        width:auto;
+        word-wrap: break-word;
+        padding: 10px;
+    }
+
+    .timeline{
+        zoom: 1.0; /* Old IE only */
+        -moz-transform: scaleX(1.0);
+        -webkit-transform: scaleX(1.0);
+        transform: scaleX(1.0);
+    }
+
+</style>
+<script src="../../dist/common.js"></script>
+<script src="../../dist/browser.js"></script>
+<body>
+<!--div id="top" style="display:block;top:0;height:10px; background-color:white; visibility: visible;"></div-->
+<!--div style="display:block; position: fixed; z-index:2;transform: translateY(50%);top:50%;border: solid 1px black;
+background: linear-gradient(to right, rgba(183,233,255,0.5), rgba(255,255,255,0.5));"-->
+<p> <span id="span_alert"></span></p></div>
+<!--<div class="gap" style="display: block; height: 5px"></div>-->
+<div id="audio_container" class="container" style="display:none;  z-index:10; background-color: #e8e8e8; padding:4px; margin-bottom:5px;
+    width: auto; border: solid 0px gray;box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);" >
+    <div class="title_div" style="display:table-row-group; width: 99%; height:100%; border: solid 1px gray;
+        text-shadow: 1px 1px 2px rgba(0,0,0,0.6); text-align: center;" align="center">
+        <img class="progress" src="./images/XEupj.gif" style="display:table-cell;width:8%;float: right;" width="28" height="28"/>
+        <div style="display:table-cell;width:95%;vertical-align: top;">
+            <!--<span class="title" style="display:inline; font-size: small;" align="center">default</span>-->
+            <div class="title" contenteditable="true" style="display:inline; font-size: small;" align="center">No Title</div>
+            <img class="owner_logo" src= "../images/ic_logo_circle.gif" style="display:inline; visibility:hidden;" width="16" height="16"/>
+        </div>
+        <input type="image" class="favourites" src="../images/ic_heart_blue.png" style="display:table-cell;float: left;
+          visibility:hidden; vertical-align: top; padding:5px;width:30px; height:30px;"/>
+
+    </div>
+    <div class ="div_audio">
+        <audio type="audio/mp3" id="audio_0" style="width: 100%;  padding-top:10px;" autoplay="autoplay" controls>
+            <!--source src="" type="audio/mpeg">
+            <source src="audio/music.ogg" type="audio/ogg; codecs=vorbis"-->
+            Тag audio doesn't support. </audio>
+        <img class="send_chat" src="./images/ic_send_chat.png" style="visibility:hidden;" width="40" height="40"/>
+    </div>
+    <div align="right" style="padding-bottom: 2px">
+        <input type="image" class="donate" src="./images/donate_pp.png" style="display:none; vertical-align: bottom;
+               width:50px; height:30px;" owner='' owner_email=''/>
+    </div>
+    <!--<div class="empty" style="display: block; height: 20px"></div>-->
+</div>
+
+<div id="img_container" class="container" style="display:none;position: relative; background-color: #e8e8e8; padding:4px;
+    width: auto; height: auto;
+    bottom: 0px;  border: solid 0px gray; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
+    align='center'>
+    <div class="title_div">
+        <img class="progress" src="./images/XEupj.gif" style="display:inline;float: right;" width="28" height="28"/>
+        <!--<span class="title" style="display:inline-block;vertical-align: top; font-size: small;" >default</span>-->
+        <div class="title" contenteditable="true">No Title</div>
+    </div>
+    <div class="div_img">
+        <img id="img_0" src="./images/ic_infodesk.png"/>
+    </div>
+</div>
+
+<div id="iframe_container" class="container" style="display:none; background-color: #e8e8e8; padding:4px; border: solid 0px darkgrey;
+     width: auto; overflow: hidden; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div class="title_div"  style="display:inline-block; z-index:9; width: 100%; height:auto; padding-bottom: 10px;
+        border: solid 0px gray; text-align:center ; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">
+        <img class="progress" src="./images/XEupj.gif" style="position: relative;display:inline; float: left; vertical-align: text-top; width:20px;
+            height:20px; left: 0px"/>
+        <div style="display: inline; width:95%; vertical-align: top;">
+            <div class="title" contenteditable="false"  data-translate="InfoDesk" style="display:inline; top: 0px;
+            font-size: small;vertical-align: top" >No Title</div>
+            <!--<span class="title"  style="display:inline; top: 0px;font-size: small;vertical-align: top"  align="center">InfoDesk</script></span>-->
+            <img class="owner_logo" src= "./images/ic_logo_circle.gif" alt=""  style="display:inline; vertical-align: top; visibility:hidden;" width="16" height="16"/>
+        </div>
+        <input type="image" class="favourites" src="../images/ic_heart_blue.png" style="display:table-cell; float: right;
+            vertical-align: top; padding-right:10px; width:30px; height:30px;"/>
+    </div>
+    <div class="div_iframe" style="display:none; z-index:9; border-radius: 5px;width: auto; padding:4px;
+        background-color: #adb8c0">
+        <div id="scroll_div_right"></div>
+        <div id="scroll_div_left">
+            <img id="prev" src="./images/ic_prev.png"  height="50" width="20" align="left" />
+        </div>
+        <iframe class="timeline" frameborder="0"
+            sandbox="allow-same-origin  allow-top-navigation  allow-forms  allow-scripts"></iframe>
+    </div>
+
+</div>
+
+<div id="bottom" style="display:block;top:0;height:10px; background-color:white; visibility: visible;"></div>
+
+<canvas width="0" height="0" style="display: none"></canvas>
+</body>
+</html>

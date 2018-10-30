@@ -1,5 +1,7 @@
 const path = require('path');
+
 const webpack = require('webpack'); //to access built-in plugins
+
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 const NODE_ENV = process.env.NODE_ENV || 'development';
@@ -7,12 +9,18 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 module.exports = {
 
     devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':null,
-    context: __dirname+'/src',
+    //context: __dirname+'/js',
 
     entry: {
+        // 'supplier':['babel-polyfill',
+        //     __dirname+'/src/supplier/supplier_entry.js'
+        // ],
+        // 'user':['babel-polyfill',
+        //     __dirname+'/src/user/user_entry.js'
+        // ]
+        'supplier': __dirname+'/src/supplier/supplier.entry.js',
+        'user': __dirname+'/src/user/user.entry.js'
 
-        pano:'./user/user_entry.js',        user:'./user/user_entry.js',
-        admin:'./admin/admin_entry.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -41,10 +49,9 @@ module.exports = {
             }
         ],
         loaders:[
-            { test: /\.js/, loader: "babel" },
             { test: /\.css/, loader: "style-loader!css-loader" },
             { test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
-            { test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loader: 'babel?optional[]=runtime&stage=0'},
+            //{ test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loader: 'babel?optional[]=runtime&stage=0'},
             { test: /\.png/, loader: "url-loader?limit=100000&mimetype=image/png" },
             { test: /\.gif/, loader: "url-loader?limit=100000&mimetype=image/gif" },
             { test: /\.jpg/, loader: "file-loader" },
@@ -61,8 +68,7 @@ module.exports = {
             jQuery: 'jquery',
             'window.jquery': 'jquery',
             'window.jQuery': 'jquery',
-            AFRAME: "aframe",
-            aframe: "aframe"
+            ol:'ol'
         }),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV),
@@ -73,13 +79,13 @@ module.exports = {
         //    template: './dist/main.tmplt.html'
         // }),
 
-        new webpack.NoEmitOnErrorsPlugin()
-        // new webpack.optimize.CommonsChunkPlugin({
-        //     name:'common',
-        //     chunks:['user', 'admin']
+        new webpack.NoEmitOnErrorsPlugin(),
+        new ExtractTextPlugin('./src/html/css/main.css')
+
+        //, new webpack.optimize.CommonsChunkPlugin({
+        //     name:'common'
         // })
-        //    new ExtractTextPlugin('./src/html/css/main.css'),
-   ],
+    ],
     resolve: {
         alias: {
             jquery: path.join(__dirname, 'node_modules/jquery/src/jquery'),

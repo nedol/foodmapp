@@ -4,27 +4,23 @@ var https = require('https');
 //const vr_server= require('./vreport/server')
 var mysql = require('mysql');
 
-let http = require("http");
-
 let globaljs = require('./global');
 let utils = require('./utils.js');
 
 let Dict = require('./dict/dict');
 
-var urlencode = require('urlencode');
-const fs = require('fs')
+//var urlencode = require('urlencode');
+
 const path = require('path')
 const url = require('url');
 var Email = require('./email/email');
 let email = new Email();
 
-var md5 = require('md5');
+var md5 = require('md5.js');
 
 var isJSON = require('is-json');
 
 const translate = require('google-translate-api');//ISO 639-1
-
-
 
 let con_param = globaljs.con_param;//change every 8 min
 global.con_obj;
@@ -41,7 +37,7 @@ String.prototype.replaceAll = function(search, replace){
 
 module.exports = {
 
-    GetTokenLoop : function (server) {
+    GetTokenLoop(server) {
 
         return;
 
@@ -73,23 +69,50 @@ module.exports = {
 
     },
 
-    startConnection:function () {
+    startConnection () {
         StartConnection();
     },
 
-    HandleRequest:function (req, q, res) {
+    HandleRequest(req, q, res) {
 
-        switch(q.proj){
+        switch(q.proj) {
+            case'rtc':
+                let RTC = require('./rtc/rtc');
+                try {
+                    let rtc = new RTC();
+                    rtc.dispatch(req, q, res);
+                }catch(ex){
+                    res.end(JSON.stringify({error:'ServerError'}));
+                    return;
+                }
+                break;
             case'vr':
-                let VReport = require('./vreport/vreport');
-                let vr = new VReport();
-                vr.dispatch(req,q,res);
-
+                let VReport = require('./vreport/vreport.js');
+                try{
+                    let vr = new VReport();
+                    vr.dispatch(req, q, res);
+                }catch(ex)
+                {
+                    //res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end('end');
+                    return;
+                }
                 break;
             case'bm':
                 let BonMenu = require('./bonmenu/bonmenu');
                 let bm = new BonMenu();
                 bm.dispatch(q,res);
+                break;
+            case'id':
+                let Infodesk = require('./infodesk/infodesk');
+                let id = new Infodesk();
+                id.dispatch(req, q,res);
+                break;
+
+            case'd2d':
+                let D2D = require('./d2d/d2d');
+                let d2d = new D2D();
+                d2d.dispatch(q,res);
                 break;
             default:
                 console.log();
@@ -99,9 +122,6 @@ module.exports = {
 
     }
 }
-
-
-
 
 function StartConnection() {
 
@@ -162,7 +182,7 @@ function InitUser(q, res) {
             res.end(JSON.stringify({
                 data: result[0].obj_data,
                 ddd: result[0].ddd,
-                menu: result[0].order_data,
+                offer: result[0].order_data,
                 maxdate:result[0].date
             }));
 
@@ -197,12 +217,12 @@ function InitAdmin(q, res) {
                 res.end('Wrong data format');
                 return;
             }
-            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"menu\":[\"tab_1\"]}";
+            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"offer\":[\"tab_1\"]}";
 
 
             if (owner.uid == q.uid) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, menu: menu_data}));
+                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, offer: menu_data}));
                 return;
             }
             if (!owner.uid) {
@@ -219,12 +239,12 @@ function InitAdmin(q, res) {
                 });
             }else{
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, menu: menu_data}));
+                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, offer: menu_data}));
             }
 
         }else{
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"data": result[0].obj_data,"menu": "[tab_1]"}));
+            res.end(JSON.stringify({"data": result[0].obj_data,"offer": "[tab_1]"}));
         }
     });
 }
@@ -250,7 +270,7 @@ function select_query(q, res) {
 
         }else{
             //res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"menu":'undefined'}))
+            res.end(JSON.stringify({"offer":'undefined'}))
         }
     });
 }

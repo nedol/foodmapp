@@ -1,0 +1,45 @@
+<style>
+    .ui-draggable, .ui-droppable {
+        background-position: top;
+    }
+    #share_modal{
+        border: 1px solid rgba(0, 0, 0, 0.3);
+        border-radius: 15px;
+        box-shadow: 0 3px 7px rgba(0, 0, 0, 0.3);
+        border-top: 5px solid #eb9816;
+    }
+</style>
+
+<script>
+    var transition;
+    function OpenShareDialog(div_html){
+        $('head').append('<link rel="stylesheet" type="text/css" href="../libs/jquery/mobile/1.4.5/jquery.mobile-1.4.5.min.css">');
+
+        $('#share_modal')[0].showModal();
+        transition = setTimeout(function() {
+            $('#share_modal').addClass('dialog-scale');
+        }, 1);
+        $("#element").append(div_html);
+
+    }
+
+    function OnCloseShare() {
+        $('#share_modal')[0].close();
+        $('#share_modal').removeClass('dialog-scale');
+        $("#element").children().remove();
+        // $('#settings_modal').remove();
+        clearTimeout(transition);
+        $('head').find('link').last().remove();//remove last file from html file
+    }
+</script>
+
+<div id="share_include">
+<dialog id="share_modal">
+    <img src="./images/ic_stop.png" onclick="OnCloseShare()" style="float: right; width: 28px; height: 28px;
+				vertical-align: top"/>
+    <p></p>
+    <div id="element"></div>
+    <div></div>
+</dialog>
+
+</div>

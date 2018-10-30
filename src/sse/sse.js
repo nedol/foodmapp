@@ -5,12 +5,39 @@ module.exports = class SSE{
 
     constructor(){
 
+        this.eventSource = new window.EventSource(host_port+'?proj=rtc&trans=all&sse=1&uid='+that.uid+'&role='+that.role+'&email='+that.email.from
+            //,{withCredentials: true}
+        );
+        this.eventSource.onerror = function(e) {
+            if (this.readyState == EventSource.CONNECTING) {
+                //console.log("Соединение порвалось, пересоединяемся...");
+            } else {
+                //console.log("Ошибка, состояние: " + this.readyState);
+            }
+        };
+        this.eventSource.onopen = function(e) {
+            console.log("Соединение открыто");
+            setTimeout(function () {
+                cb();
+            },100);
+
+        };
+        this.eventSource.onmessage = function (e) {
+            //console.log(e.data);
+            that.OnMessage(JSON.parse(e.data));
+
+        };
+        this.eventSource.addEventListener('sse', (e) => {
+            console.log(e.data);
+            // => Hello world!
+        });
+
     }
 
 
     SetOrderUpdLstnr(user, class_obj,cb){
 
-        let url = http + host_port + '?' + //
+        let url = host_port + '?' + //
             user +
             "&proj=bm"+
             "&func=getreserved" +
@@ -23,11 +50,10 @@ module.exports = class SSE{
         $.ajax({
             url: url,
             method: "GET",
-            //dataType: 'json',
-            contentType: false,
+            dataType: 'json',
+            contentType: 'application/x-www-form-urlencoded',
             cache: false,
-            processData: false,
-            crossDomain: true,
+            processData: true,
             user: user,
             this_obj:this,
             class_obj:class_obj,
@@ -47,7 +73,7 @@ module.exports = class SSE{
 
     SetOrderAdminUpdLstnr( order_data, cb){
 
-        var url = http + host_port + '?' + //
+        var url =  host_port + '?' + //
             "func=upd_order_admin"+
             "&order_data="+order_data;
         $.ajax({

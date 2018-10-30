@@ -1,8 +1,43 @@
-
+let proj = require('ol/proj');
 let http = require('http');
 let https = require('https');
 
+
 module.exports = {
+
+    formatSSE:function(str){
+        return 'data: '+ JSON.stringify(str) + '\n\n';
+    },
+
+    Include:function(url, append, f) {
+
+        $.ajax({
+            url: url,
+            method: "GET",
+            dataType: 'text',
+            append: append,
+            func: f,
+            error: function (xhr, status, error) {
+                console.log(error.Message);
+            },
+            complete: function (data) {
+                var resp = data.responseText;
+                var replacements = {
+                    'щlatщ': 'latitude',
+                    'щlonщ': 'longitude',
+                    'щcatщ': 'category'
+                };
+
+                var newNode = String(resp).replace(/щ\w+щ/g, function (all) {
+                    return all in replacements ? replacements[all] : all;
+                });
+
+                $(newNode).appendTo(append);
+                if(this.func)
+                    eval(this.func+'()');
+            },
+        });
+    },
 
     getParameterByName: function (name, url) {
     if (!url) url = window.location.href;
@@ -164,7 +199,44 @@ module.exports = {
             }
         }
         return objects;
+    },
+
+    distanceBetweenPoints: function(coor, center, xy, callback){
+
+        var Geographic  = new ol.Projection("EPSG:4326");
+        var Mercator = new ol.Projection("EPSG:900913");
+        // if(xy==='x'){
+        //     coor[1] = center[1];
+        // }
+        //
+        // if(xy==='y'){
+        //     coor[0] = center[0];
+        // }
+
+        var point1 = new ol.Geometry.Point(xy==='y'?center[0]:coor[0], xy==='x'?center[1]:coor[1]).transform(Geographic, Mercator);
+        var point2 = new ol.Geometry.Point(center[0], center[1]).transform(Geographic, Mercator);
+        callback( point1.distanceTo(point2));
+
+    },
+
+
+    getDistanceFromLatLonInKm:function (lat1,lon1,lat2,lon2){
+
+    function deg2rad(deg) {
+        return deg * (Math.PI/180)
     }
+
+    var R = 6371; // Radius of the earth in km
+    var dLat = deg2rad(lat2-lat1);  // deg2rad below
+    var dLon = deg2rad(lon2-lon1);
+    var a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    var d = R * c; // Distance in km
+    return d;
+}
 
 
 

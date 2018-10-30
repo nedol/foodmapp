@@ -1,86 +1,11 @@
 const server= require('./server')
+
 const qs = require('querystring');
 const url = require('url');
+const express = require('express')
+const app = express();
+var http = require('http');
 
-const express = require('express');
-const app = require("express")();
-
-app.get('/', function (req, res) {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    var q = url.parse(req.url, true).query;
-    server.HandleRequest(req, q, res)
-})
-
-app.get("/update_reserve", (req, res) => {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    let data = JSON.stringify(server.GetReserveData());
-    res.writeHead(200,{'Content-Type': 'text/event-stream'});
-    console.log(data);
-    res.end('data: ' + data + '\n\n');
-    setTimeout(function () {
-        server.SetReserveData(undefined);
-    },1500);
-
-});
-
-app.get("/update_order", (req, res) => {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    let upd = JSON.stringify(server.GetOrderUpd());
-    res.writeHead(200,{'Content-Type': 'text/event-stream'});
-    console.log(upd);
-    res.end('data: ' + upd + '\n\n');
-    setTimeout(function () {
-        server.SetOrderUpd(undefined);
-    },1500);
-
-});
-
-// POST method route
-app.post('/', function (req, res) {
-
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    // Request methods you wish to allow
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    // Request headers you wish to allow
-    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
-    // Set to true if you need the website to include cookies in the requests sent
-    // to the API (e.g. in case you use sessions)
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    processPost(req, res, function (req,res) {
-        var q = url.parse(req.url, true).query;
-        server.HandleRequest(req, req.post, res);
-    });
-})
-
-app.listen(8081, () =>
-    server.GetTokenLoop(server)
-)
-
-server.startConnection();
 
 function processPost(request, response, callback) {
     var queryData = "";
@@ -95,8 +20,10 @@ function processPost(request, response, callback) {
         });
 
         request.on('end', function() {
-            request.post = qs.parse(queryData);
-            callback(request,response);
+            if(queryData.length>0) {
+                request.post = JSON.parse(queryData);
+                callback(request, response);
+            }
         });
 
     } else {
@@ -105,3 +32,36 @@ function processPost(request, response, callback) {
     }
 }
 
+
+var node = http.createServer(function(req, res) {
+    // res.writeHead(200, {'Content-Type': 'application/json'});
+    // res.end('test');
+    // return;
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    // Request methods you wish to allow
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
+    // Request headers you wish to allow
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    // Set to true if you need the website to include cookies in the requests sent
+    // to the API (e.g. in case you use sessions)
+    res.setHeader('Access-Control-Allow-Credentials', true);
+
+    if(req.method == 'POST') {
+        processPost(req, res, function (req, res) {
+            server.HandleRequest(req, req.post, res);
+        });
+    }else{
+
+        var q = url.parse(req.url, true).query;
+
+        // res.writeHead(200, {'Content-Type': 'application/json'});
+        // res.end(JSON.stringify({'test get':q.func}));
+        // return;
+
+        server.HandleRequest(req, q, res)
+    }
+});
+
+node.listen(3000);
+
+server.startConnection();

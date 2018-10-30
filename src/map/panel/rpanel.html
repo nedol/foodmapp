@@ -1,0 +1,79 @@
+<style>
+    #zoom_but{
+        display:block;
+        position: absolute;
+        /*z-index:30;*/
+        color: #1b1b1b;
+        top: 50%;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        /*line-height: auto;*/
+        border: solid 1px grey;
+        text-align:center;
+        vertical-align:middle;
+        font-size: 170%;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: whitesmoke;
+        cursor: n-resize;
+    }
+
+    #search_but{
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #loc_ctrl {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 30%;
+        width: 40px;
+        height: 40px;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #location_img {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:1;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #pin {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: transparent;
+        z-index:2;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+</style>
+<img id="search_but"  src="../images/ic_map_search.png" onclick="SearchPlace();"
+     ontouchstart = "setTimeout(function(){
+        SearchPlace();
+     },200);"
+     title="Search">
+<section id="loc_ctrl"  title="Location" onclick="StartLocation();"
+         ontouchstart = "setTimeout(function(){
+         StartLocation();
+         },100);">
+    <img id="location_img" src="../images/ic_location.png">
+    <img id="pin" src="../images/ic_pin.png" onclick="StopLocation();">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+

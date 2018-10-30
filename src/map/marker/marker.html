@@ -1,0 +1,94 @@
+<script>
+    var Marker;
+    setTimeout(function () {
+        Marker = new Marker( document.getElementById('marker'));
+    }, 100);
+
+
+    function Marker(element){
+
+        this.overlay = new ol.Overlay({
+            element: element,
+            positioning: 'bottom-center',
+            offset: [0.0, 0.0]
+        });
+
+        Map.addOverlay(this.overlay);
+
+        $('#marker').css("visibility", "visible");
+
+        $('#marker').on('click', function (e) {
+            console.log();
+            //$('#browser_container').css('display','inline-block');
+        });
+
+        $('#marker').on('touchstart', function (ev) {
+            $('#browser_container').css('display','inline-block');
+        });
+
+        this.overlay.on('change:position', function (e) {
+            //$('#browser_container').css('display','inline-block');
+            console.log();
+        });
+
+        this.overlay.on('change:positioning', function (e) {
+            //$('#browser_container').css('display','inline-block');
+            console.log();
+        });
+
+        this.overlay.on('change:map', function (e) {
+            //$('#browser_container').css('display','inline-block');
+            console.log();
+        });
+
+        $('#marker').on('stop_location', function (e, param1, param2) {
+            if(!loc_mode)
+                $('#marker>img').attr("src", "./marker/images/kolobot.png?v=4.71");
+        });
+
+        $("#marker").on("change:cur_pos",function ( evt, coor, param2) {
+            Marker.overlay.setPosition([coor[0], coor[1]]);
+        });
+
+        Map.getView().on('change:center', function (event) {
+            // if($('#marker>img').attr("src")!== "./images/android_1.png")
+            //     $('#marker>img').attr("src", "./images/android_1.png");
+            // else
+            //     $('#marker>img').attr("src", "./images/android_1.png");
+            // Map.render();
+            // console.log($('#marker>img').attr("src"));
+        });
+
+        Map.on('moveend', function (event) {
+            if(!loc_mode)
+                $('#marker>img').attr("src", "./marker/images/kolobot.png?v=4.71");
+            else
+                $('#marker>img').attr("src", "./marker/images/kolobot_walking.gif?v=4.71");
+        });
+
+        Map.on('movestart', function (event) {
+
+            $('#marker>img').attr("src", "./marker/images/kolobot_running.gif?v=4.71");
+        });
+
+    };
+
+</script>
+<div id="marker_include">
+<style>
+    #marker {
+        display:block;
+        visibility:hidden;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+    }
+</style>
+
+<section id="marker" title="kolobot">
+    <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
+</section>
+</div>
+

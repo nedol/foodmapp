@@ -1,6 +1,6 @@
 'use strict'
 export {Menu}
-require('bootstrap')
+
 const langs = require("../dict/languages");
 
 var md5 = require('md5');

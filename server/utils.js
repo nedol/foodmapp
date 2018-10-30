@@ -1,8 +1,12 @@
-
+'use strict'
 let http = require('http');
 let https = require('https');
 
 module.exports = {
+
+    formatSSE(str){
+        return 'data: '+ JSON.stringify(str) + '\n\n';
+    },
 
     getParameterByName: function (name, url) {
     if (!url) url = window.location.href;

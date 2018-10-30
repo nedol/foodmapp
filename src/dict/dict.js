@@ -109,7 +109,7 @@ class Dict {
             }
 
             $.ajax({
-                url: http + host_port,
+                url: host_port,
                 method: "POST",
                 dataType: 'json',
                 data: data_obj,

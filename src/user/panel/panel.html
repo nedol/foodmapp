@@ -1,0 +1,105 @@
+<style>
+    #panel{
+        display: none;
+        position: fixed;
+        left:0px;
+        height:100%;
+        width: auto;
+        border: 1px solid lightgray;
+        width:auto;
+        padding-left:1px;
+        background-color: rgba(200, 200, 200, 1.0);
+        z-index: 10;
+        /*pointer-events:none;!*non-clickable*!*/
+    }
+
+    #container{
+        position: fixed;
+        height:100%;
+        top:0px;
+        overflow-y: auto;/*overflow: hidden;*/
+        white-space: nowrap;
+        display: block;
+        padding-right: 0px;
+    }
+
+    .text_1{
+        font-size: small;
+        border-bottom: #8c8c8c;
+        padding-right: 10px;
+    }
+
+    .text_2{
+        font-size: small;
+        color:#1b6d85;
+        word-wrap:break-word
+    }
+
+    #sortable1 div, #sortable2 div,#sortable3 div {
+        margin: 0 2px 2px 2px;
+        padding: 2px;
+        font-size: 1.2em;
+        width: auto;
+    }
+
+</style>
+
+
+<div id="panel_include">
+
+<div id="panel" >
+    <div id="container" class="sortable"></div>
+</div>
+
+   <div class="item" style="display: none; margin-bottom:10px; padding:10px; background-color:ghostwhite;
+       border: 1px solid #000; border-color: #adb8c0; pointer-events: initial;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+       <img class="logo" style="position:relative; display: inline; float:left;width: 30px; height: 30px;"
+            onclick="OnClickBucketListLogo(this);"/>
+       <div style="display: inline-block;margin:10px;padding-left: 10px;">
+           <div style="white-space:normal;"><h1 class="text_1">text_1</h1></div>
+           <div><p class="text_2">text_2</p></div>
+       </div>
+       <div style="width: 100%">
+           <img class="checked"  style="vertical-align: top; width: 30px; height: 30px;"/>
+       </div>
+   </div>
+
+
+   <div id="image_item" class="image_item"
+        style="display: none; margin-bottom:5px; padding:5px; padding-bottom:15px; pointer-events: initial;
+        background-color: whitesmoke; border: 1px solid #000; border-color: lightgrey;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+       <div class="title" data-width="150" style="font-size: small; font-style: normal;
+           margin-bottom: 5px;
+           word-wrap: break-word;" ondblclick="MakeEditable(this);">
+           <img  src="../src/images/ic_edit.png" style="display: inline; right: 0px" width="10px" onclick="MakeEditable($('.title'));"/>
+       </div>
+
+       <img  class="photo ui-state-default"  onclick="OnClickPhoto(this);" />
+
+   </div>
+
+   <div class="audio_item" style="display: none; border-bottom: 1px; border: 1px solid #000; border-style: solid;
+       border-color: lightgrey; margin-bottom:5px;
+       background-color: whitesmoke;  pointer-events: initial;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+
+       <div style="display: table-row">
+           <!--<span class="audio_title" style="display: table-cell; vertical-align: middle;font-size: small;" align="center">default</span>-->
+        <div class="title" data-width="150" style="font-size: small; font-style: normal;
+            word-wrap: break-word;margin:5px;" ondblclick="MakeEditable(this);">
+            <img  src="../src/images/ic_edit.png" style="display: inline; right: 0px" width="10px" onclick="MakeEditable($('.title'));"/>
+        </div>
+
+    </div>
+    <img class="logo" style="display:table-cell;float: left; vertical-align: baseline; border: solid 0px transparent;
+                padding:5px; height:35px;"  src="../src/categories/images/ic_0.png" onclick="OnClickAudioLogo(this);">
+    <audio type="audio/mp4"  style="width: 100%;  padding-top:10px;" preload="auto" controls   draggable="true" ondragstart="drag(event)">
+        <!--source type="audio/mpeg">
+        <source type="audio/ogg; codecs=vorbis"-->
+        Тag audio doesn't support. </audio>
+    <img class="share" style="display:none;float: right; vertical-align: top; border: solid 0px transparent;
+        padding:5px; height:35px;"  src="../src/images/ic_share.png" onclick="OnClickShare(this);"/>
+</div>
+</div>
