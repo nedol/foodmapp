@@ -1,13 +1,13 @@
 'use strict'
 export {Supplier};
 
-let utils = require('../utils');
+let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
-import {SupplierOffer} from '../menu/offer.supplier';
+import {SupplierOffer} from './supplier.offer';
 import {Dict} from '../dict/dict.js?v=4';
-import {Network} from "../network";
-import {RTCOperator} from "../rtc/rtc_operator"
+import {Network} from "../../network";
+//import {RTCOperator} from "../rtc/rtc_operator"
 
 import {Map} from '../map/map'
 
@@ -19,7 +19,7 @@ var ColorHash = require('color-hash');
 
 require('bootstrap');
 require('bootstrap-select');
-var moment = require('moment');
+var moment = require('moment/moment');
 
 require('bootstrap/js/modal.js');
 
@@ -69,7 +69,7 @@ class Supplier{
         //class_obj.menu.menuObj = JSON.parse(data.menu);
 
 
-        this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
+        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
 
         cb();
         this.DocReady();
@@ -126,7 +126,7 @@ class Supplier{
                             //class_obj.menu.menuObj = JSON.parse(data.menu);
                         }
 
-                        that.rtc_operator = new RTCOperator(that.uid, that.email,"browser",that.network);
+                        //that.rtc_operator = new RTCOperator(that.uid, that.email,"browser",that.network);
 
                         cb();
                         that.DocReady();
@@ -169,9 +169,8 @@ class Supplier{
             let time = $('.sel_time').text();
 
             $(this).data("DateTimePicker").toggle();
-
-
         });
+
         $('.sel_time').on("change",this,function (ev) {
             let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
             let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];

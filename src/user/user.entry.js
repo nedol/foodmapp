@@ -123,7 +123,7 @@ class Map {
             this.ol_map.getLayers().set("OSM", this.osm, true);
         }
 
-        this.Geo = new geo(this);
+        this.geo = new geo(this);
         this.offer = new Menu(this);
         this.animate = new Animate(this);
         this.settings = new Settings(this);
@@ -249,7 +249,7 @@ class Map {
         var obj = jsAr.shift();
         window.db.setFile(obj, function (cat) {
             if (jsAr.length === 0)
-                this.GetObjects(cat);
+                this.GetObjectsFromStorage(cat);
             else
                 this.SetMarkersArExt(cat, jsAr);
         });

@@ -314,7 +314,7 @@ class MenuUser extends Menu{
 
         $("#menu_dialog").off('hide.bs.modal');
         $('.item_title').off('click');
-        //$('#add_item').off('click',this.AddOfferItem);
+        //$('#add_item').off('click',this.AddMenuItem);
         //$('.modal-body').find('.add_tab').off('click', this.AddTab);
         $('.tab_inserted').remove();
         $('.sp_dlg').off('changed.bs.select', this.OnChangeLang);

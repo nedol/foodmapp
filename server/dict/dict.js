@@ -1,6 +1,6 @@
 //export {Dict};
 var md5 = require('md5');
-var urlencode = require('urlencode');
+
 module.exports = class Dict {
 
     constructor(data){
@@ -20,30 +20,18 @@ module.exports = class Dict {
             let item = dtAr[i];
             let key = $(item).attr("data-translate").toLowerCase();
             if ($.inArray(key,keyAr)!==-1) {
-                let val = this.dict[key][lang]?this.dict[key][lang]:this.dict[key]['en'];
-
-                if(item.isEntity)
-                    item.setAttribute('text','value',urlencode.decode(val));
-                if($(item).text())
-                    $(item).text(urlencode.decode(val));
-                if($(item).val())
-                    $(item).val(urlencode.decode(val));
-                if($(item).attr("title"))
-                    $(item).attr("title", urlencode.decode(val));
-                if($(item).attr("placeholder"))
-                    $(item).attr("placeholder", urlencode.decode(val));
-                if($(item).attr("value"))
-                    $(item).attr("value", urlencode.decode(val));
-
+                if (this.dict[key][lang]) {
+                    if($(item).text())
+                        $(item).text(this.dict[key][lang]);
+                    if($(item).attr("title"))
+                        $(item).attr("title", this.dict[key][lang]);
+                    if($(item).attr("placeholder"))
+                        $(item).attr("placeholder", this.dict[key][lang]);
+                    if($(item).attr("value"))
+                        $(item).attr("value", this.dict[key][lang]);
+                }
             }
         }
-    }
-
-    getValByKey(lang,key){
-
-        return this.dict[key][lang]?
-            this.dict[key][lang]:
-            (this.dict[key]['en']?this.dict[key]['en']:'');
     }
 
     getDictValue(lang, value) {

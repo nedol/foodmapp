@@ -1,5 +1,5 @@
 export {DB};
-import {GetObjId} from '../../utils';
+import {GetObjId} from '../../utils/utils';
 import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
 import proj from 'ol/proj';

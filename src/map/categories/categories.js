@@ -1,7 +1,7 @@
 export {Categories};
 
 import {Overlay} from "../overlay/overlay";
-import {createThumb} from "../../utils";
+import {createThumb} from "../../utils/utils";
 
 
 

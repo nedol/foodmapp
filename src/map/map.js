@@ -9,7 +9,7 @@ import interaction from 'ol/interaction';
 import control from 'ol/control';
 import proj from 'ol/proj';
 
-import {geo} from './location/geolocation';
+import {Geo} from './location/geolocation';
 import {Menu} from './menu/menu';
 import {Categories} from "./categories/categories";
 import {Animate} from "./animate/animate";
@@ -70,8 +70,8 @@ class Map {
 
 
         this.marker = new Marker( this, document.getElementById('marker'));
-        this.Geo = new geo(this);
-        //this.menu = new Menu(this);
+        this.geo = new Geo(this);
+        this.menu = new Menu(this);
         //this.animate = new Animate(this);
         //this.settings = new Settings(this);
         this.categories = new Categories(this);
@@ -91,17 +91,7 @@ class Map {
 
             if (!window.db)
                 window.db = new DB(function () {
-                    if (window.sets.app_mode === 'quest')
-                        window.db.getFile("mega_route", function (data) {
-                            //let obj = JSON.parse(data);
-                            if (data.data) {
-                                new Route().DrawRoute(data.data);
 
-                                this.animate.flyTo(data.data[data.data.length - 1], function () {
-                                    //Marker.overlay.setPosition(data.data[data.data.length-1]);
-                                });
-                            }
-                        });
                 });
 
 
@@ -155,7 +145,7 @@ class Map {
     }
 
 
-    GetObjects(cat) {
+    GetObjectsFromStorage(cat) {
         let that = this;
         window.db.getRange(cat, window.area[0], window.area[2], window.area[1], window.area[3], function (cat, features) {
             let layer = that.ol_map.getLayers().get(cat);
@@ -166,11 +156,9 @@ class Map {
 
             let source = layer.values_.vector;
             $.each(features, function (key, f) {
-                if (f.values_.object.overlay && f.values_.object.overlay.includes('ddd')) {
-                    if (DDD)
-                        DDD.CheckDownload3D(f.values_.object);
-                } else if (!source.getFeatureById(f.getId()))
+                if (!source.getFeatureById(f.getId())) {
                     that.layers.AddCluster(layer, f);
+                }
             });
 
         });
@@ -181,7 +169,7 @@ class Map {
         var obj = jsAr.shift();
         window.db.setFile(obj, function (cat) {
             if (jsAr.length === 0)
-                this.GetObjects(cat);
+                this.GetObjectsFromStorage(cat);
             else
                 this.SetMarkersArExt(cat, jsAr);
         });
@@ -231,5 +219,12 @@ class Map {
         } catch (ex) {
             console.log();
         }
+    }
+
+    MoveToLocation(location){
+        let that = this;
+        this.animate.flyTo(location, function () {
+            //Marker.overlay.setPosition(data.data[data.data.length-1]);
+        });
     }
 }

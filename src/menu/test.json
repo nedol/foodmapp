@@ -1,0 +1,77 @@
+{
+  "4945e5be7e3ff701db5f75433ed9e626": {
+    "email": "nedol.infodesk@gmail.com",
+    "uname": "Nedol",
+    "reserved": [{
+      "table_1": [{
+        "menu_1": [{
+          "ddeb50f3cdd633650acef33587b91d78": {
+            "status": "ordered"
+          }
+        }, {
+          "dca6bc43cf56029ba3ac81f00bd3a557": {
+            "status": "accepted"
+          }
+        }, {
+          "f0d091fca3695aaa1390debd8df558d7": {
+            "status": " "
+          }
+        }, {
+          "f0d091fca3695aaa1390debd8df558d7": {
+            "status": " "
+          }
+        }],
+        "comment": "My comment"
+      }, {
+        "menu_2": [{
+          "ddeb50f3cdd633650acef33587b91d78": {
+            "status": " "
+          }
+        }, {
+          "dca6bc43cf56029ba3ac81f00bd3a557": {
+            "status": " "
+          }
+        }, {
+          "f0d091fca3695aaa1390debd8df558d7": {
+            "status": " "
+          }
+        }]
+      }]
+    }]
+      },
+      "DZaWi90cfE5epYTbACdmqw==": {
+        "email": "nedol@gnarod.ru",
+        "uname": "Nedol",
+        "reserved": [{
+          "table_4": [{
+            "menu_1": [{
+              "5d74c98e91d51dce100554459b4b4308": {
+                "status": "ordered"
+              }
+            }, {
+              "7989df9e68cacc6685a9788354d37de8": {
+                "status": "accepted"
+              }
+            }]
+          }, {
+            "menu_2": [{
+              "ddeb50f3cdd633650acef33587b91d78": {
+                "status": " "
+              }
+            }, {
+              "dca6bc43cf56029ba3ac81f00bd3a557": {
+                "status": "accepted"
+              }
+            }, {
+              "f0d091fca3695aaa1390debd8df558d7": {
+                "status": " "
+              }
+            }]
+          }]
+        }]
+      }
+      }
+
+http://nedol.ru/reserve/server/?func=updatereservation&user={%22uid%22:%225945e5be7e3ff701db5f75433ed9e626%22,%22email%22:%22nedooleg@gmail.com%22,%22uname%22:%22nedol%22}&lat=43.712985&lon=7.261390&date=2018-01-10&reserve=-table_3&lang=fr&_=1515582889421
+http://nedol.ru/reserve/server/?func=updatereservation&user={"uid":"5945e5be7e3ff701db5f75433ed9e626","email":"nedooleg@gmail.com","uname":"nedol"}&lat=43.712985&lon=7.261390&date=2018-01-10&reserve=-table_10&lang=fr
+http://nedol.ru/reserve/server/?func=updatereservation&user={"uid":"5945e5be7e3ff701db5f75433ed9e626","email":"nedooleg@gmail.com","uname":"nedol"}&lat=43.712985&lon=7.261390&date=2018-01-10&reserve=-table_10&lang=fr

@@ -13,7 +13,7 @@ import Fill from 'ol/style/fill';
 import Text from 'ol/style/text';
 import Stroke from 'ol/style/stroke';
 
-import {GetObjId} from "../../utils";
+import {GetObjId} from "../../utils/utils";
 import source from 'ol/source/source';
 import Observable from 'ol/observable';
 

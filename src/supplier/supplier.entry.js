@@ -6,9 +6,9 @@ require('jquery-ui-touch-punch');
 
 require('dialog-polyfill');
 
-require("../global");
+require("../../global");
 
-import {GetObjId,getParameterByName} from "../utils/utils";
+import {getParameterByName} from "../utils/utils";
 import {Supplier} from './supplier'
 
 const langs = require("../dict/languages");
@@ -19,6 +19,8 @@ require('bootstrap/js/tab.js');
 require('bootstrap-select');
 var isJSON = require('is-json');
 var md5 = require('md5');
+
+var moment = require('moment');
 require('../../lib/bootstrap-datetimepicker');
 
 window.demoMode = (getParameterByName('dm')==='0'?false:true);

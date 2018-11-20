@@ -1,7 +1,7 @@
 'use strict'
 export {SupplierOffer}
 
-let utils = require('../utils');
+let utils = require('../utils/utils');
 var urlencode = require('urlencode');
 require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
@@ -17,9 +17,9 @@ var moment = require('moment');
 
 var md5 = require('md5');
 var isJSON = require('is-json');
-import {Import} from "./import/import"
-import {Menu} from "./menu"
-import {createThumb} from "../utils";
+import {Import} from "../map/import/import"
+import {Menu} from "../map/menu/menu"
+import {createThumb} from "../utils/utils";
 
 class SupplierOffer extends Menu{
 

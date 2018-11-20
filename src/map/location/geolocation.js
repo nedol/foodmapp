@@ -1,4 +1,4 @@
-export {geo};
+export {Geo};
 import Geolocation from 'ol/geolocation';
 import proj from 'ol/proj';
 
@@ -6,7 +6,7 @@ import proj from 'ol/proj';
 import {Feature} from "../events/feature.events";
 
 
-class geo {
+class Geo {
 
     constructor(map) {
         this.map = map;

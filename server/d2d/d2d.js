@@ -43,8 +43,8 @@ module.exports = class D2D {
                         else
                             this.updateorderuser(q, res);
                         break;
-                    case 'updateoffer':
-                        this.updateoffer(q, res);
+                    case 'UpdateOffer':
+                        this.UpdateOffer(q, res);
                         break;
                     case 'translate':
                         this.translate(q, res);
@@ -422,7 +422,7 @@ module.exports = class D2D {
         });
     }
 
-    updateoffer(q, res){
+    UpdateOffer(q, res){
 
         let offer = urlencode.decode(q.offer);
         if(isJSON(offer)){
@@ -662,11 +662,11 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT * "+
-            " FROM  objects"+
+            " FROM  suppliers"+
             " WHERE latitude>"+ arCoor[0] +" AND latitude<"+arCoor[1] +
             " AND longitude>" + arCoor[2] + " AND longitude<" +arCoor[3] +
             " AND (categories=" + ar[1]+")"+
-            " AND (status=0 OR status=1) AND level<="+ar[2];
+            " AND (status=0 OR status=1)";
 
         global.con_obj.query(sql, function (err, result) {
 
