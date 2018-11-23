@@ -1,5 +1,7 @@
+'use strict'
 export {DOMEvents};
 
+import {Overlay} from "../overlay/overlay";
 import Extent from 'ol/extent';
 
 class DOMEvents {
@@ -24,23 +26,21 @@ class DOMEvents {
             $("#loc_ctrl").css('left', parseInt(screen.width - 50/*- $("#loc_ctrl").css('left')*/) + 'px');
             $("#loc_ctrl").css('top', parseInt(screen.height - $("#loc_ctrl").css('top')) + 'px');
 
-        })
-
-        $("#d2d_region").draggable({
-            start: function () {
-                console.log("drag start");
-            },
-            drag: function () {
-                $("#d2d_region").attr('drag', true);
-            },
-            stop: function () {
-                var rel_x = parseInt($("#d2d_region").position().left / window.innerWidth * 100);
-                $("#d2d_region").css('right', rel_x + '%');
-                var rel_y = parseInt($("#d2d_region").position().bottom / window.innerHeight * 100);
-                $("#d2d_region").css('top', rel_y + '%');
-                console.log("drag stop");
-            }
         });
+
+
+        $("#my_truck").on('dragstart',function (ev) {
+
+        });
+
+        $('#map').on('dragover',function (ev) {
+            ev.preventDefault();
+        });
+        $('#map').on('drop',function (ev) {
+            ev.preventDefault();
+            new Overlay(that.map,$('#my_truck')[0],[ev.originalEvent.clientX,ev.originalEvent.clientY]);
+        });
+
 
         $("#search_but").draggable({
             start: function () {

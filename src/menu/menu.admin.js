@@ -48,11 +48,11 @@ class MenuAdmin extends Menu{
     }
 
 
-    OpenMenu(event) {
+    OpenOffer(event) {
 
         this.menu = event.data.menu.menu_obj;
 
-        $("#menu_dialog").modal({
+        $("#offer_dialog").modal({
             show: true,
             keyboard:true
         });
@@ -91,14 +91,14 @@ class MenuAdmin extends Menu{
             selectText($(this));
         });
 
-        $("#menu_dialog").find('.modal-title').text("Menu for ");
-        $("#menu_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
-        $("#menu_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        $("#menu_dialog").on('hide.bs.modal', this,this.CloseMenu);
+        $("#offer_dialog").find('.modal-title').text("Menu for ");
+        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
+        $("#offer_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        $("#offer_dialog").on('hide.bs.modal', this,this.CloseMenu);
 
         $('#add_item').css('display', 'block');
         $('#add_tab_li').css('display','block');
-        $("#menu_dialog").find('.toolbar').css('display', 'block');
+        $("#offer_dialog").find('.toolbar').css('display', 'block');
 
         for (let tab in this.menu) {
             if(!tab) continue;
@@ -161,7 +161,7 @@ class MenuAdmin extends Menu{
 
                 $('#' + tab).append(menu_item);
 
-                $(tmplt).insertAfter('#menu_dialog');
+                $(tmplt).insertAfter('#offer_dialog');
 
                 if ($(menu_item).find('.item_content').css('display') == 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
@@ -204,13 +204,13 @@ class MenuAdmin extends Menu{
             }
         }
 
-        //window.dict.set_lang(window.sets.lang,$("#menu_dialog"));
+        //window.dict.set_lang(window.sets.lang,$("#offer_dialog"));
         let sp = $('.sp_dlg');
         $(sp).selectpicker();
         let evnts = $._data($(sp).get(0), "events");
 
         this.lang = window.sets.lang;
-        window.dict.set_lang(window.sets.lang,$("#menu_dialog"));
+        window.dict.set_lang(window.sets.lang,$("#offer_dialog"));
         $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         if(!evnts['changed.bs.select']) {
@@ -348,7 +348,7 @@ class MenuAdmin extends Menu{
         if ($(menu_item).find('.item_content').css('display') == 'block')
            $(menu_item).find('.item_content').slideToggle("fast");
 
-        $(tmplt).insertAfter('#menu_dialog');
+        $(tmplt).insertAfter('#offer_dialog');
 
         return true;
     }
@@ -402,7 +402,7 @@ class MenuAdmin extends Menu{
         this.menu_id = event.target.id;
 
 
-        $("#menu_dialog").modal({
+        $("#offer_dialog").modal({
             show: true,
             keyboard:true
         });
@@ -420,42 +420,42 @@ class MenuAdmin extends Menu{
 
                 });
             }
-            window.dict.set_lang(sel_lang,$("#menu_dialog") );
+            window.dict.set_lang(sel_lang,$("#offer_dialog") );
             window.admin.menu.lang = sel_lang;
 
         });
 
-        $("#menu_dialog").find('.toolbar').css('display', 'none');
+        $("#offer_dialog").find('.toolbar').css('display', 'none');
 
         $('#add_item').css('display','none');
 
         $('#add_tab_li').css('display','none');
 
-        $("#menu_dialog").find('.modal-title').attr('data-translate', md5('Order for'));
-        //$("#menu_dialog").find('.modal-title').text("Order for ");
-        $("#menu_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
-        $("#menu_dialog").find('.modal-table-number').css('display','inline-block');
-        $("#menu_dialog").find('.modal-table-number').text("Table # "+this.table_id.replace('table_',''));
-        $("#menu_dialog").find('.modal-menu-number').css('display','inline-block');
-        $("#menu_dialog").find('.modal-menu-number').text("Menu # "+this.menu_id.replace('menu_',''));
-        $("#menu_dialog").on('hide.bs.modal',
+        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Order for'));
+        //$("#offer_dialog").find('.modal-title').text("Order for ");
+        $("#offer_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
+        $("#offer_dialog").find('.modal-table-number').css('display','inline-block');
+        $("#offer_dialog").find('.modal-table-number').text("Table # "+this.table_id.replace('table_',''));
+        $("#offer_dialog").find('.modal-menu-number').css('display','inline-block');
+        $("#offer_dialog").find('.modal-menu-number').text("Menu # "+this.menu_id.replace('menu_',''));
+        $("#offer_dialog").on('hide.bs.modal',
             {this:this, table_id:event.target.parentEl.id,menu_id:event.target.id},this.CloseOrder);
 
-        $("#menu_dialog").find('.cancel_menu').off('click touchstart');
-        $("#menu_dialog").find('.cancel_menu').on('click touchstart',this,function (ev) {
+        $("#offer_dialog").find('.cancel_menu').off('click touchstart');
+        $("#offer_dialog").find('.cancel_menu').on('click touchstart',this,function (ev) {
             ev.data.CancelMenu(ev);
         });
 
-        $("#menu_dialog").find('.cancel_menu').css('display','inline-block');
+        $("#offer_dialog").find('.cancel_menu').css('display','inline-block');
 
         for(let u in this.order) {
             if(this.order[u][this.table_id] && this.order[u][this.table_id][this.menu_id]) {
                 this.uid = u;
                 if (this.from && this.to) {
 
-                    $("#menu_dialog").find('.pre_order_but').text('Pre-Orders');
-                    $('<span class="caret"></span></button>').appendTo($("#menu_dialog").find('.pre_order_but'));
-                    $("#menu_dialog").find('.pre_order_div').css('display', 'inline-block');
+                    $("#offer_dialog").find('.pre_order_but').text('Pre-Orders');
+                    $('<span class="caret"></span></button>').appendTo($("#offer_dialog").find('.pre_order_but'));
+                    $("#offer_dialog").find('.pre_order_div').css('display', 'inline-block');
 
                     let item = this.order[u][this.table_id][this.menu_id];
                     $(item).sort(function (a, b) {
@@ -468,7 +468,7 @@ class MenuAdmin extends Menu{
 
                     // this.from = item.from;
                     // this.to = item.to;
-                    //$("#menu_dialog").find('.time_range[from="' + item.from + '"]').addClass(this.active_class);
+                    //$("#offer_dialog").find('.time_range[from="' + item.from + '"]').addClass(this.active_class);
 
                 }
             }
@@ -482,12 +482,12 @@ class MenuAdmin extends Menu{
         let item = this.order[$(el).attr('i')][$(el).attr('table')][$(el).attr('menu')];
         if (item.from === from && item.to === to) {
 
-            $("#menu_dialog").find('.time_range').removeClass(this.active_class);
-            $("#menu_dialog").find('.time_range[from="' + from + '"]').addClass(this.active_class);
-            $("#menu_dialog").find('.tab-pane').empty();
-            // $("#menu_dialog").find('li.tab_inserted').empty();
-            $("#menu_dialog").find('.pre_order_but').text(from+'-'+to);
-            $('<span class="caret"></span></button>').appendTo($("#menu_dialog").find('.pre_order_but'));
+            $("#offer_dialog").find('.time_range').removeClass(this.active_class);
+            $("#offer_dialog").find('.time_range[from="' + from + '"]').addClass(this.active_class);
+            $("#offer_dialog").find('.tab-pane').empty();
+            // $("#offer_dialog").find('li.tab_inserted').empty();
+            $("#offer_dialog").find('.pre_order_but').text(from+'-'+to);
+            $('<span class="caret"></span></button>').appendTo($("#offer_dialog").find('.pre_order_but'));
             this.from = from;
             this.to = to;
             this.FillOrder();
@@ -504,12 +504,12 @@ class MenuAdmin extends Menu{
             let table = ev.data.table_id;
             let time = $('.sel_time').text();
             ev.data = ev.data.parent;
-            $("#menu_dialog").find('.cancel_menu').off(ev);
+            $("#offer_dialog").find('.cancel_menu').off(ev);
             if(this.order[ev.data.uid][table][menu]){
                 let reserve = Object.assign({},ev.data.order);
                 delete reserve[time][ev.data.uid][table][menu];
                 ev.data.UpdateReservation(ev,table,reserve[time],function (ev) {
-                    $('#menu_dialog').modal('hide');
+                    $('#offer_dialog').modal('hide');
                 });
             }
         }
@@ -573,11 +573,11 @@ class MenuAdmin extends Menu{
 
                 $(tmplt).insertAfter('.tab-content');
 
-                $("#menu_dialog").find('.modal-footer').attr('contenteditable', 'false');
+                $("#offer_dialog").find('.modal-footer').attr('contenteditable', 'false');
 
                 if(this.order && this.order['comment']) {
-                    $("#menu_dialog").find('.comment').css('display', 'block');
-                    $("#menu_dialog").find('.comment').val(urlencode.decode(this.order['comment']));
+                    $("#offer_dialog").find('.comment').css('display', 'block');
+                    $("#offer_dialog").find('.comment').val(urlencode.decode(this.order['comment']));
                 }
 
                 let title = this.menu[tab][i].title;
@@ -588,16 +588,16 @@ class MenuAdmin extends Menu{
                         this.order[t][this.table_id][this.menu_id]['order'][title]) {
                         let order = this.order[t][this.table_id][this.menu_id];
                         if (order['order'][title]['ordered']) {
-                            //$("#menu_dialog").find('[from="' + order.from + '"]').css('color', 'red');
+                            //$("#offer_dialog").find('[from="' + order.from + '"]').css('color', 'red');
 
                             $(menu_item).find('.item_title').css('color', 'red');
-                            $("#menu_dialog").find('a[href="#' + tab + '"]').css('color', 'red');
-                            $("#menu_dialog").find('.pre_order_but').css('color', 'red');
+                            $("#offer_dialog").find('a[href="#' + tab + '"]').css('color', 'red');
+                            $("#offer_dialog").find('.pre_order_but').css('color', 'red');
 
                         } else if (order['order'][title]['status'] === '') {
-                            $("#menu_dialog").find('[from="' + order.from + '"]').css('color', '');
+                            $("#offer_dialog").find('[from="' + order.from + '"]').css('color', '');
                             $(menu_item).find('.item_title').css('color', '');
-                            $("#menu_dialog").find('a[href="#' + tab + '"]').css('color', '');
+                            $("#offer_dialog").find('a[href="#' + tab + '"]').css('color', '');
                         }
                         if (order['order'][title]['accepted']) {
                             $(menu_item).find(':checkbox').prop('checked', true);
@@ -612,7 +612,7 @@ class MenuAdmin extends Menu{
         window.dict.Translate('en',window.sets.lang,function () {
             //$('.sp_dlg').find('option:selected').prop("selected", false);
             $($('.sp_dlg').find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
-            window.dict.set_lang(window.sets.lang,$("#menu_dialog") );
+            window.dict.set_lang(window.sets.lang,$("#offer_dialog") );
             window.admin.menu.lang = window.sets.lang;
         });
     }
@@ -675,23 +675,23 @@ class MenuAdmin extends Menu{
 
         $(':checkbox').prop('checked', false);
 
-        $("#menu_dialog").off('hide.bs.modal');
+        $("#offer_dialog").off('hide.bs.modal');
         $('#add_item').off('click');
         $('.item_title').off('click');
         //$('.sp_dlg').off('change');
-        $("#menu_dialog").find('.comment').val('');
-        $("#menu_dialog").find('.comment').css('display','none');
+        $("#offer_dialog").find('.comment').val('');
+        $("#offer_dialog").find('.comment').css('display','none');
 
-        $("#menu_dialog").find(':checked').prop('checked', false);
+        $("#offer_dialog").find(':checked').prop('checked', false);
 
-        $("#menu_dialog").find('.tab-pane').empty();
+        $("#offer_dialog").find('.tab-pane').empty();
 
         $('.pre_order_list').empty();
-        $("#menu_dialog").find('.pre_order_div').css('display', 'none');
+        $("#offer_dialog").find('.pre_order_div').css('display', 'none');
 
 
-        $("#menu_dialog").find('.modal-table-number').text('');
-        $("#menu_dialog").find('.modal-menu-number').text('');
+        $("#offer_dialog").find('.modal-table-number').text('');
+        $("#offer_dialog").find('.modal-menu-number').text('');
 
     }
 
@@ -785,16 +785,16 @@ class MenuAdmin extends Menu{
         //if(ev.data.changed)
         menu.SaveMenu(ev,$('.sp_dlg option:selected').val());
 
-        $("#menu_dialog").find('.tab-pane').empty();
+        $("#offer_dialog").find('.tab-pane').empty();
 
-        $("#menu_dialog").off('hide.bs.modal');
+        $("#offer_dialog").off('hide.bs.modal');
         $('.item_title').off('click');
         //$('#add_item').off('click',this.AddMenuItem);
         //$('.modal-body').find('.add_tab').off('click', this.AddTab);
         $('.div_tab_inserted').remove();
         $('.tab_inserted').remove();
         $('.sp_dlg').off('changed.bs.select');
-        $("#menu_dialog").find('.toolbar').css('display', 'none');
+        $("#offer_dialog").find('.toolbar').css('display', 'none');
         $('input:file').off('change');
     }
 
@@ -807,7 +807,7 @@ class MenuAdmin extends Menu{
         let sel_lang = $('.sp_dlg option:selected').val().toLowerCase().substring(0, 2);
 
         window.dict.Translate('en',sel_lang, function () {
-            window.dict.set_lang(sel_lang, $("#menu_dialog"));
+            window.dict.set_lang(sel_lang, $("#offer_dialog"));
             window.admin.menu.lang = sel_lang;
         });
     }

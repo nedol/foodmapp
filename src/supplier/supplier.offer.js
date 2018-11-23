@@ -18,13 +18,13 @@ var moment = require('moment');
 var md5 = require('md5');
 var isJSON = require('is-json');
 import {Import} from "../map/import/import"
-import {Menu} from "../map/menu/menu"
+
 import {createThumb} from "../utils/utils";
 
-class SupplierOffer extends Menu{
+class SupplierOffer {
 
     constructor(){
-        super();
+
         this.admin;
         this.uid;
         this.changed = false;
@@ -47,7 +47,7 @@ class SupplierOffer extends Menu{
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
-        $("#menu_dialog").modal({
+        $("#offer_dialog").modal({
             show: true,
             keyboard:true
         });
@@ -86,20 +86,22 @@ class SupplierOffer extends Menu{
             selectText($(this));
         });
 
-        $("#menu_dialog").find('.modal-title').text("Menu for ");
-        $("#menu_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
-        $("#menu_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        $("#menu_dialog").on('hide.bs.modal', this,this.CloseMenu);
+        $("#offer_dialog").find('.modal-title').text("Menu for ");
+        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
+        $("#offer_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        $("#offer_dialog").on('hide.bs.modal', this,this.CloseMenu);
 
         $('#add_item').css('display', 'block');
         $('#add_tab_li').css('display','block');
-        $("#menu_dialog").find('.toolbar').css('display', 'block');
+        $("#offer_dialog").find('.toolbar').css('display', 'block');
 
         for (let tab in this.offer) {
             if(!tab) continue;
             if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted" draggable="true" ondragstart="drag(event)"><a data-toggle="tab"  contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a></li>').insertBefore($('#add_tab_li'));
-                $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none"></div>').insertBefore($('#add_tab_div'));
+                $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+                    '</li>').insertBefore($('#add_tab_li'));
+                $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
+                    '</div>').insertBefore($('#add_tab_div'));
             }
 
             for (let i in this.offer[tab]) {
@@ -156,7 +158,7 @@ class SupplierOffer extends Menu{
 
                 $('#' + tab).append(menu_item);
 
-                $(tmplt).insertAfter('#menu_dialog');
+                $(tmplt).insertAfter('#offer_dialog');
 
                 if ($(menu_item).find('.item_content').css('display') == 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
@@ -205,7 +207,7 @@ class SupplierOffer extends Menu{
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        window.dict.set_lang(window.sets.lang,$("#menu_dialog"));
+        window.dict.set_lang(window.sets.lang,$("#offer_dialog"));
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {
@@ -245,8 +247,8 @@ class SupplierOffer extends Menu{
             });
         });
 
-        $("#menu_dialog").find('.publish_offer').off('click touchstart');
-        $("#menu_dialog").find('.publish_offer').on('click touchstart',this,function (ev) {
+        $("#offer_dialog").find('.publish_offer').off('click touchstart');
+        $("#offer_dialog").find('.publish_offer').on('click touchstart',this,function (ev) {
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
             ev.data.parent.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),date, ev.data.location);
         });
@@ -260,10 +262,21 @@ class SupplierOffer extends Menu{
         let tab = 'tab_'+$('.tab-pane').length;
 
         ev.data.changed = true;
+        let cats ='';
+        $(".category[state='1']").each(function (i, cat) {
+            cats +='<a href="#" onclick=$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text())>'+cat.title+'</a>';
+        });
 
-        $('<li class="tab_inserted"><a data-toggle="tab" contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a></li>').insertBefore($('#add_tab_li'));
+        $('<li class="tab_inserted  dropdown"><a data-toggle="tab" contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+                '<div class="dropdown-content">'+
+                    cats+
+                '</div>'+
+            '</li>').insertBefore($('#add_tab_li'));
 
-        $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+'</div>').insertBefore($('#add_tab_div'));
+        $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
+            '</div>').insertBefore($('#add_tab_div'));
+
+
 
     }
 
@@ -352,7 +365,7 @@ class SupplierOffer extends Menu{
         if ($(menu_item).find('.item_content').css('display') == 'block')
            $(menu_item).find('.item_content').slideToggle("fast");
 
-        $(tmplt).insertAfter('#menu_dialog');
+        $(tmplt).insertAfter('#offer_dialog');
 
         return true;
     }
@@ -403,12 +416,12 @@ class SupplierOffer extends Menu{
             let table = ev.data.table_id;
             let time = $('.sel_time').text();
             ev.data = ev.data.parent;
-            $("#menu_dialog").find('.cancel_menu').off(ev);
+            $("#offer_dialog").find('.cancel_menu').off(ev);
             if(this.order[ev.data.uid][table][menu]){
                 let reserve = Object.assign({},ev.data.order);
                 delete reserve[time][ev.data.uid][table][menu];
                 ev.data.UpdateReservation(ev,table,reserve[time],function (ev) {
-                    $('#menu_dialog').modal('hide');
+                    $('#offer_dialog').modal('hide');
                 });
             }
         }
@@ -513,16 +526,16 @@ class SupplierOffer extends Menu{
         //if(ev.data.changed)
         menu.SaveOffer(ev,window.sets.lang);
 
-        $("#menu_dialog").find('.tab-pane').empty();
+        $("#offer_dialog").find('.tab-pane').empty();
 
-        $("#menu_dialog").off('hide.bs.modal');
+        $("#offer_dialog").off('hide.bs.modal');
         $('.item_title').off('click');
         //$('#add_item').off('click',this.AddOfferItem);
         //$('.modal-body').find('.add_tab').off('click', this.AddTab);
         $('.div_tab_inserted').remove();
         $('.tab_inserted').remove();
         //$('.sp_dlg').off('changed.bs.select');
-        $("#menu_dialog").find('.toolbar').css('display', 'none');
+        $("#offer_dialog").find('.toolbar').css('display', 'none');
         $('input:file').off('change');
     }
 
@@ -535,7 +548,7 @@ class SupplierOffer extends Menu{
         let sel_lang = $('.sp_dlg option:selected').val().toLowerCase().substring(0, 2);
 
         window.dict.Translate('en',sel_lang, function () {
-            window.dict.set_lang(sel_lang, $("#menu_dialog"));
+            window.dict.set_lang(sel_lang, $("#offer_dialog"));
             window.admin.menu.lang = sel_lang;
         });
     }

@@ -80,7 +80,7 @@ class Menu {
 
         $(tab).append($(menu_item)[0]);
 
-        $(tmplt).insertAfter('#menu_dialog');
+        $(tmplt).insertAfter('#offer_dialog');
 
         return true;
     }

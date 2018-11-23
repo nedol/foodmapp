@@ -43,41 +43,41 @@ class MenuUser extends Menu{
         this.table_id = event.target.parentEl.id;
         this.menu_id = event.currentTarget.id;
 
-        $("#menu_dialog").modal({
+        $("#offer_dialog").modal({
             show: true,
             keyboard:true
         });
 
         this.parent = event.data;
 
-        $("#menu_dialog").find('.input').on('change', this, function (ev) {
+        $("#offer_dialog").find('.input').on('change', this, function (ev) {
             ev.data.changed = true;
         });
 
-        $("#menu_dialog").find('input').on('change', this, function (ev) {
+        $("#offer_dialog").find('input').on('change', this, function (ev) {
             ev.data.changed = true;
         });
 
-        $("#menu_dialog").find('.cancel_menu').off('click touchstart');
-        $("#menu_dialog").find('.cancel_menu').on('click touchstart',this,function (ev) {
+        $("#offer_dialog").find('.cancel_menu').off('click touchstart');
+        $("#offer_dialog").find('.cancel_menu').on('click touchstart',this,function (ev) {
             ev.data.CancelMenu(ev);
         });
 
         $('#add_item').css('display','none');
-        $("#menu_dialog").find('.cancel_menu').css('display','inline-block');
-        $("#menu_dialog").find('.modal-title').attr('data-translate', md5('Order for'));
-        $("#menu_dialog").find('.modal-title').text("Order for ");
-        $("#menu_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
-        $("#menu_dialog").find('.modal-table-number').css('display','inline-block');
-        $("#menu_dialog").find('.modal-table-number').text("Table # "+this.table_id.replace('table_',''));
-        $("#menu_dialog").find('.modal-menu-number').css('display','inline-block');
-        $("#menu_dialog").find('.modal-menu-number').text("Menu # "+this.menu_id.replace('menu_',''));
+        $("#offer_dialog").find('.cancel_menu').css('display','inline-block');
+        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Order for'));
+        $("#offer_dialog").find('.modal-title').text("Order for ");
+        $("#offer_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
+        $("#offer_dialog").find('.modal-table-number').css('display','inline-block');
+        $("#offer_dialog").find('.modal-table-number').text("Table # "+this.table_id.replace('table_',''));
+        $("#offer_dialog").find('.modal-menu-number').css('display','inline-block');
+        $("#offer_dialog").find('.modal-menu-number').text("Menu # "+this.menu_id.replace('menu_',''));
 
-        $("#menu_dialog").on('hide.bs.modal',
+        $("#offer_dialog").on('hide.bs.modal',
             {this:this, table_id:this.table_id,menu_id:this.menu_id},this.CloseOrder);
-        $("#menu_dialog").find('.modal-footer').css('display', 'block');
+        $("#offer_dialog").find('.modal-footer').css('display', 'block');
 
-        $("#menu_dialog").find('.comment').attr('id',this.table_id+'_'+this.menu_id+'_comment');
+        $("#offer_dialog").find('.comment').attr('id',this.table_id+'_'+this.menu_id+'_comment');
 
         this.FillMenu();
 
@@ -150,7 +150,7 @@ class MenuUser extends Menu{
                     if (this.order[this.table_id] && this.order[this.table_id][this.menu_id]) {
                         this.this_order = this.order[this.table_id][this.menu_id];
                         if (this.order[this.table_id][this.menu_id]['comment']) {
-                            $("#menu_dialog").find('.comment').val(urlencode.decode(this.order[this.table_id][this.menu_id]['comment']));
+                            $("#offer_dialog").find('.comment').val(urlencode.decode(this.order[this.table_id][this.menu_id]['comment']));
                         }
 
                         let title = $(menu_item).find('.item_title').text();
@@ -182,7 +182,7 @@ class MenuUser extends Menu{
         window.dict.Translate('en',window.sets.lang,function () {
             //$('.sp_dlg').find('option:selected').prop("selected", false);
             $($('.sp_dlg').find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
-            window.dict.set_lang(window.sets.lang,$("#menu_dialog") );
+            window.dict.set_lang(window.sets.lang,$("#offer_dialog") );
         });
     }
 
@@ -209,9 +209,9 @@ class MenuUser extends Menu{
 
             input[table_id][menu_id] = order[class_obj.uid][table_id][menu_id];
 
-            if ($("#menu_dialog").find('.comment').val().length>1){
-                if($("#menu_dialog").find('.comment').attr('id')===table_id+'_'+menu_id+'_comment')
-                    input[table_id][menu_id]['comment']=$("#menu_dialog").find('.comment').val();
+            if ($("#offer_dialog").find('.comment').val().length>1){
+                if($("#offer_dialog").find('.comment').attr('id')===table_id+'_'+menu_id+'_comment')
+                    input[table_id][menu_id]['comment']=$("#offer_dialog").find('.comment').val();
             }
             if ($(miAr[p]).find(':checkbox').prop('checked')){
                 if(order[class_obj.uid][table_id][menu_id])
@@ -242,19 +242,19 @@ class MenuUser extends Menu{
         ev.data.this.changed = false;
         class_obj.menu.table_id = '';
 
-        $("#menu_dialog").off('hide.bs.modal');
+        $("#offer_dialog").off('hide.bs.modal');
 
         $('.item_title').off('click');
 
         $('#add_item').off('click');
 
-        $("#menu_dialog").find('.tab-pane').empty();
+        $("#offer_dialog").find('.tab-pane').empty();
 
-        $("#menu_dialog").find('.comment_input').val('');
+        $("#offer_dialog").find('.comment_input').val('');
 
-        $("#menu_dialog").find('.modal-footer').css('display','none');
-        $("#menu_dialog").find('.comment').val('');
-        $("#menu_dialog").find('.cancel_menu').css('display','none');
+        $("#offer_dialog").find('.modal-footer').css('display','none');
+        $("#offer_dialog").find('.comment').val('');
+        $("#offer_dialog").find('.cancel_menu').css('display','none');
 
     }
 
@@ -264,7 +264,7 @@ class MenuUser extends Menu{
 
         $('#add_item').css('display', 'none');
 
-        $("#menu_dialog").modal({
+        $("#offer_dialog").modal({
             show: true,
             keyboard:true
         });
@@ -272,13 +272,13 @@ class MenuUser extends Menu{
 
         $('#add_item').css('display','none');
 
-        $("#menu_dialog").find('.modal-title').text("Menu for ");
-        $("#menu_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
-        $("#menu_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
-        $("#menu_dialog").on('hide.bs.modal', this,this.CloseMenu);
+        $("#offer_dialog").find('.modal-title').text("Menu for ");
+        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
+        $("#offer_dialog").find('.modal-title-date').text($('#datetimepicker').data("DateTimePicker").date().format('DD.MM.YYYY'));
+        $("#offer_dialog").on('hide.bs.modal', this,this.CloseMenu);
 
-        $("#menu_dialog").find('.modal-table-number').css('display','none');
-        $("#menu_dialog").find('.modal-menu-number').css('display','none');
+        $("#offer_dialog").find('.modal-table-number').css('display','none');
+        $("#offer_dialog").find('.modal-menu-number').css('display','none');
 
 
         $('#add_tab_li').css('display','none');
@@ -296,12 +296,12 @@ class MenuUser extends Menu{
             let table = ev.data.table_id;
             let time = $('.sel_time').text();
             ev.data = ev.data.parent;
-            $("#menu_dialog").find('.cancel_menu').off(ev);
+            $("#offer_dialog").find('.cancel_menu').off(ev);
             if(this.order[table][menu]){
                 let reserve = Object.assign({},ev.data.order);
                 delete reserve[time][ev.data.uid][table][menu];
                 ev.data.UpdateReservation(ev,table,reserve[time],function (ev) {
-                    $('#menu_dialog').modal('hide');
+                    $('#offer_dialog').modal('hide');
                 });
             }
         }
@@ -310,15 +310,15 @@ class MenuUser extends Menu{
 
     CloseMenu(ev) {
 
-        $("#menu_dialog").find('.tab-pane').empty();
+        $("#offer_dialog").find('.tab-pane').empty();
 
-        $("#menu_dialog").off('hide.bs.modal');
+        $("#offer_dialog").off('hide.bs.modal');
         $('.item_title').off('click');
         //$('#add_item').off('click',this.AddMenuItem);
         //$('.modal-body').find('.add_tab').off('click', this.AddTab);
         $('.tab_inserted').remove();
         $('.sp_dlg').off('changed.bs.select', this.OnChangeLang);
-        $("#menu_dialog").find('.cancel_menu').css('display','none');
+        $("#offer_dialog").find('.cancel_menu').css('display','none');
 
     }
 }

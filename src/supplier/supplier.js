@@ -11,7 +11,7 @@ import {Network} from "../../network";
 
 import {Map} from '../map/map'
 
-//import {DB} from "../storage/db"
+import {DB} from "../map/storage/db"
 
 var urlencode = require('urlencode');
 
@@ -31,7 +31,9 @@ class Supplier{
         this.uid = (window.demoMode?'e2f6cb3e58815222c734f661820df37e':uObj.uid);
         this.email = uObj.email;
 
-        //this.db = new DB();
+        this.db = new DB(function () {
+            
+        });
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
@@ -44,7 +46,7 @@ class Supplier{
             this.date = last;
         }
 
-        this.map = new Map();
+        this.map = new Map(this);
 
         this.order= {};
 
@@ -61,9 +63,12 @@ class Supplier{
         let dict = JSON.parse(localStorage.getItem('dict'));
         if(dict) {
             window.dict = new Dict(dict);
-            window.dict.set_lang(window.sets.lang, $('#main_window'));
-        }
 
+        }else{
+            localStorage.setItem("dict",'{}');
+            window.dict = new Dict({});
+        }
+        window.dict.set_lang(window.sets.lang, $('#main_window'));
         localStorage.setItem("lang", window.sets.lang);
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);

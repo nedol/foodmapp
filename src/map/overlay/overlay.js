@@ -1,22 +1,25 @@
 export {Overlay};
-import {User} from "../menu/user";
 
+import {LatLonToMeters, Screen} from "../../utils/utils";
+
+//import {User} from "../menu/user";
 import _ol_Overlay_  from "ol/overlay";
+import proj from 'ol/proj';
 
 
 class Overlay {
 
-    constructor(map, element, pos, coor) {
+    constructor(map, element, pos) {
 
         this.map = map;
-        var iframe = $(element).find("iframe");
-        var width = $(iframe).width();
-        var height = $(iframe).height();
+        let that = this;
+        let coor = map.ol_map.getCoordinateFromPixel(pos);
 
         this.overlay = new _ol_Overlay_({
             element: element,
-            positioning: pos,
-            offset: 'bottom-center'
+            position: coor,
+            positioning: 'bottom-center',
+            offset:[0,0]
         });
 
         element.ovl = this.overlay;
@@ -24,40 +27,32 @@ class Overlay {
         $(element).on('map:pointerdrag', function (ev) {
 
             var offset = $(this).offset();
-            var center = ol.proj.transform(d2d_map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-            var coor = ol.proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
+            var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+            var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
             var x = LatLonToMeters(center[0], 0, coor[0], 0);
             x = center[0] > coor[0] ? x : -x;
             var y = LatLonToMeters(0, center[1], 0, coor[1]);
             y = center[1] < coor[1] ? y : -y;
 
-            ev.offset = {'x': x, 'y': y};
-            if (iframe[0].contentWindow)
-                iframe[0].contentWindow.MapMoveEvent(ev);
         });
-
-        this.coordinates = coor;
-
-        this.overlay.setPosition(this.coordinates);
 
         this.map.ol_map.addOverlay(this.overlay);
 
-        this.transition = setTimeout(function () {
+        // this.transition = setTimeout(function () {
+        //
+        //     $(element).addClass("ovl_scale");
+        //     $(element).trigger("scale");
+        //     var scale = 1;//Math.pow((Map.getView().getZoom()/15),3).toFixed(3);
+        //     $(element).css('transform', 'scale(' + scale + ')');
+        //     // $(element).css('transition', 'transform 100ms');
+        // }, 5);
 
-            $(element).addClass("ovl_scale");
-            $(element).trigger("scale");
-            var scale = 1;//Math.pow((Map.getView().getZoom()/15),3).toFixed(3);
-            $(element).css('transform', 'scale(' + scale + ')');
-            // $(element).css('transition', 'transform 100ms');
-        }, 5);
-
-
-        $("#" + $(element).attr('id') + "_img").on('click', function (e) {
+        $(element).on('click', that.map.supplier, function (ev) {
             console.log("on click");
-            // $("#"+$(element).attr('id')+"_img").attr('src','./images/gifs/McDonalds/RonaldMcDonalds_128.gif');
+            that.map.supplier.offer.OpenOffer(ev);
         });
 
-        $("#" + $(element).attr('id') + "_img").on('touchstart', function (ev) {
+        $(element).on('touchstart', function (ev) {
 
         });
 
@@ -66,9 +61,6 @@ class Overlay {
 
             //var scale = Math.pow((Map.getView().getZoom()/15),3).toFixed(3);
             //$(element).css('transform', 'scale('+scale+')');
-            ev.zoom = this.getZoom();
-            if (iframe[0].contentWindow)
-                iframe[0].contentWindow.ZoomChanged(ev);
 
             // $(element).css('transition', 'transform 100ms');
             // $("#"+$(element).attr('id')+"_img").height(scale);

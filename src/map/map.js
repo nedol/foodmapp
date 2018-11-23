@@ -1,3 +1,4 @@
+'use strict'
 export {Map}
 
 import map from 'ol/map';
@@ -22,14 +23,13 @@ import {Panel} from "./panel/panel";
 import {Import} from "./import/import";
 import {Marker} from "./marker/marker"
 
-import {GetObjId,distanceBetweenPoints} from "../utils/utils";
-
 class Map {
 
-    constructor() {
+    constructor(sup) {
         //let full_screen = new ol.control.FullScreen();
         //full_screen.setTarget('full_screen');
         window.sets.app_mode = 'd2d';
+        this.supplier = sup;
 
         this.lat_param = '55.739';//getParameterByName('lat');
         this.lon_param = '37.687';//getParameterByName('lon');
@@ -145,11 +145,10 @@ class Map {
     }
 
 
-    GetObjectsFromStorage(cat) {
+    GetObjectsFromStorage(cat, area) {
         let that = this;
-        window.db.getRange(cat, window.area[0], window.area[2], window.area[1], window.area[3], function (cat, features) {
+        window.db.getRange(cat, area[0], area[2], area[1], area[3], function (cat, features) {
             let layer = that.ol_map.getLayers().get(cat);
-
             if (!layer) {
                 layer = that.layers.CreateLayer(cat, '1');
             }
@@ -160,7 +159,6 @@ class Map {
                     that.layers.AddCluster(layer, f);
                 }
             });
-
         });
     }
 

@@ -18,7 +18,7 @@ class Import {
 
         if (this.map.ol_map.getView().getZoom() >= 14) {
             try {
-                $(".category[state='1']").each(function (i, item) {
+                $(".category[state='1']").each(function (i, cat) {
 
                     var area = [
                         (parseFloat(LotLat[1].toFixed(1)) - 0.05).toFixed(2),
@@ -26,20 +26,18 @@ class Import {
                         (parseFloat(LotLat[0].toFixed(1)) - 0.05).toFixed(2),
                         (parseFloat(LotLat[0].toFixed(1)) + 0.05).toFixed(2)
                     ];
-                    window.area = area;
 
-                    let str = $(item).attr('id') +  "_" + area;
+                    let str = $(cat).attr('id') +  "_" + area;
 
                     if (!IsDownloadedArea(str)) {
-                        that.GetSupplierData($(item).attr('id'), str, LotLat, function (res) {
+                        that.GetSupplierData($(cat).attr('id'), str, function (res) {
                             if (res)
                                 that.areasAr.push(str);
                         });
-
                     }
 
                     if (window.db)
-                        that.map.GetObjectsFromStorage($(item).attr('id'));
+                        that.map.GetObjectsFromStorage($(cat).attr('id'), area);
 
                 });
             } catch (ex) {
@@ -121,7 +119,7 @@ class Import {
         try{
             var url = host_port+'/?'+ //
                 "proj=d2d"+
-                "&func=import_data"+
+                "&func=get_suppliers"+
                 "&areas="+area_str+
                 "&lang="+window.sets.lang;
 

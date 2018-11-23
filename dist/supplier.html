@@ -115,7 +115,7 @@
     .grow { transition: all .2s ease-in-out; }
     .grow:hover { transform: scale(1.75); }
 
-    #d2d_region{
+    #my_truck{
         display: block;
         position: absolute;
         right: 10px;
@@ -350,7 +350,7 @@
     </div>
 </div>
 
-<div id="menu_dialog" class="modal fade"  role="dialog">
+<div id="offer_dialog" class="modal fade"  role="dialog">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image addr</div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -410,6 +410,48 @@
                 }
                 .tab-content::-webkit-scrollbar {
                     width: 0 !important;
+                }
+                li {
+                    float: left;
+                }
+
+                li a, .dropbtn {
+                    display: inline-block;
+                    color: white;
+                    text-align: center;
+                    padding: 14px 16px;
+                    text-decoration: none;
+                }
+
+                li a:hover, .dropdown:hover .dropbtn {
+                    background-color: red;
+                }
+
+                li.dropdown {
+                    display: inline-block;
+                }
+
+                .dropdown-content {
+                    display: none;
+                    position: absolute;
+                    background-color: #f9f9f9;
+                    min-width: 160px;
+                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                    z-index: 1;
+                }
+
+                .dropdown-content a {
+                    color: black;
+                    padding: 12px 16px;
+                    text-decoration: none;
+                    display: block;
+                    text-align: left;
+                }
+
+                .dropdown-content a:hover {background-color: #f1f1f1}
+
+                .dropdown:hover .dropdown-content {
+                    display: block;
                 }
             </style>
             <div class="modal-header" style="position: relative;width: 100%;">
@@ -506,6 +548,7 @@
             float:right
         }
     </style>
+
     <div  id="menu_item_tmplt"
           style="display: none;
             border-radius: 5px;
@@ -544,7 +587,7 @@
 <input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;
     visibility: visible" align="center"/>
 
-<img id="d2d_region"  src="../src/user/images/truck.png" title="Search">
+<img id="my_truck"  src="../src/user/images/truck.png" title="My Truck" draggable="true" >
 
 <img id="search_but"  src="../src/user/images/ic_map_search.png" title="Search">
 <section id="loc_ctrl"  title="Location">

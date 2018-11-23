@@ -18,7 +18,7 @@ class DB {
         this.iDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB,
             this.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction,
             this.baseName = "D2DStore",
-            this.storeName = "objectesStore",
+            this.storeName = "supplierStore",
             this.imgStoreName = "imagesStore";
 
 
@@ -28,8 +28,6 @@ class DB {
                 f();
             });
         }
-
-        console.log("DB supported");
     }
 
     logerr(err) {
@@ -54,10 +52,12 @@ class DB {
                 db.onerror = function (event) {
                     console.log(event);
                 };
-                let vObjectStore = db.createObjectStore('objectesStore', {keyPath: "id"});
-                vObjectStore.createIndex("id", "id", {unique: true});
-                vObjectStore.createIndex("category", "category", {unique: false});
-                vObjectStore.createIndex("latlon", ["latitude", "longitude"], {unique: true});
+                let vObjectStore = db.createObjectStore('objectesStore', {keyPath: "uid"});
+                vObjectStore.createIndex("uid", "uid", {unique: true});
+                vObjectStore.createIndex("hash", "hash", {unique: false});
+                vObjectStore.createIndex("categories", "categories", {unique: false});
+                vObjectStore.createIndex("offer", "offer", {unique: false});
+                vObjectStore.createIndex("latlon", ["latitude", "longitude"], {unique: false});
                 let vImgStore = db.createObjectStore('imagesStore', {keyPath: "hash"});
                 func.connectDB(f);
             };
