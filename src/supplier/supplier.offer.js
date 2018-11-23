@@ -1,15 +1,13 @@
 'use strict'
 export {SupplierOffer}
 
-let utils = require('../utils/utils');
 var urlencode = require('urlencode');
 require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 // require('bootstrap/dist/css/bootstrap.css');
 // require('font-awesome/css/font-awesome.css');
-// require('summernote/dist/summernote.css');
-// require('summernote');
+
 let Dict = require('../dict/dict.js');
 const langs = require("../dict/languages");
 
@@ -17,9 +15,8 @@ var moment = require('moment');
 
 var md5 = require('md5');
 var isJSON = require('is-json');
-import {Import} from "../map/import/import"
 
-import {createThumb} from "../utils/utils";
+import {utils} from "../utils/utils";
 
 class SupplierOffer {
 
@@ -227,7 +224,7 @@ class SupplierOffer {
             //listFiles(evt);
             let  files = $("input[type='file']")[0].files;
             let el = $(ev.target).attr('el_id');
-            window.admin.offer.import.handleFileSelect(ev, files, el, function (data, el, smt) {
+            utils.HandleFileSelect(ev, files, el, function (data, el, smt) {
                 if(data) {
                     $("#" + el).attr('src', data);
                     let thumb = false;
@@ -236,7 +233,7 @@ class SupplierOffer {
 
                     $("#" + el).on('load', {el:el}, function (ev) {
                         if(!thumb)
-                            createThumb($("#" + ev.data.el)[0], $("#" + ev.data.el).width(), $("#" + ev.data.el).height(), el, function (thmb, el) {
+                            utils.createThumb($("#" + ev.data.el)[0], $("#" + ev.data.el).width(), $("#" + ev.data.el).height(), el, function (thmb, el) {
                                 thumb = true;
                                 $("#" + el).attr('src', thmb.src);
                                 moveImage($("#" + el));
@@ -330,7 +327,8 @@ class SupplierOffer {
                 $(menu_item).find('.img-fluid').css('visibility','hidden');
             }else {
                 ev.target = $(menu_item).find('.img-fluid')[0];
-                $(menu_item).find('.img-fluid').trigger(ev);
+                ev.type = 'dblclick';
+                $($(menu_item).find('.img-fluid')[0]).trigger(ev);
                 $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
             }
         });
@@ -405,7 +403,6 @@ class SupplierOffer {
 
         this.changed = true;
     }
-    
 
     CancelMenu(ev){
         ev.stopPropagation();
@@ -552,6 +549,8 @@ class SupplierOffer {
             window.admin.menu.lang = sel_lang;
         });
     }
+
+
 
 }
 
