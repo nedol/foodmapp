@@ -72,7 +72,7 @@ module.exports = class Dict {
             }
 
             $.ajax({
-                url: http + host_port,
+                url: host_port,
                 method: "POST",
                 dataType: 'json',
                 data: data_obj,
@@ -102,7 +102,7 @@ module.exports = class Dict {
                                 window.dict.dict[key][l] = add[key][l];
                             }
                         }
-                        window.dict.set_lang(sel_lang,$("#menu_dialog") );
+                        window.dict.set_lang(sel_lang,$("#offer_dialog") );
 
                         if(this.cb)
                             this.cb();
