@@ -6,6 +6,8 @@ var isJSON = require('is-json');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 
+var intersection = require('array-intersection');
+
 module.exports = class D2D {
 
     constructor(){
@@ -657,16 +659,15 @@ module.exports = class D2D {
 
     GetSuppliers(q, res){
 
-        let ar = q.areas.split('_');
-        let arCoor = ar[3].split(',');
+        let arCoor = q.areas.split(',');
+        let catsAr = q.cats.split(',');
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT * "+
-            " FROM  suppliers"+
-            " WHERE latitude>"+ arCoor[0] +" AND latitude<"+arCoor[1] +
-            " AND longitude>" + arCoor[2] + " AND longitude<" +arCoor[3] +
-            " AND (categories=" + ar[1]+")"+
-            " AND (status=0 OR status=1)";
+        let sql = " SELECT * , SPLIT_STR(of.categories, ',') as catar"+
+            " FROM  supplier as sup, offer as of, offer_data as ofd"+
+            " WHERE sup.uid = of.sup_uid AND of.data_id = ofd.id" +
+            " AND latitude>"+ arCoor[0] +" AND latitude<"+arCoor[1] +
+            " AND longitude>" + arCoor[2] + " AND longitude<" +arCoor[3];
 
         global.con_obj.query(sql, function (err, result) {
 
@@ -675,8 +676,16 @@ module.exports = class D2D {
                 res.end(JSON.stringify({'err':err}));
                 return;
             }
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify(result));
+
+            if(intersection(result.catar,catsAr).length >0){
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify(result));
+            }else{
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end();
+            }
+
+
 
         });
 
