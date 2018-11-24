@@ -685,8 +685,6 @@ module.exports = class D2D {
                 res.end();
             }
 
-
-
         });
 
     }

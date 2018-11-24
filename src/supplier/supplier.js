@@ -10,7 +10,6 @@ import {Network} from "../../network";
 //import {RTCOperator} from "../rtc/rtc_operator"
 
 import {Map} from '../map/map'
-
 import {DB} from "../map/storage/db"
 
 var urlencode = require('urlencode');
@@ -69,6 +68,7 @@ class Supplier{
             window.dict = new Dict({});
         }
         window.dict.set_lang(window.sets.lang, $('#main_window'));
+        window.dict.set_lang(window.sets.lang, $('#categories'));
         localStorage.setItem("lang", window.sets.lang);
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
@@ -272,7 +272,6 @@ class Supplier{
         let that = this;
         if(!location.lat || !location.lon){
             this.PickRegion( function () {
-
                 that.PublishOffer(data, date, location);
             });
         }
@@ -294,7 +293,7 @@ class Supplier{
     }
 
     PickRegion(){
-        alert('Выбирите регион доставки');
+        alert($('#choose_region').text());
     }
 
     GetReserved(ev) {

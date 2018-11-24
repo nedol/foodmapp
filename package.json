@@ -39,6 +39,7 @@
     "extends": "google"
   },
   "dependencies": {
+    "array-intersection": "^0.1.2",
     "axios": "^0.18.0",
     "axios-cancel": "^0.2.2",
     "bootstrap": "^3.3.7",

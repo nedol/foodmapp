@@ -38,7 +38,10 @@ class DOMEvents {
         });
         $('#map').on('drop',function (ev) {
             ev.preventDefault();
-            new Overlay(that.map,$('#my_truck')[0],[ev.originalEvent.clientX,ev.originalEvent.clientY]);
+            let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
+            let coor = map.ol_map.getCoordinateFromPixel(pixel);
+            map.supplier.offer.location = coor;
+            new Overlay(that.map,$('#my_truck')[0],coor);
         });
 
 

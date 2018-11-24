@@ -32,7 +32,7 @@ class SupplierOffer {
         this.from;
         this.to;
 
-        this.location = {lat:'',lon:{}};
+        this.location = {lat:'',lon:''};
 
         this.active_class = 'w3-border w3-border-grey w3-round-large';
     }
@@ -251,7 +251,6 @@ class SupplierOffer {
         });
     }
 
-
     AddTab(ev){
 
         ev.preventDefault(); // avoid to execute the actual submit of the form.
@@ -261,7 +260,11 @@ class SupplierOffer {
         ev.data.changed = true;
         let cats ='';
         $(".category[state='1']").each(function (i, cat) {
-            cats +='<a href="#" onclick=$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text())>'+cat.title+'</a>';
+            let text =  md5(cat.title);
+            cats +='<a href="#" onclick=' +
+                 '$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text());' +
+                 //'$(this).parent().parent().find("a[data-toggle=tab]").attr("href","'+cat.title+'")' +
+                 '>'+cat.title+'</a>';
         });
 
         $('<li class="tab_inserted  dropdown"><a data-toggle="tab" contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
@@ -273,8 +276,11 @@ class SupplierOffer {
         $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
             '</div>').insertBefore($('#add_tab_div'));
 
-
-
+    }
+    function() {
+        let tab = $(this).parent().parent().find("a[data-toggle=tab]");
+        $(tab).text($(this).text());
+        $(tab).attr('data-translate', md5($(this).text()));
     }
 
     AddOfferItem(ev){
@@ -434,11 +440,13 @@ class SupplierOffer {
             let id = $(value).attr('id');
             let val = $($('[data-translate="' + md5(id) + '"]')[0]).text();
 
+
             if (!window.dict.dict[md5(id)]) {
                 window.dict.dict[md5(id)] = {[lang]: val};
             }
 
             window.dict.dict[md5(id)][lang] = val;
+
 
             let miAr = $(this).find('.menu_item');
             if (miAr.length === 0) {

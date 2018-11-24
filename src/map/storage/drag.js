@@ -28,7 +28,7 @@ class Drag {
         // let map = document.getElementById('map');
         // FileAPI.event.on(map, 'drop', function (evt/**Event*/) {
         //     evt.preventDefault();
-        //     handleFileSelect(evt);
+        //     HandleFileSelect(evt);
         // });
 
     }
@@ -59,7 +59,7 @@ class Drag {
             files = evt.originalEvent.dataTransfer.files; // FileList object.
         // files is a FileList of File objects. List some properties.
         for (let i = 0, f; f = files[i]; i++) {
-            console.log('handleFileSelect:' + f.type);
+            console.log('HandleFileSelect:' + f.type);
             switch (f.type) {
                 case "audio/mp3":
                 case "audio/amr":

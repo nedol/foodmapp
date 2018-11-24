@@ -8,7 +8,7 @@ require('dialog-polyfill');
 
 require("../../global");
 
-import {getParameterByName} from "../utils/utils";
+import {utils} from "../utils/utils";
 import {Supplier} from './supplier'
 
 const langs = require("../dict/languages");
@@ -23,7 +23,7 @@ var md5 = require('md5');
 var moment = require('moment');
 require('../../lib/bootstrap-datetimepicker');
 
-window.demoMode = (getParameterByName('dm')==='0'?false:true);
+window.demoMode = (utils.getParameterByName('dm')==='0'?false:true);
 
 
 $(document).on('readystatechange', function () {
@@ -44,7 +44,7 @@ $(document).on('readystatechange', function () {
 
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
-    window.sets.lang = getParameterByName('lang');
+    window.sets.lang = utils.getParameterByName('lang');
 
 
     $('#datetimepicker').datetimepicker({
@@ -123,7 +123,7 @@ $(document).on('readystatechange', function () {
 
     let uObj;
     let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-    if(getParameterByName('email')) {
+    if(utils.getParameterByName('email')) {
         let uid = md5(JSON.stringify(Date.now()));
         if(!localStorage.getItem('supplier')) {
             uObj = {[date]:{"email":getParameterByName('email'),"uid":uid,"offer":{}}};

@@ -13,7 +13,7 @@ import Fill from 'ol/style/fill';
 import Text from 'ol/style/text';
 import Stroke from 'ol/style/stroke';
 
-import {GetObjId} from "../../utils/utils";
+import {utils} from "../../utils/utils";
 import source from 'ol/source/source';
 import Observable from 'ol/observable';
 
@@ -153,7 +153,7 @@ class Layers {
                     if (features.length > 1 || obj.ambit * d2d_map.ol_map.getView().getZoom() <= 500) {
 
                         if (obj.overlay) {
-                            let id_str = GetObjId(obj.latitude, obj.longitude);
+                            let id_str = utils.GetObjId(obj.latitude, obj.longitude);
                             RemoveOverlay(id_str);
                         }
 

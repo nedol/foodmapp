@@ -229,7 +229,7 @@ class MenuAdmin extends Menu{
             //listFiles(evt);
             let  files = $("input[type='file']")[0].files;
             let el = $(ev.target).attr('el_id');
-            window.admin.menu.import.handleFileSelect(ev, files, el, function (data, el, smt) {
+            window.admin.menu.import.HandleFileSelect(ev, files, el, function (data, el, smt) {
                 if(data) {
                     $("#" + el).attr('src', data);
                     let thumb = false;

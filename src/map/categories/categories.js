@@ -1,7 +1,7 @@
 export {Categories};
 
 import {Overlay} from "../overlay/overlay";
-import {createThumb} from "../../utils/utils";
+import {utils} from "../../utils/utils";
 
 
 
@@ -56,7 +56,7 @@ class Categories {
                             let h = this.height;
                             let dev = (w > h ? w : h);
                             let scale = (42 / dev).toPrecision(6);//.toFixed(6);
-                            createThumb(this, this.width * scale, this.height * scale, this.alt, function (thmb, category) {
+                            utils.createThumb(this, this.width * scale, this.height * scale, this.alt, function (thmb, category) {
                                 //localStorage.setItem("ic_" + category, thmb.src);
                                 if (category === cat) {
                                     //callback();

@@ -22,7 +22,7 @@
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
 
-<!--<script src="../lib/load-image.all.min.js"></script>-->
+<script src="../lib/load-image.all.min.js"></script>
 
 <style>
 
@@ -298,20 +298,28 @@
     </div>
 
     <div align="center" id="categories">
-        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../src/user/images/ic_0.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../src/user/images/ic_10.png" state="1" />
-        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../src/user/images/ic_20.png" state="1" />
-        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../src/user/images/ic_30.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../src/user/images/ic_40.png" state="1" />
-        <input type="image" class="category" cat="fish" id="50" title="Fresh fish" src="../src/user/images/ic_50.png" state="1" />
-        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../src/user/images/ic_60.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../src/user/images/ic_70.png" state="1" />
-        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../src/user/images/ic_80.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../src/user/images/ic_90.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../src/user/images/ic_100.png" state="1" />
-        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../src/user/images/ic_110.png" state="0" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../src/user/images/ic_120.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../src/user/images/ic_0.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../src/user/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../src/user/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../src/user/images/ic_30.png" state="0"  data-translate="3fb5a1fd02693fe2959220f291b05f19" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../src/user/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../src/user/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../src/user/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../src/user/images/ic_70.png" state="1"  data-translate="25090ca7ae49ae5e0826233de9b89a30" />
+        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../src/user/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../src/user/images/ic_90.png" state="0"  data-translate="822ce45977e6e321b1a6b2efa72df99f" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../src/user/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../src/user/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../src/user/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
     </div>
+
+    <script>
+        function OnClickCat(ev) {
+            let tab = $(this).parent().parent().find("a[data-toggle=tab]");
+            $(tab).text($(this).text());
+            $(tab).attr("data-translate", md5($(this).text()));
+        }
+    </script>
 
 </div>
 
@@ -351,7 +359,7 @@
 </div>
 
 <div id="offer_dialog" class="modal fade"  role="dialog">
-    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image addr</div>
+    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <style>
@@ -455,21 +463,25 @@
                 }
             </style>
             <div class="modal-header" style="position: relative;width: 100%;">
-                <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle" style="display: inline-block" data-toggle="dropdown"
-                        data-width="fit" type="button">
-                    <span class="glyphicon glyphicon-option-vertical"></span>
-                </button>
-                <ul id="menu_list" class="dropdown-menu order_menu_options" role="menu" aria-labelledby="menu1">
-                    <li href="#" class="publish_offer" data-width="fit"><a role="menuitem" tabindex="-1" href="#" data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                    <li href="#" class="publish_offer" data-width="fit"><a role="menuitem" tabindex="-1" href="#" data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
-                </ul>
+                <div class="dropdown" style="display: inline-block">
+                    <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"  data-toggle="dropdown"
+                            data-width="fit" type="button">
+                        <span class="glyphicon glyphicon-option-vertical"></span>
+                    </button>
+                    <ul id="menu_list" class="dropdown-menu order_menu_options">
+                        <li class="publish_offer" data-width="fit"><a href="#"
+                               data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                        <li class="cancel_offer" data-width="fit"><a href="#"
+                               data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
+                    </ul>
+                </div>
 
                 <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
                 <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
                 <h4 class="modal-table-number"  style="display: none">Table</h4>
                 <h4 class="modal-menu-number"  style="display: none">Menu</h4>
 
-                <button type="button" class="btn close" data-dismiss="modal" >
+                <button type="button" class="btn close" data-dismiss="modal" data-translate="">
                     <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
                 </button>
                 <!--<div style="display: inline-block; position:absolute; right: 100px;padding: 0px;">-->
@@ -577,10 +589,12 @@
         </div>
     </div>
     <input type="file" class="file" multiple style="display: none;"/>
+
+    <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9">Choose a region for delivery</data>
+
 </div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
-
 
 <div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
 
@@ -595,6 +609,7 @@
     <img id="pin" src="../src/user/images/ic_pin.png">
 </section>
 <h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
 
 </body>
 </html>

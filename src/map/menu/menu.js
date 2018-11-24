@@ -1,6 +1,7 @@
 export {Menu};
-import {InitAuth,OnClickAuth} from './auth.js'
+import {InitAuth} from './auth.js'
 import {Drag} from '../storage/drag.js';
+import {utils} from "../../utils/utils";
 
 class Menu {
 
@@ -31,7 +32,7 @@ class Menu {
 
             //listFiles(evt);
             let files = $("input[type='file']")[0].files;
-            handleFileSelect(evt, files)
+            utils.HandleFileSelect(evt, files)
         });
 
         InitAuth();
@@ -45,7 +46,6 @@ class Menu {
                 });
         });
 
-        $('#ar').on('click', this.OnClickAR);
 
         $('#settings').on('click', function () {
             // require("imports-loader?this=>window!../../lib/jquery.mobile-1.4.5.min.js");
@@ -72,15 +72,6 @@ class Menu {
         $("#file").trigger('click');
     }
 
-    OnClickAR(el) {
-        //TODO:
-        let img = new Image();
-        img.src = '../ar/ar.html';
-        let w = img.width;
-        let h = img.height;
-
-        window.open('../ar/ar.html', '', "width=" + w + ", height=" + h);
-    }
 
     OnClickMenuItem(el) {
 

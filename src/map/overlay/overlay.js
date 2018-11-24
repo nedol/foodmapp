@@ -1,6 +1,6 @@
 export {Overlay};
 
-import {LatLonToMeters, Screen} from "../../utils/utils";
+import {utils} from "../../utils/utils";
 
 //import {User} from "../menu/user";
 import _ol_Overlay_  from "ol/overlay";
@@ -9,11 +9,10 @@ import proj from 'ol/proj';
 
 class Overlay {
 
-    constructor(map, element, pos) {
+    constructor(map, element, coor) {
 
         this.map = map;
         let that = this;
-        let coor = map.ol_map.getCoordinateFromPixel(pos);
 
         this.overlay = new _ol_Overlay_({
             element: element,
@@ -29,9 +28,9 @@ class Overlay {
             var offset = $(this).offset();
             var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
             var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
-            var x = LatLonToMeters(center[0], 0, coor[0], 0);
+            var x = utils.LatLonToMeters(center[0], 0, coor[0], 0);
             x = center[0] > coor[0] ? x : -x;
-            var y = LatLonToMeters(0, center[1], 0, coor[1]);
+            var y = utils.LatLonToMeters(0, center[1], 0, coor[1]);
             y = center[1] < coor[1] ? y : -y;
 
         });

@@ -18,28 +18,32 @@ class Import {
 
         if (this.map.ol_map.getView().getZoom() >= 14) {
             try {
+
+                let cats= [];
                 $(".category[state='1']").each(function (i, cat) {
-
-                    var area = [
-                        (parseFloat(LotLat[1].toFixed(1)) - 0.05).toFixed(2),
-                        (parseFloat(LotLat[1].toFixed(1)) + 0.05).toFixed(2),
-                        (parseFloat(LotLat[0].toFixed(1)) - 0.05).toFixed(2),
-                        (parseFloat(LotLat[0].toFixed(1)) + 0.05).toFixed(2)
-                    ];
-
-                    let str = $(cat).attr('id') +  "_" + area;
-
-                    if (!IsDownloadedArea(str)) {
-                        that.GetSupplierData($(cat).attr('id'), str, function (res) {
-                            if (res)
-                                that.areasAr.push(str);
-                        });
-                    }
-
-                    if (window.db)
-                        that.map.GetObjectsFromStorage($(cat).attr('id'), area);
-
+                    cats.push(parseInt(cat.id));
                 });
+
+                var area = [
+                    (parseFloat(LotLat[1].toFixed(1)) - 0.05).toFixed(2),
+                    (parseFloat(LotLat[1].toFixed(1)) + 0.05).toFixed(2),
+                    (parseFloat(LotLat[0].toFixed(1)) - 0.05).toFixed(2),
+                    (parseFloat(LotLat[0].toFixed(1)) + 0.05).toFixed(2)
+                ];
+
+                let str = cats +  "_" +  area;
+
+                if (!IsDownloadedArea(cats +  "_" +  area)) {
+                    let uid = that.map.supplier.uid;
+                    that.LoadSupplierData(uid, cats, area, function (res) {
+                        if (res)
+                            that.areasAr.push(cats +  "_" +  area);
+                    });
+                }
+
+                if (window.db)
+                    that.map.GetObjectsFromStorage(cats, area);
+
             } catch (ex) {
                 console.log(ex);
             }
@@ -54,7 +58,7 @@ class Import {
         }
     }
 
-    GetSupplierData(cat, area_str, cb ) {
+    LoadSupplierData(uid, cats,area, cb ) {
         let that =  this;
 
         function processResult(res) {
@@ -120,7 +124,9 @@ class Import {
             var url = host_port+'/?'+ //
                 "proj=d2d"+
                 "&func=get_suppliers"+
-                "&areas="+area_str+
+                "&uid="+ uid+
+                "&cats="+cats+
+                "&areas="+area+
                 "&lang="+window.sets.lang;
 
             $.ajax({
@@ -148,4 +154,6 @@ class Import {
         }
 
     }
+
+
 }

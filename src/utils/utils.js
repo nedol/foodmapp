@@ -1,39 +1,39 @@
-
+export {utils}
 let http = require('http');
 let https = require('https');
 
-module.exports = {
+class Utils{
 
-    getParameterByName: function (name, url) {
-    if (!url) url = window.location.href;
-    name = name.replace(/[\[\]]/g, "\\$&");
-    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
-        results = regex.exec(url);
-    if (!results) return null;
-    if (!results[2]) return '';
-    return decodeURIComponent(results[2].replace(/\+/g, " "));
-    },
+    getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
 
-    toJSONLocal: function (date) {
+    toJSONLocal(date) {
         var local = new Date(date);
         local.setMinutes(date.getMinutes() - date.getTimezoneOffset());
         return local.toJSON().slice(0, 10);
-    },
+    }
 
-    QueryMethod : function (protocol,options, postData, res, cb) {
+    QueryMethod(protocol,options, postData, res, cb) {
         let http_;
         if(protocol==='http')
             http_ = http;
         else if(protocol==='https')
             http_ = https;
-    var req = http_.request(options, function (res) {
-        console.log('Status: ' + res.statusCode);
-        console.log('Headers: ' + JSON.stringify(res.headers));
-        res.setEncoding('utf8');
-        res.on('data', function (body) {
-            console.log('Body: ' + body);
-            cb(body, res);
-        });
+        var req = http_.request(options, function (res) {
+            console.log('Status: ' + res.statusCode);
+            console.log('Headers: ' + JSON.stringify(res.headers));
+            res.setEncoding('utf8');
+            res.on('data', function (body) {
+                console.log('Body: ' + body);
+                cb(body, res);
+            });
     });
     req.on('error', function (e) {
         console.log('problem with request: ' + e.message);
@@ -44,78 +44,9 @@ module.exports = {
         req.write(postData);
     req.end();
 
-    },
+    }
 
-    Parse:function (result) {
-        try {
-            return JSON.parse(result);
-        } catch (e) {
-            throw e;
-        }
-    },
-
-    HTML:function(){
-        var x,mnem=
-            {34:"quot",38:"amp",39:"apos",60:"lt",62:"gt",402:"fnof",
-            338:"OElig",339:"oelig",352:"Scaron",353:"scaron",
-            376:"Yuml",710:"circ",732:"tilde",8226:"bull",8230:"hellip",
-            8242:"prime",8243:"Prime",8254:"oline",8260:"frasl",8472:"weierp",
-            8465:"image",8476:"real",8482:"trade",8501:"alefsym",8592:"larr",
-            8593:"uarr",8594:"rarr",8595:"darr",8596:"harr",8629:"crarr",
-            8656:"lArr",8657:"uArr",8658:"rArr",8659:"dArr",8660:"hArr",
-            8704:"forall",8706:"part",8707:"exist",8709:"empty",8711:"nabla",
-            8712:"isin",8713:"notin",8715:"ni",8719:"prod",8721:"sum",
-            8722:"minus",8727:"lowast",8730:"radic",8733:"prop",8734:"infin",
-            8736:"ang",8743:"and",8744:"or",8745:"cap",8746:"cup",8747:"int",
-            8756:"there4",8764:"sim",8773:"cong",8776:"asymp",8800:"ne",
-            8801:"equiv",8804:"le",8805:"ge",8834:"sub",8835:"sup",8836:"nsub",
-            8838:"sube",8839:"supe",8853:"oplus",8855:"otimes",8869:"perp",
-            8901:"sdot",8968:"lceil",8969:"rceil",8970:"lfloor",8971:"rfloor",
-            9001:"lang",9002:"rang",9674:"loz",9824:"spades",9827:"clubs",
-            9829:"hearts",9830:"diams",8194:"ensp",8195:"emsp",8201:"thinsp",
-            8204:"zwnj",8205:"zwj",8206:"lrm",8207:"rlm",8211:"ndash",
-            8212:"mdash",8216:"lsquo",8217:"rsquo",8218:"sbquo",8220:"ldquo",
-            8221:"rdquo",8222:"bdquo",8224:"dagger",8225:"Dagger",8240:"permil",
-            8249:"lsaquo",8250:"rsaquo",8364:"euro",977:"thetasym",978:"upsih",982:"piv"},
-            tab=("nbsp|iexcl|cent|pound|curren|yen|brvbar|sect|uml|"+
-                "copy|ordf|laquo|not|shy|reg|macr|deg|plusmn|sup2|sup3|"+
-                "acute|micro|para|middot|cedil|sup1|ordm|raquo|frac14|"+
-                "frac12|frac34|iquest|Agrave|Aacute|Acirc|Atilde|Auml|"+
-                "Aring|AElig|Ccedil|Egrave|Eacute|Ecirc|Euml|Igrave|"+
-                "Iacute|Icirc|Iuml|ETH|Ntilde|Ograve|Oacute|Ocirc|Otilde|"+
-                "Ouml|times|Oslash|Ugrave|Uacute|Ucirc|Uuml|Yacute|THORN|"+
-                "szlig|agrave|aacute|acirc|atilde|auml|aring|aelig|ccedil|"+
-                "egrave|eacute|ecirc|euml|igrave|iacute|icirc|iuml|eth|ntilde|"+
-                "ograve|oacute|ocirc|otilde|ouml|divide|oslash|ugrave|uacute|"+
-                "ucirc|uuml|yacute|thorn|yuml").split("|");
-        for(x=0;x<96;x++)mnem[160+x]=tab[x];
-        tab=("Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|"+
-            "Lambda|Mu|Nu|Xi|Omicron|Pi|Rho").split("|");
-        for(x=0;x<17;x++)mnem[913+x]=tab[x];
-        tab=("Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega").split("|");
-        for(x=0;x<7;x++)mnem[931+x]=tab[x];
-        tab=("alpha|beta|gamma|delta|epsilon|zeta|eta|theta|iota|kappa|"+
-            "lambda|mu|nu|xi|omicron|pi|rho|sigmaf|sigma|tau|upsilon|phi|chi|"+
-            "psi|omega").split("|");
-        for(x=0;x<25;x++)mnem[945+x]=tab[x];
-        return {
-            encode:function(text){
-                return text.replace(/[\u00A0-\u2666<>\&]/g,function(a){
-                    return "&"+(mnem[a=a.charCodeAt(0)]||"#"+a)+";"
-                })
-            },
-            decode:function(text){
-                return text.replace(/\&#?(\w+);/g,function(a,b){
-                    if(Number(b))return String.fromCharCode(Number(b));
-                    for(x in mnem){
-                        if(mnem[x]===b)return String.fromCharCode(x);
-                    }
-                })
-            }
-        }
-    },
-
-    resizeBase64Img:function(base64, width, height) {
+    resizeBase64Img(base64, width, height) {
         var canvas = document.createElement("canvas");
         canvas.width = width;
         canvas.height = height;
@@ -127,9 +58,9 @@ module.exports = {
             deferred.resolve($("<img/>").attr("src", canvas.toDataURL()));
         });
         return deferred.promise();
-    },
+    }
 
-    createThumb:function (base, w, h, logo, callback) {
+    createThumb(base, w, h, logo, callback) {
         var c = document.createElement("canvas"),    // create a canvas
             ctx = c.getContext("2d"),                // get context
             img = new Image();                       // final image
@@ -141,9 +72,9 @@ module.exports = {
             callback(this, logo);                // provide image to callback
         };
         img.src = c.toDataURL();                     // convert canvas to URL
-    },
+    }
 
-    isIntersec:function (from, from_1, to, to_1) {
+    isIntersec(from, from_1, to, to_1) {
         if((from >=from_1 && to<=to_1)||
         (from <=from_1 && to>=to_1)||
         (from <= from_1 && to>from_1 && to<=to_1) ||
@@ -152,8 +83,8 @@ module.exports = {
         }else{
             return false;
         }
-    },
-    getObjects: function(obj, key, val) {
+    }
+    getObjects(obj, key, val) {
         var objects = [];
         for (var i in obj) {
             if (!obj.hasOwnProperty(i)) continue;
@@ -164,8 +95,8 @@ module.exports = {
             }
         }
         return objects;
-    },
-    LatLonToMeters: function(lat1, lon1, lat2, lon2){  // generally used geo measurement function
+    }
+    LatLonToMeters(lat1, lon1, lat2, lon2){  // generally used geo measurement function
         var R = 6378.137; // Radius of earth in KM
         var dLat = lat2 * Math.PI / 180 - lat1 * Math.PI / 180;
         var dLon = lon2 * Math.PI / 180 - lon1 * Math.PI / 180;
@@ -177,6 +108,151 @@ module.exports = {
         return d * 1000; // meters
     }
 
+    HandleFileSelect(evt, files, el, cb) {
+        evt.stopPropagation();
+        evt.preventDefault();
+        let that = this;
+        this.reader = new FileReader();
 
+        if(!files && evt.originalEvent.dataTransfer)
+            files = evt.originalEvent.dataTransfer.files; // FileList object.
+        // files is a FileList of File objects. List some properties.
+        for (let i = 0, f; f = files[i]; i++) {
+            console.log('HandleFileSelect:'+f.type);
+            switch (f.type) {
+                case "audio/mp3": case "audio/amr": case "audio/wav":  case "video/mp4": case "ogg":
+
+                that.LoadFile(f, function (obj) {
+                    cb(obj, el);
+                });
+                break;
+                case "image/jpeg":   case "image/jpg":
+                case "image/png":
+                case "image/gif":
+                    that.LoadImage(f, function (obj) {
+                        if(!obj)
+                            return null;
+                        cb(obj, el);
+                    });
+                    break;
+            }
+        }
+    }
+    LoadImage(f, callback){
+
+        loadImage(
+            f,
+            function (img) {
+                let or = (img.width >= img.height) ? 'l' : 'p';
+                let options = [];
+                options['canvas'] = true;
+                options['orientation'] = true;
+                if (or === 'l') {
+                    options['minWidth'] = 70;
+                    options['maxHeight'] = 50;
+                } else if (or === 'p') {
+                    options['minHeight'] = 70;
+                    options['maxWidth'] = 50;
+                }
+
+                callback(img.toDataURL(f.type));
+
+            },
+            {
+                orientation:true,
+                canvas:true
+                //maxWidth: 600,
+                //maxHeight: 300
+            }// Options
+        );
+
+    }
+    LoadFile(f, callback) {
+
+        this.reader.onerror = errorHandler;
+        this.reader.onabort = function(e) {
+            alert('File read cancelled');
+        };
+        this.reader.onload = (function (f) {
+            return function (e) {
+                console.log("data:" );
+                HandleResults(this.reader.result);
+            }
+        })(f);
+
+        this.reader.readAsDataURL(f);
+        //reader.readAsBinaryString(f);
+        //reader.readAsArrayBuffer(f);
+
+        function errorHandler(evt) {
+            switch(evt.target.error.code) {
+                case evt.target.error.NOT_FOUND_ERR:
+                    alert('File Not Found!');
+                    break;
+                case evt.target.error.NOT_READABLE_ERR:
+                    alert('File is not readable');
+                    break;
+                case evt.target.error.ABORT_ERR:
+                    break; // noop
+                default:
+                    alert('An error occurred reading this file.');
+            };
+        }
+
+        function HandleResults(res){
+
+            let coor = [];
+            let ctype, func, cat;
+            if (f.type.indexOf("audio/") !== -1) {
+                ctype = '1';
+                func = 'InsertAudio';
+                cat = '0'
+            }
+            let fAr = f.name.split('_');
+            if (f.name.indexOf('id_') !== -1 && fAr[1].indexOf('.') !== -1 && fAr[2].indexOf('.') !== -1) {
+                coor[0] = parseFloat(fAr[2].split('h')[0]);
+                coor[1] = parseFloat(fAr[1]);
+
+            } else {
+
+            }
+
+            //let obj_id = GetObjId(coor[1],coor[0]);
+            // let hash = MD5(obj_id);
+            // img_db.setFile({id:hash,data:data});
+
+
+            let obj = {
+                category: cat,
+                type: ctype,
+                filename: f.name,
+                id: obj_id,
+                longitude: coor[0],
+                latitude: coor[1],
+                ambit: 50,
+                status: '1',
+                image: "..src/categories/images/ic_0.png",//icon
+                //scale: scale,
+                url: hash,
+                caption: f.name,
+                func: func
+            }
+
+        }
+    }
+    LoadThmb(f, options, callback){
+
+        loadImage(
+            f,
+            function (thmb) {
+                let logo_data = thmb.toDataURL("image/jpeg");
+                callback(logo_data);
+            },
+            options
+        );
+    }
 
 }
+
+
+let utils = new Utils();
