@@ -32,6 +32,8 @@ class SupplierOffer {
         this.from;
         this.to;
 
+        this.arCat = []
+
         this.location = {lat:'',lon:''};
 
         this.active_class = 'w3-border w3-border-grey w3-round-large';
@@ -86,6 +88,7 @@ class SupplierOffer {
         $("#offer_dialog").find('.modal-title').text("Menu for ");
         $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
         $("#offer_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        $("#offer_dialog").off('hide.bs.modal');
         $("#offer_dialog").on('hide.bs.modal', this,this.CloseMenu);
 
         $('#add_item').css('display', 'block');
@@ -255,7 +258,7 @@ class SupplierOffer {
 
         ev.preventDefault(); // avoid to execute the actual submit of the form.
         ev.stopPropagation();
-        let tab = 'tab_'+$('.tab-pane').length;
+        let tab = 'tab_'+String($('.tab-pane').length-1);
 
         ev.data.changed = true;
         let cats ='';
@@ -276,11 +279,6 @@ class SupplierOffer {
         $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
             '</div>').insertBefore($('#add_tab_div'));
 
-    }
-    function() {
-        let tab = $(this).parent().parent().find("a[data-toggle=tab]");
-        $(tab).text($(this).text());
-        $(tab).attr('data-translate', md5($(this).text()));
     }
 
     AddOfferItem(ev){
@@ -433,20 +431,21 @@ class SupplierOffer {
     }
 
     GetOfferItems(lang,active){
-
-         var offerObj = {};
+        let that = this;
+        let offerObj = {};
+        that.arCat = [];
 
         $('div.div_tab_inserted').each(function (index, value) {
             let id = $(value).attr('id');
-            let val = $($('[data-translate="' + md5(id) + '"]')[0]).text();
-
+            let val = $($('a[data-translate="' + md5(id) + '"]')).text();
+            that.arCat.push(parseInt($('[data-translate="' + md5(id) + '"]')[0].id));
 
             if (!window.dict.dict[md5(id)]) {
                 window.dict.dict[md5(id)] = {[lang]: val};
             }
 
-            window.dict.dict[md5(id)][lang] = val;
-
+            if(val)
+                window.dict.dict[md5(id)][lang] = val;
 
             let miAr = $(this).find('.menu_item');
             if (miAr.length === 0) {
@@ -522,8 +521,8 @@ class SupplierOffer {
 
         let class_obj = ev.data.parent;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
-
-        window.admin.UpdateOfferLocal( this.GetOfferItems(lang), this.location, window.dict.dict, date);
+        let items = this.GetOfferItems(lang);
+        window.admin.UpdateOfferLocal( items , this.location, window.dict.dict, date);
     }
 
     CloseMenu(ev) {

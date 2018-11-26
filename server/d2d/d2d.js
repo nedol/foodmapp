@@ -45,7 +45,7 @@ module.exports = class D2D {
                         else
                             this.updateorderuser(q, res);
                         break;
-                    case 'UpdateOffer':
+                    case 'updateoffer':
                         this.UpdateOffer(q, res);
                         break;
                     case 'translate':
@@ -82,6 +82,11 @@ module.exports = class D2D {
 
                     case 'get_suppliers':
                         this.GetSuppliers(q, res);
+                        break;
+
+                    default:
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        res.end();
                         break;
 
                 }
@@ -435,20 +440,21 @@ module.exports = class D2D {
             return;
         }
 
-        var sql_select =
-            "SELECT o.id as offer_id, o.data as offer, DATE_FORMAT(o.date,'%Y-%m-%d') as date" +
-            " FROM  offers as o, supplier as sup" +
-            " WHERE o.sup_uid=sup.uid AND sup.uid=\""+q.supplier+"\""+
-            " AND date=\""+q.date+"\""+
-            " ORDER BY o.id DESC";
 
-        global.con_obj.query(sql_select, function (err, result) {
+        let sql =
+            "SELECT of.id as offer_id, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            " FROM  supplier as sup, offer as of"+
+            " WHERE of.sup_uid=sup.uid AND sup.uid=\""+q.uid+"\"" +
+            " AND date=\""+q.date+"\""+
+            " ORDER BY of.id DESC";
+
+        global.con_obj.query(sql, function (err, result) {
             if (err) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({err: err}));
                 return;
             }
-            let values;
+            let values, sql;
             if(result.length>0) {
                 if (q.dict && result[0].offer) {// && result[0].obj_data.length<q.dict.length){
                     let data = JSON.parse(result[0].offer);
@@ -457,7 +463,7 @@ module.exports = class D2D {
                     data.dict = JSON.parse(dict);
                     values = [JSON.stringify(data)];
 
-                    var sql = "UPDATE offers SET data=?   WHERE id=" + result[0].offer_id;
+                    sql = "UPDATE offer SET data=?   WHERE id=" + result[0].offer_id;
                     //console.log(sql);
 
                     global.con_obj.query(sql, values, function (err, result) {
@@ -468,16 +474,15 @@ module.exports = class D2D {
                 }
 
                 if (new Date(result[0].date) >= new Date(q.date)) {
-                    values = [urlencode.decode(q.offer), result[0].order_id, q.date];
-                    var sql =
-                        ' UPDATE offers SET  data=?' +
-                        ' WHERE id =? AND DATE_FORMAT(date,"%Y-%m-%d")  =?';
+                    values = [urlencode.decode(q.offer), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period, result[0].offer_id];
+                    sql =
+                        'UPDATE offer SET data=?, categories=?, longitude=?, latitude=?, period=? WHERE id=?';
                 }
-            }else{
-                values = [q.supplier,JSON.stringify(offer),q.date,q.period];
-                var sql = 'INSERT INTO offers SET sup_uid=?, data=?, date=?, period=?';
+            }else {
+                values = [q.uid, JSON.stringify(offer),JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
+                sql =
+                    'INSERT INTO offer SET sup_uid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
             }
-
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
                     res.writeHead(200, {'Content-Type': 'application/json'});
@@ -489,7 +494,6 @@ module.exports = class D2D {
                     res.end(JSON.stringify({result: result}));
                 }
             });
-
         });
     }
 
@@ -664,8 +668,8 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT * , SPLIT_STR(of.categories, ',') as catar"+
-            " FROM  supplier as sup, offer as of, offer_data as ofd"+
-            " WHERE sup.uid = of.sup_uid AND of.data_id = ofd.id" +
+            " FROM  supplier as sup, offer as of"+
+            " WHERE sup.uid = of.sup_uid" +
             " AND latitude>"+ arCoor[0] +" AND latitude<"+arCoor[1] +
             " AND longitude>" + arCoor[2] + " AND longitude<" +arCoor[3];
 
