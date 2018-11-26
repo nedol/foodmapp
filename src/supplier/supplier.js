@@ -11,6 +11,7 @@ import {Network} from "../../network";
 
 import {Map} from '../map/map'
 import {DB} from "../map/storage/db"
+import proj from 'ol/proj';
 
 var urlencode = require('urlencode');
 
@@ -247,7 +248,7 @@ class Supplier{
                 uObj = {
                     "email": utils.getParameterByName('email'),
                     "uid": this.uid,
-                    "location":JSON.stringify(location),
+                    "location":location,
                     "offer": offer
                 };
                 localStorage.setItem('supplier', JSON.stringify({[date]:uObj}));
@@ -256,7 +257,7 @@ class Supplier{
                 uObj = {
                     "email": this.email,
                     "uid": this.uid,
-                    "location":JSON.stringify(location),
+                    "location":location,
                     "offer": offer
                 };
 
@@ -270,7 +271,7 @@ class Supplier{
 
     PublishOffer(data, date, location){
         let that = this;
-        if(!location.lat || !location.lon){
+        if(!location){
             this.PickRegion( function () {
                 that.PublishOffer(data, date, location);
             });
@@ -279,9 +280,11 @@ class Supplier{
         let data_obj = {
             "proj": "d2d",
             "func": "updateoffer",
-            "supplier": uObj.uid,
+            "uid": that.uid,
+            "categories": that.offer.arCat,
             "date": date,
             "period":"17:00-19:00",
+            "location": proj.toLonLat(that.offer.location),
             "offer": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict),
             "lang": window.sets.lang
