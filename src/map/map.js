@@ -72,7 +72,7 @@ class Map {
         this.marker = new Marker( this, document.getElementById('marker'));
         this.geo = new Geo(this);
         this.menu = new Menu(this);
-        //this.animate = new Animate(this);
+        this.animate = new Animate(this);
         //this.settings = new Settings(this);
         this.categories = new Categories(this);
         this.layers = new Layers(this);
@@ -100,7 +100,7 @@ class Map {
         }
 
         setTimeout(function () {
-            if (this.lat_param && this.lon_param) {
+            if (that.lat_param && that.lon_param) {
                 window.sets.coords.cur = proj.fromLonLat([parseFloat(that.lon_param), parseFloat(that.lat_param)]);
                 let latlon = proj.toLonLat(window.sets.coords.cur);
                 that.GetSuppliers(that.lat_param, that.lon_param);
@@ -145,20 +145,24 @@ class Map {
     }
 
 
-    GetObjectsFromStorage(cat, area) {
+    GetObjectsFromStorage(cats, area) {
         let that = this;
-        window.db.getRange(cat, area[0], area[2], area[1], area[3], function (cat, features) {
-            let layer = that.ol_map.getLayers().get(cat);
-            if (!layer) {
-                layer = that.layers.CreateLayer(cat, '1');
-            }
 
-            let source = layer.values_.vector;
-            $.each(features, function (key, f) {
-                if (!source.getFeatureById(f.getId())) {
-                    that.layers.AddCluster(layer, f);
+        window.db.getRange( that.supplier.date, cats, parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
+            for(let f in features) {
+                for(let c in features[f].values_.categories) {
+                    let cat = features[f].values_.categories[c];
+                    let layer = that.ol_map.getLayers().get(cat);
+                    if (!layer) {
+                        layer = that.layers.CreateLayer(cat, '1');
+                    }
+
+                    let source = layer.values_.vector;
+                    if (!source.getFeatureById(features[f].getId())) {
+                        that.layers.AddCluster(layer, features[f]);
+                    }
                 }
-            });
+            }
         });
     }
 

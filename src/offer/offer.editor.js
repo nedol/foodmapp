@@ -1,12 +1,11 @@
 'use strict'
-export {SupplierOffer}
+export {OfferEditor}
 
 var urlencode = require('urlencode');
 require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
-// require('bootstrap/dist/css/bootstrap.css');
-// require('font-awesome/css/font-awesome.css');
+
 
 let Dict = require('../dict/dict.js');
 const langs = require("../dict/languages");
@@ -17,11 +16,12 @@ var md5 = require('md5');
 var isJSON = require('is-json');
 
 import {utils} from "../utils/utils";
+import {OfferViewer} from "./offer.viewer";
 
-class SupplierOffer {
+class OfferEditor extends OfferViewer{
 
     constructor(){
-
+        super();
         this.admin;
         this.uid;
         this.changed = false;
@@ -32,11 +32,12 @@ class SupplierOffer {
         this.from;
         this.to;
 
-        this.arCat = []
+        this.arCat = [];
 
-        this.location = {lat:'',lon:''};
+        this.location = [];
 
         this.active_class = 'w3-border w3-border-grey w3-round-large';
+
     }
 
 
@@ -201,7 +202,6 @@ class SupplierOffer {
             }
         }
 
-
         // let sp = $('.sp_dlg');
         // $(sp).selectpicker();
         // let evnts = $._data($(sp).get(0), "events");
@@ -316,7 +316,7 @@ class SupplierOffer {
         hash = md5(new Date()+1);
         window.dict.dict[hash] = {};
         $(menu_item).find('.content_text').attr('data-translate', hash);
-        $(menu_item).find('.img-fluid').attr('src', './images/banner.png');
+        $(menu_item).find('.img-fluid').attr('src', '../dist/images/banner.png');
         $(menu_item).find('.img-fluid').attr('id','img_'+tab.replace('#','')+'_'+pos);
         $(menu_item).find('.img-fluid').on('dblclick', this_obj.OnClickImport);
         $(menu_item).find('.put_image').css('display', 'block');

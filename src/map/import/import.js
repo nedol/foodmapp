@@ -2,6 +2,7 @@ export {Import};
 
 import proj from 'ol/proj';
 var md5 = require('md5');
+var urlencode = require('urlencode');
 
 class Import {
 
@@ -31,13 +32,13 @@ class Import {
                     (parseFloat(LotLat[0].toFixed(1)) + 0.05).toFixed(2)
                 ];
 
-                let str = cats +  "_" +  area;
+                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-                if (!IsDownloadedArea(cats +  "_" +  area)) {
+                if (!IsDownloadedArea(date+"_"+cats +  "_" +  area)) {
                     let uid = that.map.supplier.uid;
                     that.LoadSupplierData(uid, cats, area, function (res) {
                         if (res)
-                            that.areasAr.push(cats +  "_" +  area);
+                            that.areasAr.push(date+"_"+cats +  "_" +  area);
                     });
                 }
 
@@ -60,99 +61,61 @@ class Import {
 
     LoadSupplierData(uid, cats,area, cb ) {
         let that =  this;
-
-        function processResult(res) {
-
-            // var res = $.grep($(res), function (el, i) {
-            //     return el.object === 'object'
-            // });
-
-            if (res.length > 0) {
-
-                let markerArr = [];
-
-                for (var i = 0; i < res.length; i++) {
-                    var obj = res[i];
-
-                    if (obj.area) {
-                        that.areasAr.push(obj.area);
-                        continue;
-                    }
-
-                    cat = obj.category;
-
-                    if (obj.logo) {
-                        //var id_str = GetObjId(obj.latitude,obj.longitude);
-                        obj.logo = "data:image/*;base64," + obj.logo;
-                    }
-
-                    addToArr(markerArr, obj);
-
-                }
-
-                if(markerArr.length>0)
-                    that.map.SetMarkersArExt(cat, markerArr);
-
-
-            }
-            cb(true);
-        }
-
-        function addToArr(jsAr,obj) {
-
-            jsAr.push({
-                owner: obj.owner,
-                id: md5(parseFloat(obj.latitude),parseFloat(obj.longitude)),
-                url: obj.url,//.replace("http","https"),
-                category: obj.category,
-                level: obj.level,
-                func: obj.func,
-                caption: obj.caption,
-                title: obj.title,
-                longitude: parseFloat(obj.longitude),
-                latitude: parseFloat(obj.latitude),
-                logo: obj.logo,
-                owner: obj.owner,
-                owner_email: obj.owner_email,
-                overlay: obj.overlay
-            });
-
-        }
-
-
         try{
-            var url = host_port+'/?'+ //
-                "proj=d2d"+
-                "&func=get_suppliers"+
-                "&uid="+ uid+
-                "&cats="+cats+
-                "&areas="+area+
-                "&lang="+window.sets.lang;
+            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-            $.ajax({
-                url: url,
-                method: "GET",
-                dataType: 'json',
-                processData:false,
-                async: true,   // asynchronous request? (synchronous requests are discouraged...)
-                cache: false,
-                crossDomain: true,
-                success: processResult,
-                error: function(xhr, status, error){
-                    //var err = eval("(" + xhr.responseText + ")");
-                    console.log(error.Message);
-                    console.warn(xhr.responseText);
-                    cb(false);
-                },
-                complete: function (data) {
-                    //alert(data.responseText);
-                },
+            let data_obj = {
+                "proj": "d2d",
+                "func": "get_suppliers",
+                "uid": uid,
+                "categories": cats,
+                "date": date,
+                "period":"17:00-19:00",
+                "areas": area
+            };
+
+            that.map.supplier.network.postRequest(data_obj, function (data) {
+                if(data)
+                    processResult(data);
             });
 
         }catch (ex) {
             console.log();
         }
 
+        function processResult(res) {
+            try {
+                res = JSON.parse(urlencode.decode(res));
+                if (res) {
+                    cb(true);
+                    for (let i in res) {
+                        let obj = res[i];
+                        obj = formatObject(obj);
+                        window.db.setFile(obj, function (bool) {
+
+                        });
+                    }
+
+                }else{
+                    cb(false);
+                }
+            }catch(ex){
+                console.log();
+            }
+        }
+
+        function formatObject(obj) {
+            return {
+                uid: obj.uid,
+                email: obj.email,
+                date: obj.date,
+                categories: obj.cats,
+                longitude: obj.lon,
+                latitude: obj.lat,
+                logo: "../dist/images/truck.png",
+                offer: obj.data
+            };
+        }
     }
 
 

@@ -48,7 +48,7 @@ class Overlay {
 
         $(element).on('click', that.map.supplier, function (ev) {
             console.log("on click");
-            that.map.supplier.offer.OpenOffer(ev);
+            that.map.supplier.offer.OpenOffer(ev, 'edit');
         });
 
         $(element).on('touchstart', function (ev) {

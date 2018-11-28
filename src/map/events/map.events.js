@@ -35,6 +35,14 @@ class MapEvents{
                 $('#menu_items').slideToggle('slow', function () {
                 });
 
+            that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                window.db.getFile(feature.values_.features[0].id_, function (obj) {
+                    event.data  = that.map.supplier.offer;
+                    event.data.offer.offer = JSON.parse(obj.offer);
+                    that.map.supplier.viewer.OpenOffer(event);
+                });
+            });
+
         });
 
         this.map.ol_map.on('movestart', function (event) {

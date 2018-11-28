@@ -4,7 +4,7 @@ export {Supplier};
 let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
-import {SupplierOffer} from './supplier.offer';
+import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js?v=4';
 import {Network} from "../../network";
 //import {RTCOperator} from "../rtc/rtc_operator"
@@ -12,6 +12,10 @@ import {Network} from "../../network";
 import {Map} from '../map/map'
 import {DB} from "../map/storage/db"
 import proj from 'ol/proj';
+import layerVector from 'ol/layer/vector';
+
+import {Overlay} from "../map/overlay/overlay";
+import {OfferViewer} from "../offer/offer.viewer";
 
 var urlencode = require('urlencode');
 
@@ -28,25 +32,35 @@ class Supplier{
 
     constructor(uObj) {
 
-        this.uid = (window.demoMode?'e2f6cb3e58815222c734f661820df37e':uObj.uid);
-        this.email = uObj.email;
+        this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        let last = Object.keys(uObj)[Object.keys(uObj).length-1];
+
+        this.offer = new OfferEditor();
+        this.viewer = new OfferViewer();
+
+        if(last && uObj[last]){
+            this.uid = uObj[last].uid;
+            this.email = uObj[last].email;
+            this.offer.offer = uObj[last].offer;
+            this.offer.location = uObj[last].location;
+            uObj[this.date] = uObj[last];
+            localStorage.setItem("supplier", JSON.stringify(uObj));
+        }
 
         this.db = new DB(function () {
             
         });
 
-        this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        this.map = new Map(this);
+        this.map.MoveToLocation(this.offer.location);
 
-        this.rtc_operator;
-
-        this.offer = new SupplierOffer();
-        let last = Object.keys(uObj)[0];
-        if(uObj[last]) {
-            this.offer.offer = uObj[last].offer;
-            this.date = last;
+        let sup = JSON.parse(localStorage.getItem('supplier'));
+        if(!sup[this.date]) {
+            sup[this.date]= {uid:this.uid,email:this.email};
+            localStorage.setItem('supplier', JSON.stringify(sup));
         }
 
-        this.map = new Map(this);
+        this.rtc_operator;
 
         this.order= {};
 
@@ -55,10 +69,6 @@ class Supplier{
     IsAuth_test(cb){
 
         this.network = new Network(host_port);
-
-        $('.dt_val').val(this.date);
-
-        $('#datetimepicker').on('dp.change',this,this.GetReserved);
 
         let dict = JSON.parse(localStorage.getItem('dict'));
         if(dict) {
@@ -78,7 +88,10 @@ class Supplier{
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
 
         cb();
-        this.DocReady();
+
+        $('#main_menu').on('click touch', this, this.OpenOfferEditor);
+
+        this.DateTimePickerEvents();
     }
 
     IsAuth(cb) {
@@ -155,7 +168,8 @@ class Supplier{
         }
     }
 
-    DocReady() {
+    DateTimePickerEvents(){
+        let that = this;
 
         let time = $('.period_list').find('a')[0].text;
         $('.sel_time').text(time);
@@ -184,6 +198,7 @@ class Supplier{
             $('#dt_to').val(to);
 
         });
+
         $('#dt_to').on("dp.change",this, function (ev) {
 
             let date_to = new moment($('#period_1').find('.to')[0].getAttribute('text').value, 'HH:mm');//;
@@ -196,13 +211,16 @@ class Supplier{
 
             $(this).data("DateTimePicker").toggle();
         });
+
         $('#date').on("click touchstart",this,function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
+
         $('.period').find('.from').on("click touchstart",this,function (ev) {
             if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
                 $('#dt_from').data("DateTimePicker").toggle();
         });
+
         $('.period').find('.to').on("click touchstart", this,function (ev) {
             if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
                 $('#dt_to').data("DateTimePicker").toggle();
@@ -210,18 +228,45 @@ class Supplier{
 
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
-            $('.dt_val').val($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+            that.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-            ev.data.order_hash = undefined;
-            $('#period_1').attr('visible','false');
-            $('#period_2').attr('visible','false');
+            $('.dt_val').val(that.date);
+
             $('.sel_time').find('option').css('visibility','visible');
 
             $(this).data("DateTimePicker").toggle();
+
+            let layers = that.map.ol_map.getLayers();
+            layers.forEach(function (layer, i, layers) {
+                if(layer.constructor.name==="_ol_layer_Vector_") {
+                    var features = layer.getSource().getFeatures();
+                    features.forEach((feature) => {
+                        layer.getSource().removeFeature(feature);
+                    });
+                }
+            });
+
+            let sup = JSON.parse(localStorage.getItem('supplier'));
+
+            if(!sup[that.date]) {
+                that.offer.offer = {};
+                sup[that.date]= {uid:that.uid,email:that.email,offer:{},location:[]};
+                localStorage.setItem('supplier', JSON.stringify(sup));
+            }else {
+                if(sup[that.date].offer)
+                    that.offer.offer = sup[that.date].offer;
+                if(sup[that.date].location.length===2) {
+                    that.offer.location = sup[that.date].location;
+                    that.map.MoveToLocation(sup[that.date].location);
+                    new Overlay(that.map,$('#my_truck')[0],sup[that.date].location);
+                }
+
+            }
+
+            //this.GetReserved();
+
+
         });
-
-        $('#main_menu').on('click touch', this, this.OpenOfferEditor);
-
     }
 
     OnClickTimeRange(ev){
@@ -236,7 +281,7 @@ class Supplier{
     }
 
     OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer(ev);
+        ev.data.offer.OpenOffer(ev, 'edit');
     }
 
     UpdateOfferLocal(offer, location, dict, date){

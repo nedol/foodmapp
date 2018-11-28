@@ -3,13 +3,14 @@ import {utils} from '../../utils/utils';
 import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
 import proj from 'ol/proj';
-//var DB = DB || {};
+var md5 = require('md5');
+
 class DB {
 
     constructor(f) {
 
         this.DBcon;
-        this.version = 1;
+        this.version = 2;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -36,7 +37,7 @@ class DB {
 
 
     connectDB(f) {
-        var func = this;
+        var that = this;
         try {
             var request = this.iDB.open(this.baseName, this.version);
             request.onerror = this.logerr;
@@ -52,14 +53,18 @@ class DB {
                 db.onerror = function (event) {
                     console.log(event);
                 };
-                let vObjectStore = db.createObjectStore('objectesStore', {keyPath: "uid"});
+                let vObjectStore = db.createObjectStore(that.storeName, {keyPath: "uid"});
                 vObjectStore.createIndex("uid", "uid", {unique: true});
+                vObjectStore.createIndex("datelatlon", ["date","latitude","longitude"], {unique: false});
+                vObjectStore.createIndex("date","date", {unique: false});
                 vObjectStore.createIndex("hash", "hash", {unique: false});
                 vObjectStore.createIndex("categories", "categories", {unique: false});
                 vObjectStore.createIndex("offer", "offer", {unique: false});
-                vObjectStore.createIndex("latlon", ["latitude", "longitude"], {unique: false});
-                let vImgStore = db.createObjectStore('imagesStore', {keyPath: "hash"});
-                func.connectDB(f);
+                vObjectStore.createIndex("latitude","latitude", {unique: false});
+                vObjectStore.createIndex("longitude","longitude", {unique: false});
+                vObjectStore.createIndex("period","period", {unique: false});
+                let vImgStore = db.createObjectStore(that.imgStoreName, {keyPath: "hash"});
+                that.connectDB(f);
             };
 
         } catch (ex) {
@@ -89,54 +94,58 @@ class DB {
             };
     }
 
-    getFile(file_id, obj, f) {
+    getFile(file_id, f) {
 
         if (!file_id)
             return;
         try {
-            var request = this.DBcon.transaction([this.storeName], "readonly").objectStore(this.storeName).get(file_id);
-            request.onerror = logerr;
+            let objectStore = this.DBcon.transaction(this.storeName, "readonly").objectStore(this.storeName);
+            var iuid = objectStore.index("uid");
+            var request = objectStore.get(file_id);
+            request.onerror = this.logerr;
             request.onsuccess = function () {
                 //console.log("File get from DB:"+request.result);
-                f(this.result ? this.result : -1, file_id, obj);
+                f(this.result ? this.result : -1);
             }
         } catch (ex) {
-
+            console.log(ex);
         }
     }
 
-    getRange(cat, lat_0, lon_0, lat_1, lon_1, f) {
+    getRange(date,cats, lat_0, lon_0, lat_1, lon_1, f) {
 
         if(!this.DBcon)
             return;
         var tx = this.DBcon.transaction([this.storeName], "readonly");
         var objectStore = tx.objectStore(this.storeName);
-        var features = [];
-        var icat = objectStore.index("category");
-        var boundKeyRange = IDBKeyRange.only(cat);
+        var ilatlon = objectStore.index("datelatlon");
+        var lowerBound = [date,lat_0,lon_0];
+        var upperBound = [date,lat_1,lon_1];
+        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound);
 
-        icat.openCursor(boundKeyRange).onsuccess = function (event) {
+        var features = [];
+
+        ilatlon.openCursor(boundKeyRange).onsuccess = function (event) {
+
             var cursor = event.target.result;
             if (cursor) {
-                cat = cursor.value.category;
                 var markerFeature = new Feature({
                     geometry: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
                     labelPoint: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
-                    name: cursor.value.title ? cursor.value.title : "",
-                    tooltip: cursor.value.title ? cursor.value.title : "",
+                    //name: cursor.value.title ? cursor.value.title : "",
+                    //tooltip: cursor.value.title ? cursor.value.title : "",
+                    categories: JSON.parse(cursor.value.categories),
                     object: cursor.value
                 });
-                var id_str = GetObjId(cursor.value.latitude, cursor.value.longitude);
-                markerFeature.setId(id_str);
-                if (cursor.value.latitude <= lat_1 && cursor.value.longitude <= lon_1 &&
-                    cursor.value.latitude >= lat_0 && cursor.value.longitude >= lon_0)
-                    features.push(markerFeature);
+                var id_str = md5(cursor.value.email);
+                markerFeature.setId(cursor.value.uid);
+                features.push(markerFeature);
                 cursor.continue();
             }
         };
 
         tx.oncomplete = function () {
-            f(cat, features);
+            f(features);
         }
 
     }
@@ -147,10 +156,10 @@ class DB {
         var request = objectStore.put(obj);
         request.onerror = function (err) {
             console.log(err);
-            f(obj.category);
+            f(false);
         };
         request.onsuccess = function () {
-            f(obj.category);
+            f(true);
         }
     }
 

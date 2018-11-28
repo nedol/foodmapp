@@ -90,6 +90,7 @@ class Layers {
     }
 
     CreateLayer(cat, state) {
+        let that = this;
         let style;
         let features = [];
 
@@ -112,73 +113,27 @@ class Layers {
                 let features = cl_feature.values_.features;
                 if (features.length > 0)
                     $.each(features, function (key, feature) {
-
                         let id_str = feature.getId();
-                        window.db.getFile(id_str, cl_feature, function (res, id_str, feature) {
+                        window.db.getFile(id_str, function (res) {
                             if (res !== -1) {
-                                let style = OutputObject(res);
+                                let style = getObjectStyle(res);
                                 if (style)
-                                    feature.setStyle(style);
+                                    cl_feature.setStyle(style);
                             }
                         });
                     });
 
 
-                function OutputObject(obj) {
+                function getObjectStyle(obj) {
 
                     if (!obj || parseInt(obj.status) === 0)
                         return null;
 
-                    if (obj.category == 10) {
-                        //TODO SetFlash(cl_feature);
-                    }
                     let logo = '';
                     let scale = 1;
 
-                    if (obj.category === '3')
-                        logo = '../src/images/empty.png';
-                    else
-                        logo = obj.logo;
+                    logo = obj.logo;
                     scale = .3;//Map.getView().getZoom()/obj.ambit;
-
-
-                    if (!logo && obj.category !== 3) {
-                        if (obj.type === 1)
-                            cat = 'ic_0_0.png';
-                        let cat = String(obj.category >= 10 ? Math.floor(obj.category / 10) * 10 : obj.category);
-                        logo = '../src/categories/images/ic_' + cat + '.png';
-                        scale = 0.35;
-                    }
-
-                    if (features.length > 1 || obj.ambit * d2d_map.ol_map.getView().getZoom() <= 500) {
-
-                        if (obj.overlay) {
-                            let id_str = utils.GetObjId(obj.latitude, obj.longitude);
-                            RemoveOverlay(id_str);
-                        }
-
-                    } else {
-                        let ext = this.map.ol_map.getView().calculateExtent();
-                        let res = Extent.getIntersection(ext, cl_feature.getGeometry().getExtent());
-                        if (Extent.isEmpty(res)) {//out of screen
-
-                            if (obj.overlay) {
-                                let id_str = GetObjId(obj.latitude, obj.longitude);
-                                RemoveOverlay(id_str);
-                            } else {
-                                let layer = this.map.ol_map.getLayers().get(obj.category);
-                                layer.getSource().removeFeature(cl_feature);
-                            }
-                            return null;
-                        } else if (obj.overlay && jQuery.inArray(obj, ar) === -1) {
-                            this.ar.push(obj);
-
-
-                            //DownloadOverlayIFrame(obj.overlay, obj);
-                            //return;
-                        }
-                    }
-
 
                     let opacity;
                     if (parseInt(obj.status) === 2 && obj.category !== '12')
@@ -350,11 +305,8 @@ class Layers {
     AddCluster(layer, new_features) {
 
         let vectorSource = layer.values_.vector;
-        if (new_features.length >= 2) {
-            vectorSource.addFeatures(new_features);
-        } else {
-            vectorSource.addFeature(new_features);
-        }
+
+        vectorSource.addFeature(new_features);
 
         let clusterSource = new Cluster({
             distance: 100,//parseInt(50, 10),

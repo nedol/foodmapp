@@ -431,16 +431,6 @@ module.exports = class D2D {
 
     UpdateOffer(q, res){
 
-        let offer = urlencode.decode(q.offer);
-        if(isJSON(offer)){
-            offer = JSON.parse(offer);
-        }else{
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end();
-            return;
-        }
-
-
         let sql =
             "SELECT of.id as offer_id, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offer as of"+
@@ -457,18 +447,20 @@ module.exports = class D2D {
             let values, sql;
             if(result.length>0) {
                 if (q.dict && result[0].offer) {// && result[0].obj_data.length<q.dict.length){
-                    let data = JSON.parse(result[0].offer);
-                    let dict = q.dict;
 
-                    data.dict = JSON.parse(dict);
-                    values = [JSON.stringify(data)];
+                    values = [urlencode.decode(q.offer), result[0].offer_id];
 
-                    sql = "UPDATE offer SET data=?   WHERE id=" + result[0].offer_id;
+                    sql = "UPDATE offer SET data=?   WHERE id=?";
                     //console.log(sql);
 
                     global.con_obj.query(sql, values, function (err, result) {
                         if (result) {
-
+                            values = [q.dict, q.uid];
+                            sql = "UPDATE supplier SET dict=?   WHERE id=?";
+                            global.con_obj.query(sql, values, function (err, result) {
+                                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+                                res.end();
+                            });
                         }
                     });
                 }
@@ -479,7 +471,7 @@ module.exports = class D2D {
                         'UPDATE offer SET data=?, categories=?, longitude=?, latitude=?, period=? WHERE id=?';
                 }
             }else {
-                values = [q.uid, JSON.stringify(offer),JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
+                values = [q.uid, urlencode.decode(q.offer),JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
                 sql =
                     'INSERT INTO offer SET sup_uid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
             }
@@ -663,31 +655,36 @@ module.exports = class D2D {
 
     GetSuppliers(q, res){
 
-        let arCoor = q.areas.split(',');
-        let catsAr = q.cats.split(',');
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT * , SPLIT_STR(of.categories, ',') as catar"+
+        let sql = " SELECT sup.uid as uid, of.date as date, sup.email as email, of.categories as cats, " +
+            "of.latitude as lat, of.longitude as lon, of.data as data"+
             " FROM  supplier as sup, offer as of"+
             " WHERE sup.uid = of.sup_uid" +
-            " AND latitude>"+ arCoor[0] +" AND latitude<"+arCoor[1] +
-            " AND longitude>" + arCoor[2] + " AND longitude<" +arCoor[3];
+            " AND latitude>"+ q.areas[0] +" AND latitude<"+q.areas[1] +
+            " AND longitude>" + q.areas[2] + " AND longitude<" +q.areas[3]+
+            " AND date=\""+q.date+"\" AND uid<>\""+q.uid+"\"";
 
         global.con_obj.query(sql, function (err, result) {
-
+            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({'err':err}));
                 return;
             }
 
-            if(intersection(result.catar,catsAr).length >0){
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify(result));
-            }else{
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end();
+            if(result.length>0) {
+                for(let i in result) {
+                    let cats = JSON.parse(result[i].cats);
+                    if (intersection(cats, q.categories).length > 0) {
+                        //result[i].data =  urlencode.encode(result[i].data);
+                    }else{
+                        delete result[i];
+                    }
+                }
+
+                res.write(urlencode.encode(JSON.stringify(result)));
             }
+
+            res.end();
 
         });
 

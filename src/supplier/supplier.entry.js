@@ -46,7 +46,6 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
-
     $('#datetimepicker').datetimepicker({
         inline: true,
         sideBySide: true,
@@ -56,9 +55,12 @@ $(document).on('readystatechange', function () {
         disabledDates: [
             // moment("12/25/2018"),
             //new Date(2018, 11 - 1, 21),
-            "2018-01-12 00:53"
+            "2018-01-12"
         ]
     });
+
+    let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+    $('.dt_val').val(date);
 
     let dt_w = $('#datetimepicker').css('width');
     let dt_h = $('#datetimepicker').css('height');
@@ -120,25 +122,15 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').data("DateTimePicker").toggle();
     });
 
-
     let uObj;
-    let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
     if(utils.getParameterByName('email')) {
-        let uid = md5(JSON.stringify(Date.now()));
+        let uid = md5(date);
         if(!localStorage.getItem('supplier')) {
-            uObj = {[date]:{"email":getParameterByName('email'),"uid":uid,"offer":{}}};
+            uObj = {[date]:{"email":utils.getParameterByName('email'),"uid":uid,"offer":{}}};
             localStorage.setItem('supplier',JSON.stringify(uObj));
         }else{
-            uObj = localStorage.getItem('supplier');
-            if(!isJSON(uObj)) {
-                uObj = {
-                    "email": getParameterByName('email'),
-                    "uid": uid,
-                    "offer":{}
-                };
-                localStorage.setItem('supplier', JSON.stringify({[date]:uObj}));
-            }else
-                uObj = JSON.parse(uObj);
+            uObj = JSON.parse(localStorage.getItem('supplier'));
         }
     }
 

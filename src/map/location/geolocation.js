@@ -112,6 +112,7 @@ class Geo {
 
             if (coords) {
                 that.ChangeGPSPosition(that,coords);
+
             }
         }
 
@@ -142,8 +143,11 @@ class Geo {
         try {
             var size = that.map.ol_map.getSize();// @type {ol.Size}
             //alert(loc.toString());
-            that.map.ol_map.getView().setCenter(coordinate);// centerOn(coordinates, size, [570, 350]);
-            //$("#marker").trigger("change:cur_pos",[coordinate, "Event" ]);
+
+            if(that.map.ol_map.getView().getCenter()[0]!==coordinate[0] ||
+                that.map.ol_map.getView().getCenter()[1]!==coordinate[1])
+                that.map.MoveToLocation(coordinate);
+
             var latlon = proj.toLonLat(coordinate);
             window.sets.coords.gps = coordinate;
 
@@ -155,7 +159,7 @@ class Geo {
                 return feature;
             });
             if (feature)
-                OnClickFeature(feature);
+                feature.OnClickFeature(feature);
 
         } catch (ex) {
             console.log(ex);

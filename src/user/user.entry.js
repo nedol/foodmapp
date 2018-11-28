@@ -225,7 +225,7 @@ class Map {
 
     GetObjects(cat) {
         let that = this;
-        window.db.getRange(cat, window.area[0], window.area[2], window.area[1], window.area[3], function (cat, features) {
+        window.db.getRange(that.map.supplier.date,cat, window.area[0], window.area[2], window.area[1], window.area[3], function (cat, features) {
             let layer = that.ol_map.getLayers().get(cat);
 
             if (!layer) {

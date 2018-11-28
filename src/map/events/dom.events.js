@@ -41,6 +41,11 @@ class DOMEvents {
             let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
             let coor = map.ol_map.getCoordinateFromPixel(pixel);
             map.supplier.offer.location = coor;
+
+            let sup = JSON.parse(localStorage.getItem('supplier'));
+            sup[that.map.supplier.date].location = coor;
+            localStorage.setItem('supplier', JSON.stringify(sup));
+
             new Overlay(that.map,$('#my_truck')[0],coor);
         });
 
