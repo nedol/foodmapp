@@ -59,7 +59,7 @@ class Import {
         }
     }
 
-    LoadSupplierData(uid, cats,area, cb ) {
+    LoadSupplierData(uid, cats, area, cb ) {
         let that =  this;
         try{
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
@@ -75,8 +75,9 @@ class Import {
             };
 
             that.map.supplier.network.postRequest(data_obj, function (data) {
-                if(data)
+                if(data) {
                     processResult(data);
+                }
             });
 
         }catch (ex) {
@@ -113,7 +114,8 @@ class Import {
                 longitude: obj.lon,
                 latitude: obj.lat,
                 logo: "../dist/images/truck.png",
-                offer: obj.data
+                offer: obj.data,
+                dict: obj.dict
             };
         }
     }

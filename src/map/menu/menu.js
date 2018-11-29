@@ -78,7 +78,7 @@ class Menu {
         $(el).attr('state', $(el).attr('state') === '1' ? '0' : '1');
         $(el).css('opacity', $(el).attr('state') === '1' ? 1 : 0.3);
 
-        //Map.getLayers().get($(el).attr('id')).setVisible(($(el).attr('state')==='0'?false:true));
+        this.map.getLayers().get($(el).attr('id')).setVisible(($(el).attr('state')==='0'?false:true));
 
         let cats = $(".offer").toArray();
         cats = jQuery.map(cats, function (el) {

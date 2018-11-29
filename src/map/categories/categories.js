@@ -93,24 +93,9 @@ class Categories {
 
         let layers = that.map.ol_map.getLayers().values_;
         let id = parseInt($(el).attr('id'));
-        if (id >= 10) {
-            for (let i = 0; i < 10; i++) {
-                if (layers[id + i]) {
-                    layers[id + i].setVisible(($(el).attr('state') === '0' ? false : true));
-                    $('[ovl_cat=' + $(el).attr('id') + ']').each(function (key, item) {
-                        let id_str = $(item).attr('id').split('_')[0];
-                        //this.overlay.RemoveOverlay(id_str);
-                    });
-                }
-            }
-        } else {
-            if (layers[id])
-                layers[id].setVisible(($(el).attr('state') === '0' ? false : true));
-            $('[ovl_cat=' + $(el).attr('id') + ']').each(function (key, item) {
-                let id_str = $(item).attr('id').split('_')[0];
-                //this.overlay.RemoveOverlay(id_str);
-            });
-        }
+
+        if (layers[id])
+            layers[id].setVisible(($(el).attr('state') === '0' ? false : true));
 
         let cats = $(".category").toArray();
         cats = jQuery.map(cats, function (el) {

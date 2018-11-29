@@ -12,7 +12,7 @@ import {Network} from "../../network";
 import {Map} from '../map/map'
 import {DB} from "../map/storage/db"
 import proj from 'ol/proj';
-import layerVector from 'ol/layer/vector';
+
 
 import {Overlay} from "../map/overlay/overlay";
 import {OfferViewer} from "../offer/offer.viewer";
@@ -52,17 +52,13 @@ class Supplier{
         });
 
         this.map = new Map(this);
-        this.map.MoveToLocation(this.offer.location);
-
-        let sup = JSON.parse(localStorage.getItem('supplier'));
-        if(!sup[this.date]) {
-            sup[this.date]= {uid:this.uid,email:this.email};
-            localStorage.setItem('supplier', JSON.stringify(sup));
-        }
-
-        this.rtc_operator;
-
-        this.order= {};
+        // this.map.MoveToLocation(this.offer.location);
+        //
+        // let sup = JSON.parse(localStorage.getItem('supplier'));
+        // if(!sup[this.date]) {
+        //     sup[this.date]= {uid:this.uid,email:this.email};
+        //     localStorage.setItem('supplier', JSON.stringify(sup));
+        // }
 
     }
 
@@ -276,12 +272,10 @@ class Supplier{
         $('#dt_from').val(from);
         $('#dt_to').val(to);
 
-        if(Object.keys(this.order).length>0)
-            this.SetTables(this.order,this);
     }
 
     OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer(ev, 'edit');
+        ev.data.offer.OpenOffer(ev.data.offer.offer, this);
     }
 
     UpdateOfferLocal(offer, location, dict, date){
@@ -291,7 +285,7 @@ class Supplier{
             let uObj = localStorage.getItem('supplier');
             if (!isJSON(uObj)) {
                 uObj = {
-                    "email": utils.getParameterByName('email'),
+                    "email": this.email,
                     "uid": this.uid,
                     "location":location,
                     "offer": offer

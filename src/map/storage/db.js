@@ -10,7 +10,7 @@ class DB {
     constructor(f) {
 
         this.DBcon;
-        this.version = 2;
+        this.version = 4;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -47,29 +47,48 @@ class DB {
                 f(request.result);
             }
 
-            request.onupgradeneeded = function (e) {
-                //this.iDB.DeleteDB(function () {
+            request.onupgradeneeded = function (event) {
+                //that.DeleteDB(that.iDB,that.baseName,function (db) {
                 var db = event.target.result;
                 db.onerror = function (event) {
                     console.log(event);
                 };
-                let vObjectStore = db.createObjectStore(that.storeName, {keyPath: "uid"});
-                vObjectStore.createIndex("uid", "uid", {unique: true});
-                vObjectStore.createIndex("datelatlon", ["date","latitude","longitude"], {unique: false});
-                vObjectStore.createIndex("date","date", {unique: false});
+                let vObjectStore = db.createObjectStore(that.storeName, {keyPath: ["date", "uid"]});
+                //vObjectStore.createIndex("uid", "uid", {unique: false});
+                vObjectStore.createIndex("datelatlon", ["date", "latitude", "longitude"], {unique: true});
+                vObjectStore.createIndex("dateuid", ["date", "uid"], {unique: true});
+                //vObjectStore.createIndex("date", "date", {unique: false});
                 vObjectStore.createIndex("hash", "hash", {unique: false});
                 vObjectStore.createIndex("categories", "categories", {unique: false});
                 vObjectStore.createIndex("offer", "offer", {unique: false});
-                vObjectStore.createIndex("latitude","latitude", {unique: false});
-                vObjectStore.createIndex("longitude","longitude", {unique: false});
-                vObjectStore.createIndex("period","period", {unique: false});
+                vObjectStore.createIndex("dict", "dict", {unique: false});
+                vObjectStore.createIndex("latitude", "latitude", {unique: false});
+                vObjectStore.createIndex("longitude", "longitude", {unique: false});
+                vObjectStore.createIndex("period", "period", {unique: false});
                 let vImgStore = db.createObjectStore(that.imgStoreName, {keyPath: "hash"});
                 that.connectDB(f);
+            //});
             };
 
         } catch (ex) {
             console.log('connectDB:' + ex);
         }
+    }
+
+    DeleteDB(iDB,name,cb) {
+
+        var DBDeleteRequest = iDB.deleteDatabase(name);
+
+        DBDeleteRequest.onerror = function(event) {
+            console.log("Error deleting database.");
+        };
+
+        DBDeleteRequest.onsuccess = function(event) {
+            console.log("Database deleted successfully");
+            cb(event.target.result);
+        };
+
+        cb();
     }
 
     getStorage(f) {
@@ -94,14 +113,13 @@ class DB {
             };
     }
 
-    getFile(file_id, f) {
+    getFile(date,file_id, f) {
 
-        if (!file_id)
+        if (!file_id || !date)
             return;
         try {
             let objectStore = this.DBcon.transaction(this.storeName, "readonly").objectStore(this.storeName);
-            var iuid = objectStore.index("uid");
-            var request = objectStore.get(file_id);
+            var request = objectStore.get([date,file_id]);
             request.onerror = this.logerr;
             request.onsuccess = function () {
                 //console.log("File get from DB:"+request.result);

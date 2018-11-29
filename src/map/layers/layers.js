@@ -108,21 +108,20 @@ class Layers {
             source: vectorSource,
             vector: vectorSource,
             cluster: clusterSource,
-            style: function (cl_feature, atr) {
+            style: function (cluster_feature, atr) {
 
-                let features = cl_feature.values_.features;
-                if (features.length > 0)
+                let features = cluster_feature.values_.features;
+                let rem_feat = [];
+                if (features.length > 0) {
                     $.each(features, function (key, feature) {
                         let id_str = feature.getId();
-                        window.db.getFile(id_str, function (res) {
-                            if (res !== -1) {
-                                let style = getObjectStyle(res);
-                                if (style)
-                                    cl_feature.setStyle(style);
-                            }
-                        });
+                        if (feature.values_.object.date === that.map.supplier.date) {
+                            let style = getObjectStyle(feature.values_.object);
+                            if (style)
+                                cluster_feature.setStyle(style);
+                        }
                     });
-
+                }
 
                 function getObjectStyle(obj) {
 
@@ -158,7 +157,7 @@ class Layers {
                     if (features.length > 1) {
                         iconStyle = new Style({
                             text: new Text({
-                                text: cl_feature.values_.features.length.toString(),
+                                text: cluster_feature.values_.features.length.toString(),
                                 font: '12px serif',
                                 align: 'right',
                                 scale: 1.2,

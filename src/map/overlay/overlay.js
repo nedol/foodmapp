@@ -47,8 +47,7 @@ class Overlay {
         // }, 5);
 
         $(element).on('click', that.map.supplier, function (ev) {
-            console.log("on click");
-            that.map.supplier.offer.OpenOffer(ev, 'edit');
+            that.map.supplier.offer.OpenOffer(ev.data.offer.offer, that.map.supplier);
         });
 
         $(element).on('touchstart', function (ev) {

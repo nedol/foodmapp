@@ -5,15 +5,6 @@ class BrowserEvents {
     constructor(map) {
         this.map = map;
 
-        $(window).on("orientationchange", function (event) {
-            this.map.ol_map.updateSize();
-            console.log("the orientation of the device is now " + screen.orientation.angle);
-        });
-
-        // When the user clicks anywhere outside of the modal, close it
-        $(window).on('click', function (event) {
-            console.log();
-        });
 
         $('.close').on('click', function () {
             $('#settings_modal').css('display', 'none');

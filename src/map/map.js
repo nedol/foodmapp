@@ -3,9 +3,8 @@ export {Map}
 
 import map from 'ol/map';
 import View from 'ol/view';
-import Vector from 'ol/layer/vector';
 import TileLayer from 'ol/layer/tile';
-import XYZ from 'ol/source/xyz';
+import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
 import proj from 'ol/proj';
@@ -35,17 +34,15 @@ class Map {
         this.lon_param = '37.687';//getParameterByName('lon');
         this.zoom_param = '15';//getParameterByName('zoom');
 
-        this.osm;
+        this.osm = new OSM();
         if (!this.ol_map) {
             this.ol_map = new map({
                 layers: [
-                    this.osm = new TileLayer({
-                        source: new XYZ({
-                            url: 'https://{a-c}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                            crossOrigin: 'null'
-                        })
-                    })]
-                ,
+                    new TileLayer({
+                        preload: 4,
+                        source: this.osm
+                    })
+                ],
                 interactions: interaction.defaults({altShiftDragRotate: false, pinchRotate: false}),
                 controls: control.defaults({
                     zoom: false,
@@ -65,7 +62,7 @@ class Map {
                     zoom: 17
                 })
             });
-            this.ol_map.getLayers().set("OSM", this.osm, true);
+
         }
 
 
@@ -100,17 +97,13 @@ class Map {
         }
 
         setTimeout(function () {
-            if (that.lat_param && that.lon_param) {
-                window.sets.coords.cur = proj.fromLonLat([parseFloat(that.lon_param), parseFloat(that.lat_param)]);
-                let latlon = proj.toLonLat(window.sets.coords.cur);
-                that.GetSuppliers(that.lat_param, that.lon_param);
-            }
-            let time = new Date().getTime();
-            let cl = localStorage.getItem('cur_loc');
-            cl = JSON.parse(cl);
-            if (cl != null && cl.time < 1503824276869) {
-                localStorage.clear();
-            }
+
+            // let time = new Date().getTime();
+            // let cl = localStorage.getItem('cur_loc');
+            // cl = JSON.parse(cl);
+            // if (cl != null && cl.time < 1503824276869) {
+            //     localStorage.clear();
+            // }
 
             if (!localStorage.getItem("cur_loc")) {
 
@@ -199,22 +192,6 @@ class Map {
                 },
                 complete: function (data) {
 
-                    var obj = JSON.parse(data.responseText)[0];
-                    if (obj) {
-                        obj.longitude = parseFloat(obj.longitude);
-                        obj.latitude = parseFloat(obj.latitude);
-                        var obj_id = GetObjId(obj.latitude, obj.longitude);
-                        if (obj.overlay) {
-                            if ($("#" + obj_id + "_include").length === 0) {
-                                if (obj.overlay.includes('.ddd.')) {
-                                    new ddd_obj(obj).Download3d();
-                                    //$('a-scene')[0].renderer.render();
-                                } else {
-                                    DownloadOverlay(obj.overlay, obj);
-                                }
-                            }
-                        }
-                    }
                 },
             });
 

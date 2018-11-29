@@ -657,7 +657,7 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT sup.uid as uid, of.date as date, sup.email as email, of.categories as cats, " +
-            "of.latitude as lat, of.longitude as lon, of.data as data"+
+            "of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict"+
             " FROM  supplier as sup, offer as of"+
             " WHERE sup.uid = of.sup_uid" +
             " AND latitude>"+ q.areas[0] +" AND latitude<"+q.areas[1] +

@@ -10,6 +10,17 @@ class MapEvents{
 
         let that = this;
 
+        $(window).on("orientationchange", function (event) {
+            if( that.map.ol_map)
+                that.map.ol_map.updateSize();
+            console.log("the orientation of the device is now " + screen.orientation.angle);
+        });
+
+        // When the user clicks anywhere outside of the modal, close it
+        $(window).on('click', function (event) {
+            console.log();
+        });
+
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
                 that.map.panel.StopLocation();
@@ -36,11 +47,17 @@ class MapEvents{
                 });
 
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                window.db.getFile(feature.values_.features[0].id_, function (obj) {
-                    event.data  = that.map.supplier.offer;
-                    event.data.offer.offer = JSON.parse(obj.offer);
-                    that.map.supplier.viewer.OpenOffer(event);
-                });
+                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+                if(feature.values_.features.length===1) {
+                    window.db.getFile(date, feature.values_.features[0].id_, function (obj) {
+                        if (!that.map.supplier.viewer.offer) {
+                            let offer = JSON.parse(obj.offer);
+                            that.map.supplier.viewer.OpenOffer(offer);
+                        }
+                    });
+                }else{//cluster
+                    //TODO: zoomin
+                }
             });
 
         });

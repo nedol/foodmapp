@@ -18,10 +18,10 @@ var isJSON = require('is-json');
 import {utils} from "../utils/utils";
 import {OfferViewer} from "./offer.viewer";
 
-class OfferEditor extends OfferViewer{
+class OfferEditor{
 
     constructor(){
-        super();
+
         this.admin;
         this.uid;
         this.changed = false;
@@ -41,9 +41,18 @@ class OfferEditor extends OfferViewer{
     }
 
 
-    OpenOffer(event) {
+    OpenOffer(offer, parent) {
 
-        this.offer = event.data.offer.offer;
+        this.parent = parent;
+        this.offer = offer;
+
+        $('.tab_inserted').remove();
+        $('.menu_item').remove();
+
+        $('.dropdown').css('visibility','visible');
+        $('#order_menu_button').css('visibility','visible');
+        $('#add_tab_li').css('visibility','visible');
+        $('#add_item').css('visibility','visible');
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
@@ -51,7 +60,7 @@ class OfferEditor extends OfferViewer{
             show: true,
             keyboard:true
         });
-        this.parent = event.data;
+
 
         function selectText(el) {
             $(el).focus();
@@ -111,9 +120,11 @@ class OfferEditor extends OfferViewer{
                 let menu_item = $('#' + tab + '_' + i)[0];
                 $(menu_item).attr("class", 'menu_item');
                 $(menu_item).css('display', 'block');
+
                 $(menu_item).find(':checkbox').attr('id', 'item_cb_' + i);
                 $(menu_item).find(':checkbox').attr('pos', i);
                 $(menu_item).find(':checkbox').attr('tab', tab);
+                $('.btn').css('visibility','visible');
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'true');
                 $(menu_item).find('.item_price').attr('contenteditable', 'true');
@@ -302,6 +313,7 @@ class OfferEditor extends OfferViewer{
         $(menu_item).find(':checkbox').attr('id', 'item_cb_' + pos);
         $(menu_item).find(':checkbox').attr('pos', pos);
         $(menu_item).find(':checkbox').attr('tab', tab);
+        $('.btn').css('visibility','visible');
 
         $(menu_item).find('.content_text').attr('contenteditable', 'true');
         $(menu_item).find('.item_title').attr('contenteditable', 'true');
@@ -526,9 +538,9 @@ class OfferEditor extends OfferViewer{
     }
 
     CloseMenu(ev) {
-        let menu = ev.data;
+        let that = ev.data;
         //if(ev.data.changed)
-        menu.SaveOffer(ev,window.sets.lang);
+        that.SaveOffer(ev,window.sets.lang);
 
         $("#offer_dialog").find('.tab-pane').empty();
 
@@ -541,6 +553,7 @@ class OfferEditor extends OfferViewer{
         //$('.sp_dlg').off('changed.bs.select');
         $("#offer_dialog").find('.toolbar').css('display', 'none');
         $('input:file').off('change');
+
     }
 
     OnChangeLang(ev) {

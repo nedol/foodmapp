@@ -14,6 +14,5 @@ class Events {
         this.map = map;
         this.domEvents = new DOMEvents(map);
         this.mapEvents = new MapEvents(map);
-        this.browserEvents = new BrowserEvents(map);
     }
 }
