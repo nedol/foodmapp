@@ -14,10 +14,11 @@ class Network{
         this.CancelToken = axios.CancelToken;
         this.cancel;
         this.send_req_func;
+
     }
 
     InitSSE(that, cb){
-        this.eventSource = new window.EventSource(host_port+'?proj=rtc&sse=1&uid='+that.uid
+        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&uid='+that.uid
             //,{withCredentials: true}
         );
         this.eventSource.onerror = function(e) {

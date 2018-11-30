@@ -8,6 +8,8 @@ const translate = require('google-translate-api');//ISO 639-1
 
 var intersection = require('array-intersection');
 
+global.resObj = {};
+
 module.exports = class D2D {
 
     constructor(){
@@ -23,6 +25,8 @@ module.exports = class D2D {
             });
 
             res.write(utils.formatSSE({msg:'sse'}));
+
+            resObj[q.uid] = res;
 
         } else {
             try {
@@ -82,6 +86,10 @@ module.exports = class D2D {
 
                     case 'get_suppliers':
                         this.GetSuppliers(q, res);
+                        break;
+
+                    case 'share_location':
+                        this.ShareLocation(q, res);
                         break;
 
                     default:
@@ -660,9 +668,9 @@ module.exports = class D2D {
             "of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict"+
             " FROM  supplier as sup, offer as of"+
             " WHERE sup.uid = of.sup_uid" +
-            " AND latitude>"+ q.areas[0] +" AND latitude<"+q.areas[1] +
-            " AND longitude>" + q.areas[2] + " AND longitude<" +q.areas[3]+
-            " AND date=\""+q.date+"\" AND uid<>\""+q.uid+"\"";
+            " AND of.latitude>"+ q.areas[0] +" AND of.latitude<"+q.areas[1] +
+            " AND of.longitude>" + q.areas[2] + " AND of.longitude<" +q.areas[3]+
+            " AND of.date=\""+q.date+"\" AND uid<>\""+q.uid+"\"";
 
         global.con_obj.query(sql, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -671,7 +679,7 @@ module.exports = class D2D {
                 return;
             }
 
-            sql = "UPDATE supplier SET region='"+JSON.stringify(q.areas)+"' WHERE uid=\""+q.uid+"\"";
+            sql = "UPDATE supplier SET region='"+q.areas.toString()+"', date=\""+q.date+"\" WHERE uid=\""+q.uid+"\"";
 
             global.con_obj.query(sql, function (err, result) {
                 if (err) {
@@ -696,5 +704,40 @@ module.exports = class D2D {
 
         });
 
+    }
+
+    ShareLocation(q, res){
+
+        let sql = " SELECT sup.uid, sup.latitude as lat, sup.longitude as lon" +
+            " FROM supplier as sup, offer as off " +
+            " WHERE sup.uis=odd.sup_uid" +
+            " AND off.date=" +q.date+
+            " AND SPLIT_STR(sup.region,',',0)>"+q.latitude+ " AND SPLIT_STR(sup.region,',',1)<"+q.latitude+
+            " AND SPLIT_STR(sup.region,',',2)>"+q.longitude+ " AND SPLIT_STR(sup.region,',',3)<"+q.longitude+
+            " UNION" +
+            " SELECT uid, latitude as lat, longitude as lon" +
+            " FROM customer  " +
+            " WHERE " +
+            " date=" +q.date+
+            " AND SPLIT_STR(region,',',0)>"+q.latitude+ " AND SPLIT_STR(region,',',1)<"+q.latitude+
+            " AND SPLIT_STR(region,',',2)>"+q.longitude+ " AND SPLIT_STR(region,',',3)<"+q.longitude;
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                res.end(JSON.stringify({'err': err}));
+                return;
+            }
+            if(result.length>0){
+                for(let r in result){
+                    let sse = resObj[result[r].uid];
+                    if(sse){
+                        sse.write(JSON.stringify({"func":"location","uid":md5(q.email),"location":q.location}));
+                    }
+                }
+                res.end();
+            }
+
+        });
     }
 }

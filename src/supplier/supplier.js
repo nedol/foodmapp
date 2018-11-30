@@ -67,6 +67,9 @@ class Supplier{
     IsAuth_test(cb){
 
         this.network = new Network(host_port);
+        this.network.InitSSE(this,function () {
+
+        });
 
         let dict = JSON.parse(localStorage.getItem('dict'));
         if(dict) {
@@ -95,7 +98,9 @@ class Supplier{
         try {
 
             this.network = new Network(host_port);
+            this.network.InitSSE(this,function () {
 
+            });
             $('.dt_val').val(this.date);
 
             let that =this;
