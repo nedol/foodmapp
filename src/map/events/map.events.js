@@ -1,6 +1,7 @@
 export {MapEvents}
 
 import proj from 'ol/proj';
+import Extent from 'ol/extent';
 
 class MapEvents{
 
@@ -57,7 +58,24 @@ class MapEvents{
                         }
                     });
                 }else{//cluster
-                    //TODO: zoomin
+                    var coordinates = [];
+                    $.each(feature.values_.features, function (key, feature) {
+                        coordinates.push(feature.getGeometry().flatCoordinates);
+                    });
+
+                    var extent = Extent.boundingExtent(coordinates);
+                    var buf_extent = Extent.buffer(extent, 5);
+                    //ol.extent.applyTransform(extent, transformFn, opt_extent)
+                    that.map.ol_map.getView().fit(buf_extent, {
+                        duration: window.sets.animate_duration
+                    });
+
+                    that.map.ol_map.getView().animate({
+                        center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
+                        },
+                        function () {
+
+                        });
                 }
             });
 
