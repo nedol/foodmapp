@@ -25,7 +25,7 @@ class Import {
                     cats.push(parseInt(cat.id));
                 });
 
-                var area = [
+                let area = [
                     (parseFloat(LotLat[1].toFixed(1)) - 0.05).toFixed(2),
                     (parseFloat(LotLat[1].toFixed(1)) + 0.05).toFixed(2),
                     (parseFloat(LotLat[0].toFixed(1)) - 0.05).toFixed(2),

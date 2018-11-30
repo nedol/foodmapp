@@ -17,7 +17,7 @@
 <link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
 <!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
 <link rel="stylesheet" href="../lib/style.css">
-<!--<link rel="stylesheet" href="../node_modules/summernote/dist/summernote.css">-->
+
 
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
@@ -42,9 +42,6 @@
         z-index: 0;
     }
 
-    /*#map:focus {*/
-    /*outline: #4A74A8 solid 0.15em;*/
-    /*}*/
     #main_menu{
         display: block;
         position: absolute;
@@ -244,27 +241,35 @@
         </div>
     </div>
 
-    <div id="datetimepicker"
+    <div id="dtp_container"
          style="
+            display: none;
              position: absolute;
-             top: 300px;
-             left: 20%;
-             background-color: rgba(255,255,255,.8);
-             z-index: 11;"></div>
-    <div id="dt_from"
-         style="
-             background-color: white;
-             position: absolute;
-             top:50%;
-             right: 50%;
-             z-index: 11;"></div>
-    <div id="dt_to"
-         style="
-             position: absolute;
-             top:50%;
-             right: 50%;
-             background-color: rgba(255,255,255,.7);
-             z-index: 11;"></div>
+             margin: auto;
+             top: 0;
+             right: 0;
+             bottom: 0;
+             left: 0;
+             width: 200px;
+             height: 200px;
+             z-index: 11;">
+        <div id="datetimepicker" style="display: inline-block"></div>
+    </div>
+        <div id="dt_from"
+             style="
+                 background-color: white;
+                 position: absolute;
+                 top:50%;
+                 right: 50%;
+                 z-index: 11;"></div>
+        <div id="dt_to"
+             style="
+                 position: absolute;
+                 top:50%;
+                 right: 50%;
+                 background-color: rgba(255,255,255,.7);
+                 z-index: 11;"></div>
+
 
 </div>
 
@@ -487,8 +492,7 @@
 
                 <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
                 <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                <h4 class="modal-table-number"  style="display: none">Table</h4>
-                <h4 class="modal-menu-number"  style="display: none">Menu</h4>
+                <h4 class="modal-menu-number"  style="display: none">Offer</h4>
 
                 <button type="button" class="btn close" data-dismiss="modal" data-translate="">
                     <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
@@ -579,7 +583,9 @@
             width: 100%;" contenteditable="false">
         <div>
             <label  class="btn"  style="visibility:hidden">
-                <input type="checkbox" class="checkbox-inline" style="display: none"><i class="fa fa-square-o fa-2x"></i><i class="fa fa-check-square-o fa-2x"></i>
+                <input type="checkbox" class="checkbox-inline" style="display: none">
+                <i class="fa fa-square-o fa-2x"></i>
+                <i class="fa fa-check-square-o fa-2x"></i>
             </label>
             <div class="input item_title" tabindex="0" placeholder="Input title">&nbsp;&nbsp;&nbsp;</div>
             <div class="input item_price"><i class="fa fa-euro"></i></div>

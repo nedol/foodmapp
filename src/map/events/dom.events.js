@@ -29,26 +29,6 @@ class DOMEvents {
         });
 
 
-        $("#my_truck_ovl").on('dragstart',function (ev) {
-
-        });
-
-        $('#map').on('dragover',function (ev) {
-            ev.preventDefault();
-        });
-        $('#map').on('drop',function (ev) {
-            ev.preventDefault();
-            let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
-            let coor = map.ol_map.getCoordinateFromPixel(pixel);
-            map.supplier.offer.location = coor;
-
-            let sup = JSON.parse(localStorage.getItem('supplier'));
-            sup[that.map.supplier.date].location = coor;
-            localStorage.setItem('supplier', JSON.stringify(sup));
-
-            new Overlay(that.map,$('#my_truck_ovl')[0],coor);
-        });
-
 
         $("#search_but").draggable({
             start: function () {

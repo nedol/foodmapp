@@ -46,6 +46,8 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
+    let scale;
+
     $('#datetimepicker').datetimepicker({
         inline: true,
         sideBySide: true,
@@ -62,19 +64,31 @@ $(document).on('readystatechange', function () {
     let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
     $('.dt_val').val(date);
 
-    let dt_w = $('#datetimepicker').css('width');
-    let dt_h = $('#datetimepicker').css('height');
-    let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
-    $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
+    let dt_w = $('#dtp_container').css('width');
+    let dt_h = $('#dtp_container').css('height');
+    scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
+
+    //$('#datetimepicker').hide();
 
     $(window).on( "resize", function( event ) {
-        let dt_w = $('#datetimepicker').css('width');
-        let dt_h = $('#datetimepicker').css('height');
-        let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
-        $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
+        let dt_w = $('#dtp_container').css('width');
+        let dt_h = $('#dtp_container').css('height');
+        scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
+        $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
     });
 
     $('#datetimepicker').data("DateTimePicker").toggle();
+
+    $('#datetimepicker').on('dp.show',function (ev) {
+        $(this).css("background-color", "rgba(255,255,255,.8)");
+        $('#dtp_container').css('display', 'block');
+
+        $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
+    });
+
+    $('#datetimepicker').on('dp.hide',function (ev) {
+        $('#dtp_container').css('display', 'none');
+    })
 
     $('#dt_from').datetimepicker({
         inline: true,

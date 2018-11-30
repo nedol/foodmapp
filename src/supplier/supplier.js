@@ -98,8 +98,6 @@ class Supplier{
 
             $('.dt_val').val(this.date);
 
-            $('#datetimepicker').on('dp.change',this,this.GetReserved);
-
             let that =this;
 
             var data_obj ={
@@ -271,6 +269,34 @@ class Supplier{
 
             //this.GetReserved();
         });
+
+        $("#my_truck").on('dragstart',function (ev) {
+
+        });
+
+        $('#map').on('dragover',function (ev) {
+            ev.preventDefault();
+        });
+
+        $('#map').on('drop',function (ev) {
+            ev.preventDefault();
+            if(that.my_truck_ovl) {
+                that.my_truck_ovl.RemoveOverlay();
+                that.my_truck_ovl = '';
+            }
+            let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
+            let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
+            that.map.supplier.offer.location = coor;
+
+            let sup = JSON.parse(localStorage.getItem('supplier'));
+            sup[that.map.supplier.date].location = coor;
+            localStorage.setItem('supplier', JSON.stringify(sup));
+            $('#my_truck').css('visibility','visible');
+            let my_truck_2 = $('#my_truck').clone()[0];
+            $(my_truck_2).attr('id','my_truck_2');
+            that.my_truck_ovl  = new Overlay(that.map,my_truck_2,coor);
+            $('#my_truck').css('visibility','hidden');
+        });
     }
 
     OnClickTimeRange(ev){
@@ -290,25 +316,25 @@ class Supplier{
 
         if(window.demoMode) {
             this.offer.offer = offer;
-            let uObj = localStorage.getItem('supplier');
+            let uObj = JSON.parse(localStorage.getItem('supplier'));
             if (!isJSON(uObj)) {
-                uObj = {
+                uObj[date] = {
                     "email": this.email,
                     "uid": this.uid,
                     "location":location,
                     "offer": offer
                 };
-                localStorage.setItem('supplier', JSON.stringify({[date]:uObj}));
+                localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{
-                uObj = {
+                uObj[date] = {
                     "email": this.email,
                     "uid": this.uid,
                     "location":location,
                     "offer": offer
                 };
 
-                localStorage.setItem('supplier', JSON.stringify({[date]:uObj}));
+                localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }
 

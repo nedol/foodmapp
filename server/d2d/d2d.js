@@ -671,11 +671,19 @@ module.exports = class D2D {
                 return;
             }
 
+            sql = "UPDATE supplier SET region='"+JSON.stringify(q.areas)+"' WHERE uid=\""+q.uid+"\"";
+
+            global.con_obj.query(sql, function (err, result) {
+                if (err) {
+                    console.log(JSON.stringify({'err':err}));
+                }
+            });
+
             if(result.length>0) {
                 for(let i in result) {
                     let cats = JSON.parse(result[i].cats);
                     if (intersection(cats, q.categories).length > 0) {
-                        result[i].uid = md5(result[i].email);
+                        result[i].uid = md5(result[i].email);//!!!
                     }else{
                         delete result[i];
                     }
