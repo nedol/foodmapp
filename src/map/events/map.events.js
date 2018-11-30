@@ -52,7 +52,8 @@ class MapEvents{
                     window.db.getFile(date, feature.values_.features[0].id_, function (obj) {
                         if (!that.map.supplier.viewer.offer) {
                             let offer = JSON.parse(obj.offer);
-                            that.map.supplier.viewer.OpenOffer(offer);
+                            that.map.supplier.viewer.OpenOffer(offer, JSON.parse(obj.dict));
+
                         }
                     });
                 }else{//cluster

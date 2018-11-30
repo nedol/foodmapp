@@ -54,10 +54,7 @@ class DB {
                     console.log(event);
                 };
                 let vObjectStore = db.createObjectStore(that.storeName, {keyPath: ["date", "uid"]});
-                //vObjectStore.createIndex("uid", "uid", {unique: false});
                 vObjectStore.createIndex("datelatlon", ["date", "latitude", "longitude"], {unique: true});
-                vObjectStore.createIndex("dateuid", ["date", "uid"], {unique: true});
-                //vObjectStore.createIndex("date", "date", {unique: false});
                 vObjectStore.createIndex("hash", "hash", {unique: false});
                 vObjectStore.createIndex("categories", "categories", {unique: false});
                 vObjectStore.createIndex("offer", "offer", {unique: false});

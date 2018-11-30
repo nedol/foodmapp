@@ -5,7 +5,7 @@ let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
 import {OfferEditor} from '../offer/offer.editor';
-import {Dict} from '../dict/dict.js?v=4';
+import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
 //import {RTCOperator} from "../rtc/rtc_operator"
 
@@ -34,6 +34,8 @@ class Supplier{
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         let last = Object.keys(uObj)[Object.keys(uObj).length-1];
+
+        this.my_truck_ovl;
 
         this.offer = new OfferEditor();
         this.viewer = new OfferViewer();
@@ -79,8 +81,6 @@ class Supplier{
         localStorage.setItem("lang", window.sets.lang);
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
-
-
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
 
         cb();
@@ -170,7 +170,6 @@ class Supplier{
         let time = $('.period_list').find('a')[0].text;
         $('.sel_time').text(time);
 
-
         $('#dt_from').on("dp.change",this, function (ev) {
 
             let date_from =  new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
@@ -244,24 +243,33 @@ class Supplier{
 
             let sup = JSON.parse(localStorage.getItem('supplier'));
 
+            $('#my_truck').css('visibility','visible');
+
+            if(that.my_truck_ovl) {
+                that.my_truck_ovl.RemoveOverlay();
+                that.my_truck_ovl = '';
+            }
+
             if(!sup[that.date]) {
                 that.offer.offer = {};
                 sup[that.date]= {uid:that.uid,email:that.email,offer:{},location:[]};
                 localStorage.setItem('supplier', JSON.stringify(sup));
+
             }else {
                 if(sup[that.date].offer)
                     that.offer.offer = sup[that.date].offer;
                 if(sup[that.date].location.length===2) {
                     that.offer.location = sup[that.date].location;
                     that.map.MoveToLocation(sup[that.date].location);
-                    new Overlay(that.map,$('#my_truck')[0],sup[that.date].location);
+                    let my_truck_2 = $('#my_truck').clone()[0];
+                    $(my_truck_2).attr('id','my_truck_2');
+                    that.my_truck_ovl = new Overlay(that.map,my_truck_2,sup[that.date].location);
+                    $('#my_truck').css('visibility','hidden');
                 }
 
             }
 
             //this.GetReserved();
-
-
         });
     }
 

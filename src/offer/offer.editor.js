@@ -456,8 +456,9 @@ class OfferEditor{
                 window.dict.dict[md5(id)] = {[lang]: val};
             }
 
-            if(val)
+            if(val) {
                 window.dict.dict[md5(id)][lang] = val;
+            }
 
             let miAr = $(this).find('.menu_item');
             if (miAr.length === 0) {
@@ -478,8 +479,9 @@ class OfferEditor{
 
                     if (text.length === 0 || !text.trim())
                         continue;
-                    if(!window.dict.dict[hash])
+                    if(!window.dict.dict[hash]) {
                         window.dict.dict[hash] = {};
+                    }
                     if (text !== window.dict.dict[hash][lang]) {
                         let obj = Object.assign({},window.dict.dict[hash]);
                         delete window.dict.dict[hash];
@@ -497,8 +499,9 @@ class OfferEditor{
                         let h = $(cont_text).height();
                         hash = $(cont_text).attr('data-translate');
                         text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
-                        if(!window.dict.dict[hash])
+                        if(!window.dict.dict[hash]) {
                             window.dict.dict[hash] = {};
+                        }
                         if (text !== window.dict.dict[hash][lang]) {
                             let obj = Object.assign({},window.dict.dict[hash]);
                             //delete window.dict.dict[hash];
@@ -511,7 +514,8 @@ class OfferEditor{
                         item.width = w;
                         item.height = h;
                     }else{
-                        delete item.content;
+                        if(item.content)
+                            delete item.content;
                     }
 
                     if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {

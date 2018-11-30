@@ -8,7 +8,7 @@ require('bootstrap/js/tab.js');
 // require('bootstrap/dist/css/bootstrap.css');
 // require('font-awesome/css/font-awesome.css');
 
-let Dict = require('../dict/dict.js');
+import {Dict} from '../dict/dict.js';
 const langs = require("../dict/languages");
 
 var moment = require('moment');
@@ -23,6 +23,7 @@ class OfferViewer {
     constructor(){
         this.changed = false;
         this.offer ;
+        this.dict;
 
         this.arCat = [];
 
@@ -33,12 +34,13 @@ class OfferViewer {
     }
 
 
-    OpenOffer(offer) {
+    OpenOffer(offer, dict) {
 
         this.offer = offer;
+        this.dict = new Dict(dict);
 
-        $('.tab_inserted').remove();
         $('.menu_item').remove();
+        $('.tab_inserted').remove();
 
         $('.dropdown').css('visibility','hidden');
         $('#add_tab_li').css('visibility','hidden');
@@ -137,7 +139,7 @@ class OfferViewer {
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        window.dict.set_lang(window.sets.lang,$("#offer_dialog"));
+        this.dict.set_lang(window.sets.lang,$("#offer_dialog"));
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {

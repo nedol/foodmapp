@@ -338,29 +338,8 @@ class Overlay {
 
     }
 
-    RemoveOverlay(id_str) {
-
-        if ($("#" + id_str + '_ovl_container').length > 0) {
-            var ovl = d2d_map.ol_map.getOverlayById(id_str);
-            $(ovl.values_.element).removeClass("ovl_scale");
-            setTimeout(function () {
-                d2d_map.ol_map.removeOverlay(ovl);
-                //$("#" + id_str + '_ovl_container').remove();//no need
-            }, 800);
-        }
-    }
-
-    StartNewQuest(lat, lon) {
-
-        var loc;
-        if (coords.gps)
-            loc = ol.proj.toLonLat(coords.gps);
-        else if (Marker.overlay.getPosition()) {
-            loc = ol.proj.toLonLat(Marker.overlay.getPosition());
-        }
-
-        app_mode = 'quest';
-
-        new Route([[lat, lon], [loc[1], loc[0]]]);
+    RemoveOverlay() {
+        let that = this;
+        that.map.ol_map.removeOverlay(that.overlay);
     }
 }

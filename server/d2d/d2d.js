@@ -675,7 +675,7 @@ module.exports = class D2D {
                 for(let i in result) {
                     let cats = JSON.parse(result[i].cats);
                     if (intersection(cats, q.categories).length > 0) {
-                        //result[i].data =  urlencode.encode(result[i].data);
+                        result[i].uid = md5(result[i].email);
                     }else{
                         delete result[i];
                     }

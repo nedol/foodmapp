@@ -126,6 +126,15 @@
         background-color: rgba(200,200,200,0.7);
     }
 
+    #my_truck_2{
+        display: block;
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+        background-color: rgba(250,250,250,0);
+    }
+
     #zoom_but{
         display:block;
         position: absolute;
@@ -238,7 +247,7 @@
     <div id="datetimepicker"
          style="
              position: absolute;
-             top: 150px;
+             top: 300px;
              left: 20%;
              background-color: rgba(255,255,255,.8);
              z-index: 11;"></div>
@@ -293,24 +302,24 @@
     </style>
 
     <div id="category_container">
-        <img src="../src/user/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px;
+        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px;
         right: 50%; left:50%"/>
     </div>
 
     <div align="center" id="categories">
-        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../src/user/images/ic_0.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;"/>
-        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../src/user/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
-        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../src/user/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
-        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../src/user/images/ic_30.png" state="0"  data-translate="3fb5a1fd02693fe2959220f291b05f19" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../src/user/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
-        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../src/user/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
-        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../src/user/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../src/user/images/ic_70.png" state="1"  data-translate="25090ca7ae49ae5e0826233de9b89a30" />
-        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../src/user/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../src/user/images/ic_90.png" state="0"  data-translate="822ce45977e6e321b1a6b2efa72df99f" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../src/user/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
-        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../src/user/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../src/user/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../dist/images/ic_0.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../dist/images/ic_30.png" state="0"  data-translate="3fb5a1fd02693fe2959220f291b05f19" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../dist/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../dist/images/ic_70.png" state="1"  data-translate="25090ca7ae49ae5e0826233de9b89a30" />
+        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../dist/images/ic_90.png" state="0"  data-translate="822ce45977e6e321b1a6b2efa72df99f" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
     </div>
 
     <script>
@@ -465,14 +474,14 @@
             <div class="modal-header" style="position: relative;width: 100%;">
                 <div class="dropdown" style="display: inline-block">
                     <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"  data-toggle="dropdown"
-                            data-width="fit" type="button">
+                           data-width="fit" type="button">
                         <span class="glyphicon glyphicon-option-vertical"></span>
                     </button>
                     <ul id="menu_list" class="dropdown-menu order_menu_options">
                         <li class="publish_offer" data-width="fit"><a href="#"
-                               data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                           data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
                         <li class="cancel_offer" data-width="fit"><a href="#"
-                               data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
+                           data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
                     </ul>
                 </div>
 
@@ -569,9 +578,8 @@
             margin-bottom: 5px;
             width: 100%;" contenteditable="false">
         <div>
-            <label  class="btn">
+            <label  class="btn"  style="visibility:hidden">
                 <input type="checkbox" class="checkbox-inline" style="display: none"><i class="fa fa-square-o fa-2x"></i><i class="fa fa-check-square-o fa-2x"></i>
-                <span class="glyphicon glyphicon-time" style="display: none; position: relative; left: -25px"></span>
             </label>
             <div class="input item_title" tabindex="0" placeholder="Input title">&nbsp;&nbsp;&nbsp;</div>
             <div class="input item_price"><i class="fa fa-euro"></i></div>
@@ -590,7 +598,7 @@
     </div>
     <input type="file" class="file" multiple style="display: none;"/>
 
-    <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9">Choose a region for delivery</data>
+    <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
 
 </div>
 
@@ -601,12 +609,12 @@
 <input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;
     visibility: visible" align="center"/>
 
-<img id="my_truck"  src="../src/user/images/truck.png" title="My Truck" draggable="true" >
+<img id="my_truck"  src="../dist/images/my_truck.png" title="My Truck" draggable="true" >
 
-<img id="search_but"  src="../src/user/images/ic_map_search.png" title="Search">
+<img id="search_but"  src="../dist/images/ic_map_search.png" title="Search">
 <section id="loc_ctrl"  title="Location">
-    <img id="location_img" src="../src/user/images/ic_location.png">
-    <img id="pin" src="../src/user/images/ic_pin.png">
+    <img id="location_img" src="../dist/images/ic_location.png">
+    <img id="pin" src="../dist/images/ic_pin.png">
 </section>
 <h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
 

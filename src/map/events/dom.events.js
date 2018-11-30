@@ -29,7 +29,7 @@ class DOMEvents {
         });
 
 
-        $("#my_truck").on('dragstart',function (ev) {
+        $("#my_truck_ovl").on('dragstart',function (ev) {
 
         });
 
@@ -46,7 +46,7 @@ class DOMEvents {
             sup[that.map.supplier.date].location = coor;
             localStorage.setItem('supplier', JSON.stringify(sup));
 
-            new Overlay(that.map,$('#my_truck')[0],coor);
+            new Overlay(that.map,$('#my_truck_ovl')[0],coor);
         });
 
 
