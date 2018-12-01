@@ -275,9 +275,9 @@ class OfferEditor{
         let cats ='';
         $(".category[state='1']").each(function (i, cat) {
             let text =  md5(cat.title);
-            cats +='<a href="#" onclick=' +
-                 '$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text());' +
-                 //'$(this).parent().parent().find("a[data-toggle=tab]").attr("href","'+cat.title+'")' +
+            cats +='<a href="#" cat="'+cat.id+'" onclick="OnClickCat(this,)"' +
+                 //'$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text());'+
+                 //+'$(this).parent().parent().find("a[data-toggle=tab]").attr("href","'+cat.id+'");' +
                  '>'+cat.title+'</a>';
         });
 
@@ -320,13 +320,13 @@ class OfferEditor{
         $(menu_item).find('.item_price').attr('contenteditable', 'true');
 
         $(menu_item).find('.item_title').text('item_title');
-        let hash = md5(new Date());
-        window.dict.dict[hash] = {};
+        let hash = md5(new Date().getTime());
+        //window.dict.dict[hash] = {};
         $(menu_item).find('.item_title').attr('data-translate',hash);
         $(menu_item).find('.item_price').text('1');
         $(menu_item).find('.content_text').text('content_text');
-        hash = md5(new Date()+1);
-        window.dict.dict[hash] = {};
+        hash = md5(new Date().getTime()+1);
+        //window.dict.dict[hash] = {};
         $(menu_item).find('.content_text').attr('data-translate', hash);
         $(menu_item).find('.img-fluid').attr('src', '../dist/images/banner.png');
         $(menu_item).find('.img-fluid').attr('id','img_'+tab.replace('#','')+'_'+pos);
@@ -448,9 +448,11 @@ class OfferEditor{
         that.arCat = [];
 
         $('.div_tab_inserted').each(function (index, val) {
-            that.arCat.push(parseInt(index));
+
             let tab = $(val).attr('id');
             let value = $('a[href="#'+tab+'"]').text();
+            let cat = $('.category[title='+value+']').attr('id');
+            that.arCat.push(parseInt(cat));
             if(value) {
                 if(!window.dict.dict[md5(value)]){
                     window.dict.dict[md5(value)] = {};

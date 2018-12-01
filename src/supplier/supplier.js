@@ -71,22 +71,25 @@ class Supplier{
 
         });
 
-        let dict = JSON.parse(localStorage.getItem('dict'));
-        if(dict) {
-            window.dict = new Dict(dict);
+        $.getJSON('../dict/sys.dict.json', function (data) {
+            let dict = JSON.parse(localStorage.getItem('dict'));
+            dict = Object.assign(dict, data);
+            if(dict) {
+                window.dict = new Dict(dict);
 
-        }else{
-            localStorage.setItem("dict",'{}');
-            window.dict = new Dict({});
-        }
-        window.dict.set_lang(window.sets.lang, $('#main_window'));
-        window.dict.set_lang(window.sets.lang, $('#categories'));
-        localStorage.setItem("lang", window.sets.lang);
+            }else{
+                localStorage.setItem("dict",'{}');
+                window.dict = new Dict({});
+            }
+            window.dict.set_lang(window.sets.lang, $('#main_window'));
+            window.dict.set_lang(window.sets.lang, $('#categories'));
+            localStorage.setItem("lang", window.sets.lang);
+
+            cb();
+        });
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
-
-        cb();
 
         $('#main_menu').on('click touch', this, this.OpenOfferEditor);
 

@@ -1,0 +1,86 @@
+{
+  "23d285609698e41e54306c4189c90569":{
+    "en":"Publish The Offer",
+    "ru":"Опубликовать"
+  },
+  "f479ee0428deb391dacad49e70199eb4":{
+    "en":"Cancel The Offer",
+    "ru":"Отменить"
+  },
+  "ef6f6a1c0e002ecd1063b3ee0ac9302d": {
+    "ru": "описание продукта",
+    "en": "description"
+  },
+  "4b310a8f25bcb1082f21fa8cde0b28e9": {
+    "en": "Choose a region for delivery",
+    "ru": "Выберите регион для доставки"
+  },
+  "c9cc8cce247e49bae79f15173ce97354": {
+    "en": "Save & Close",
+    "ru": "Сохранить и закрыть"
+  },
+  "3e68ad9b7ced9994b62721c5af7c5fbc": {
+    "en": "Input url for image or press Cancel to upload the image from your device",
+    "ru": "Введите адрес изображения в интернете или нажмите Отмена для загрузки с компьютера"
+  },
+  "110a4b01beabd53b661a47d4b44bd7a8": {
+    "en": "Publish",
+    "ru": "Опубликовать"
+  },
+  "9894ba007958648fbb95dab79f5c49b8": {
+    "en": "Pizza",
+    "ru": "Пицца"
+  },
+  "5204a8300227b12b9344514e31658a57": {
+    "en": "Fruits & Veges",
+    "ru": "Овощи-фрукты"
+  },
+  "936beb3789addd4616f024f2cd2caac8": {
+    "en": "Milk & Butter",
+    "ru": "Молоко-масло"
+  },
+  "3fb5a1fd02693fe2959220f291b05f19": {
+    "en": "Cheese",
+    "ru": "Сыр"
+  },
+  "f3d5840c5a17c2fabec8c07d8a993272": {
+    "en": "Meat",
+    "ru": "Мясо"
+  },
+  "b9d8d413b50edbd26d34cbd4a5a5f8e7": {
+    "en": "Fish",
+    "ru": "Рыба"
+  },
+  "54a790c38eed762e354f16fb664c53de": {
+    "en": "Mushrooms",
+    "ru": "Грибы"
+  },
+  "25090ca7ae49ae5e0826233de9b89a30": {
+    "en": "Eggs",
+    "ru": "Яйца"
+  },
+  "c1680e5a5622cdeebcf7d4e8795f3569": {
+    "en": "Chicken",
+    "ru": "Птица"
+  },
+  "822ce45977e6e321b1a6b2efa72df99f": {
+    "en": "Liver",
+    "ru": "Колбасы"
+  },
+  "161af5daa71abf18b8ad2c9593678e78": {
+    "en": "Ice-cream",
+    "ru": "Мороженное"
+  },
+  "710cabd76238783bc3ebd5dc4ddf91bc": {
+    "en": "Bread",
+    "ru": "Хлеб"
+  },
+  "54976a99e9bea2b1c5ca1b04cfcca910": {
+    "en": "Bio",
+    "ru": "Био"
+  },
+  "0ad4f20d1443d9529ab35534c1ba505b": {
+    "ru": "название",
+    "en": "name"
+  }
+}

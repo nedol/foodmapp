@@ -443,7 +443,7 @@ module.exports = class D2D {
             "SELECT of.id as offer_id, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offer as of"+
             " WHERE of.sup_uid=sup.uid AND sup.uid=\""+q.uid+"\"" +
-            " AND date=\""+q.date+"\""+
+            " AND of.date=\""+q.date+"\""+
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, result) {

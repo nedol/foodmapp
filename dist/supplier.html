@@ -328,10 +328,10 @@
     </div>
 
     <script>
-        function OnClickCat(ev) {
-            let tab = $(this).parent().parent().find("a[data-toggle=tab]");
-            $(tab).text($(this).text());
-            $(tab).attr("data-translate", md5($(this).text()));
+        function OnClickCat(el) {
+            let tab = $(el).parent().parent().find("a[data-toggle=tab]");
+            $(tab).text($(el).text());
+            $(tab).attr("cat",$(el).attr('cat'));
         }
     </script>
 
