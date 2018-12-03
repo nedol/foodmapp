@@ -53,9 +53,10 @@ class DB {
                 db.onerror = function (event) {
                     console.log(event);
                 };
-                let vObjectStore = db.createObjectStore(that.storeName, {keyPath: ["date", "uid"]});
-                vObjectStore.createIndex("datelatlon", ["date", "latitude", "longitude"], {unique: true});
-                vObjectStore.createIndex("hash", "hash", {unique: false});
+                let vObjectStore = db.createObjectStore(that.storeName, {keyPath: ["date", "email"]});
+                vObjectStore.createIndex("datehash", ["date","hash"], {unique: true});
+                vObjectStore.createIndex("dateemail", ["date","email"], {unique: true});
+                vObjectStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
                 vObjectStore.createIndex("categories", "categories", {unique: false});
                 vObjectStore.createIndex("offer", "offer", {unique: false});
                 vObjectStore.createIndex("dict", "dict", {unique: false});
@@ -110,15 +111,16 @@ class DB {
             };
     }
 
-    getFile(date,file_id, f) {
+    getFile(date,email, f) {
 
-        if (!file_id || !date)
+        if (!email || !date)
             return;
         try {
             let objectStore = this.DBcon.transaction(this.storeName, "readonly").objectStore(this.storeName);
-            var request = objectStore.get([date,file_id]);
+            let idateemail = objectStore.index("dateemail");
+            var request = idateemail.get([date,email]);
             request.onerror = this.logerr;
-            request.onsuccess = function () {
+            request.onsuccess = function (ev) {
                 //console.log("File get from DB:"+request.result);
                 f(this.result ? this.result : -1);
             }
@@ -153,7 +155,7 @@ class DB {
                     object: cursor.value
                 });
                 var id_str = md5(cursor.value.email);
-                markerFeature.setId(cursor.value.uid);
+                markerFeature.setId(cursor.value.hash);
                 features.push(markerFeature);
                 cursor.continue();
             }

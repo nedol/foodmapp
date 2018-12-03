@@ -665,7 +665,7 @@ module.exports = class D2D {
     GetSuppliers(q, res){
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT sup.uid as uid, of.date as date, sup.email as email, of.categories as cats, " +
+        let sql = " SELECT of.date as date, sup.email as email, of.categories as cats, " +
             "of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict"+
             " FROM  supplier as sup, offer as of"+
             " WHERE sup.uid = of.sup_uid" +
@@ -692,7 +692,7 @@ module.exports = class D2D {
                 for(let i in result) {
                     let cats = JSON.parse(result[i].cats);
                     if (intersection(cats, q.categories).length > 0) {
-                        result[i].uid = md5(result[i].email);//!!!
+
                     }else{
                         delete result[i];
                     }

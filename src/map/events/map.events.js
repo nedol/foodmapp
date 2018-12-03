@@ -50,7 +50,8 @@ class MapEvents{
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
                 if(feature.values_.features.length===1) {
-                    window.db.getFile(date, feature.values_.features[0].id_, function (obj) {
+                    window.db.getFile(date, feature.values_.features[0].values_.object.email, function (obj) {
+                        if(obj!==-1)
                         if (!that.map.supplier.viewer.offer) {
                             let offer = JSON.parse(obj.offer);
                             that.map.supplier.viewer.OpenOffer(offer, JSON.parse(obj.dict));

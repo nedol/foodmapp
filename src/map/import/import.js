@@ -34,11 +34,10 @@ class Import {
 
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-                if (!IsDownloadedArea(date+"_"+cats +  "_" +  area)) {
+                if (!IsDownloadedArea(date+"_"+cats + "_" + area)) {
                     let uid = that.map.supplier.uid;
                     that.LoadSupplierData(uid, cats, area, function (res) {
-                        if (res)
-                            that.areasAr.push(date+"_"+cats +  "_" +  area);
+                        that.areasAr.push(date+"_"+cats +  "_" +  area);
                     });
                 }
 
@@ -91,6 +90,8 @@ class Import {
                     cb(true);
                     for (let i in res) {
                         let obj = res[i];
+                        if(!obj)
+                            continue;
                         obj = formatObject(obj);
                         window.db.setFile(obj, function (bool) {
 
@@ -106,8 +107,8 @@ class Import {
         }
 
         function formatObject(obj) {
+            let hash = md5(JSON.stringify({offer: obj.data,dict: obj.dict}));
             return {
-                uid: obj.uid,
                 email: obj.email,
                 date: obj.date,
                 categories: obj.cats,
@@ -115,7 +116,8 @@ class Import {
                 latitude: obj.lat,
                 logo: "../dist/images/truck.png",
                 offer: obj.data,
-                dict: obj.dict
+                dict: obj.dict,
+                hash: hash
             };
         }
     }

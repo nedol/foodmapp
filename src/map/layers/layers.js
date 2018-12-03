@@ -115,11 +115,17 @@ class Layers {
                 if (features.length > 0) {
                     $.each(features, function (key, feature) {
                         let id_str = feature.getId();
-                        if (feature.values_.object.date === that.map.supplier.date) {
-                            let style = getObjectStyle(feature.values_.object);
-                            if (style)
-                                cluster_feature.setStyle(style);
-                        }
+                        window.db.getFile(that.map.supplier.date,feature.values_.object.email,function (res) {
+                            if(res!==-1) {
+                                if (feature.values_.object.date === that.map.supplier.date) {
+                                    let style = getObjectStyle(feature.values_.object);
+                                    if (style)
+                                        cluster_feature.setStyle(style);
+                                }
+                            }else{
+                                vectorSource.removeFeature(feature);
+                            }
+                        });
                     });
                 }
 
