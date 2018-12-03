@@ -59,30 +59,6 @@ class OfferEditor{
             document.execCommand('selectAll', false, null);
         }
 
-        function moveImage(image){
-            $(image).mousedown(function() {
-                $(this).data("dragging", true);
-                //console.log("dragging","true");
-            });
-
-            $(image).mouseup(function() {
-                $(this).data("dragging", false);
-                //console.log("dragging","false");
-            });
-
-            $(image).mousemove(function(e) {
-                if (!$(this).data("dragging"))
-                    return;
-                //console.log("X:"+ ((e.clientX - $(this).width())-120)+"  Y:"+ (e.clientY - $(this).height()/2))
-                $(this).css("left", e.clientX - $(this).width()-120);
-                //$(this).css("top", e.clientY - ($(this).height()/2 +20));
-                // $(this).offset({
-                //     left: e.pageX,
-                //     top: e.pageY + 20
-                // });
-            });
-        }
-
         $(".content_text").dblclick(function () {
             selectText($(this));
         });
@@ -153,11 +129,24 @@ class OfferEditor{
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
                     $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_left);
-                    moveImage($(menu_item).find('.img-fluid'));
+
+                    $(menu_item).find('.img-fluid').draggable({
+                        start: function () {
+                            console.log("drag start");
+                        },
+                        drag: function () {
+                            $(menu_item).find('.img-fluid').attr('drag', true);
+                        },
+                        stop: function () {
+                            var rel_x = parseInt($(menu_item).find('.img-fluid').position().left / window.innerWidth * 100);
+                            $(menu_item).find('.img-fluid').css('right', rel_x + '%');
+                            var rel_y = parseInt($(menu_item).find('.img-fluid').position().bottom / window.innerHeight * 100);
+                            $(menu_item).find('.img-fluid').css('top', rel_y + '%');
+                        }
+                    });
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
-
 
                 $('#' + tab).append(menu_item);
 
@@ -337,6 +326,21 @@ class OfferEditor{
                 ev.target = $(menu_item).find('.img-fluid')[0];
                 that.OnClickImport(ev);
                 $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
+            }
+        });
+
+        $(menu_item).find('.img-fluid').draggable({
+            start: function () {
+                console.log("drag start");
+            },
+            drag: function () {
+                $(menu_item).find('.img-fluid').attr('drag', true);
+            },
+            stop: function () {
+                var rel_x = parseInt($(menu_item).find('.img-fluid').position().left / window.innerWidth * 100);
+                $(menu_item).find('.img-fluid').css('right', rel_x + '%');
+                var rel_y = parseInt($(menu_item).find('.img-fluid').position().bottom / window.innerHeight * 100);
+                $(menu_item).find('.img-fluid').css('top', rel_y + '%');
             }
         });
 
