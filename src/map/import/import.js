@@ -15,9 +15,9 @@ class Import {
         let that = this;
         if (!window.sets.coords.cur)
             return;
-        var LotLat = proj.toLonLat(window.sets.coords.cur);
+        var LotLat = proj.toLonLat(this.map.ol_map.getView().getCenter());//(window.sets.coords.cur);
 
-        if (this.map.ol_map.getView().getZoom() >= 14) {
+        if (this.map.ol_map.getView().getZoom() >= 9) {
             try {
 
                 let cats= [];

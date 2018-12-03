@@ -1,4 +1,5 @@
 'use strict'
+let moment = require('moment');
 
 let utils = require('../utils');
 var md5 = require('md5');
@@ -668,8 +669,8 @@ module.exports = class D2D {
             "of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict"+
             " FROM  supplier as sup, offer as of"+
             " WHERE sup.uid = of.sup_uid" +
-            " AND of.latitude>"+ q.areas[0] +" AND of.latitude<"+q.areas[1] +
-            " AND of.longitude>" + q.areas[2] + " AND of.longitude<" +q.areas[3]+
+            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
             " AND of.date=\""+q.date+"\" AND uid<>\""+q.uid+"\"";
 
         global.con_obj.query(sql, function (err, result) {
@@ -678,8 +679,8 @@ module.exports = class D2D {
                 res.end(JSON.stringify({'err':err}));
                 return;
             }
-
-            sql = "UPDATE supplier SET region='"+q.areas.toString()+"', date=\""+q.date+"\" WHERE uid=\""+q.uid+"\"";
+            let now = moment().format('YYYY-MM-DD');
+            sql = "UPDATE supplier SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
 
             global.con_obj.query(sql, function (err, result) {
                 if (err) {

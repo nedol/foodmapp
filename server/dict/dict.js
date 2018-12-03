@@ -102,7 +102,7 @@ module.exports = class Dict {
                                 window.dict.dict[key][l] = add[key][l];
                             }
                         }
-                        window.dict.set_lang(sel_lang,$("#offer_dialog") );
+                        window.dict.set_lang(sel_lang,$("#offer_editor") );
 
                         if(this.cb)
                             this.cb();

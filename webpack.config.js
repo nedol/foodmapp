@@ -18,8 +18,8 @@ module.exports = {
         // 'user':['babel-polyfill',
         //     __dirname+'/src/user/user_entry.js'
         // ]
-        'supplier': __dirname+'/src/supplier/supplier.entry.js'
-        //'user': __dirname+'/src/user/user.entry.js'
+        'supplier': __dirname+'/src/supplier/supplier.entry.js',
+        'customer': __dirname+'/src/customer/customer.entry.js'
 
     },
     output: {

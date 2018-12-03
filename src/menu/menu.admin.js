@@ -52,7 +52,7 @@ class MenuAdmin extends Menu{
 
         this.menu = event.data.menu.menu_obj;
 
-        $("#offer_dialog").modal({
+        $("#offer_editor").modal({
             show: true,
             keyboard:true
         });

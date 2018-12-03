@@ -40,7 +40,12 @@ class Supplier{
         this.offer = new OfferEditor();
         this.viewer = new OfferViewer();
 
-        if(last && uObj[last]){
+        if(uObj[this.date]){
+            this.uid = uObj[this.date].uid;
+            this.email = uObj[this.date].email;
+            this.offer.offer = uObj[this.date].offer;
+            this.offer.location = uObj[this.date].location;
+        }else if(last && uObj[last]){
             this.uid = uObj[last].uid;
             this.email = uObj[last].email;
             this.offer.offer = uObj[last].offer;
@@ -257,8 +262,10 @@ class Supplier{
             }
 
             if(!sup[that.date]) {
-                that.offer.offer = {};
-                sup[that.date]= {uid:that.uid,email:that.email,offer:{},location:[]};
+                let uObj = JSON.parse(localStorage.getItem('supplier'));
+                let last = Object.keys(uObj)[Object.keys(uObj).length-1]
+                that.offer.offer = uObj[last].offer?uObj[last].offer:{};
+                sup[that.date]= {uid:that.uid,email:that.email, offer: that.offer.offer,location:that.offer.location};
                 localStorage.setItem('supplier', JSON.stringify(sup));
 
             }else {
@@ -317,7 +324,7 @@ class Supplier{
     }
 
     OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer(ev.data.offer.offer, this);
+        ev.data.offer.OpenOffer(ev.data.offer.offer, ev.data);
     }
 
     UpdateOfferLocal(offer, location, dict, date){
@@ -352,10 +359,9 @@ class Supplier{
 
     PublishOffer(data, date, location){
         let that = this;
-        if(!location){
-            this.PickRegion( function () {
-                that.PublishOffer(data, date, location);
-            });
+        if(!location || location.length===0){
+            this.PickRegion();
+            return;
         }
         let uObj = JSON.parse(localStorage.getItem('supplier'));
         let data_obj = {
@@ -365,7 +371,7 @@ class Supplier{
             "categories": that.offer.arCat,
             "date": date,
             "period":"17:00-19:00",
-            "location": proj.toLonLat(that.offer.location),
+            "location": proj.toLonLat(location),
             "offer": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict),
             "lang": window.sets.lang

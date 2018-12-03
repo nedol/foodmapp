@@ -144,6 +144,7 @@ class Map {
         window.db.getRange( that.supplier.date, cats, parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
                 for(let c in features[f].values_.categories) {
+
                     let cat = features[f].values_.categories[c];
                     let layer = that.ol_map.getLayers().get(cat);
                     if (!layer) {
@@ -151,9 +152,11 @@ class Map {
                     }
 
                     let source = layer.values_.vector;
-                    if (!source.getFeatureById(features[f].getId())) {
+
+                    if(source.getFeatureById(features[f].getId()) && features[f].values_.object.date===that.supplier.date)
+                        continue;
+                    if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===that.supplier.date)
                         that.layers.AddCluster(layer, features[f]);
-                    }
                 }
             }
         });

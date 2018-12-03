@@ -39,8 +39,9 @@ class OfferViewer {
         this.offer = offer;
         this.dict = new Dict(dict);
 
-        $('.menu_item').remove();
-        $('.tab_inserted').remove();
+        let ovc_2 = $("#offer_viewer").clone();
+        $(ovc_2).attr('id','offer_viewer_clone');
+        $(ovc_2).insertAfter($("#offer_viewer"));
 
         $('.dropdown').css('visibility','hidden');
         $('#add_tab_li').css('visibility','hidden');
@@ -48,30 +49,31 @@ class OfferViewer {
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
-        $("#offer_dialog").modal({
+        ovc_2.modal({
             show: true,
             keyboard:true
         });
         this.parent = event.data;
 
-        $("#offer_dialog").find('.modal-title').text("Offer for ");
-        $("#offer_dialog").find('.modal-title').attr('data-translate', md5('Menu for'));
-        $("#offer_dialog").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        $("#offer_dialog").off('hide.bs.modal');
-        $("#offer_dialog").on('hide.bs.modal', this,this.CloseMenu);
+        ovc_2.find('.modal-title').text("Offer for ");
+        ovc_2.find('.modal-title').attr('data-translate', md5('Menu for'));
+        ovc_2.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        ovc_2.off('hide.bs.modal');
+        ovc_2.on('hide.bs.modal', this,this.CloseMenu);
 
-        $("#offer_dialog").find('.toolbar').css('display', 'block');
+        ovc_2.find('.toolbar').css('display', 'block');
 
         for (let tab in this.offer) {
-            if(!tab) continue;
+            if(!tab || this.offer[tab].length===0) continue;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore($('#add_tab_li'));
+                    '</li>').insertBefore(ovc_2.find('.add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore($('#add_tab_div'));
+                    '</div>').insertBefore(ovc_2.find('.add_tab_div'));
             }
 
             for (let i in this.offer[tab]) {
+
                 let tmplt = $('#menu_item_tmplt').clone();
                 $('#menu_item_tmplt').attr('id', tab + '_' + i);
                 let menu_item = $('#' + tab + '_' + i)[0];
@@ -90,6 +92,10 @@ class OfferViewer {
                 }
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
 
+                $(menu_item).find('.item_content').addClass('collapse');
+                $(menu_item).find('.item_title').attr('data-toggle','collapse');
+                $(menu_item).find('.item_title').attr('href','.collapse');
+
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
                 $(menu_item).find('.content_text').attr('data-translate', this.offer[tab][i].content);
@@ -101,14 +107,6 @@ class OfferViewer {
                 // if(this.offer[tab][i].height)
                 //     $(menu_item).find('.content_text').css('height',(this.offer[tab][i].height));
 
-                $(menu_item).find('.content_text').on('dblclick', function (ev) {
-                    let img = $(menu_item).find('.img-fluid')[0];
-                    let img_os = $(menu_item).find('.img-fluid').offset();
-                    return;//TODO
-                    if(ev.offsetX <  img_os.left+img.width && ev.offsetX > img_os.left &&
-                        ev.offsetY < img_os.top+img.height && ev.offsetY > img_os.top )
-                        $(menu_item).find('.img-fluid').trigger(ev);
-                });
 
                 if(this.offer[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
@@ -118,9 +116,9 @@ class OfferViewer {
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
-                $('#' + tab).append(menu_item);
+                ovc_2.find('#' + tab).append(menu_item);
 
-                $(tmplt).insertAfter('#offer_dialog');
+                $(tmplt).insertAfter('#offer_viewer');
 
                 if ($(menu_item).find('.item_content').css('display') == 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
@@ -139,7 +137,7 @@ class OfferViewer {
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        this.dict.set_lang(window.sets.lang,$("#offer_dialog"));
+        this.dict.set_lang(window.sets.lang,ovc_2);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {
@@ -157,7 +155,7 @@ class OfferViewer {
         let sel_lang = $('.sp_dlg option:selected').val().toLowerCase().substring(0, 2);
 
         window.dict.Translate('en',sel_lang, function () {
-            window.dict.set_lang(sel_lang, $("#offer_dialog"));
+            window.dict.set_lang(sel_lang, $("#offer_viewer"));
             window.admin.menu.lang = sel_lang;
         });
     }
@@ -165,6 +163,7 @@ class OfferViewer {
 
     CloseMenu(ev) {
         ev.data.offer = '';
+        $('#offer_viewer_clone').remove();
     }
 }
 

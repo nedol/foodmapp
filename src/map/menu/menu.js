@@ -28,12 +28,12 @@ class Menu {
             $("[drag]").trigger('click', true);
         }
 
-        $('input:file').change(function (evt) {
-
-            //listFiles(evt);
-            let files = $("input[type='file']")[0].files;
-            utils.HandleFileSelect(evt, files)
-        });
+        // $('input:file').change(function (evt) {
+        //
+        //     //listFiles(evt);
+        //     let files = $("input[type='file']")[0].files;
+        //     utils.HandleFileSelect(evt, files)
+        // });
 
         InitAuth();
 
