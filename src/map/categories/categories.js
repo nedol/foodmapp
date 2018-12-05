@@ -1,9 +1,9 @@
 export {Categories};
 
 import {Overlay} from "../overlay/overlay";
-import {utils} from "../../utils/utils";
+import {Utils} from "../../utils/utils";
 
-
+let utils = new Utils();
 
 class Categories {
 

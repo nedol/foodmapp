@@ -52,10 +52,9 @@ class MapEvents{
                 if(feature.values_.features.length===1) {
                     window.db.getFile(date, feature.values_.features[0].values_.object.email, function (obj) {
                         if(obj!==-1)
-                        if (!that.map.supplier.viewer.offer) {
+                        if (!window.admin.viewer.offer) {
                             let offer = JSON.parse(obj.offer);
-                            that.map.supplier.viewer.OpenOffer(offer, JSON.parse(obj.dict));
-
+                            window.admin.viewer.OpenOffer(obj.email, offer, JSON.parse(obj.dict));
                         }
                     });
                 }else{//cluster

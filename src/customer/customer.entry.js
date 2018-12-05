@@ -8,7 +8,7 @@ require('dialog-polyfill');
 
 require("../../global");
 
-import {utils} from "../utils/utils";
+import {Utils} from "../utils/utils";
 import {Customer} from './customer'
 
 const langs = require("../dict/languages");
@@ -22,6 +22,8 @@ var md5 = require('md5');
 
 var moment = require('moment');
 require('../../lib/bootstrap-datetimepicker');
+
+let utils = new Utils();
 
 window.demoMode = (utils.getParameterByName('dm')==='0'?false:true);
 
@@ -46,7 +48,7 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
-    let scale;
+
 
     $('#datetimepicker').datetimepicker({
         inline: true,
@@ -66,7 +68,7 @@ $(document).on('readystatechange', function () {
 
     let dt_w = $('#dtp_container').css('width');
     let dt_h = $('#dtp_container').css('height');
-    scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
+    let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
 
     //$('#datetimepicker').hide();
 
@@ -88,7 +90,7 @@ $(document).on('readystatechange', function () {
 
     $('#datetimepicker').on('dp.hide',function (ev) {
         $('#dtp_container').css('display', 'none');
-    })
+    });
 
     $('#dt_from').datetimepicker({
         inline: true,
@@ -145,6 +147,8 @@ $(document).on('readystatechange', function () {
             localStorage.setItem('customer',JSON.stringify(uObj));
         }else{
             uObj = JSON.parse(localStorage.getItem('customer'));
+            if(!uObj[date])
+                uObj[date] = {uid:uid};
         }
     }
 

@@ -39,18 +39,13 @@ class Customer{
         if(uObj[this.date]){
             this.uid = uObj[this.date].uid;
             this.email = uObj[this.date].email;
-            this.viewer.offer = uObj[this.date].offer;
-            this.viewer.location = uObj[this.date].location;
-        }else if(last && uObj[last]){
-            this.uid = uObj[last].uid;
-            this.email = uObj[last].email;
-            this.viewer.offer = uObj[last].offer;
-            this.viewer.location = uObj[last].location;
-            uObj[this.date] = uObj[last];
-            localStorage.setItem("customer", JSON.stringify(uObj));
+
+        }else{
+            //this.uid = uObj[this.date].uid;
+            this.email = uObj[this.date].email;
         }
 
-        this.db = new DB(function () {
+        window.db = new DB(function () {
             
         });
 
@@ -62,6 +57,7 @@ class Customer{
         //     sup[this.date]= {uid:this.uid,email:this.email};
         //     localStorage.setItem('customer', JSON.stringify(sup));
         // }
+
 
     }
 
@@ -82,7 +78,7 @@ class Customer{
                 localStorage.setItem("dict",'{}');
                 window.dict = new Dict({});
             }
-            window.dict.set_lang(window.sets.lang, $('#main_window'));
+            window.dict.set_lang(window.sets.lang, $('body'));
             window.dict.set_lang(window.sets.lang, $('#categories'));
             localStorage.setItem("lang", window.sets.lang);
 
@@ -250,63 +246,7 @@ class Customer{
 
             let cust = JSON.parse(localStorage.getItem('customer'));
 
-            $('#my_truck').css('visibility','visible');
-
-            if(that.my_truck_ovl) {
-                that.my_truck_ovl.RemoveOverlay();
-                that.my_truck_ovl = '';
-            }
-
-            if(!cust[that.date]) {
-                let uObj = JSON.parse(localStorage.getItem('customer'));
-                let last = Object.keys(uObj)[Object.keys(uObj).length-1]
-                that.viewer.offer = uObj[last].offer?uObj[last].offer:{};
-                cust[that.date]= {uid:that.uid,email:that.email, offer: that.viewer.offer,location:that.viewer.location};
-                localStorage.setItem('customer', JSON.stringify(cust));
-
-            }else {
-                if(cust[that.date].offer)
-                    that.viewer.offer = cust[that.date].offer;
-                if(cust[that.date].location.length===2) {
-                    that.viewer.location = cust[that.date].location;
-                    that.map.MoveToLocation(cust[that.date].location);
-                    let my_truck_2 = $('#my_truck').clone()[0];
-                    $(my_truck_2).attr('id','my_truck_2');
-                    that.my_truck_ovl = new Overlay(that.map,my_truck_2,cust[that.date].location);
-                    $('#my_truck').css('visibility','hidden');
-                }
-
-            }
-
             //this.GetReserved();
-        });
-
-        $("#my_truck").on('dragstart',function (ev) {
-
-        });
-
-        $('#map').on('dragover',function (ev) {
-            ev.preventDefault();
-        });
-
-        $('#map').on('drop',function (ev) {
-            ev.preventDefault();
-            if(that.my_truck_ovl) {
-                that.my_truck_ovl.RemoveOverlay();
-                that.my_truck_ovl = '';
-            }
-            let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
-            let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            that.map.customer.offer.location = coor;
-
-            let cust = JSON.parse(localStorage.getItem('customer'));
-            cust[that.map.customer.date].location = coor;
-            localStorage.setItem('customer', JSON.stringify(cust));
-            $('#my_truck').css('visibility','visible');
-            let my_truck_2 = $('#my_truck').clone()[0];
-            $(my_truck_2).attr('id','my_truck_2');
-            that.my_truck_ovl  = new Overlay(that.map,my_truck_2,coor);
-            $('#my_truck').css('visibility','hidden');
         });
     }
 
@@ -319,165 +259,24 @@ class Customer{
 
     }
 
-    OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer(ev.data.offer.offer, this);
-    }
-
-    UpdateOfferLocal(offer, location, dict, date){
-
-        if(window.demoMode) {
-            this.offer.offer = offer;
-            let cust = JSON.parse(localStorage.getItem('customer'));
-            if (!isJSON(cust)) {
-                cust[date] = {
-                    "email": this.email,
-                    "uid": this.uid,
-                    "location":location,
-                    "offer": offer
-                };
-                localStorage.setItem('customer', JSON.stringify(cust));
-                localStorage.setItem('dict',JSON.stringify(dict));
-            }else{
-                cust[date] = {
-                    "email": this.email,
-                    "uid": this.uid,
-                    "location":location,
-                    "offer": offer
-                };
-
-                localStorage.setItem('customer', JSON.stringify(cust));
-                localStorage.setItem('dict',JSON.stringify(dict));
-            }
-
-        }
-
-    }
-
-
     PickRegion(){
         alert($('#choose_region').text());
     }
 
-    GetReserved(ev) {
+    UpdateOrderLocal(order, location, email, date){
 
-        if(ev.stopPropagation)
-            ev.stopPropagation();
-        if(ev.preventDefault)
-            ev.preventDefault();
-
-        var dateTimeAr = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-
-        try {
-
-            var url = host_port + '?' + //
-                "proj=d2d"+
-                "&admin="+ ev.data.uid +
-                "&func=getreserved" +
-                "&date=" + dateTimeAr +
-                "&lang=" + window.sets.lang;
-
-            console.log(url);
-
-            $.ajax({
-                url: url,
-                method: "GET",
-                dataType: 'json',
-                processData: false,
-                async: true,   // asynchronous request? (synchronous requests are discouraged...)
-                cache: false,
-                crossDomain: true,
-                success: function (resp, msg) {
-
-
-                },
-                error: function (xhr, status, error) {
-                    //var err = eval("(" + xhr.responseText + ")");
-
-                    console.log(error.Message);
-                    console.log(xhr.responseText);
-
-                },
-                complete: function (data) {
-                    //alert(data.responseText);
-                },
-            });
-
-        } catch (ex) {
-            console.log(ex);
+        this.viewer.order = order;
+        let uObj = JSON.parse(localStorage.getItem('customer'));
+        if (!isJSON(uObj)) {
+            uObj[date] = {
+                "location":location
+            };
+            uObj[date][email] = {order: order};
+            localStorage.setItem('customer', JSON.stringify(uObj));
+        }else{
+            uObj[date][email] = {order: order};
+            localStorage.setItem('customer', JSON.stringify(uObj));
         }
-    }
-
-
-
-    UpdateReservation(event, table_id, data_obj,cb) {
-
-        let time = $('.sel_time').text();
-        if(!this.viewer[time])
-            this.viewer[time]={};
-        if (!this.viewer[time][this.uid])
-            this.viewer[time][this.uid] = {};
-        if (!this.viewer[time][this.uid][table_id])
-            this.viewer[time][this.uid][table_id] = data_obj?data_obj[this.uid][table_id]:
-                {'menu_1':{'viewer':{}},'menu_2':{'viewer':{}}};
-
-        if(window.demoMode) {
-            this.ClearTableReserve();
-            this.SetTables(this.viewer,this);
-            return;
-        }
-        let url = host_port;
-        let data =
-            "proj=d2d"+
-            "&func=updatereservation"+
-            "&user="+localStorage.getItem('user')+
-            "&time="+time+
-            "&date="+event.data.date+
-            "&table="+table_id+
-            "&menus="+urlencode.encode(JSON.stringify(this.viewer[time][this.uid][table_id]))+
-            "&lang="+window.sets.lang;
-//'{"'+res[0].id + '":{"viewer": {},"from":"'+$('#period_1').find('.from')[0].getAttribute('text').value+'","to":"'+$('#period_1').find('.to')[0].getAttribute('text').value+'"}}';
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            dataType: 'json',
-            data: data,
-            class_obj:event.data,
-            cb:cb,
-            success: function (resp) {
-                let arr = resp;
-                if(isJSON(resp))
-                    arr = JSON.parse(resp);
-                if(resp.user) {
-                    localStorage.setItem("user", resp.user);//
-                }
-                if(!arr) {
-                    new TWEEN.Tween($('#target')[0].object3D.position).to({
-                        y: 0,
-                        x: 0,//_x * visible_width,
-                        z: 0 //_y * visible_height
-                    }, 1000)
-                        .repeat(0)//Infinity)
-                        .onUpdate(function () { // Called after tween.js updates
-                            //document.querySelector('#camera').setAttribute('camera', 'fov', '60');
-                        })
-                        .easing(TWEEN.Easing.Quadratic.In).start();
-                } else {
-
-                }
-            },
-            error: function(xhr, status, error){
-                //let err = eval("(" + xhr.responseText + ")");
-                localStorage.removeItem("user");//
-                console.log(error.Message);
-                //alert(xhr.responseText);
-            },
-            complete: function (data) {
-                //alert(data.responseText);
-                if(this.cb)
-                    this.cb();
-            },
-        });
     }
 
     UpdateOrder(viewer, date) {

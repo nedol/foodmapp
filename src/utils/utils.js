@@ -1,4 +1,4 @@
-export {utils}
+export {Utils}
 let http = require('http');
 let https = require('https');
 
@@ -253,6 +253,3 @@ class Utils{
     }
 
 }
-
-
-let utils = new Utils();

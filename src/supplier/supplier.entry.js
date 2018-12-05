@@ -8,7 +8,7 @@ require('dialog-polyfill');
 
 require("../../global");
 
-import {utils} from "../utils/utils";
+import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
 
 const langs = require("../dict/languages");
@@ -22,6 +22,8 @@ var md5 = require('md5');
 
 var moment = require('moment');
 require('../../lib/bootstrap-datetimepicker');
+
+let utils = new Utils();
 
 window.demoMode = (utils.getParameterByName('dm')==='0'?false:true);
 

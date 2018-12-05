@@ -1,11 +1,12 @@
 export {Overlay};
 
-import {utils} from "../../utils/utils";
+import {Utils} from "../../utils/utils";
 
 //import {User} from "../menu/user";
 import _ol_Overlay_  from "ol/overlay";
 import proj from 'ol/proj';
 
+let utils = new Utils();
 
 class Overlay {
 

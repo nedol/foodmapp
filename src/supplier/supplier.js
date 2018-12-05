@@ -54,7 +54,7 @@ class Supplier{
             localStorage.setItem("supplier", JSON.stringify(uObj));
         }
 
-        this.db = new DB(function () {
+        window.db = new DB(function () {
             
         });
 
@@ -434,8 +434,6 @@ class Supplier{
             console.log(ex);
         }
     }
-
-
 
     UpdateReservation(event, table_id, data_obj,cb) {
 

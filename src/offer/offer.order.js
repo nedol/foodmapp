@@ -34,41 +34,47 @@ class OfferOrder {
     }
 
 
-    OpenOffer(offer, dict) {
+    OpenOffer(em, offer, dict) {
 
+        this.email = em;
         this.offer = offer;
         this.dict = new Dict(dict);
 
-        $('.dropdown').css('visibility','hidden');
-        $('#add_tab_li').css('visibility','hidden');
-        $('#add_item').css('visibility','hidden');
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+        let order = JSON.parse(localStorage.getItem('customer'))[date][em];
+
+        let ovc_2 = $("#offer_order").clone();
+        $(ovc_2).attr('id','offer_order_clone');
+        $(ovc_2).insertAfter($("#offer_order"));
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
-        $("#offer_order").modal({
+        ovc_2.modal({
             show: true,
             keyboard:true
         });
         this.parent = event.data;
 
-        $("#offer_order").find('.modal-title').text("Offer for ");
-        $("#offer_order").find('.modal-title').attr('data-translate', md5('Menu for'));
-        $("#offer_order").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        $("#offer_order").off('hide.bs.modal');
-        $("#offer_order").on('hide.bs.modal', this,this.CloseMenu);
+        ovc_2.find('.modal-title').text("Offer for ");
+        ovc_2.find('.modal-title').attr('data-translate', md5('Menu for'));
+        ovc_2.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        ovc_2.off('hide.bs.modal');
+        ovc_2.on('hide.bs.modal', this,this.CloseMenu);
 
-        $("#offer_order").find('.toolbar').css('display', 'block');
+        ovc_2.find('.toolbar').css('display', 'block');
 
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0) continue;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore($("#offer_order").find('.add_tab_li'));
+                    '</li>').insertBefore(ovc_2.find('.add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore($("#offer_order").find('.add_tab_div'));
+                    '</div>').insertBefore(ovc_2.find('.add_tab_div'));
             }
 
             for (let i in this.offer[tab]) {
+
                 let tmplt = $('#menu_item_tmplt').clone();
                 $('#menu_item_tmplt').attr('id', tab + '_' + i);
                 let menu_item = $('#' + tab + '_' + i)[0];
@@ -77,6 +83,12 @@ class OfferOrder {
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
                 $(menu_item).find('.item_price').attr('contenteditable', 'false');
+
+                $(menu_item).find('.item_content').addClass('collapse');
+                $(menu_item).find('.item_title').attr('data-toggle','collapse');
+                $(menu_item).find('.item_title').attr('href','.collapse');
+
+
                 if(this.offer[tab][i].title){
                     try {
                         $(menu_item).find('.item_title').text(window.dict.dict[this.offer[tab][i].title][window.sets.lang]);
@@ -84,12 +96,13 @@ class OfferOrder {
                         ;
                     }
                     $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
+                    if(order && order.order && order.order[this.offer[tab][i].title]){
+                        $(menu_item).find('.btn').text($('.qnty').text()+order.order[this.offer[tab][i].title]['qnty']);
+                        $(menu_item).attr('ordered', order.order[this.offer[tab][i].title]['qnty']);
+                        //$(menu_item).find('.item_content').addClass('collapse in');
+                    }
                 }
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
-
-                $(menu_item).find('.item_content').addClass('collapse');
-                $(menu_item).find('.item_title').attr('data-toggle','collapse');
-                $(menu_item).find('.item_title').attr('href','.collapse');
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
@@ -111,7 +124,7 @@ class OfferOrder {
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
-                $('#offer_order').find('#' + tab).append(menu_item);
+                ovc_2.find('#' + tab).append(menu_item);
 
                 $(tmplt).insertAfter('#offer_order');
 
@@ -121,10 +134,15 @@ class OfferOrder {
                     $(menu_item).find('.item_content').slideToggle("fast");
                 }
 
-                $(menu_item).find('.add_picture').css('display','none');
-
-                $(menu_item).find('.add_content').css('display','none');
+                $(menu_item).find('li').on('click', function(ev){
+                    $(menu_item).find('.btn').text($('.qnty').text()+ev.target.text);
+                    $(menu_item).attr('ordered', ev.target.text);
+                });
             }
+        }
+
+        if(order && order.order) {
+            $('.comment').text(order.order.comment);
         }
 
         // let sp = $('.sp_dlg');
@@ -132,7 +150,7 @@ class OfferOrder {
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        this.dict.set_lang(window.sets.lang,$("#offer_order"));
+        this.dict.set_lang(window.sets.lang,ovc_2);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {
@@ -141,28 +159,34 @@ class OfferOrder {
 
     }
 
-    OnChangeLang(ev) {
-        ev.preventDefault(); // avoid to execute the actual submit of the form.
-        ev.stopPropagation();
-        let menu = ev.data;
-        menu.SaveOffer(ev,window.admin.menu.lang);
-
-        let sel_lang = $('.sp_dlg option:selected').val().toLowerCase().substring(0, 2);
-
-        window.dict.Translate('en',sel_lang, function () {
-            window.dict.set_lang(sel_lang, $("#offer_order"));
-            window.admin.menu.lang = sel_lang;
-        });
-    }
-
-
     CloseMenu(ev) {
+        let that = ev.data;
+        that.SaveOrder(ev,window.sets.lang);
         ev.data.offer = '';
-
-        $('.menu_item').remove();
-        $('.tab_inserted').text('');
-        $('.tab_inserted').remove();
+        $('#offer_order_clone').remove();
     }
+
+    GetOrderItems(lang){
+        let that = this;
+        let order = {};
+        $('.menu_item[ordered]').each(function (index, val) {
+            order[$(val).find('.item_title').attr('data-translate')] = {
+                qnty: $(this).attr('ordered')
+            }
+        });
+        order['comment'] = $('#offer_order_clone').find('.comment')[0].value;
+        return order;
+    }
+
+    SaveOrder(ev, lang) {
+
+        let that = ev.data;
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
+        let items = this.GetOrderItems(lang);
+        window.admin.UpdateOrderLocal( items , that.location, that.email, date);
+    }
+
+
 }
 
 

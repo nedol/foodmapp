@@ -15,8 +15,10 @@ var moment = require('moment');
 var md5 = require('md5');
 var isJSON = require('is-json');
 
-import {utils} from "../utils/utils";
+import {Utils} from "../utils/utils";
 import {OfferViewer} from "./offer.viewer";
+
+let utils = new Utils();
 
 class OfferEditor{
 
