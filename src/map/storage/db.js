@@ -111,7 +111,7 @@ class DB {
             };
     }
 
-    getFile(date,email, f) {
+    getFile(date, e1start, e1end, email, f) {
 
         if (!email || !date)
             return;
@@ -121,18 +121,26 @@ class DB {
             var request = idateemail.get([date,email]);
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {
-                //console.log("File get from DB:"+request.result);
-                f(this.result ? this.result : -1);
+
+                if(this.result){
+                    let period = this.result.period.split('-');
+                    if(e1start > period[0] && e1start < period[1] || period[0] > e1start && period[0] < e1end) {
+                        f(this.result);
+                    }
+                }else{
+                   return -1;
+                }
             }
         } catch (ex) {
             console.log(ex);
         }
     }
 
-    getRange(date,cats, lat_0, lon_0, lat_1, lon_1, f) {
+    getRange(date, e1start, e1end, lat_0, lon_0, lat_1, lon_1, f) {
 
         if(!this.DBcon)
             return;
+
         var tx = this.DBcon.transaction([this.storeName], "readonly");
         var objectStore = tx.objectStore(this.storeName);
         var ilatlon = objectStore.index("datelatlon");
@@ -146,17 +154,27 @@ class DB {
 
             var cursor = event.target.result;
             if (cursor) {
-                var markerFeature = new Feature({
-                    geometry: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
-                    labelPoint: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
-                    //name: cursor.value.title ? cursor.value.title : "",
-                    //tooltip: cursor.value.title ? cursor.value.title : "",
-                    categories: JSON.parse(cursor.value.categories),
-                    object: cursor.value
-                });
-                var id_str = md5(cursor.value.email);
-                markerFeature.setId(cursor.value.hash);
-                features.push(markerFeature);
+
+                if(cursor.value.date!==date)
+                    cursor.continue();
+
+                let period = cursor.value.period.split('-');
+
+                if(e1start > period[0] && e1start < period[1] || period[0] > e1start && period[0] < e1end) {
+
+                    var markerFeature = new Feature({
+                        geometry: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
+                        labelPoint: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
+                        //name: cursor.value.title ? cursor.value.title : "",
+                        //tooltip: cursor.value.title ? cursor.value.title : "",
+                        categories: JSON.parse(cursor.value.categories),
+                        object: cursor.value
+                    });
+                    var id_str = md5(cursor.value.email);
+                    markerFeature.setId(cursor.value.hash);
+                    features.push(markerFeature);
+                }
+
                 cursor.continue();
             }
         };
@@ -199,28 +217,4 @@ class DB {
         });
     }
 
-
-    GetObjectAttr(id_str, attr, f) {
-
-        window.db.getFile(id_str, null, function (res, id_str, obj) {
-
-            if (res !== -1) {
-                uObj = JSON.parse(res.data);
-                f(uObj[attr]);
-            }
-        });
-    }
-
-    SetObjectAttr(id_str, attr, new_val) {
-
-        window.db.getFile(id_str, null, function (res, id_str, obj) {
-
-            if (res !== -1) {
-                res[attr] = new_val;
-                window.db.setFile(res, function (cat) {
-
-                });
-            }
-        });
-    }
 }

@@ -121,13 +121,6 @@ $(document).on('readystatechange', function () {
         //,daysOfWeekDisabled: [0, 6]
     });
 
-    $('#dt_from').css('transform', 'scale('+scale+','+scale+')');
-    $('#dt_from').css('top', '100px');
-    $('#dt_from').data("DateTimePicker").toggle();
-
-    $('#dt_to').css('transform', 'scale('+scale+','+scale+')');
-    $('#dt_to').css('top', '100px');
-    $('#dt_to').data("DateTimePicker").toggle();
 
     // $(window).on( "orientationchange", function( event ) {
     //     let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
@@ -143,12 +136,12 @@ $(document).on('readystatechange', function () {
     if(utils.getParameterByName('email')) {
         let uid = md5(date);
         if(!localStorage.getItem('customer')) {
-            uObj = {[date]:{"email":utils.getParameterByName('email'),"uid":uid,"order":{}}};
+            uObj = {"email":utils.getParameterByName('email'),"uid":uid,[date]:{"order":{}}};
             localStorage.setItem('customer',JSON.stringify(uObj));
         }else{
             uObj = JSON.parse(localStorage.getItem('customer'));
-            if(!uObj[date])
-                uObj[date] = {uid:uid};
+            if(!uObj)
+                uObj= {uid:uid};
         }
     }
 

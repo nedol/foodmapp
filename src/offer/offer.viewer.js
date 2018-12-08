@@ -34,10 +34,12 @@ class OfferViewer {
     }
 
 
-    OpenOffer(offer, dict) {
+    OpenOffer(em, period, offer, dict) {
 
+        this.email = em;
         this.offer = offer;
         this.dict = new Dict(dict);
+        this.period = period;
 
         let ovc_2 = $("#offer_viewer").clone();
         $(ovc_2).attr('id','offer_viewer_clone');
@@ -125,10 +127,6 @@ class OfferViewer {
                     && $(menu_item).find('.content_text').text()===""){
                     $(menu_item).find('.item_content').slideToggle("fast");
                 }
-
-                $(menu_item).find('.add_picture').css('display','none');
-
-                $(menu_item).find('.add_content').css('display','none');
             }
         }
 

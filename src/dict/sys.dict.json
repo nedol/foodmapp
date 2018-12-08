@@ -15,6 +15,10 @@
     "en": "Choose a region for delivery",
     "ru": "Выберите регион для доставки"
   },
+  "c5db61ffb92f10e3e72921a57b3ec421":{
+    "en": "Input address for delivery",
+    "ru": "Введите адрес доставки"
+  },
   "c9cc8cce247e49bae79f15173ce97354": {
     "en": "Save & Close",
     "ru": "Сохранить и закрыть"
@@ -90,5 +94,9 @@
   "1545c78dc94617fdcf969b057ece6372":{
     "ru": "Заказать",
     "en": "Make Order"
+  },
+  "3492b62254e3625dee5ff96208e0e9d9":{
+    "ru": "Заказ по доставке на",
+    "en": "Order for "
   }
 }

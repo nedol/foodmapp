@@ -110,17 +110,20 @@ class Layers {
             cluster: clusterSource,
             style: function (cluster_feature, atr) {
 
+                let period = $('.sel_time').text().split(' - ');
                 let features = cluster_feature.values_.features;
                 let rem_feat = [];
                 if (features.length > 0) {
                     $.each(features, function (key, feature) {
                         let id_str = feature.getId();
-                        window.db.getFile(that.map.supplier.date,feature.values_.object.email,function (res) {
+                        window.db.getFile(that.map.supplier.date,period[0],period[1],feature.values_.object.email,function (res) {
                             if(res!==-1) {
                                 if (feature.values_.object.date === that.map.supplier.date) {
                                     let style = getObjectStyle(feature.values_.object);
                                     if (style)
                                         cluster_feature.setStyle(style);
+                                }else{
+                                    vectorSource.removeFeature(feature);
                                 }
                             }else{
                                 vectorSource.removeFeature(feature);

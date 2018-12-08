@@ -7,6 +7,7 @@ var isJSON = require('is-json');
 import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
+import  _ol_interaction_DrawEventType_ from "ol/interaction/draweventtype";
 //import {RTCOperator} from "../rtc/rtc_operator"
 
 import {Map} from '../map/map'
@@ -37,12 +38,12 @@ class Customer{
         this.viewer = new OfferOrder();
 
         if(uObj[this.date]){
-            this.uid = uObj[this.date].uid;
-            this.email = uObj[this.date].email;
+            this.uid = uObj.uid;
+            this.email = uObj.email;
 
         }else{
             //this.uid = uObj[this.date].uid;
-            this.email = uObj[this.date].email;
+            this.email = uObj.email;
         }
 
         window.db = new DB(function () {
@@ -62,6 +63,8 @@ class Customer{
     }
 
     IsAuth_test(cb){
+
+        this.map.Init();
 
         this.network = new Network(host_port);
         this.network.InitSSE(this,function () {
@@ -237,10 +240,7 @@ class Customer{
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
                 if(layer.constructor.name==="_ol_layer_Vector_") {
-                    var features = layer.getSource().getFeatures();
-                    features.forEach((feature) => {
-                        layer.getSource().removeFeature(feature);
-                    });
+                    layer.getSource().refresh();
                 }
             });
 
@@ -256,82 +256,31 @@ class Customer{
         $('.sel_time').text($(ev).text());
         $('#dt_from').val(from);
         $('#dt_to').val(to);
-
+        let layers = this.map.ol_map.getLayers();
+        layers.forEach(function (layer, i, layers) {
+            if(layer.constructor.name==="_ol_layer_Vector_") {
+                layer.getSource().refresh();
+            }
+        });
     }
 
     PickRegion(){
-        alert($('#choose_region').text());
+        alert($('.input_address').text());
     }
 
-    UpdateOrderLocal(order, location, email, date){
+    UpdateOrderLocal(obj){
 
-        this.viewer.order = order;
+        this.viewer.order = obj.order;
         let uObj = JSON.parse(localStorage.getItem('customer'));
-        if (!isJSON(uObj)) {
-            uObj[date] = {
-                "location":location
-            };
-            uObj[date][email] = {order: order};
-            localStorage.setItem('customer', JSON.stringify(uObj));
-        }else{
-            uObj[date][email] = {order: order};
-            localStorage.setItem('customer', JSON.stringify(uObj));
-        }
+        if(!uObj[obj.date])
+            uObj[obj.date] = {};
+        if(!uObj[obj.date][obj.email])
+            uObj[obj.date][obj.email] = {};
+        uObj[obj.date][obj.email].order =  obj.order;
+        uObj['address'] = obj.address;
+        localStorage.setItem('customer', JSON.stringify(uObj));
     }
 
-    UpdateOrder(viewer, date) {
-
-        let time = $('.sel_time').text();
-        this.viewer[time] = viewer;
-
-        if(window.demoMode){
-
-            this.ClearTableReserve();
-            this.SetTables(this.viewer,this);
-
-            return;
-        }
-
-        let url = host_port
-        let data =
-            "proj=bm"+
-            "&func=updateorder"+
-            "&admin="+localStorage.getItem('admin')+
-            "&lat="+this.lat_param+
-            "&lon="+this.lon_param+
-            "&date="+date+
-            "&viewer="+JSON.stringify(this.viewer).replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/\n/g,'%0D').replace(/"/g,'\"')+
-            "&lang="+window.sets.lang;
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            dataType: 'json',
-            data: data,
-            class_obj:this,
-            success: function (resp) {
-                let arr = resp;
-                if(isJSON(resp))
-                    arr = JSON.parse(resp);
-                if(!arr) {
-
-                } else {
-
-                    if(arr.msg)
-                        console.log(arr.msg);
-
-                }
-            },
-            error: function(xhr, status, error){
-                //let err = eval("(" + xhr.responseText + ")");
-                console.log(error.Message);
-                alert(xhr.responseText);
-            },
-            complete: function (data) {
-                //alert(data.responseText);
-            },
-        });
-    }
 
     UpdateDict(dict, cb){
 
@@ -366,6 +315,30 @@ class Customer{
             complete: function (data) {
 
             },
+        });
+    }
+
+    PublishOrder(data, adr){
+        let that = this;
+        if(!adr){
+            this.PickRegion();
+            return;
+        }
+        let data_obj = {
+            "proj": "d2d",
+            "func": "updateorder",
+            "uid": that.uid,
+            "cusem": that.email,
+            "supem": data.email,
+            "date": $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'),
+            "period":$('.sel_time').text(),
+            "address": adr,
+            "order": JSON.stringify(data.order),
+            "lang": window.sets.lang
+        };
+
+        this.network.postRequest(data_obj, function (data) {
+            console.log(data);
         });
     }
 

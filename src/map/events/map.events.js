@@ -7,7 +7,7 @@ class MapEvents{
 
     constructor(map){
 
-        this.map = map
+        this.map = map;
 
         let that = this;
 
@@ -24,7 +24,7 @@ class MapEvents{
 
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
-                that.map.panel.StopLocation();
+                that.map.geo.StopLocation();
             }
 
             var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
@@ -49,12 +49,13 @@ class MapEvents{
 
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+                let period = $('.sel_time').text().split(' - ');
                 if(feature.values_.features.length===1) {
-                    window.db.getFile(date, feature.values_.features[0].values_.object.email, function (obj) {
+                    window.db.getFile(date, period[0],period[1],feature.values_.features[0].values_.object.email, function (obj) {
                         if(obj!==-1)
                         if (!window.admin.viewer.offer) {
                             let offer = JSON.parse(obj.offer);
-                            window.admin.viewer.OpenOffer(obj.email, offer, JSON.parse(obj.dict));
+                            window.admin.viewer.OpenOffer(obj.email, obj.period, offer, JSON.parse(obj.dict),[obj.latitude, obj.longitude]);
                         }
                     });
                 }else{//cluster
@@ -66,9 +67,7 @@ class MapEvents{
                     var extent = Extent.boundingExtent(coordinates);
                     var buf_extent = Extent.buffer(extent, 5);
                     //ol.extent.applyTransform(extent, transformFn, opt_extent)
-                    that.map.ol_map.getView().fit(buf_extent, {
-                        duration: window.sets.animate_duration
-                    });
+                    that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
 
                     that.map.ol_map.getView().animate({
                         center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration

@@ -27,6 +27,8 @@ class OfferEditor{
         this.changed = false;
         this.offer ;
 
+        this.period;
+
         this.arCat = [];
 
         this.location = [];
@@ -39,8 +41,6 @@ class OfferEditor{
     OpenOffer(offer, parent) {
 
         let that = this;
-
-        this.parent = parent;
         this.offer = offer;
 
         $('.dropdown').css('visibility','visible');
@@ -243,8 +243,7 @@ class OfferEditor{
 
         $("#offer_editor").find('.publish_offer').off('click touchstart');
         $("#offer_editor").find('.publish_offer').on('click touchstart',this,function (ev) {
-            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-            ev.data.parent.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),date, ev.data.location);
+            window.admin.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),date, ev.data.location);
         });
     }
 

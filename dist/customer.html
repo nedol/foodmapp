@@ -32,7 +32,9 @@
         height: 100%;
         width: 100%;
     }
-
+    .scaled{
+        transform: scale(1.5)
+    }
     .map{
         padding: 0px;
         margin: 0px;
@@ -40,6 +42,18 @@
         width: 100%;
         position: fixed;
         z-index: 0;
+    }
+
+    #marker {
+        display:block;
+        position:absolute;
+        bottom:0;
+        visibility:visible;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
     }
 
     #main_menu{
@@ -195,25 +209,19 @@
         z-index:12;
         /*-webkit-animation:bounce 1s infinite;*/
     }
+
+    .form-group{
+        position:absolute;
+        width:250px;
+        right:50px;
+        top:10px;
+        z-index: 10;"
+    }
 </style>
 
 <body>
 
 <div id="map" class="map"></div>
-
-<style>
-    #marker {
-        display:block;
-        position:absolute;
-        bottom:0;
-        visibility:visible;
-        pointer-events: initial;
-        -webkit-user-drag: none;
-        z-index:10;
-        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
-        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
-    }
-</style>
 
 <section id="marker" title="kolobot">
     <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
@@ -221,7 +229,7 @@
 
 <div id="main_window" class="container">
     <div class="row">
-        <div class="form-group" style="position:absolute;width:300px;right:2px;z-index: 10;">
+        <div class="form-group scaled">
             <div class='input-group date'   style="width:auto" >
                 <input type='text'  class="form-control dt_val"
                        value="Day of Delivery"/>
@@ -234,8 +242,16 @@
                     <span class="caret"></span>
                 </button>
                 <ul id="period_list" class="dropdown-menu period_list" role="menu" aria-labelledby="menu1">
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">19:00 - 24:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">13:00 - 17:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
+                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
                 </ul>
             </div>
         </div>
@@ -255,20 +271,6 @@
              z-index: 11;">
         <div id="datetimepicker" style="display: inline-block"></div>
     </div>
-        <div id="dt_from"
-             style="
-                 background-color: white;
-                 position: absolute;
-                 top:50%;
-                 right: 50%;
-                 z-index: 11;"></div>
-        <div id="dt_to"
-             style="
-                 position: absolute;
-                 top:50%;
-                 right: 50%;
-                 background-color: rgba(255,255,255,.7);
-                 z-index: 11;"></div>
 
 
 </div>
@@ -381,7 +383,7 @@
             <style>
                 .modal-header{
                     padding:9px 15px;
-                    border-bottom:1px solid #eee;
+                    border-bottom:1px solid #5e5e5e;
                     background-color: #0e0e0e;
                     -webkit-border-top-left-radius: 5px;
                     -webkit-border-top-right-radius: 5px;
@@ -392,12 +394,13 @@
                     font-family: Arial, Helvetica, sans-serif;
                 }
                 .modal-body{
+                    position:sticky;
                     padding:9px 15px;
                     border-bottom:1px solid black;
                     border-top:1px solid black;
                     border-right:1px solid black;
                     border-left:1px solid black;
-                    color: white;
+                    color: #ffffff;
                     background-color: black ;
                     -webkit-border-top-left-radius: 0px;
                     -webkit-border-top-right-radius: 0px;
@@ -410,7 +413,8 @@
                     padding: 9px 15px;
                     border-bottom: 1px solid black;
                     border-top: 0px;
-                    color: white;
+
+                    color: #5e5e5e;
                     background-color: black;
                     -webkit-border-top-left-radius: 5px;
                     -webkit-border-top-right-radius: 5px;
@@ -480,23 +484,35 @@
             </style>
             <div class="modal-header" style="position: relative;width: 100%;">
                 <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-default btn-sm order_menu_button dropdown-toggle"  data-toggle="dropdown"
-                            data-width="fit" type="button">
-                        <span class="glyphicon glyphicon-option-vertical"></span>
+                    <button class="btn btn-sm dropdown-toggle"  data-toggle="dropdown"
+                        data-width="fit" type="button" style="background-color: #0a0a0a">
+                        <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
                     </button>
-                    <ul class="dropdown-menu order_menu_options menu_list">
-                        <li class="publish_offer" data-width="fit"><a href="#"
+                    <ul class="dropdown-menu order_menu_options menu_list scaled">
+                        <li class="publish_order" data-width="fit"><a href="#"
                               data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                        <li class="cancel_offer" data-width="fit"><a href="#"
+                        <li class="cancel_order" data-width="fit"><a href="#"
                              data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
                     </ul>
                 </div>
+                <div style="display: inline-block; width:85%;margin: 0 auto;">
+                    <!--<div   data-translate="3492b62254e3625dee5ff96208e0e9d9"-->
+                           <!--style="-->
+                             <!--display: block;-->
+                             <!--font-family:'Courier New';-->
+                             <!--color: #c4e3f3;-->
+                             <!--float: right;-->
+                             <!--font-size: 12px;-->
+                             <!--word-wrap: break-word;">-->
+                        <!--<h6 class="modal-title-date" style=" color: #c4e3f3">Date</h6>-->
+                    <!--</div>-->
+                    <h5 class="modal-title address" contenteditable="true" style="text-align: center; color: #c4e3f3">Ленинский пр.</h5>
+                    <!--<h6 class="modal-title-date"-->
+                        <!--style="display: inline-block;-->
+                        <!--color: #c4e3f3">Date</h6>-->
+                </div>
 
-                <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
-                <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                <h4 class="modal-menu-number"  style="display: none">Offer</h4>
-
-                <button type="button" class="btn close" data-dismiss="modal" data-translate="">
+                <button type="button" class="btn close" data-dismiss="modal">
                     <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
                 </button>
                 <!--<div style="display: inline-block; position:absolute; right: 100px;padding: 0px;">-->
@@ -521,12 +537,13 @@
                 </div>
             </div>
             <div class="modal-footer">
-                 <textarea  class="comment"
-                    style="display:block; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
+
+                <span class="glyphicon glyphicon-comment scaled" data-toggle="collapse" href=".tacollapse"></span>
+
+                 <textarea  class="comment tacollapse"
+                    style="display:block; text-align:left; width: 100%; color: #ff6d6b; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
                 <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
-                <span class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 10px"></span>
-
             </div>
         </div>
     </div>
@@ -537,13 +554,7 @@
             border-color: #719ECE;
             box-shadow: 0 0 10px #719ECE;
         }
-        .item_title{
-            display: inline-block;
-            font-family:'Segoe Script';
-            font-size: x-large;
-            width: 70%;
-            word-wrap: break-word;
-        }
+
         .item_content{
             position:relative;
             height: 200px;
@@ -586,22 +597,40 @@
             margin-bottom: 10px;
             width: 100%;
         }
+        .qnty{
+            display: inline-block;
+            color: #0088bb;
+            position: relative;
+            font-weight:normal;
+            font-size:18px;
+        }
+
     </style>
 
     <div  id="menu_item_tmplt" contenteditable="false">
 
-        <div class="input item_title" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b">&nbsp;&nbsp;&nbsp;</div>
+        <div class="input item_title" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b"
+             style="
+             display: inline-block;
+             font-family:'Segoe Script';
+             font-size: x-large;
+             width: 65%;
+             word-wrap: break-word;" >&nbsp;&nbsp;&nbsp;
+        </div>
         <div class="input item_price"><i class="fa fa-euro"></i></div>
-        <div class="dropdown" style="display: inline-block;float: right">
-            <button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown"  data-translate="1545c78dc94617fdcf969b057ece6372">Make Order
+        <div class="dropdown" style="display: inline-block; float: right">
+            <div class="qnty" style="padding-right: 10px" data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Q-nty</div>
+
+            <button class="btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown"  contenteditable="true"
+                    data-translate="1545c78dc94617fdcf969b057ece6372">Make Order
                 <span class="caret"></span></button>
-            <ul class="dropdown-menu">
+            <ul class="dropdown-menu scaled"  multiple>
+                <li><a href="#">0</a></li>
                 <li><a href="#">1</a></li>
                 <li><a href="#">2</a></li>
                 <li><a href="#">3</a></li>
                 <li><a href="#">4</a></li>
                 <li><a href="#">5</a></li>
-                <li><a href="#">&gt;5</a></li>
             </ul>
         </div>
         <div class="item_content">
@@ -624,7 +653,7 @@
 
 <data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
 
-<data class="alerts choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
+<data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
 
 
 </body>

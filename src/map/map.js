@@ -18,7 +18,6 @@ import {Layers} from './layers/layers';
 import {Events} from './events/events';
 
 import {Feature} from "./events/feature.events";
-import {Panel} from "./panel/panel";
 import {Import} from "./import/import";
 import {Marker} from "./marker/marker"
 
@@ -73,16 +72,15 @@ class Map {
         //this.settings = new Settings(this);
         this.categories = new Categories(this);
         this.layers = new Layers(this);
-        this.events = new Events(this);
         this.feature = new Feature(this);
-        this.panel = new Panel(this);
         this.import = new Import(this);
 
-        this.init();
     }
 
-    init() {
+    Init() {
         let that = this;
+
+        this.events = new Events(this);
 
         if (window.sets.app_mode !== 'demo') {
 
@@ -140,8 +138,8 @@ class Map {
 
     GetObjectsFromStorage(cats, area) {
         let that = this;
-
-        window.db.getRange( that.supplier.date, cats, parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
+        let period = $('.sel_time').text().split(' - ');
+        window.db.getRange( that.supplier.date, period[0], period[1], parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
                 for(let c in features[f].values_.categories) {
 
@@ -208,5 +206,15 @@ class Map {
         this.animate.flyTo(location, function () {
             //Marker.overlay.setPosition(data.data[data.data.length-1]);
         });
+    }
+
+    SetBounds(obj) {
+        try {
+            this.ol_map.getView().fit(proj.transformExtent([parseFloat(obj.sw_lng), parseFloat(obj.sw_lat), parseFloat(obj.ne_lng), parseFloat(obj.ne_lat)], 'EPSG:4326', 'EPSG:3857'), {
+                duration: window.sets.animate_duration
+            }); // [minlon, minlat, maxlon, maxlat]
+        } catch (ex) {
+            alert(ex);
+        }
     }
 }

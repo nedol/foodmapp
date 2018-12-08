@@ -111,6 +111,7 @@ class Import {
             return {
                 email: obj.email,
                 date: obj.date,
+                period: obj.period,
                 categories: obj.cats,
                 longitude: obj.lon,
                 latitude: obj.lat,

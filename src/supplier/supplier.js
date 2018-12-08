@@ -320,7 +320,12 @@ class Supplier{
         $('.sel_time').text($(ev).text());
         $('#dt_from').val(from);
         $('#dt_to').val(to);
-
+        let layers = this.map.ol_map.getLayers();
+        layers.forEach(function (layer, i, layers) {
+            if(layer.constructor.name==="_ol_layer_Vector_") {
+                layer.getSource().refresh();
+            }
+        });
     }
 
     OpenOfferEditor(ev) {
@@ -334,6 +339,7 @@ class Supplier{
             let uObj = JSON.parse(localStorage.getItem('supplier'));
             if (!isJSON(uObj)) {
                 uObj[date] = {
+                    "period": $('.sel_time').text(),
                     "email": this.email,
                     "uid": this.uid,
                     "location":location,
@@ -343,6 +349,7 @@ class Supplier{
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{
                 uObj[date] = {
+                    "period": $('.sel_time').text(),
                     "email": this.email,
                     "uid": this.uid,
                     "location":location,
@@ -363,14 +370,14 @@ class Supplier{
             this.PickRegion();
             return;
         }
-        let uObj = JSON.parse(localStorage.getItem('supplier'));
+
         let data_obj = {
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
             "categories": that.offer.arCat,
             "date": date,
-            "period":"17:00-19:00",
+            "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
             "offer": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict),

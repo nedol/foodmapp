@@ -28,6 +28,11 @@ class DOMEvents {
 
         });
 
+        $('#loc_ctrl').on('click ontouchstart', this, window.admin.map.geo.StartLocation);
+
+        $('#pin').on('click ontouchstart', this, window.admin.map.geo.StopLocation);
+
+        $('#search_but').on('click ontouchstart', this, window.admin.map.geo.SearchLocation);
 
 
         $("#search_but").draggable({

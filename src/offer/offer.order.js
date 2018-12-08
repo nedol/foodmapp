@@ -18,6 +18,7 @@ var isJSON = require('is-json');
 
 import {utils} from "../utils/utils";
 
+
 class OfferOrder {
 
     constructor(){
@@ -29,20 +30,38 @@ class OfferOrder {
 
         this.location = [];
 
+        this.address;
+
         this.active_class = 'w3-border w3-border-grey w3-round-large';
 
     }
 
 
-    OpenOffer(em, offer, dict) {
-
+    OpenOffer(em, period, offer, dict, latlon) {
+        let that = this;
         this.email = em;
         this.offer = offer;
         this.dict = new Dict(dict);
 
-        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-        let order = JSON.parse(localStorage.getItem('customer'))[date][em];
+        this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        this.period = period;
+        let order;
+        let ls = JSON.parse(localStorage.getItem('customer'));
+        if(ls[this.date] && ls[this.date][em]){
+            order= ls[this.date][em];
+        }
+
+        this.address = ls.address;
+        if (!this.address) {
+            window.admin.map.geo.SearchPlace(latlon, 18, function (obj) {
+                that.address = obj;
+                $('.address').text(obj.street + "," + obj.house);
+            });
+        } else {
+            $('.address').text(this.address);
+        }
+
 
         let ovc_2 = $("#offer_order").clone();
         $(ovc_2).attr('id','offer_order_clone');
@@ -56,11 +75,11 @@ class OfferOrder {
         });
         this.parent = event.data;
 
-        ovc_2.find('.modal-title').text("Offer for ");
-        ovc_2.find('.modal-title').attr('data-translate', md5('Menu for'));
         ovc_2.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
         ovc_2.off('hide.bs.modal');
         ovc_2.on('hide.bs.modal', this,this.CloseMenu);
+
+        window.dict.set_lang(window.sets.lang,ovc_2[0]);
 
         ovc_2.find('.toolbar').css('display', 'block');
 
@@ -97,9 +116,10 @@ class OfferOrder {
                     }
                     $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
                     if(order && order.order && order.order[this.offer[tab][i].title]){
-                        $(menu_item).find('.btn').text($('.qnty').text()+order.order[this.offer[tab][i].title]['qnty']);
+                        $(menu_item).find('.btn').text(order.order[this.offer[tab][i].title]['qnty']);
                         $(menu_item).attr('ordered', order.order[this.offer[tab][i].title]['qnty']);
-                        //$(menu_item).find('.item_content').addClass('collapse in');
+                        $(menu_item).find('.btn').removeClass('btn-default');
+                        $(menu_item).find('.btn').addClass('btn-success');
                     }
                 }
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
@@ -135,8 +155,13 @@ class OfferOrder {
                 }
 
                 $(menu_item).find('li').on('click', function(ev){
-                    $(menu_item).find('.btn').text($('.qnty').text()+ev.target.text);
+                    $(menu_item).find('.btn').focus();
+                    $(menu_item).find('.btn').text(ev.target.text).val();
+
+                    $(menu_item).find('.btn').removeClass('btn-default');
+                    $(menu_item).find('.btn').addClass('btn-success');
                     $(menu_item).attr('ordered', ev.target.text);
+
                 });
             }
         }
@@ -149,13 +174,15 @@ class OfferOrder {
         // $(sp).selectpicker();
         // let evnts = $._data($(sp).get(0), "events");
         //
-        this.lang = window.sets.lang;
-        this.dict.set_lang(window.sets.lang,ovc_2);
+        this.dict.set_lang(window.sets.lang,ovc_2[0]);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
-        // if(!evnts['changed.bs.select']) {
-        //     $(sp).on('changed.bs.select', this, this.OnChangeLang);
-        // }
+        $($('.tab_inserted')[0]).find('a').trigger('click');
+
+        $(ovc_2).find('.publish_order').off('click touchstart');
+        $(ovc_2).find('.publish_order').on('click touchstart',this,function (ev) {
+            window.admin.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address);
+        });
 
     }
 
@@ -168,14 +195,21 @@ class OfferOrder {
 
     GetOrderItems(lang){
         let that = this;
-        let order = {};
+        let obj = {order:{}};
         $('.menu_item[ordered]').each(function (index, val) {
-            order[$(val).find('.item_title').attr('data-translate')] = {
-                qnty: $(this).attr('ordered')
+            if($(this).attr('ordered')==='0'){
+                return;
+            }
+            obj.order[$(val).find('.item_title').attr('data-translate')] = {
+                qnty: $(val).find('button[data-toggle=dropdown]').text()
             }
         });
-        order['comment'] = $('#offer_order_clone').find('.comment')[0].value;
-        return order;
+        obj['email'] = this.email;
+        obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
+        obj['date'] = this.date;
+        obj['period'] = this.period;
+        obj['address'] = $('#offer_order_clone').find('.address').text();
+        return obj;
     }
 
     SaveOrder(ev, lang) {
@@ -183,7 +217,7 @@ class OfferOrder {
         let that = ev.data;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
         let items = this.GetOrderItems(lang);
-        window.admin.UpdateOrderLocal( items , that.location, that.email, date);
+        window.admin.UpdateOrderLocal( items , that.email, date);
     }
 
 
