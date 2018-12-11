@@ -36,8 +36,8 @@ class Network{
 
         };
         this.eventSource.onmessage = function (e) {
-            //console.log(e.data);
-            //that.OnMessage(JSON.parse(e.data));
+            console.log(e.data);
+            window.user.OnMessage(JSON.parse(e.data));
 
         };
         this.eventSource.addEventListener('sse', (e) => {

@@ -151,8 +151,8 @@ class OfferEditor{
                 if(this.offer[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
-                    $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_left);
-                    $(menu_item).find('.img-fluid').css('top', this.offer[tab][i].img_top);
+                    $(menu_item).find('.img-fluid').css('left',!this.offer[tab][i].img_left?0:this.offer[tab][i].img_left);
+                    $(menu_item).find('.img-fluid').css('top', !this.offer[tab][i].img_top?0:this.offer[tab][i].img_top);
 
                     that.MakeDraggable($(menu_item).find('.img-fluid'));
                 }
@@ -202,6 +202,20 @@ class OfferEditor{
                 $(menu_item).find('.toolbar').css('display', 'block');
 
             }
+
+            $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
+                if(ev.relatedTarget) {
+                    let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                    window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
+                }
+            });
+
+            $('[href="#'+tab+'"]').on('hide.bs.tab',function (ev) {
+                if(event.target) {
+                    let items = that.getTabItems($(ev.target).text(), window.sets.lang);
+                    //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
+                }
+            });
         }
 
         if(this.status==='published' || this.status==='approved') {
@@ -233,16 +247,17 @@ class OfferEditor{
                                 "<td>" + res[i].period + "</td>" +
                                 "<td>" + data[kAr[k]].qnty + "</td>" +
                                 "<td>    " +
-                                "<textarea style=\'background-color: #0a0a0a\'>" + data[kAr[k]].comment + "</textarea>" +
+                                    "<textarea style=\'background-color: #0a0a0a\'>" + data[kAr[k]].comment + "</textarea>" +
                                 "</td>" +
+                                "<td>" +0+ "</td>" +
                                 "<td>" +
-                                "<label  class=\"btn\">" +
-                                "<input type=\"checkbox\" class=\"checkbox-inline\" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
-                                "<i class=\"fa fa-square-o fa-2x\"></i>" +
-                                "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
-                                "</label>" +
+                                    "<label  class=\"btn\">" +
+                                    "<input type=\"checkbox\" class=\"checkbox-inline\" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
+                                    "<i class=\"fa fa-square-o fa-2x\"></i>" +
+                                    "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
+                                    "</label>" +
                                 "</td>" +
-                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').siblings('.orders').find('tbody'));
+                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').siblings('.orders').css('display','block').find('tbody'));
 
                         }
                     })
@@ -510,6 +525,122 @@ class OfferEditor{
         $('#order_menu_button').dropdown("toggle")
     }
 
+    getTabItems(tab,lang,active){
+        let that = this;
+        let offerObj = {};
+        that.arCat = [];
+
+        let value = $('a[href="#'+tab+'"]').text();
+        let cat;
+        if(value) {
+            cat = $('.category[title='+value+']').attr('id');
+            if(!cat)
+                cat='1000';
+            that.arCat.push(parseInt(cat));
+
+            if(!window.dict.dict[md5(value)]){
+                window.dict.dict[md5(value)] = {};
+            }
+            window.dict.dict[md5(value)][lang] = value;
+        }
+
+        let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
+        if (!checked && active) {
+            delete that.arCat[parseInt(cat)];
+        } else {
+            let miAr = $('#'+tab).find('.menu_item');
+            offerObj[value] = [];
+
+            for (let i = 0; i < miAr.length; i++) {
+                let item = {};
+                item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
+                if(active && item.checked==='false'){
+                    continue; //active only
+                }
+                let title = $(miAr[i]).find('.item_title');
+                let hash = $(title).attr('data-translate');
+                let text = $(miAr[i]).find('.item_title').text();
+
+                if (text.length === 0 || !text.trim())
+                    continue;
+                if(!window.dict.dict[hash]) {
+                    window.dict.dict[hash] = {};
+                }
+                if (text !== window.dict.dict[hash][lang]) {
+                    let obj = Object.assign({},window.dict.dict[hash]);
+                    delete window.dict.dict[hash];
+                    hash = md5(text);
+                    window.dict.dict[hash] = obj;
+                    window.dict.dict[hash][lang] = text;
+                    $(title).attr('data-translate',hash);
+                }
+                item.title = hash;
+                item.price = $(miAr[i]).find('.item_price').text();
+
+                if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
+                    let cont_text = $(miAr[i]).find('.content_text');
+                    let w = $(cont_text).width();
+                    let h = $(cont_text).height();
+                    hash = $(cont_text).attr('data-translate');
+                    text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
+                    if(!window.dict.dict[hash]) {
+                        window.dict.dict[hash] = {};
+                    }
+                    if (text !== window.dict.dict[hash][lang]) {
+                        let obj = Object.assign({},window.dict.dict[hash]);
+                        //delete window.dict.dict[hash];
+                        hash = md5(text);
+                        window.dict.dict[hash] = obj;
+                        window.dict.dict[hash][lang] = text;
+                        $(cont_text).attr('data-translate',hash);
+                    }
+                    item.content = hash;
+                    item.width = w;
+                    item.height = h;
+                }else{
+                    if(item.content)
+                        delete item.content;
+                }
+
+                if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
+                    item.img = $(miAr[i]).find('.img-fluid').attr('src');
+                    if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
+                        item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
+                    if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
+                        item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
+                }else {
+                    delete item.img;
+                }
+
+                $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
+                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusem'),function (obj) {
+                        obj.status = 'approved';
+                        window.db.SetObject('orderStore', obj, function (res) {
+                            let data_obj = {
+                                "proj": "d2d",
+                                "func": "updateorderstatus",
+                                "uid": window.user.uid,
+                                "cusem": $(el).attr('cusem'),
+                                "supem": window.user.email,
+                                "date": window.user.date,
+                                "status":  'approved',
+                                "lang": window.sets.lang
+                            };
+
+                            window.user.network.postRequest(data_obj, function (data) {
+                                console.log(data);
+                            });
+                        });
+                    });
+                });
+
+                offerObj[value].push(item);
+            }
+        }
+
+        return offerObj;
+    }
+
     GetOfferItems(lang,active){
         let that = this;
         let offerObj = {};
@@ -593,8 +724,10 @@ class OfferEditor{
 
                         if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                             item.img = $(miAr[i]).find('.img-fluid').attr('src');
-                            item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
-                            item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
+                            if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
+                                item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
+                            if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
+                                item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
                         }else {
                             delete item.img;
                         }
@@ -621,8 +754,6 @@ class OfferEditor{
                             });
                         });
 
-
-
                         offerObj[value].push(item);
                 }
             }
@@ -632,17 +763,27 @@ class OfferEditor{
     }
 
     SaveOffer(ev, lang) {
-
-        let class_obj = ev.data.parent;
-        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
-        let items = this.GetOfferItems(lang);
-        window.user.UpdateOfferLocal( items , this.location, window.dict.dict, this.status);
+        let active = $("li.tab_inserted.active").text();
+        if(active) {
+            let items = this.getTabItems(active, lang);
+            window.user.UpdateOfferLocal(active, items, this.location, window.dict.dict, this.status);
+        }
     }
 
     CloseMenu(ev) {
         let that = ev.data;
         //if(ev.data.changed)
         that.SaveOffer(ev,window.sets.lang);
+
+        var r = confirm("Do Publish the Offer?");
+        if (r == true) {
+            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),window.user.date, ev.data.location, function (obj) {
+                that.obj = obj;
+                that.status = obj[window.user.date].status;
+            });
+        } else {
+
+        }
 
         $("#offer_editor").find('.tab-pane').empty();
 

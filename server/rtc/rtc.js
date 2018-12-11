@@ -107,14 +107,14 @@ module.exports = class RTC {
 
                     break;
 
-                case 'editor':
+                case 'offer':
                       //logger.info("func:"+q.func+" "+q.role+":"+q.uid);
 
                     this.SetParams(req, q);
 
                     this.HandleCall(req, q);
 
-                    this.BroadcastOperatorStatus(q, 'editor');
+                    this.BroadcastOperatorStatus(q, 'offer');
 
                     break;
 
@@ -342,7 +342,7 @@ module.exports = class RTC {
 
                     Peer(caller, q, uid);
 
-                    if (global.rtcPull[q.trans][uid].desc === 'editor' && q.desc && q.cand) {
+                    if (global.rtcPull[q.trans][uid].desc === 'offer' && q.desc && q.cand) {
                         remAr = {
                             "desc": q.desc,
                             "cand": q.cand,

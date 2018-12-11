@@ -22,7 +22,7 @@ class OfferViewer {
 
     constructor(){
         this.changed = false;
-        this.editor ;
+        this.offer ;
         this.dict;
 
         this.arCat = [];
@@ -37,7 +37,7 @@ class OfferViewer {
     OpenOffer(em, period, offer, dict) {
 
         this.email = em;
-        this.editor = offer;
+        this.offer = offer;
         this.dict = new Dict(dict);
         this.period = period;
 
@@ -55,7 +55,6 @@ class OfferViewer {
             show: true,
             keyboard:true
         });
-        this.parent = event.data;
 
         ovc_2.find('.modal-title').text("Offer for ");
         ovc_2.find('.modal-title').attr('data-translate', md5('Menu for'));
@@ -65,8 +64,9 @@ class OfferViewer {
 
         ovc_2.find('.toolbar').css('display', 'block');
 
-        for (let tab in this.editor) {
-            if(!tab || this.editor[tab].length===0) continue;
+        for (let tab in this.offer) {
+            if(!tab || this.offer[tab].length===0)
+                continue;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
                     '</li>').insertBefore(ovc_2.find('.add_tab_li'));
@@ -74,46 +74,51 @@ class OfferViewer {
                     '</div>').insertBefore(ovc_2.find('.add_tab_div'));
             }
 
-            for (let i in this.editor[tab]) {
+            for (let i in this.offer[tab]) {
 
                 let tmplt = $('#menu_item_tmplt').clone();
                 $('#menu_item_tmplt').attr('id', tab + '_' + i);
                 let menu_item = $('#' + tab + '_' + i)[0];
                 $(menu_item).attr("class", 'menu_item');
                 $(menu_item).css('display', 'block');
+                $('#add_item').css('visibility','hidden');
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
                 $(menu_item).find('.item_price').attr('contenteditable', 'false');
-                if(this.editor[tab][i].title){
+
+                $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
+                $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
+
+
+                if(this.offer[tab][i].title){
                     try {
-                        $(menu_item).find('.item_title').text(window.dict.dict[this.editor[tab][i].title][window.sets.lang]);
+                        $(menu_item).find('.item_title').text(window.dict.dict[this.offer[tab][i].title][window.sets.lang]);
                     }catch(ex){
                         ;
                     }
-                    $(menu_item).find('.item_title').attr('data-translate', this.editor[tab][i].title);
+                    $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
                 }
-                $(menu_item).find('.item_price').text(this.editor[tab][i].price);
-
-                $(menu_item).find('.item_content').addClass('collapse');
-                $(menu_item).find('.item_title').attr('data-toggle','collapse');
-                $(menu_item).find('.item_title').attr('href','.collapse');
+                $(menu_item).find('.item_price').text(this.offer[tab][i].price);
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
-                $(menu_item).find('.content_text').attr('data-translate', this.editor[tab][i].content);
-                if(this.editor[tab][i].content)
+                $(menu_item).find('.content_text').attr('data-translate', this.offer[tab][i].content);
+                if(this.offer[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
-                if(this.editor[tab][i].width)
-                    $(menu_item).find('.content_text').css('width',(this.editor[tab][i].width));
+                if(this.offer[tab][i].width)
+                    $(menu_item).find('.content_text').css('width',(this.offer[tab][i].width));
 
-                // if(this.editor[tab][i].height)
-                //     $(menu_item).find('.content_text').css('height',(this.editor[tab][i].height));
+                // if(this.offer[tab][i].height)
+                //     $(menu_item).find('.content_text').css('height',(this.offer[tab][i].height));
 
 
-                if(this.editor[tab][i].img) {
+                if(this.offer[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    $(menu_item).find('.img-fluid').attr('src', this.editor[tab][i].img);
-                    $(menu_item).find('.img-fluid').css('left',this.editor[tab][i].img_left);
+                    $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
+                    if(this.offer[tab][i].img_left)
+                        $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_left);
+                    if(this.offer[tab][i].img_top)
+                        $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_top);
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
@@ -160,7 +165,7 @@ class OfferViewer {
 
 
     CloseMenu(ev) {
-        ev.data.editor = '';
+        ev.data.offer = '';
         $('#offer_viewer_clone').remove();
     }
 }

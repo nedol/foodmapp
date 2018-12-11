@@ -48,7 +48,7 @@ class Overlay {
         // }, 5);
 
         $(element).on('click touchstart', window.user, function (ev) {
-            window.user.editor.OpenOffer(window.user);
+            window.user.offer.OpenOffer(window.user);
         });
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {

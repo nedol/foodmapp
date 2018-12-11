@@ -182,7 +182,7 @@ function InitUser(q, res) {
             res.end(JSON.stringify({
                 data: result[0].obj_data,
                 ddd: result[0].ddd,
-                editor: result[0].order_data,
+                offer: result[0].order_data,
                 maxdate:result[0].date
             }));
 
@@ -217,12 +217,12 @@ function InitAdmin(q, res) {
                 res.end('Wrong data format');
                 return;
             }
-            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"editor\":[\"tab_1\"]}";
+            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"offer\":[\"tab_1\"]}";
 
 
             if (owner.uid == q.uid) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, editor: menu_data}));
+                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, offer: menu_data}));
                 return;
             }
             if (!owner.uid) {
@@ -239,12 +239,12 @@ function InitAdmin(q, res) {
                 });
             }else{
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, editor: menu_data}));
+                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, offer: menu_data}));
             }
 
         }else{
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"data": result[0].obj_data,"editor": "[tab_1]"}));
+            res.end(JSON.stringify({"data": result[0].obj_data,"offer": "[tab_1]"}));
         }
     });
 }
@@ -270,7 +270,7 @@ function select_query(q, res) {
 
         }else{
             //res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"editor":'undefined'}))
+            res.end(JSON.stringify({"offer":'undefined'}))
         }
     });
 }

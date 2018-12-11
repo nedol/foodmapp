@@ -139,8 +139,11 @@ $(document).on('readystatechange', function () {
             localStorage.setItem('supplier',JSON.stringify(uObj));
         }else{
             uObj = JSON.parse(localStorage.getItem('supplier'));
-            if(!uObj[date])
-                uObj[date]= {data:{}};
+            if(!uObj[date]) {
+                let last = Object.keys(uObj)[Object.keys(uObj).length-1];
+                let data = uObj[last]['data'];
+                uObj[date] = {data: data?data:{}};
+            }
         }
     }
     window.user = new Supplier(uObj);

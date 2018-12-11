@@ -93,9 +93,6 @@ class Import {
                         let obj = res[i];
                         if(!obj)
                             continue;
-                        if(obj.email===window.user.email || !window.user.email){
-                            continue;
-                        }
                         obj = formatObject(obj);
                         window.db.SetObject('supplierStore',obj, function (success) {
 

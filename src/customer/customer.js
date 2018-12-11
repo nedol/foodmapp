@@ -37,7 +37,7 @@ class Customer{
         this.uid = uObj.uid;
         this.email = uObj.email;
 
-        window.db = new DB(function () {
+        window.db = new DB(this.constructor.name,function () {
             
         });
 
@@ -120,7 +120,7 @@ class Customer{
 
                     }else if (data.auth){//TODO: =='OK') {
                         localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.editor) {
+                        if(data.offer) {
                             let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
                             window.dict = new Dict(JSON.parse(data.data).dict);
                             window.dict.set_lang(window.sets.lang, $('#main_window'));
@@ -140,7 +140,7 @@ class Customer{
                         let dict = JSON.parse(str).dict;
                         window.dict = new Dict(dict);
                         window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.editor.menuObj = JSON.parse(data.editor);
+                        that.offer.menuObj = JSON.parse(data.offer);
                         that.DocReady();
                     }else{
                         let err = data.err;
@@ -324,6 +324,10 @@ class Customer{
         this.network.postRequest(data_obj, function (data) {
             console.log(data);
         });
+    }
+
+    OnMessage(res){
+
     }
 
 }

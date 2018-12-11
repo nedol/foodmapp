@@ -37,13 +37,13 @@ class Supplier{
 
         this.my_truck_ovl;
 
-        this.editor = new OfferEditor(uObj, this.date);
+        this.offer = new OfferEditor(uObj, this.date);
         this.viewer = new OfferViewer();
 
         this.uid = uObj.uid;
         this.email = uObj.email;
 
-        window.db = new DB(function () {});
+        window.db = new DB(this.constructor.name, function () {});
 
         this.map = new Map();
 
@@ -124,7 +124,7 @@ class Supplier{
 
                     }else if (data.auth){//TODO: =='OK') {
                         localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.editor) {
+                        if(data.offer) {
                             let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
                             window.dict = new Dict(JSON.parse(data.data).dict);
                             window.dict.set_lang(window.sets.lang, $('#main_window'));
@@ -144,7 +144,7 @@ class Supplier{
                         let dict = JSON.parse(str).dict;
                         window.dict = new Dict(dict);
                         window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.editor.menuObj = JSON.parse(data.editor);
+                        that.offer.menuObj = JSON.parse(data.offer);
                         that.DocReady();
                     }else{
                         let err = data.err;
@@ -218,15 +218,15 @@ class Supplier{
             if(!sup[that.date]) {
                 let uObj = JSON.parse(localStorage.getItem('supplier'));
                 let last = Object.keys(uObj)[Object.keys(uObj).length-1]
-                that.editor.editor = uObj[last].data?uObj[last].data:{};
-                sup[that.date]= {data: that.editor.editor,location:that.editor.location};
+                that.offer.offer = uObj[last].data?uObj[last].data:{};
+                sup[that.date]= {data: that.offer.offer,location:that.offer.location};
                 localStorage.setItem('supplier', JSON.stringify(sup));
 
             }else {
                 if(sup[that.date].data)
-                    that.editor.editor = sup[that.date].data;
+                    that.offer.offer = sup[that.date].data;
                 if(sup[that.date].location && sup[that.date].location.length===2) {
-                    that.editor.location = sup[that.date].location;
+                    that.offer.location = sup[that.date].location;
                     that.map.MoveToLocation(sup[that.date].location);
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id','my_truck_2');
@@ -254,7 +254,7 @@ class Supplier{
             }
             let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
             let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            window.user.editor.location = coor;
+            window.user.offer.location = coor;
 
             let sup = JSON.parse(localStorage.getItem('supplier'));
             sup[window.user.date].location = coor;
@@ -282,23 +282,31 @@ class Supplier{
     }
 
     OpenOfferEditor(ev) {
-        ev.data.editor.OpenOffer();
+        ev.data.offer.OpenOffer();
     }
 
-    UpdateOfferLocal(offer, location, dict, status){
+    UpdateOfferLocal(tab, offer, location, dict, status){
 
         if(window.demoMode) {
-            this.editor.offer = offer;
             let uObj = JSON.parse(localStorage.getItem('supplier'));
-            if (!isJSON(uObj)) {
-                uObj['email'] = this.email;
-                uObj['uid'] = this.uid;
-                uObj[window.user.date] = {
-                    "period": $('.sel_time').text(),
-                    "location":location,
-                    "data": offer,
-                    "status": status
-                };
+            if (uObj) {
+                if(tab){
+                    for(let i in offer[tab]){
+                        if(!offer[tab][i].img_left)
+                            offer[tab][i].img_left = uObj[window.user.date].data[tab][i].img_left;
+                        if(!offer[tab][i].img_top)
+                            offer[tab][i].img_top = uObj[window.user.date].data[tab][i].img_top;
+                    }
+                    uObj[window.user.date].data[tab] = offer[tab];
+                }else {
+                    uObj[window.user.date] = {
+                        "period": $('.sel_time').text(),
+                        "location": location,
+                        "data": offer,
+                        "status": status
+                    };
+                }
+                this.offer.offer[tab] = offer[tab];
                 localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{
@@ -328,11 +336,11 @@ class Supplier{
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
-            "categories": that.editor.arCat,
+            "categories": that.offer.arCat,
             "date": date,
             "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
-            "editor": urlencode.encode(JSON.stringify(data)),
+            "offer": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict),
             "lang": window.sets.lang
         };
@@ -350,6 +358,10 @@ class Supplier{
 
     PickRegion(){
         alert($('#choose_region').text());
+    }
+
+    OnMessage(data){
+
     }
 
 

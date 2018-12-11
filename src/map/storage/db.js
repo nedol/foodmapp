@@ -7,10 +7,10 @@ var md5 = require('md5');
 
 class DB {
 
-    constructor(f) {
+    constructor(user, f) {
 
         this.DBcon;
-        this.version = 12;
+        this.version = 13;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -18,10 +18,9 @@ class DB {
 
         this.iDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB,
             this.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction,
-            this.baseName = "D2DStore",
+            this.baseName = user+ ".D2DStore",
             this.supplierStore = "supplierStore",
-            this.orderStore = "orderStore",
-            this.imgStoreName = "imagesStore";
+            this.orderStore =  "orderStore";
 
         if (!this.DBcon) {
             this.connectDB(function (con) {
@@ -59,15 +58,15 @@ class DB {
 
                     }
                     let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "email"]});
-                    vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
-                    vSupplierStore.createIndex("dateemail", ["date","email"], {unique: true});
-                    vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
-                    vSupplierStore.createIndex("categories", "categories", {unique: false});
-                    vSupplierStore.createIndex("editor", "editor", {unique: false});
-                    vSupplierStore.createIndex("dict", "dict", {unique: false});
-                    vSupplierStore.createIndex("latitude", "latitude", {unique: false});
-                    vSupplierStore.createIndex("longitude", "longitude", {unique: false});
-                    vSupplierStore.createIndex("period", "period", {unique: false});
+                        vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
+                        vSupplierStore.createIndex("dateemail", ["date","email"], {unique: true});
+                        vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
+                        vSupplierStore.createIndex("categories", "categories", {unique: false});
+                        vSupplierStore.createIndex("offer", "offer", {unique: false});
+                        vSupplierStore.createIndex("dict", "dict", {unique: false});
+                        vSupplierStore.createIndex("latitude", "latitude", {unique: false});
+                        vSupplierStore.createIndex("longitude", "longitude", {unique: false});
+                        vSupplierStore.createIndex("period", "period", {unique: false});
                     try{
                         db.deleteObjectStore(that.orderStore);
                     }catch(ex){
@@ -122,11 +121,10 @@ class DB {
 
                 if(this.result){
                     let period = this.result.period.split('-');
-                    if(e1start > period[0] && e1start < period[1] || period[0] > e1start && period[0] < e1end) {
+                    if(parseInt(e1start) >= parseInt(period[0]) && parseInt(e1start) <= parseInt(period[1])
+                        || parseInt(period[0]) >= parseInt(e1start) && parseInt(period[0]) <= parseInt(e1end)) {
                         f(this.result);
                     }
-                }else{
-                   return -1;
                 }
             }
         } catch (ex) {
