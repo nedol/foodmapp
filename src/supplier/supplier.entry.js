@@ -121,14 +121,6 @@ $(document).on('readystatechange', function () {
         //,daysOfWeekDisabled: [0, 6]
     });
 
-    $('#dt_from').css('transform', 'scale('+scale+','+scale+')');
-    $('#dt_from').css('top', '100px');
-    $('#dt_from').data("DateTimePicker").toggle();
-
-    $('#dt_to').css('transform', 'scale('+scale+','+scale+')');
-    $('#dt_to').css('top', '100px');
-    $('#dt_to').data("DateTimePicker").toggle();
-
     // $(window).on( "orientationchange", function( event ) {
     //     let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
     //     $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
@@ -143,15 +135,16 @@ $(document).on('readystatechange', function () {
     if(utils.getParameterByName('email')) {
         let uid = md5(date);
         if(!localStorage.getItem('supplier')) {
-            uObj = {[date]:{"email":utils.getParameterByName('email'),"uid":uid,"offer":{}}};
+            uObj = {"email":utils.getParameterByName('email'),"uid":uid,[date]:{"data":{}}};
             localStorage.setItem('supplier',JSON.stringify(uObj));
         }else{
             uObj = JSON.parse(localStorage.getItem('supplier'));
+            if(!uObj[date])
+                uObj[date]= {data:{}};
         }
     }
-
-    window.admin = new Supplier(uObj);
-    window.admin.IsAuth_test(function (data) {//TODO:
+    window.user = new Supplier(uObj);
+    window.user.IsAuth_test(function (data) {//TODO:
 
     });
 

@@ -229,7 +229,7 @@ class MenuAdmin extends Menu{
             //listFiles(evt);
             let  files = $("input[type='file']")[0].files;
             let el = $(ev.target).attr('el_id');
-            window.admin.menu.import.HandleFileSelect(ev, files, el, function (data, el, smt) {
+            window.user.menu.import.HandleFileSelect(ev, files, el, function (data, el, smt) {
                 if(data) {
                     $("#" + el).attr('src', data);
                     let thumb = false;
@@ -421,7 +421,7 @@ class MenuAdmin extends Menu{
                 });
             }
             window.dict.set_lang(sel_lang,$("#offer_dialog") );
-            window.admin.menu.lang = sel_lang;
+            window.user.menu.lang = sel_lang;
 
         });
 
@@ -462,7 +462,7 @@ class MenuAdmin extends Menu{
                         return parseInt(a.from.replace(':', '')) - parseInt(b.from.replace(':', ''));
                     });
 
-                    // $('<li><a href="#"  onclick="window.admin.menu.OnClickTimeRange(this)" i="' + u + '" table="' + this.table_id
+                    // $('<li><a href="#"  onclick="window.user.menu.OnClickTimeRange(this)" i="' + u + '" table="' + this.table_id
                     //     + '" menu="' + this.menu_id + '" from="' + item.from + '" to="' + item.to + '">' + item.from + '-'
                     //     + item.to + '</a></li>').appendTo($('.pre_order_list'));
 
@@ -613,7 +613,7 @@ class MenuAdmin extends Menu{
             //$('.sp_dlg').find('option:selected').prop("selected", false);
             $($('.sp_dlg').find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
             window.dict.set_lang(window.sets.lang,$("#offer_dialog") );
-            window.admin.menu.lang = window.sets.lang;
+            window.user.menu.lang = window.sets.lang;
         });
     }
 
@@ -626,14 +626,14 @@ class MenuAdmin extends Menu{
         let this_order = ev.data.this.order;
         let from = class_obj.menu.from;
         let to = class_obj.menu.to;
-        let u = ev.data.this.uid?ev.data.this.uid:window.admin.uid;
+        let u = ev.data.this.uid?ev.data.this.uid:window.user.uid;
 
         let miAr = $('.menu_item').toArray();
         for (let p in miAr) {
             let key = $(miAr[p]).find('.item_title').attr('data-translate');
             if ($(miAr[p]).find(':checkbox').prop('checked')) {
                 //let obj = {[u]:{[table_id]:{[menu_id]:{"from":"13:00","to":"14:00","order":{[key]:{"status":"accepted"}}}}}};
-                if(u ===window.admin.uid) {
+                if(u ===window.user.uid) {
                     if (!this_order[u])
                         this_order[u] = {};
                 }
@@ -776,7 +776,7 @@ class MenuAdmin extends Menu{
             }
         });
 
-        window.admin.UpdateMenu(menuObj, window.dict.dict, date);
+        window.user.UpdateMenu(menuObj, window.dict.dict, date);
 
     }
 
@@ -802,13 +802,13 @@ class MenuAdmin extends Menu{
         ev.preventDefault(); // avoid to execute the actual submit of the form.
         ev.stopPropagation();
         let menu = ev.data;
-        menu.SaveMenu(ev,window.admin.menu.lang);
+        menu.SaveMenu(ev,window.user.menu.lang);
 
         let sel_lang = $('.sp_dlg option:selected').val().toLowerCase().substring(0, 2);
 
         window.dict.Translate('en',sel_lang, function () {
             window.dict.set_lang(sel_lang, $("#offer_dialog"));
-            window.admin.menu.lang = sel_lang;
+            window.user.menu.lang = sel_lang;
         });
     }
 

@@ -51,11 +51,11 @@ class MapEvents{
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
                 let period = $('.sel_time').text().split(' - ');
                 if(feature.values_.features.length===1) {
-                    window.db.getFile(date, period[0],period[1],feature.values_.features[0].values_.object.email, function (obj) {
+                    window.db.getSupplier(date, period[0],period[1],feature.values_.features[0].values_.object.email, function (obj) {
                         if(obj!==-1)
-                        if (!window.admin.viewer.offer) {
-                            let offer = JSON.parse(obj.offer);
-                            window.admin.viewer.OpenOffer(obj.email, obj.period, offer, JSON.parse(obj.dict),[obj.latitude, obj.longitude]);
+                        if (!window.user.viewer.offer) {
+                            let offer = JSON.parse(obj.data);
+                            window.user.viewer.OpenOffer(obj.email, obj.period, offer, JSON.parse(obj.dict),[obj.latitude, obj.longitude]);
                         }
                     });
                 }else{//cluster

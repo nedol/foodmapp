@@ -15,6 +15,7 @@ class Import {
         let that = this;
         if (!window.sets.coords.cur)
             return;
+
         var LotLat = proj.toLonLat(this.map.ol_map.getView().getCenter());//(window.sets.coords.cur);
 
         if (this.map.ol_map.getView().getZoom() >= 9) {
@@ -35,7 +36,7 @@ class Import {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
                 if (!IsDownloadedArea(date+"_"+cats + "_" + area)) {
-                    let uid = that.map.supplier.uid;
+                    let uid = window.user.uid;
                     that.LoadSupplierData(uid, cats, area, function (res) {
                         that.areasAr.push(date+"_"+cats +  "_" +  area);
                     });
@@ -65,15 +66,15 @@ class Import {
 
             let data_obj = {
                 "proj": "d2d",
-                "func": "get_suppliers",
+                "func": "getsuppliers",
                 "uid": uid,
                 "categories": cats,
                 "date": date,
-                "period":"17:00-19:00",
+                "period":$('.sel_time').text(),
                 "areas": area
             };
 
-            that.map.supplier.network.postRequest(data_obj, function (data) {
+            window.user.network.postRequest(data_obj, function (data) {
                 if(data) {
                     processResult(data);
                 }
@@ -92,8 +93,11 @@ class Import {
                         let obj = res[i];
                         if(!obj)
                             continue;
+                        if(obj.email===window.user.email || !window.user.email){
+                            continue;
+                        }
                         obj = formatObject(obj);
-                        window.db.setFile(obj, function (bool) {
+                        window.db.SetObject('supplierStore',obj, function (success) {
 
                         });
                     }
@@ -116,7 +120,7 @@ class Import {
                 longitude: obj.lon,
                 latitude: obj.lat,
                 logo: "../dist/images/truck.png",
-                offer: obj.data,
+                data: obj.data,
                 dict: obj.dict,
                 hash: hash
             };
@@ -124,4 +128,42 @@ class Import {
     }
 
 
+    GetOrders() {
+        try {
+            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+            let data_obj = {
+                "proj": "d2d",
+                "func": "getorders",
+                "uid": window.user.uid,
+                "date": date
+            };
+
+            window.user.network.postRequest(data_obj, function (data) {
+                if(data) {
+                    processResult(data);
+                }
+            });
+
+            function processResult(res) {
+                try {
+                    if (res) {
+                        for (let i in res) {
+                            let obj = res[i];
+                            if(!obj)
+                                continue;
+                            window.db.SetObject('orderStore', obj, function (success) {
+
+                            });
+                        }
+
+                    }
+                }catch(ex){
+                    console.log();
+                }
+            }
+        }catch(ex){
+            
+        }
+    }
 }

@@ -54,7 +54,7 @@ class OfferOrder {
 
         this.address = ls.address;
         if (!this.address) {
-            window.admin.map.geo.SearchPlace(latlon, 18, function (obj) {
+            window.user.map.geo.SearchPlace(latlon, 18, function (obj) {
                 that.address = obj;
                 $('.address').text(obj.street + "," + obj.house);
             });
@@ -103,9 +103,9 @@ class OfferOrder {
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
                 $(menu_item).find('.item_price').attr('contenteditable', 'false');
 
-                $(menu_item).find('.item_content').addClass('collapse');
-                $(menu_item).find('.item_title').attr('data-toggle','collapse');
-                $(menu_item).find('.item_title').attr('href','.collapse');
+
+                $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
+                $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
 
 
                 if(this.offer[tab][i].title){
@@ -181,7 +181,7 @@ class OfferOrder {
 
         $(ovc_2).find('.publish_order').off('click touchstart');
         $(ovc_2).find('.publish_order').on('click touchstart',this,function (ev) {
-            window.admin.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address);
+            window.user.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address);
         });
 
     }
@@ -189,7 +189,7 @@ class OfferOrder {
     CloseMenu(ev) {
         let that = ev.data;
         that.SaveOrder(ev,window.sets.lang);
-        ev.data.offer = '';
+        that.offer = '';
         $('#offer_order_clone').remove();
     }
 
@@ -217,7 +217,7 @@ class OfferOrder {
         let that = ev.data;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
         let items = this.GetOrderItems(lang);
-        window.admin.UpdateOrderLocal( items , that.email, date);
+        window.user.UpdateOrderLocal( items , that.email, date);
     }
 
 

@@ -27,7 +27,7 @@ module.exports = class D2D {
 
             res.write(utils.formatSSE({msg:'sse'}));
 
-            resObj[q.uid] = res;
+            resObj[q.email] = res;
 
         } else {
             try {
@@ -38,6 +38,9 @@ module.exports = class D2D {
                     case 'auth':
                         this.auth(q, res);
                         break;
+                    case 'updateorderstatus':
+                        this.UpdateOrderStatus(q, res);
+                        break;
                     case 'updateorder':
                         this.UpdateOrder(q, res);
                         break;
@@ -47,13 +50,12 @@ module.exports = class D2D {
                     case 'translate':
                         this.translate(q, res);
                         break;
-                    case 'updatedict':
-                        this.updatedict(q, res);
+                    case 'getorders':
+                        this.GetOrders(q, res);
                         break;
-                    case 'get_suppliers':
+                    case 'getsuppliers':
                         this.GetSuppliers(q, res);
                         break;
-
                     case 'share_location':
                         this.ShareLocation(q, res);
                         break;
@@ -88,7 +90,7 @@ module.exports = class D2D {
                 res.end(JSON.stringify({
                     data: result[0].obj_data,
                     ddd: result[0].ddd,
-                    offer: result[0].order_data,
+                    editor: result[0].order_data,
                     maxdate:result[0].date
                 }));
 
@@ -125,12 +127,12 @@ module.exports = class D2D {
                         res.end('Wrong data format');
                         return;
                     }
-                    let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"offer\":[\"tab_1\"]}";
+                    let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"editor\":[\"tab_1\"]}";
 
 
                     if (owner.uid == q.uid) {
                         res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, offer: menu_data}));
+                        res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, editor: menu_data}));
                         return;
                     }
                     if (!owner.uid) {
@@ -151,13 +153,13 @@ module.exports = class D2D {
                             msg: 'Demo Mode',
                             auth: 'ERROR',
                             data: result[0].obj_data,
-                            offer: menu_data
+                            editor: menu_data
                         }));
                     }
 
                 } else {
                     res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end(JSON.stringify({"data": result[0].obj_data, "offer": "[tab_1]"}));
+                    res.end(JSON.stringify({"data": result[0].obj_data, "editor": "[tab_1]"}));
                 }
 
             }catch(ex) {
@@ -187,7 +189,7 @@ module.exports = class D2D {
 
             }else{
                 //res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({"offer":'undefined'}))
+                res.end(JSON.stringify({"editor":'undefined'}))
             }
         });
     }
@@ -196,7 +198,7 @@ module.exports = class D2D {
 
         let sql =
             "SELECT of.id as offer_id, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
-            " FROM  supplier as sup, offer as of"+
+            " FROM  supplier as sup, offers as of"+
             " WHERE of.sup_uid=sup.uid AND sup.uid=\""+q.uid+"\"" +
             " AND of.date=\""+q.date+"\""+
             " ORDER BY of.id DESC";
@@ -209,11 +211,11 @@ module.exports = class D2D {
             }
             let values, sql;
             if(result.length>0) {
-                if (q.dict && result[0].offer) {// && result[0].obj_data.length<q.dict.length){
+                if (q.dict && result[0].editor) {// && result[0].obj_data.length<q.dict.length){
 
-                    values = [urlencode.decode(q.offer), result[0].offer_id];
+                    values = [urlencode.decode(q.editor), result[0].offer_id];
 
-                    sql = "UPDATE offer SET data=?   WHERE id=?";
+                    sql = "UPDATE offers SET data=?   WHERE id=?";
                     //console.log(sql);
 
                     global.con_obj.query(sql, values, function (err, result) {
@@ -229,14 +231,14 @@ module.exports = class D2D {
                 }
 
                 if (new Date(result[0].date) >= new Date(q.date)) {
-                    values = [urlencode.decode(q.offer), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period, result[0].offer_id];
+                    values = [urlencode.decode(q.editor), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period, result[0].offer_id];
                     sql =
-                        'UPDATE offer SET data=?, categories=?, longitude=?, latitude=?, period=? WHERE id=?';
+                        'UPDATE offers SET data=?, categories=?, longitude=?, latitude=?, period=? WHERE id=?';
                 }
             }else {
-                values = [q.uid, urlencode.decode(q.offer),JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
+                values = [q.uid, urlencode.decode(q.editor),JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
                 sql =
-                    'INSERT INTO offer SET sup_uid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
+                    'INSERT INTO offers SET sup_uid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
             }
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
@@ -254,9 +256,9 @@ module.exports = class D2D {
 
     UpdateOrder(q, res){
         let that = this;
-        let status = 'updated';
+        let status = 'published';
         let sql =
-            "SELECT ord.id as ordid, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "SELECT ord.id as ordid, ord.status as ordstatus, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
             " WHERE sup.email=\'"+q.supem+"\' AND cus.uid=\'"+q.uid+"\'" +
             " AND of.sup_uid=sup.uid AND cus.email=ord.cusem AND of.date=\""+q.date+"\"" +
@@ -271,7 +273,7 @@ module.exports = class D2D {
             }
             let values, sql;
             if(result.length>0) {
-               if(Object.keys(q.order).length<=3){
+               if(Object.keys(q.order).length<=3){//'{}'
                     status = 'deleted';
                }
 
@@ -284,7 +286,10 @@ module.exports = class D2D {
 
                     global.con_obj.query(sql, values, function (err, result) {
                         if (result) {
-                            values = [q.dict, "updated", q.uid];
+                            status= 'published';
+                            if(result[0].ordstatus==='approved')
+                                status = 'approved';
+                            values = [q.dict, status, q.uid];
                             sql = "UPDATE customer SET dict=?, status=?   WHERE id=?";
                             global.con_obj.query(sql, values, function (err, result) {
                                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
@@ -295,6 +300,8 @@ module.exports = class D2D {
                 }
 
                 if (new Date(result[0].date) >= new Date(q.date)) {
+                   if(result[0].ordstatus==='approved')
+                       status = 'approved';
                     values = [q.order, q.period, status, result[0].ordid];
                     sql =
                         'UPDATE orders SET data=?, period=?,status=? WHERE id=?';
@@ -302,8 +309,7 @@ module.exports = class D2D {
             }else {
                 status = 'published';
                 values = [q.cusem, q.supem, q.order, q.address.street+","+q.address.house, q.date, q.period,status];
-                sql =
-                    'INSERT INTO orders SET cusem=?, supem=?, data=?, address=?, date=?, period=?, status=?';
+                sql = 'INSERT INTO orders SET cusem=?, supem=?, data=?, address=?, date=?, period=?, status=?';
             }
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
@@ -311,8 +317,43 @@ module.exports = class D2D {
                     return;
                 }
                 if (result) {
+                    if(resObj[q.supem])
+                        resObj[q.supem].write(JSON.stringify({func:'order',status:status,data:q}));
                     res.end(JSON.stringify({result: result}));
                 }
+            });
+        });
+    }
+
+    UpdateOrderStatus(q, res){
+        let that = this;
+        let sql =
+            "SELECT ord.id as ordid, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
+            " WHERE sup.email=\'"+q.supem+"\' AND sup.uid=\'"+q.uid+"\'" +
+            " AND of.sup_uid=sup.uid AND cus.email=ord.cusem AND ord.cusem=\""+q.cusem+"\" AND ord.date=\""+q.date+"\"" +
+            " AND ord.date=\'"+q.date+"\'"+
+            " ORDER BY of.id DESC";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                res.end(JSON.stringify({err: err}));
+                return;
+            }
+            let values, sql;
+            if(result.length>0) {
+                values = [ q.status, result[0].ordid];
+
+                sql = "UPDATE orders SET status=? WHERE id=?";
+            }
+            global.con_obj.query(sql, values, function (err, result) {
+                if (err) {
+                    res.end(JSON.stringify({err: err}));
+                    return;
+                }
+
+                res.end(JSON.stringify({result: result}));
             });
         });
     }
@@ -376,7 +417,7 @@ module.exports = class D2D {
             " WHERE sup.uid = of.sup_uid" +
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date=\""+q.date+"\" AND uid<>\""+q.uid+"\"";
+            " AND of.date=\""+q.date+"\"";
 
         global.con_obj.query(sql, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -444,6 +485,27 @@ module.exports = class D2D {
                 res.end();
             }
 
+        });
+    }
+
+
+    GetOrders(q, res) {
+        let sql = "SELECT ord.* " +
+            " FROM orders as ord, supplier as sup" +
+            " WHERE ord.supem=sup.email " +
+            " AND LOWER(sup.uid)='" + q.uid+"' AND ord.date='"+q.date+"'"+
+            " AND ord.status<>'deleted'";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                console.log(JSON.stringify({'err':err}));
+            }
+
+            if(result.length>0){
+                res.write(JSON.stringify(result));
+            }
+            res.end();
         });
     }
 }

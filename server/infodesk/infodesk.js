@@ -83,10 +83,10 @@ module.exports =  class Infodesk{
             if(result.length>0) {
 
                 let owner = JSON.parse(result[0].owner);
-                let menu = JSON.parse(result[0].data).offer
+                let menu = JSON.parse(result[0].data).editor
                 if (menu){
                     var jsonfile = require('jsonfile')
-                    var file = './offer/' + menu + '.json'
+                    var file = './editor/' + menu + '.json'
                     jsonfile.readFile(file, function (err, obj) {
                         if ( err || obj === null) {
                             obj={};
@@ -94,7 +94,7 @@ module.exports =  class Infodesk{
 
                         if (owner.uid == q.uid) {
                             res.writeHead(200, {'Content-Type': 'application/json'});
-                            res.end(JSON.stringify({auth: 'OK',offer:obj}));
+                            res.end(JSON.stringify({auth: 'OK',editor:obj}));
                             return;
                         }
                         if (!owner.uid) {

@@ -28,11 +28,28 @@ class DOMEvents {
 
         });
 
-        $('#loc_ctrl').on('click ontouchstart', this, window.admin.map.geo.StartLocation);
+        $('#loc_ctrl').on('click ontouchstart', this, window.user.map.geo.StartLocation);
 
-        $('#pin').on('click ontouchstart', this, window.admin.map.geo.StopLocation);
+        $('#pin').on('click ontouchstart', this, window.user.map.geo.StopLocation);
 
-        $('#search_but').on('click ontouchstart', this, window.admin.map.geo.SearchLocation);
+        $('#search_but').on('click ontouchstart', this, function (ev) {
+
+            if ($("#search_but").attr('drag') === 'true') {
+                $("#search_but").attr('drag', false);
+                return;
+            }
+            let text = "Input location name";
+            let hint = "London, Trafalgar Square";
+            if (window.window.sets.lang === 'ru') {
+                text = "Введите название местоположения";
+                hint = "Москва, Красная площадь";
+            }
+            let place = prompt(text, hint);
+
+            window.user.map.geo.SearchLocation(text,function (bound) {
+                ev.data.map.SetBounds({sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+            });
+        });
 
 
         $("#search_but").draggable({

@@ -7,15 +7,12 @@ var isJSON = require('is-json');
 import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
-import  _ol_interaction_DrawEventType_ from "ol/interaction/draweventtype";
+
 //import {RTCOperator} from "../rtc/rtc_operator"
 
 import {Map} from '../map/map'
 import {DB} from "../map/storage/db"
-import proj from 'ol/proj';
 
-
-import {Overlay} from "../map/overlay/overlay";
 import {OfferOrder} from "../offer/offer.order";
 
 var urlencode = require('urlencode');
@@ -37,28 +34,14 @@ class Customer{
 
         this.viewer = new OfferOrder();
 
-        if(uObj[this.date]){
-            this.uid = uObj.uid;
-            this.email = uObj.email;
-
-        }else{
-            //this.uid = uObj[this.date].uid;
-            this.email = uObj.email;
-        }
+        this.uid = uObj.uid;
+        this.email = uObj.email;
 
         window.db = new DB(function () {
             
         });
 
-        this.map = new Map(this);
-        // this.map.MoveToLocation(this.offer.location);
-        //
-        // let sup = JSON.parse(localStorage.getItem('customer'));
-        // if(!sup[this.date]) {
-        //     sup[this.date]= {uid:this.uid,email:this.email};
-        //     localStorage.setItem('customer', JSON.stringify(sup));
-        // }
-
+        this.map = new Map();
 
     }
 
@@ -137,7 +120,7 @@ class Customer{
 
                     }else if (data.auth){//TODO: =='OK') {
                         localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.offer) {
+                        if(data.editor) {
                             let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
                             window.dict = new Dict(JSON.parse(data.data).dict);
                             window.dict.set_lang(window.sets.lang, $('#main_window'));
@@ -157,7 +140,7 @@ class Customer{
                         let dict = JSON.parse(str).dict;
                         window.dict = new Dict(dict);
                         window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.offer.menuObj = JSON.parse(data.offer);
+                        that.editor.menuObj = JSON.parse(data.editor);
                         that.DocReady();
                     }else{
                         let err = data.err;
@@ -334,6 +317,7 @@ class Customer{
             "period":$('.sel_time').text(),
             "address": adr,
             "order": JSON.stringify(data.order),
+            "status": "published",
             "lang": window.sets.lang
         };
 

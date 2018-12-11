@@ -242,16 +242,16 @@
                     <span class="caret"></span>
                 </button>
                 <ul id="period_list" class="dropdown-menu period_list" role="menu" aria-labelledby="menu1">
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
                 </ul>
             </div>
         </div>
@@ -609,7 +609,7 @@
 
     <div  id="menu_item_tmplt" contenteditable="false">
 
-        <div class="input item_title" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b"
+        <div class="input item_title" data-toggle="collapse" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b"
              style="
              display: inline-block;
              font-family:'Segoe Script';
@@ -621,9 +621,9 @@
         <div class="dropdown" style="display: inline-block; float: right">
             <div class="qnty" style="padding-right: 10px" data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Q-nty</div>
 
-            <button class="btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown"  contenteditable="true"
-                    data-translate="1545c78dc94617fdcf969b057ece6372">Make Order
-                <span class="caret"></span></button>
+            <button class="btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown">0
+                <!--<span class="caret"></span>-->
+            </button>
             <ul class="dropdown-menu scaled"  multiple>
                 <li><a href="#">0</a></li>
                 <li><a href="#">1</a></li>
@@ -633,7 +633,7 @@
                 <li><a href="#">5</a></li>
             </ul>
         </div>
-        <div class="item_content">
+        <div class="item_content collapse">
             <textarea  class="input content_text" style="position:absolute;visibility: hidden;height:200px; width:100%;background-color: rgba(255,255,255,0); z-index: 11" contenteditable="false">&nbsp;&nbsp;&nbsp;</textarea>
             <img class="input img-fluid w3-image" style="display:block;position:absolute;visibility: hidden; height:180px;right:5px;padding-left:10px;z-index: 10;"  draggable="false"  src="" >
         </div>

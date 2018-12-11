@@ -7,6 +7,7 @@ var isJSON = require('is-json');
 import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
+
 //import {RTCOperator} from "../rtc/rtc_operator"
 
 import {Map} from '../map/map'
@@ -33,43 +34,24 @@ class Supplier{
     constructor(uObj) {
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-        let last = Object.keys(uObj)[Object.keys(uObj).length-1];
 
         this.my_truck_ovl;
 
-        this.offer = new OfferEditor();
+        this.editor = new OfferEditor(uObj, this.date);
         this.viewer = new OfferViewer();
 
-        if(uObj[this.date]){
-            this.uid = uObj[this.date].uid;
-            this.email = uObj[this.date].email;
-            this.offer.offer = uObj[this.date].offer;
-            this.offer.location = uObj[this.date].location;
-        }else if(last && uObj[last]){
-            this.uid = uObj[last].uid;
-            this.email = uObj[last].email;
-            this.offer.offer = uObj[last].offer;
-            this.offer.location = uObj[last].location;
-            uObj[this.date] = uObj[last];
-            localStorage.setItem("supplier", JSON.stringify(uObj));
-        }
+        this.uid = uObj.uid;
+        this.email = uObj.email;
 
-        window.db = new DB(function () {
-            
-        });
+        window.db = new DB(function () {});
 
-        this.map = new Map(this);
-        // this.map.MoveToLocation(this.offer.location);
-        //
-        // let sup = JSON.parse(localStorage.getItem('supplier'));
-        // if(!sup[this.date]) {
-        //     sup[this.date]= {uid:this.uid,email:this.email};
-        //     localStorage.setItem('supplier', JSON.stringify(sup));
-        // }
+        this.map = new Map();
 
     }
 
     IsAuth_test(cb){
+
+        this.map.Init();
 
         this.network = new Network(host_port);
         this.network.InitSSE(this,function () {
@@ -86,7 +68,7 @@ class Supplier{
                 localStorage.setItem("dict",'{}');
                 window.dict = new Dict({});
             }
-            window.dict.set_lang(window.sets.lang, $('#main_window'));
+            window.dict.set_lang(window.sets.lang, $('body'));
             window.dict.set_lang(window.sets.lang, $('#categories'));
             localStorage.setItem("lang", window.sets.lang);
 
@@ -142,7 +124,7 @@ class Supplier{
 
                     }else if (data.auth){//TODO: =='OK') {
                         localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.offer) {
+                        if(data.editor) {
                             let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
                             window.dict = new Dict(JSON.parse(data.data).dict);
                             window.dict.set_lang(window.sets.lang, $('#main_window'));
@@ -162,7 +144,7 @@ class Supplier{
                         let dict = JSON.parse(str).dict;
                         window.dict = new Dict(dict);
                         window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.offer.menuObj = JSON.parse(data.offer);
+                        that.editor.menuObj = JSON.parse(data.editor);
                         that.DocReady();
                     }else{
                         let err = data.err;
@@ -181,22 +163,6 @@ class Supplier{
         let time = $('.period_list').find('a')[0].text;
         $('.sel_time').text(time);
 
-        $('#dt_from').on("dp.change",this, function (ev) {
-
-            let date_from =  new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
-            let date = moment($(this).data("DateTimePicker").date().format('HH:mm'), 'HH:mm');
-            if(date.isBefore(date_from)) {
-                $(this).data("DateTimePicker").toggle();
-                return true;
-            }
-            $('#period_1').find('.from')[0].setAttribute('text', 'value', $(this).data("DateTimePicker").date().format('HH:00'));
-            //$('#period_1').find('.to')[0].setAttribute('text', 'value', mom.add(4, 'h').format('HH:00'));
-
-            let time = $('.sel_time').text();
-
-            $(this).data("DateTimePicker").toggle();
-        });
-
         $('.sel_time').on("change",this,function (ev) {
             let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
             let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];
@@ -205,18 +171,6 @@ class Supplier{
 
         });
 
-        $('#dt_to').on("dp.change",this, function (ev) {
-
-            let date_to = new moment($('#period_1').find('.to')[0].getAttribute('text').value, 'HH:mm');//;
-            let date_from = new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
-            if(date_to.isBefore(date_from)) {
-                $(this).data("DateTimePicker").toggle();
-                return true;
-            }
-            $('#period_1').find('.to')[0].setAttribute('text', 'value', date_to.format('HH:00'));
-
-            $(this).data("DateTimePicker").toggle();
-        });
 
         $('#date').on("click touchstart",this,function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
@@ -264,25 +218,24 @@ class Supplier{
             if(!sup[that.date]) {
                 let uObj = JSON.parse(localStorage.getItem('supplier'));
                 let last = Object.keys(uObj)[Object.keys(uObj).length-1]
-                that.offer.offer = uObj[last].offer?uObj[last].offer:{};
-                sup[that.date]= {uid:that.uid,email:that.email, offer: that.offer.offer,location:that.offer.location};
+                that.editor.editor = uObj[last].data?uObj[last].data:{};
+                sup[that.date]= {data: that.editor.editor,location:that.editor.location};
                 localStorage.setItem('supplier', JSON.stringify(sup));
 
             }else {
-                if(sup[that.date].offer)
-                    that.offer.offer = sup[that.date].offer;
-                if(sup[that.date].location.length===2) {
-                    that.offer.location = sup[that.date].location;
+                if(sup[that.date].data)
+                    that.editor.editor = sup[that.date].data;
+                if(sup[that.date].location && sup[that.date].location.length===2) {
+                    that.editor.location = sup[that.date].location;
                     that.map.MoveToLocation(sup[that.date].location);
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id','my_truck_2');
                     that.my_truck_ovl = new Overlay(that.map,my_truck_2,sup[that.date].location);
                     $('#my_truck').css('visibility','hidden');
                 }
-
             }
 
-            //this.GetReserved();
+            that.map.import.GetOrders();
         });
 
         $("#my_truck").on('dragstart',function (ev) {
@@ -301,10 +254,10 @@ class Supplier{
             }
             let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
             let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            that.map.supplier.offer.location = coor;
+            window.user.editor.location = coor;
 
             let sup = JSON.parse(localStorage.getItem('supplier'));
-            sup[that.map.supplier.date].location = coor;
+            sup[window.user.date].location = coor;
             localStorage.setItem('supplier', JSON.stringify(sup));
             $('#my_truck').css('visibility','visible');
             let my_truck_2 = $('#my_truck').clone()[0];
@@ -329,42 +282,42 @@ class Supplier{
     }
 
     OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer(ev.data.offer.offer, ev.data);
+        ev.data.editor.OpenOffer();
     }
 
-    UpdateOfferLocal(offer, location, dict, date){
+    UpdateOfferLocal(offer, location, dict, status){
 
         if(window.demoMode) {
-            this.offer.offer = offer;
+            this.editor.offer = offer;
             let uObj = JSON.parse(localStorage.getItem('supplier'));
             if (!isJSON(uObj)) {
-                uObj[date] = {
+                uObj['email'] = this.email;
+                uObj['uid'] = this.uid;
+                uObj[window.user.date] = {
                     "period": $('.sel_time').text(),
-                    "email": this.email,
-                    "uid": this.uid,
                     "location":location,
-                    "offer": offer
+                    "data": offer,
+                    "status": status
                 };
                 localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{
+                uObj['email'] = this.email;
+                uObj['uid'] = this.uid;
                 uObj[date] = {
                     "period": $('.sel_time').text(),
-                    "email": this.email,
-                    "uid": this.uid,
                     "location":location,
-                    "offer": offer
+                    "data": offer,
+                    "status": status
                 };
 
                 localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }
-
         }
-
     }
 
-    PublishOffer(data, date, location){
+    PublishOffer(data, date, location, cb){
         let that = this;
         if(!location || location.length===0){
             this.PickRegion();
@@ -375,17 +328,23 @@ class Supplier{
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
-            "categories": that.offer.arCat,
+            "categories": that.editor.arCat,
             "date": date,
             "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
-            "offer": urlencode.encode(JSON.stringify(data)),
+            "editor": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict),
             "lang": window.sets.lang
         };
 
         this.network.postRequest(data_obj, function (data) {
-            console.log(data);
+            if(data.result.affectedRows===1){
+                let obj = JSON.parse(localStorage.getItem('supplier'));
+                obj[window.user.date].status = 'published';
+                localStorage.setItem('supplier',JSON.stringify(obj));
+
+                cb(obj);
+            }
         });
     }
 
@@ -393,215 +352,6 @@ class Supplier{
         alert($('#choose_region').text());
     }
 
-    GetReserved(ev) {
-
-        if(ev.stopPropagation)
-            ev.stopPropagation();
-        if(ev.preventDefault)
-            ev.preventDefault();
-
-        var dateTimeAr = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-
-        try {
-
-            var url = host_port + '?' + //
-                "proj=d2d"+
-                "&admin="+ ev.data.uid +
-                "&func=getreserved" +
-                "&date=" + dateTimeAr +
-                "&lang=" + window.sets.lang;
-
-            console.log(url);
-
-            $.ajax({
-                url: url,
-                method: "GET",
-                dataType: 'json',
-                processData: false,
-                async: true,   // asynchronous request? (synchronous requests are discouraged...)
-                cache: false,
-                crossDomain: true,
-                success: function (resp, msg) {
-
-
-                },
-                error: function (xhr, status, error) {
-                    //var err = eval("(" + xhr.responseText + ")");
-
-                    console.log(error.Message);
-                    console.log(xhr.responseText);
-
-                },
-                complete: function (data) {
-                    //alert(data.responseText);
-                },
-            });
-
-        } catch (ex) {
-            console.log(ex);
-        }
-    }
-
-    UpdateReservation(event, table_id, data_obj,cb) {
-
-        let time = $('.sel_time').text();
-        if(!this.order[time])
-            this.order[time]={};
-        if (!this.order[time][this.uid])
-            this.order[time][this.uid] = {};
-        if (!this.order[time][this.uid][table_id])
-            this.order[time][this.uid][table_id] = data_obj?data_obj[this.uid][table_id]:
-                {'menu_1':{'order':{}},'menu_2':{'order':{}}};
-
-        if(window.demoMode) {
-            this.ClearTableReserve();
-            this.SetTables(this.order,this);
-            return;
-        }
-        let url = host_port;
-        let data =
-            "proj=d2d"+
-            "&func=updatereservation"+
-            "&user="+localStorage.getItem('user')+
-            "&time="+time+
-            "&date="+event.data.date+
-            "&table="+table_id+
-            "&menus="+urlencode.encode(JSON.stringify(this.order[time][this.uid][table_id]))+
-            "&lang="+window.sets.lang;
-//'{"'+res[0].id + '":{"order": {},"from":"'+$('#period_1').find('.from')[0].getAttribute('text').value+'","to":"'+$('#period_1').find('.to')[0].getAttribute('text').value+'"}}';
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            dataType: 'json',
-            data: data,
-            class_obj:event.data,
-            cb:cb,
-            success: function (resp) {
-                let arr = resp;
-                if(isJSON(resp))
-                    arr = JSON.parse(resp);
-                if(resp.user) {
-                    localStorage.setItem("user", resp.user);//
-                }
-                if(!arr) {
-                    new TWEEN.Tween($('#target')[0].object3D.position).to({
-                        y: 0,
-                        x: 0,//_x * visible_width,
-                        z: 0 //_y * visible_height
-                    }, 1000)
-                        .repeat(0)//Infinity)
-                        .onUpdate(function () { // Called after tween.js updates
-                            //document.querySelector('#camera').setAttribute('camera', 'fov', '60');
-                        })
-                        .easing(TWEEN.Easing.Quadratic.In).start();
-                } else {
-
-                }
-            },
-            error: function(xhr, status, error){
-                //let err = eval("(" + xhr.responseText + ")");
-                localStorage.removeItem("user");//
-                console.log(error.Message);
-                //alert(xhr.responseText);
-            },
-            complete: function (data) {
-                //alert(data.responseText);
-                if(this.cb)
-                    this.cb();
-            },
-        });
-    }
-
-    UpdateOrder(order, date) {
-
-        let time = $('.sel_time').text();
-        this.order[time] = order;
-
-        if(window.demoMode){
-
-            this.ClearTableReserve();
-            this.SetTables(this.order,this);
-
-            return;
-        }
-
-        let url = host_port
-        let data =
-            "proj=bm"+
-            "&func=updateorder"+
-            "&admin="+localStorage.getItem('admin')+
-            "&lat="+this.lat_param+
-            "&lon="+this.lon_param+
-            "&date="+date+
-            "&order="+JSON.stringify(this.order).replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/\n/g,'%0D').replace(/"/g,'\"')+
-            "&lang="+window.sets.lang;
-
-        $.ajax({
-            url: url,
-            method: "POST",
-            dataType: 'json',
-            data: data,
-            class_obj:this,
-            success: function (resp) {
-                let arr = resp;
-                if(isJSON(resp))
-                    arr = JSON.parse(resp);
-                if(!arr) {
-
-                } else {
-
-                    if(arr.msg)
-                        console.log(arr.msg);
-
-                }
-            },
-            error: function(xhr, status, error){
-                //let err = eval("(" + xhr.responseText + ")");
-                console.log(error.Message);
-                alert(xhr.responseText);
-            },
-            complete: function (data) {
-                //alert(data.responseText);
-            },
-        });
-    }
-
-    UpdateDict(dict, cb){
-
-        if(window.demoMode){
-            window.dict.dict = dict;
-            cb();
-            return;
-        }
-
-        let data_obj = {
-            "proj":"d2d",
-            "func": "updatedict",
-            "admin": JSON.stringify({uid:this.uid,lon:this.lon_param,lat:this.lat_param}),
-            "dict": JSON.stringify(dict).replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/\n/g,'%0D').replace(/"/g,'\"')
-        }
-        $.ajax({
-            url: host_port,
-            method: "POST",
-            dataType: 'json',
-            data: data_obj,
-            async: true,   // asynchronous request? (synchronous requests are discouraged...)
-            success: function (resp) {
-                //$("[data-translate='" + this.key + "']").parent().val(resp);
-                cb();
-            },
-            error: function (xhr, status, error) {
-                //let err = eval("(" + xhr.responseText + ")");
-                console.log(error.Message);
-                //alert(xhr.responseText);
-            },
-
-            complete: function (data) {
-
-            },
-        });
-    }
 
 }
 

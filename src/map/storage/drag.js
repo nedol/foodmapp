@@ -154,7 +154,7 @@ class Drag {
 
                     let obj_id = GetObjId(coor[1], coor[0]);
                     let hash = MD5(obj_id);
-                    window.db.setFile({hash: hash, data: data});
+                    window.db.SetObject({hash: hash, data: data});
 
                     this.LoadThmb(f, options, function (logo_data) {
 
@@ -259,7 +259,7 @@ class Drag {
 
         let obj_id = GetObjId(coor[1], coor[0]);
         let hash = MD5(obj_id);
-        img_db.setFile({id: hash, data: data});
+        img_db.SetObject({id: hash, data: data});
 
 
         let obj = {

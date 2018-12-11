@@ -76,7 +76,7 @@ class Route {
             if (query === 0) {
 
                 Route.prototype.DrawRoute(arLoc);
-                window.db.setFile({id: 'mega_route', data: arLoc});
+                window.db.SetObject({id: 'mega_route', data: arLoc});
                 flyTo(arLoc[arLoc.length - 1], function () {
                 });
                 return;

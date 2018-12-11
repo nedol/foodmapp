@@ -17,8 +17,8 @@ class Network{
 
     }
 
-    InitSSE(that, cb){
-        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&uid='+that.uid
+    InitSSE(user, cb){
+        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&email='+user.email+'&uid='+user.uid
             //,{withCredentials: true}
         );
         this.eventSource.onerror = function(e) {

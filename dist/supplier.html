@@ -9,15 +9,15 @@
     <title>Delivery Supplier</title>
 </head>
 
-<!--<link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>-->
-<!--<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
-<!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
-<link rel="stylesheet" href="../lib/style.css">
 
+<link rel="stylesheet" href="../lib/style.css">
 
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
@@ -33,6 +33,20 @@
         width: 100%;
     }
 
+    .scaled{
+        transform: scale(1.5)
+    }
+    #marker {
+        display:block;
+        position:absolute;
+        bottom:0;
+        visibility:visible;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+    }
     .map{
         padding: 0px;
         margin: 0px;
@@ -201,19 +215,6 @@
 
 <div id="map" class="map"></div>
 
-<style>
-    #marker {
-        display:block;
-        position:absolute;
-        bottom:0;
-        visibility:visible;
-        pointer-events: initial;
-        -webkit-user-drag: none;
-        z-index:10;
-        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
-        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
-    }
-</style>
 
 <section id="marker" title="kolobot">
     <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
@@ -221,7 +222,7 @@
 
 <div id="main_window" class="container">
     <div class="row">
-        <div class="form-group" style="position:absolute;transform:scale(1.5);width:250px;right:50px;z-index: 10;">
+        <div class="form-group scaled" style="position:absolute;width:250px;right:50px;z-index: 10;">
             <div class='input-group date'   style="width:auto" >
                 <input type='text'  class="form-control dt_val"
                        value="Day of Delivery"/>
@@ -234,16 +235,17 @@
                     <span class="caret"></span>
                 </button>
                 <ul id="period_list" class="dropdown-menu period_list" role="menu" aria-labelledby="menu1">
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
-                    <li href="#"  onclick="window.admin.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
+                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
+
                 </ul>
             </div>
         </div>
@@ -263,21 +265,6 @@
              z-index: 11;">
         <div id="datetimepicker" style="display: inline-block"></div>
     </div>
-        <div id="dt_from"
-             style="
-                 background-color: white;
-                 position: absolute;
-                 top:50%;
-                 right: 50%;
-                 z-index: 11;"></div>
-        <div id="dt_to"
-             style="
-                 position: absolute;
-                 top:50%;
-                 right: 50%;
-                 background-color: rgba(255,255,255,.7);
-                 z-index: 11;"></div>
-
 
 </div>
 
@@ -346,50 +333,50 @@
 
 </div>
 
-<div id="auth_dialog" class="modal fade"  role="dialog">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn close" data-dismiss="modal" >&times;</button>
-                <div id="auth_body" class="modal-body">
-                    <div>
-                        <form action="#null" method="post" id="register">
-                            <div>
-                                <h4  data-translate="f6039d44b29456b20f8f373155ae4973">Username</h4>
-                                <input type="text" placeholder="Put Username" name="uname" required>
+<!--<div id="auth_dialog" class="modal fade"  role="dialog">-->
+    <!--<div class="modal-dialog modal-sm">-->
+        <!--<div class="modal-content">-->
+            <!--<div class="modal-header">-->
+                <!--<button type="button" class="btn close" data-dismiss="modal" >&times;</button>-->
+                <!--<div id="auth_body" class="modal-body">-->
+                    <!--<div>-->
+                        <!--<form action="#null" method="post" id="register">-->
+                            <!--<div>-->
+                                <!--<h4  data-translate="f6039d44b29456b20f8f373155ae4973">Username</h4>-->
+                                <!--<input type="text" placeholder="Put Username" name="uname" required>-->
 
-                                <!--<h4  data-translate="Password:">Password</h4>-->
-                                <!--<input type="password" placeholder="Enter Password" name="psw" required>-->
+                                <!--&lt;!&ndash;<h4  data-translate="Password:">Password</h4>&ndash;&gt;-->
+                                <!--&lt;!&ndash;<input type="password" placeholder="Enter Password" name="psw" required>&ndash;&gt;-->
 
-                                <h4>E-mail</h4>
-                                <input type="email" placeholder="Put E-mail" name="email"  title="Please put a valid email" required>
+                                <!--<h4>E-mail</h4>-->
+                                <!--<input type="email" placeholder="Put E-mail" name="email"  title="Please put a valid email" required>-->
 
-                                <button type="submit" data-translate="99dea78007133396a7b8ed70578ac6ae"  style="background-color: grey">Login</button>
+                                <!--<button type="submit" data-translate="99dea78007133396a7b8ed70578ac6ae"  style="background-color: grey">Login</button>-->
 
-                                <!--a href="#"><p class="psw" align="right" data-translate="Forgot ">Forgot password?</p></a-->
-                            </div>
-
-                            <!--<div class="container" style="background-color:#f1f1f1">-->
-                            <!--<button type="button" class="cancelbtn" onclick="OnClickCancel();">Cancel</button>-->
-                            <!--<span class="psw">Forgot <a href="#">password?</a></span>-->
+                                <!--&lt;!&ndash;a href="#"><p class="psw" align="right" data-translate="Forgot ">Forgot password?</p></a&ndash;&gt;-->
                             <!--</div>-->
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+
+                            <!--&lt;!&ndash;<div class="container" style="background-color:#f1f1f1">&ndash;&gt;-->
+                            <!--&lt;!&ndash;<button type="button" class="cancelbtn" onclick="OnClickCancel();">Cancel</button>&ndash;&gt;-->
+                            <!--&lt;!&ndash;<span class="psw">Forgot <a href="#">password?</a></span>&ndash;&gt;-->
+                            <!--&lt;!&ndash;</div>&ndash;&gt;-->
+                        <!--</form>-->
+                    <!--</div>-->
+                <!--</div>-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
+<!--</div>-->
+
 
 <div id="offer_editor" class="modal fade" role="dialog">
-    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <style>
                 .modal-header{
                     padding:9px 15px;
-                    border-bottom:1px solid #eee;
-                    background-color: #0e0e0e;
+                    border-bottom:1px solid #737373;
+                    background-color: #000000;
                     -webkit-border-top-left-radius: 5px;
                     -webkit-border-top-right-radius: 5px;
                     -moz-border-radius-topleft: 5px;
@@ -400,12 +387,12 @@
                 }
                 .modal-body{
                     padding:9px 15px;
-                    border-bottom:1px solid black;
+                    border-bottom:1px solid #262626;
                     border-top:1px solid black;
                     border-right:1px solid black;
                     border-left:1px solid black;
                     color: white;
-                    background-color: black ;
+                    background-color: #000000;
                     -webkit-border-top-left-radius: 0px;
                     -webkit-border-top-right-radius: 0px;
                     -moz-border-radius-topleft: 0px;
@@ -417,8 +404,8 @@
                     padding: 9px 15px;
                     border-bottom: 1px solid black;
                     border-top: 0px;
-                    color: white;
                     background-color: black;
+                    color: white;
                     -webkit-border-top-left-radius: 5px;
                     -webkit-border-top-right-radius: 5px;
                     -moz-border-radius-topleft: 5px;
@@ -446,16 +433,17 @@
                     float: left;
                 }
 
-                li a, .dropbtn {
+                li a {
                     display: inline-block;
-                    color: white;
+                    color: #ffffff;
+                    background-color: #737373;
                     text-align: center;
                     padding: 14px 16px;
                     text-decoration: none;
                 }
 
                 li a:hover, .dropdown:hover .dropbtn {
-                    background-color: red;
+                    background-color: #000000;
                 }
 
                 li.dropdown {
@@ -484,9 +472,17 @@
                 .dropdown:hover .dropdown-content {
                     display: block;
                 }
+                .close {
+                    color: #fff;
+                    opacity: 1;
+                }
+                .close:hover {
+                    color: #d51312;
+                    opacity: 1;
+                }
             </style>
             <div class="modal-header" style="position: relative;width: 100%;">
-                <div class="dropdown" style="display: inline-block">
+                <div class="dropdown" style="display: inline-block; background-color: #a8ff2d">
                     <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"  data-toggle="dropdown"
                            data-width="fit" type="button">
                         <span class="glyphicon glyphicon-option-vertical"></span>
@@ -503,13 +499,15 @@
                 <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
                 <h4 class="modal-menu-number"  style="display: none">Offer</h4>
 
-                <button type="button" class="btn close" data-dismiss="modal" data-translate="">
+                <!--<span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal" title="Save & Close"-->
+                    <!--style="color: #c4e3f3"></span>-->
+                <!--button type="button" class="btn close" data-dismiss="modal">
                     <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
-                </button>
-                <!--<div style="display: inline-block; position:absolute; right: 100px;padding: 0px;">-->
-                    <!--<select class="sp_dlg" data-width="fit"></select>-->
-                <!--</div>-->
-                <!--<button type="button" class="btn btn-default btn-sm cancel_menu" style="display: none">-->
+                </button-->
+
+                <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+
+
                 <!--<span class="glyphicon glyphicon-trash" data-translate="ea4788705e6873b424c65e91c2846b19">Cancel</span>-->
                 <!--</button>-->
 
@@ -532,13 +530,25 @@
                         style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
                 <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
-                <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 10px"></span>
+                <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 2px"></span>
 
             </div>
         </div>
     </div>
 
     <style>
+        #menu_item_tmplt{
+            display: none;
+        }
+        .menu_item{
+            position: relative;
+            border-radius: 5px;
+            border: 1px solid #343434;
+            padding: 5px;
+            margin-bottom: 5px;
+            width: 100%;
+            padding: 10px;
+        }
         .item_title:focus{
             outline: none !important;
             border-color: #719ECE;
@@ -575,39 +585,62 @@
             bottom:0;
         }
         .item_price{
+            display: inline-block;
             color: #0088bb;
             position: relative;
             font-weight:normal;
             font-size:24px;
-            float:right
+        }
+        .order_ctrl{
+            display: inline-block;
+            position: relative;
+            float:right;
+            color: #80afbb;
+            font-weight:normal;
+            font-size:30px;
+            padding:10px;
         }
     </style>
 
-    <div  id="menu_item_tmplt"
-          style="display: none;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            padding: 5px;
-            margin-bottom: 5px;
-            width: 100%;" contenteditable="false">
+    <div  id="menu_item_tmplt" contenteditable="false">
 
         <label  class="btn"  style="visibility:hidden">
             <input type="checkbox" class="checkbox-inline" style="display: none">
             <i class="fa fa-square-o fa-2x"></i>
             <i class="fa fa-check-square-o fa-2x"></i>
         </label>
-        <div class="input item_title" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b">&nbsp;&nbsp;&nbsp;</div>
+        <div class="input item_title" tabindex="0" data-toggle="collapse" data-translate="0ad4f20d1443d9529ab35534c1ba505b">&nbsp;&nbsp;&nbsp;</div>
         <div class="input item_price"><i class="fa fa-euro"></i></div>
+        <span class="glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden" data-toggle="collapse"></span>
 
-        <div class="item_content">
-            <textarea  class="input content_text" style="position:absolute;visibility: hidden;height:200px; width:100%;background-color: rgba(255,255,255,0); z-index: 11" contenteditable="true">&nbsp;&nbsp;&nbsp;</textarea>
-            <img class="input img-fluid w3-image" style="display:block;position:absolute;visibility: hidden; height:180px;right:5px;padding-left:10px;z-index: 10;"  draggable="false"  src="" >
+        <div class="item_content collapse">
+            <div>
+                <textarea  class="input content_text" style="position:absolute;visibility: hidden;height:200px; width:100%;background-color: rgba(255,255,255,0); z-index: 11" contenteditable="true">&nbsp;&nbsp;&nbsp;</textarea>
+                <img class="input img-fluid w3-image" style="display:block;position:absolute;visibility: hidden; height:180px;right:5px;padding-left:10px;z-index: 10;"  draggable="false"  src="" >
+            </div>
+
+            <div class="toolbar" align="center" style="display:none; position:absolute;width:100%;bottom:0">
+                <span class="glyphicon glyphicon-comment add_content" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
+                <span class="glyphicon glyphicon-picture add_picture" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+            </div>
         </div>
 
-        <div class="toolbar" align="center" style="display:none; width:100%">
-            <span class="glyphicon glyphicon-th-list add_content" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
-            <span class="glyphicon glyphicon-picture add_picture" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+        <div  class="collapse table-responsive orders">
+            <table class="table">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Distance</th>
+                    <th>Period</th>
+                    <th>Qnty</th>
+                    <th>Comments</th>
+                    <th>Approved</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+            </table>
         </div>
+
     </div>
 
     <input type="file" class="file" multiple style="display: none;"/>
@@ -620,106 +653,6 @@
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <style>
-                .modal-header{
-                    padding:9px 15px;
-                    border-bottom:1px solid #eee;
-                    background-color: #0e0e0e;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                    font-family: Arial, Helvetica, sans-serif;
-                }
-                .modal-body{
-                    padding:9px 15px;
-                    border-bottom:1px solid black;
-                    border-top:1px solid black;
-                    border-right:1px solid black;
-                    border-left:1px solid black;
-                    color: white;
-                    background-color: black ;
-                    -webkit-border-top-left-radius: 0px;
-                    -webkit-border-top-right-radius: 0px;
-                    -moz-border-radius-topleft: 0px;
-                    -moz-border-radius-topright: 0px;
-                    border-top-left-radius: 0px;
-                    border-top-right-radius: 0px;
-                }
-                .modal-footer {
-                    padding: 9px 15px;
-                    border-bottom: 1px solid black;
-                    border-top: 0px;
-                    color: white;
-                    background-color: black;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-                .comment{
-                    text-align:left;
-                    width: 100%;
-                    color: red;
-                    font-family:'Segoe Script';
-                    font-size: large;
-                    background-color: #0a0a0a
-                }
-                textarea:focus {
-                    outline: none !important;
-                    border-color: #719ECE;
-                    box-shadow: 0 0 10px #719ECE;
-                }
-                .tab-content::-webkit-scrollbar {
-                    width: 0 !important;
-                }
-                li {
-                    float: left;
-                }
-
-                li a, .dropbtn {
-                    display: inline-block;
-                    color: white;
-                    text-align: center;
-                    padding: 14px 16px;
-                    text-decoration: none;
-                }
-
-                li a:hover, .dropdown:hover .dropbtn {
-                    background-color: red;
-                }
-
-                li.dropdown {
-                    display: inline-block;
-                }
-
-                .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    background-color: #f9f9f9;
-                    min-width: 160px;
-                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                    z-index: 1;
-                }
-
-                .dropdown-content a {
-                    color: black;
-                    padding: 12px 16px;
-                    text-decoration: none;
-                    display: block;
-                    text-align: left;
-                }
-
-                .dropdown-content a:hover {background-color: #f1f1f1}
-
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-            </style>
             <div class="modal-header" style="position: relative;width: 100%;">
                 <div class="dropdown" style="display: inline-block">
                     <button class="btn btn-default btn-sm order_menu_button dropdown-toggle"  data-toggle="dropdown"
@@ -770,78 +703,6 @@
                 <span class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 10px"></span>
 
             </div>
-        </div>
-    </div>
-
-    <style>
-        .item_title:focus{
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .item_title{
-            display: inline-block;
-            font-family:'Segoe Script';
-            font-size: x-large;
-            width: 70%;
-            word-wrap: break-word;
-        }
-        .item_content{
-            position:relative;
-            height: 200px;
-            padding: 5px;
-
-        }
-        .content_text{
-            font-family:'Segoe Script';
-            font-size: medium;
-            /*height: 200px;*/
-            /*width:60%;*/
-            border-width: 0px;
-            background-color:white;
-            overflow:auto;
-            user-select: none;
-            -webkit-appearance: textarea;
-        }
-        .image_div{
-            position: absolute;
-            padding:15px;
-            right:0px;
-            bottom:0;
-        }
-        .item_price{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            float:right
-        }
-    </style>
-
-    <div  class="menu_item_tmplt"
-          style="display: none;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            padding: 5px;
-            margin-bottom: 5px;
-            width: 100%;" contenteditable="false">
-
-        <label  class="btn"  style="visibility:hidden">
-            <input type="checkbox" class="checkbox-inline" style="display: none">
-            <i class="fa fa-square-o fa-2x"></i>
-            <i class="fa fa-check-square-o fa-2x"></i>
-        </label>
-        <div class="input item_title" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b">&nbsp;&nbsp;&nbsp;</div>
-        <div class="input item_price"><i class="fa fa-euro"></i></div>
-
-        <div class="item_content">
-            <textarea  class="input content_text" style="position:absolute;visibility: hidden;height:200px; width:100%;background-color: rgba(255,255,255,0); z-index: 11" contenteditable="true">&nbsp;&nbsp;&nbsp;</textarea>
-            <img class="input img-fluid w3-image" style="display:block;position:absolute;visibility: hidden; height:180px;right:5px;padding-left:10px;z-index: 10;"  draggable="false"  src="" >
-        </div>
-
-        <div class="toolbar" align="center" style="display:none; width:100%">
-            <span class="glyphicon glyphicon-th-list add_content" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
-            <span class="glyphicon glyphicon-picture add_picture" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
         </div>
     </div>
 

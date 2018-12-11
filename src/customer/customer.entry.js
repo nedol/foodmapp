@@ -145,8 +145,8 @@ $(document).on('readystatechange', function () {
         }
     }
 
-    window.admin = new Customer(uObj);
-    window.admin.IsAuth_test(function (data) {//TODO:
+    window.user = new Customer(uObj);
+    window.user.IsAuth_test(function (data) {//TODO:
 
     });
 

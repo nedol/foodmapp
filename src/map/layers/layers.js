@@ -116,9 +116,9 @@ class Layers {
                 if (features.length > 0) {
                     $.each(features, function (key, feature) {
                         let id_str = feature.getId();
-                        window.db.getFile(that.map.supplier.date,period[0],period[1],feature.values_.object.email,function (res) {
+                        window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.email,function (res) {
                             if(res!==-1) {
-                                if (feature.values_.object.date === that.map.supplier.date) {
+                                if (feature.values_.object.date === window.user.date) {
                                     let style = getObjectStyle(feature.values_.object);
                                     if (style)
                                         cluster_feature.setStyle(style);

@@ -1,7 +1,7 @@
 export {Geo};
 import Geolocation from 'ol/geolocation';
 import proj from 'ol/proj';
-
+import {Utils} from "../../utils/utils";
 
 import {Feature} from "../events/feature.events";
 
@@ -203,20 +203,10 @@ class Geo {
         //$('#loc_img').removeAttr( "style" );
     }
 
-    SearchLocation(ev) {
+    SearchLocation(place, cb) {
 
-        let that = ev.data;
-        if ($("#search_but").attr('drag') === 'true') {
-            $("#search_but").attr('drag', false);
-            return;
-        }
-        let text = "Input location name";
-        let hint = "London, Trafalgar Square";
-        if (window.window.sets.lang === 'ru') {
-            text = "Введите название местоположения";
-            hint = "Москва, Красная площадь";
-        }
-        let place = prompt(text, hint);
+        let that = this;
+
         let nominatim =
             "https://nominatim.openstreetmap.org";///reverse";
         let query =
@@ -244,8 +234,7 @@ class Geo {
                 let lat = data[0].lat;
                 let lon = data[0].lon;
 
-                that.map.SetBounds({sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
-
+                cb(bound, lat, lon);
                 //$("#marker").trigger("change:cur_pos", [proj.fromLonLat([parseFloat(lon), parseFloat(lat)]), "Event"]);
                 //Marker.overlay.setPosition(proj.fromLonLat([parseFloat(lon), parseFloat(lat)]), '*');//http://nedol.ru');
 
@@ -287,6 +276,13 @@ class Geo {
                 console.log(data);
                 cb();
             }
+        });
+    }
+
+    GetDistanceToPlace(loc, place, cb){
+        let lonlat = proj.toLonLat(loc);
+        this.SearchLocation(place, function (bound, lat, lon) {
+            cb(new Utils().LatLonToMeters(lonlat[1], lonlat[0], lat, lon));
         });
     }
 }

@@ -80,7 +80,7 @@ class Menu {
 
         this.map.getLayers().get($(el).attr('id')).setVisible(($(el).attr('state')==='0'?false:true));
 
-        let cats = $(".offer").toArray();
+        let cats = $(".editor").toArray();
         cats = jQuery.map(cats, function (el) {
             return {id: $(el).attr('id'), state: $(el).attr('state')};
         });

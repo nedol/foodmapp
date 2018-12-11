@@ -23,11 +23,10 @@ import {Marker} from "./marker/marker"
 
 class Map {
 
-    constructor(sup) {
+    constructor() {
         //let full_screen = new ol.control.FullScreen();
         //full_screen.setTarget('full_screen');
         window.sets.app_mode = 'd2d';
-        this.supplier = sup;
 
         this.lat_param = '55.739';//getParameterByName('lat');
         this.lon_param = '37.687';//getParameterByName('lon');
@@ -69,7 +68,6 @@ class Map {
         this.geo = new Geo(this);
         this.menu = new Menu(this);
         this.animate = new Animate(this);
-        //this.settings = new Settings(this);
         this.categories = new Categories(this);
         this.layers = new Layers(this);
         this.feature = new Feature(this);
@@ -81,6 +79,8 @@ class Map {
         let that = this;
 
         this.events = new Events(this);
+
+
 
         if (window.sets.app_mode !== 'demo') {
 
@@ -102,6 +102,7 @@ class Map {
             // if (cl != null && cl.time < 1503824276869) {
             //     localStorage.clear();
             // }
+            that.import.GetOrders();
 
             if (!localStorage.getItem("cur_loc")) {
 
@@ -139,7 +140,8 @@ class Map {
     GetObjectsFromStorage(cats, area) {
         let that = this;
         let period = $('.sel_time').text().split(' - ');
-        window.db.getRange( that.supplier.date, period[0], period[1], parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
+        window.db.getRangeSupplier(window.user.date, period[0], period[1],
+            parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
                 for(let c in features[f].values_.categories) {
 
@@ -151,9 +153,9 @@ class Map {
 
                     let source = layer.values_.vector;
 
-                    if(source.getFeatureById(features[f].getId()) && features[f].values_.object.date===that.supplier.date)
+                    if(source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
                         continue;
-                    if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===that.supplier.date)
+                    if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
                         that.layers.AddCluster(layer, features[f]);
                 }
             }
@@ -163,42 +165,12 @@ class Map {
     SetMarkersArExt(cat, jsAr) {
 
         var obj = jsAr.shift();
-        window.db.setFile(obj, function (cat) {
+        window.db.SetObject('supplierStore',obj, function (cat) {
             if (jsAr.length === 0)
                 this.GetObjectsFromStorage(cat);
             else
                 this.SetMarkersArExt(cat, jsAr);
         });
-    }
-
-    GetSuppliers(lat, lon) {
-        try {
-            var url = host_port + '?' + //
-                "proj=d2d" +
-                "&func=get_suppliers" +
-                "&lat=" + lat +
-                "&lon=" + lon;
-
-            $.ajax({
-                url: url,
-                method: "GET",
-                dataType: 'json',
-                processData: false,
-                async: true,   // asynchronous request? (synchronous requests are discouraged...)
-                cache: false,
-                crossDomain: true,
-                error: function (xhr, status, error) {
-                    //var err = eval("(" + xhr.responseText + ")");
-                    console.log(error.Message);
-                },
-                complete: function (data) {
-
-                },
-            });
-
-        } catch (ex) {
-            console.log();
-        }
     }
 
     MoveToLocation(location){

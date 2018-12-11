@@ -30,8 +30,8 @@ function pageIsSelectmenuDialog( page ) {
 
 $.mobile.document
 
-	// Upon creation of the select offer, we want to make use of the fact that the ID of the
-	// listview it generates starts with the ID of the select offer itself, plus the suffix "-offer".
+	// Upon creation of the select editor, we want to make use of the fact that the ID of the
+	// listview it generates starts with the ID of the select editor itself, plus the suffix "-editor".
 	// We retrieve the listview and insert a search input before it.
 	.on( "selectmenucreate", ".filterable-select", function( event ) {
 		var input,
@@ -61,8 +61,8 @@ $.mobile.document
 				children: "> option[value]"
 			})
 
-			// Rebuild the custom select offer's list items to reflect the results of the filtering
-			// done on the select offer.
+			// Rebuild the custom select editor's list items to reflect the results of the filtering
+			// done on the select editor.
 			.on( "filterablefilter", function() {
 				selectmenu.selectmenu( "refresh" );
 			});

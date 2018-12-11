@@ -47,14 +47,9 @@ class Overlay {
         //     // $(element).css('transition', 'transform 100ms');
         // }, 5);
 
-        $(element).on('click', that.map.supplier, function (ev) {
-            that.map.supplier.offer.OpenOffer(ev.data.offer.offer, that.map.supplier);
+        $(element).on('click touchstart', window.user, function (ev) {
+            window.user.editor.OpenOffer(window.user);
         });
-
-        $(element).on('touchstart', function (ev) {
-
-        });
-
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {
 

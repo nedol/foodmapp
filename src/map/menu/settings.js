@@ -59,7 +59,7 @@ class Settings{
         });
 
         //solved in ol_map.css
-        // Swap languages when offer changes
+        // Swap languages when editor changes
         $("input").on( "click", function() {
             let el = $(this)
             if ($(el).attr('lang')) {
