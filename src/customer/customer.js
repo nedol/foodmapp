@@ -326,8 +326,12 @@ class Customer{
         });
     }
 
-    OnMessage(res){
+    OnMessage(data){
+        if(data.func ==='updateorderstatus'){
+            window.db.SetObject('orderStore',data.order,res=>{
 
+            });
+        }
     }
 
 }

@@ -37,8 +37,11 @@ class Supplier{
 
         this.my_truck_ovl;
 
-        this.offer = new OfferEditor(uObj, this.date);
+        this.editor = new OfferEditor();
         this.viewer = new OfferViewer();
+
+        this.store = uObj;
+        //this.offer = uObj[this.date].data;
 
         this.uid = uObj.uid;
         this.email = uObj.email;
@@ -124,7 +127,7 @@ class Supplier{
 
                     }else if (data.auth){//TODO: =='OK') {
                         localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.offer) {
+                        if(data.data) {
                             let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
                             window.dict = new Dict(JSON.parse(data.data).dict);
                             window.dict.set_lang(window.sets.lang, $('#main_window'));
@@ -144,7 +147,7 @@ class Supplier{
                         let dict = JSON.parse(str).dict;
                         window.dict = new Dict(dict);
                         window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.offer.menuObj = JSON.parse(data.offer);
+                        that.editor.menuObj = JSON.parse(data.data);
                         that.DocReady();
                     }else{
                         let err = data.err;
@@ -218,15 +221,15 @@ class Supplier{
             if(!sup[that.date]) {
                 let uObj = JSON.parse(localStorage.getItem('supplier'));
                 let last = Object.keys(uObj)[Object.keys(uObj).length-1]
-                that.offer.offer = uObj[last].data?uObj[last].data:{};
-                sup[that.date]= {data: that.offer.offer,location:that.offer.location};
+                that.store[that.date].data = uObj[last].data?uObj[last].data:{};
+                sup[that.date]= {data: that.store[that.date].data,location:that.editor.location};
                 localStorage.setItem('supplier', JSON.stringify(sup));
 
             }else {
                 if(sup[that.date].data)
-                    that.offer.offer = sup[that.date].data;
+                    that.store[that.date].data = sup[that.date].data;
                 if(sup[that.date].location && sup[that.date].location.length===2) {
-                    that.offer.location = sup[that.date].location;
+                    that.editor.location = sup[that.date].location;
                     that.map.MoveToLocation(sup[that.date].location);
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id','my_truck_2');
@@ -254,7 +257,7 @@ class Supplier{
             }
             let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
             let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            window.user.offer.location = coor;
+            window.user.editor.location = coor;
 
             let sup = JSON.parse(localStorage.getItem('supplier'));
             sup[window.user.date].location = coor;
@@ -282,7 +285,7 @@ class Supplier{
     }
 
     OpenOfferEditor(ev) {
-        ev.data.offer.OpenOffer();
+        ev.data.editor.OpenOffer();
     }
 
     UpdateOfferLocal(tab, offer, location, dict, status){
@@ -306,7 +309,7 @@ class Supplier{
                         "status": status
                     };
                 }
-                this.offer.offer[tab] = offer[tab];
+                this.store[this.date].data[tab] = offer[tab];
                 localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{
@@ -336,7 +339,7 @@ class Supplier{
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
-            "categories": that.offer.arCat,
+            "categories": that.editor.arCat,
             "date": date,
             "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
@@ -360,8 +363,33 @@ class Supplier{
         alert($('#choose_region').text());
     }
 
-    OnMessage(data){
+    UpdateOrderStatus(date, supem, cusem){
+        window.db.GetOrder(date, supem, cusem,function (obj) {
+            obj.status = 'approved';
+            window.db.SetObject('orderStore', obj, function (res) {
+                let data_obj = {
+                    "proj": "d2d",
+                    "func": "updateorderstatus",
+                    "uid": window.user.uid,
+                    "cusem": cusem,
+                    "supem": supem,
+                    "date": date,
+                    "status":  'approved',
+                    "lang": window.sets.lang
+                };
 
+                window.user.network.postRequest(data_obj, function (data) {
+                    console.log(data);
+                });
+            });
+        });
+    }
+    OnMessage(data){
+        if(data.func ==='updateorder'){
+            window.db.SetObject('orderStore',data.order,res=>{
+
+            });
+        }
     }
 
 

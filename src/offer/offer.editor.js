@@ -27,10 +27,9 @@ class OfferEditor{
 
         this.changed = false;
 
-        this.obj = obj;
-        this.offer = obj[date].data ;
-        this.status = obj[date].status;
-        this.location = obj[date].location;
+        this.obj;
+        this.status;
+        this.location;
 
         this.period;
 
@@ -44,6 +43,10 @@ class OfferEditor{
 
         let that = this;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+        this.offer = window.user.store[date].data;
+        this.status = window.user.store[date].status;
+        this.location = window.user.store[date].location;
 
         $('.dropdown').css('visibility','visible');
         $('#order_menu_button').css('visibility','visible');
@@ -163,10 +166,6 @@ class OfferEditor{
 
                 $(tmplt).insertAfter('#offer_editor');
 
-                $(menu_item).find('.orders').attr('id','orders'+ tab + '_' + i);
-                $(menu_item).find('.order_ctrl').attr('data-target','#orders'+ tab + '_' + i);
-
-
                 if ($(menu_item).find('.item_content').css('display') == 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
                     && $(menu_item).find('.content_text').text()===""){
@@ -201,6 +200,10 @@ class OfferEditor{
 
                 $(menu_item).find('.toolbar').css('display', 'block');
 
+                $(menu_item).find('.orders').attr('id', 'orders' + tab + '_' + i);
+                $(menu_item).find('.order_ctrl').attr('data-toggle','collapse');
+                $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
+
             }
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
@@ -212,13 +215,14 @@ class OfferEditor{
 
             $('[href="#'+tab+'"]').on('hide.bs.tab',function (ev) {
                 if(event.target) {
-                    let items = that.getTabItems($(ev.target).text(), window.sets.lang);
+                    //let items = that.getTabItems($(ev.target).text(), window.sets.lang);
                     //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
                 }
             });
         }
 
         if(this.status==='published' || this.status==='approved') {
+
             window.db.GetOrders(date, window.user.email, function (res) {
                 for (let i in res) {
                     let data = JSON.parse(res[i].data);
@@ -240,6 +244,9 @@ class OfferEditor{
                     calcDistance.then(function (dist) {
                         for (let k in kAr) {
                             let checked = res[i].status === 'approved' ? 'checked' : '';
+                            let cbdisabled='';
+                            if(res[i].status==='approved')
+                                cbdisabled = 'disabled';
                             $('.item_title[data-translate=' + kAr[k] + ']').siblings('.order_ctrl').css('visibility', 'visible');
                             $("<tr>" +
                                 "<td>" + res[i].address + "</td>" +
@@ -252,12 +259,12 @@ class OfferEditor{
                                 "<td>" +0+ "</td>" +
                                 "<td>" +
                                     "<label  class=\"btn\">" +
-                                    "<input type=\"checkbox\" class=\"checkbox-inline\" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
+                                    "<input type=\"checkbox\" class=\"checkbox-inline\" "+cbdisabled+" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
                                     "<i class=\"fa fa-square-o fa-2x\"></i>" +
                                     "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                                     "</label>" +
                                 "</td>" +
-                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').siblings('.orders').css('display','block').find('tbody'));
+                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').siblings('.orders').css('visibility','visible').find('tbody'));
 
                         }
                     })
@@ -265,7 +272,6 @@ class OfferEditor{
                             // ops, mom don't buy it
                             console.log(error.message);
                         });
-
                 }
             });
         }
@@ -613,25 +619,7 @@ class OfferEditor{
                 }
 
                 $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusem'),function (obj) {
-                        obj.status = 'approved';
-                        window.db.SetObject('orderStore', obj, function (res) {
-                            let data_obj = {
-                                "proj": "d2d",
-                                "func": "updateorderstatus",
-                                "uid": window.user.uid,
-                                "cusem": $(el).attr('cusem'),
-                                "supem": window.user.email,
-                                "date": window.user.date,
-                                "status":  'approved',
-                                "lang": window.sets.lang
-                            };
-
-                            window.user.network.postRequest(data_obj, function (data) {
-                                console.log(data);
-                            });
-                        });
-                    });
+                    window.user.UpdateOrderStatus(window.user.date, window.user.email, $(el).attr('cusem'));
                 });
 
                 offerObj[value].push(item);

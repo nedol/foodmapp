@@ -258,49 +258,49 @@ module.exports = class D2D {
         let that = this;
         let status = 'published';
         let sql =
-            "SELECT ord.id as ordid, ord.status as ordstatus, " +
-                "sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "SELECT ord.*"+ //, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
             " WHERE sup.email=\'"+q.supem+"\' AND cus.uid=\'"+q.uid+"\'" +
                 " AND of.sup_uid=sup.uid AND cus.email=ord.cusem AND of.date=\""+q.date+"\"" +
                 " AND ord.date=\'"+q.date+"\'"+
             " ORDER BY of.id DESC";
 
-        global.con_obj.query(sql, function (err, result) {
+        global.con_obj.query(sql, function (err, sel) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
                 res.end(JSON.stringify({err: err}));
                 return;
             }
             let values, sql;
-            if(result.length>0) {
-                let cusem = result[0].cusem;
+            if(sel.length>0) {
+                let cusem = sel[0].cusem;
                 if(Object.keys(q.order).length<=3){//'{}'
                     status = 'deleted';
-                } else if(result[0].ordstatus==='approved'){
+                } else if(sel[0].status==='approved'){
                     res.end(JSON.stringify({msg:'couldn\'t change approved order'}));
                     return;
                 }
 
-                values = [q.order, status, result[0].ordid];
+                values = [q.order, status, sel[0].id];
 
                 sql = "UPDATE orders SET data=?, status=? WHERE id=?";
 
                 global.con_obj.query(sql, values, function (err, result) {
                     if (result) {
-                        res.end(JSON.stringify({msg:'order approved'}));
+                        res.end(JSON.stringify({msg:'order updated'}));
 
-                        if(global.resObj[q.supem]) {
-                            //TODO: supplier ses notification
-                            global.resObj[q.supem].write(utils.formatSSE({cusem:cusem,order:q.order, status:status}));
+                        if(global.resObj[q.supem] && global.resObj[q.supem].connection.writable) {
+                            sel[0].data = q.order;
+                            sel[0].status = status;
+                            global.resObj[q.supem].write(utils.formatSSE({func:'updateorder',order:sel[0]}));
                         }
                     }
                 });
 
-                if (new Date(result[0].date) >= new Date(q.date)) {
-                   if(result[0].ordstatus==='approved')
+                if (new Date(sel[0].date) >= new Date(q.date)) {
+                   if(sel[0].status==='approved')
                        status = 'approved';
-                    values = [q.order, q.period, status, result[0].ordid];
+                    values = [q.order, q.period, status, sel[0].id];
                     sql ='UPDATE orders SET data=?, period=?,status=? WHERE id=?';
                 }
             }else {
@@ -314,8 +314,8 @@ module.exports = class D2D {
                     return;
                 }
                 if (result) {
-                    if(resObj[q.supem])
-                        resObj[q.supem].write(JSON.stringify({func:'order',status:status,data:q}));
+                    if(global.resObj[q.supem] && global.resObj[q.supem].connection.writable)
+                        resObj[q.supem].write(utils.formatSSE({func:'updateorder',order:sel[0]}));
                     res.end(JSON.stringify({result: result}));
                 }
             });
@@ -325,22 +325,22 @@ module.exports = class D2D {
     UpdateOrderStatus(q, res){
         let that = this;
         let sql =
-            "SELECT ord.id as ordid, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "SELECT ord.*,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
             " WHERE sup.email=\'"+q.supem+"\' AND sup.uid=\'"+q.uid+"\'" +
             " AND of.sup_uid=sup.uid AND cus.email=ord.cusem AND ord.cusem=\""+q.cusem+"\" AND ord.date=\""+q.date+"\"" +
             " AND ord.date=\'"+q.date+"\'"+
             " ORDER BY of.id DESC";
 
-        global.con_obj.query(sql, function (err, result) {
+        global.con_obj.query(sql, function (err, sel) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
                 res.end(JSON.stringify({err: err}));
                 return;
             }
             let values, sql;
-            if(result.length>0) {
-                values = [ q.status, result[0].ordid];
+            if(sel.length>0) {
+                values = [ q.status, sel[0].id];
 
                 sql = "UPDATE orders SET status=? WHERE id=?";
             }
@@ -349,8 +349,12 @@ module.exports = class D2D {
                     res.end(JSON.stringify({err: err}));
                     return;
                 }
-
                 res.end(JSON.stringify({result: result}));
+
+                if(global.resObj[q.cusem] && global.resObj[q.cusem].connection.writable) {
+                    sel[0].status = q.status;
+                    global.resObj[q.cusem].write(utils.formatSSE({func:'updateorderstatus',order:sel[0]}));
+                }
             });
         });
     }

@@ -600,6 +600,9 @@
             font-size:30px;
             padding:10px;
         }
+        .orders{
+            visibility: hidden;
+        }
 
 
     </style>
@@ -613,7 +616,7 @@
         </label>
         <div class="input item_title" tabindex="0" data-toggle="collapse" data-translate="0ad4f20d1443d9529ab35534c1ba505b">&nbsp;&nbsp;&nbsp;</div>
         <div class="input item_price"><i class="fa fa-euro"></i></div>
-        <span class="glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden" data-toggle="collapse"></span>
+        <span class="glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden"></span>
 
         <div class="item_content collapse">
             <div>
@@ -627,7 +630,7 @@
             </div>
         </div>
 
-        <div  class="collapse table-responsive orders" style="display: none">
+        <div  class="table-responsive collapse orders">
             <table class="table">
             <thead>
                 <tr>
@@ -636,7 +639,7 @@
                     <th>Period</th>
                     <th>Qnty</th>
                     <th>Comments</th>
-                    <th>Delivery \r\n History</th>
+                    <th>Delivery History</th>
                     <th>Approved</th>
                 </tr>
             </thead>
