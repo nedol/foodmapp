@@ -130,6 +130,11 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').data("DateTimePicker").toggle();
     });
 
+    setTimeout(function () {
+        $('#datetimepicker').trigger("dp.change");
+        $('#datetimepicker').data("DateTimePicker").toggle();
+    },200);
+
     let uObj;
 
     if(utils.getParameterByName('email')) {
@@ -140,9 +145,10 @@ $(document).on('readystatechange', function () {
         }else{
             uObj = JSON.parse(localStorage.getItem('supplier'));
             if(!uObj[date]) {
-                let last = Object.keys(uObj)[Object.keys(uObj).length-1];
+                let last = Object.keys(uObj)[Object.keys(uObj).length-2];
                 let data = uObj[last]['data'];
                 uObj[date] = {data: data?data:{}};
+                localStorage.setItem('supplier',JSON.stringify(uObj));
             }
         }
     }

@@ -166,7 +166,7 @@ class Feature{
         var obj = JSON.parse(localStorage.getItem(hash));
 
         var layer = ol_map.getLayers().get(obj.category);
-        var featureToUpdate = layer.getSource().getSource().getFeatureById(hash);
+        var featureToUpdate = layer.getSource().getFeatureById(hash);
 
         obj.status = '1';
 

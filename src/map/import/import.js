@@ -71,7 +71,8 @@ class Import {
                 "categories": cats,
                 "date": date,
                 "period":$('.sel_time').text(),
-                "areas": area
+                "areas": area,
+                "user":window.user.constructor.name
             };
 
             window.user.network.postRequest(data_obj, function (data) {
@@ -125,7 +126,7 @@ class Import {
     }
 
 
-    GetOrders() {
+    DownloadOrders(cb) {
         try {
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
@@ -140,6 +141,8 @@ class Import {
                 if(data) {
                     processResult(data);
                 }
+
+                cb();
             });
 
             function processResult(res) {
@@ -149,6 +152,7 @@ class Import {
                             let obj = res[i];
                             if(!obj)
                                 continue;
+                            obj.logo =  "../dist/images/user.png";
                             window.db.SetObject('orderStore', obj, function (success) {
 
                             });

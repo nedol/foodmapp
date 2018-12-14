@@ -8,6 +8,8 @@ import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
 import proj from 'ol/proj';
+import Point from 'ol/geom/point';
+import proj from 'ol/proj';
 
 import {Geo} from './location/geolocation';
 import {Menu} from './menu/menu';
@@ -19,7 +21,8 @@ import {Events} from './events/events';
 
 import {Feature} from "./events/feature.events";
 import {Import} from "./import/import";
-import {Marker} from "./marker/marker"
+import {Marker} from "./marker/marker";
+
 
 class Map {
 
@@ -102,7 +105,9 @@ class Map {
             // if (cl != null && cl.time < 1503824276869) {
             //     localStorage.clear();
             // }
-            that.import.GetOrders();
+            that.import.DownloadOrders(function () {
+
+            });
 
             if (!localStorage.getItem("cur_loc")) {
 
@@ -140,7 +145,7 @@ class Map {
     GetObjectsFromStorage(cats, area) {
         let that = this;
         let period = $('.sel_time').text().split(' - ');
-        window.db.getRangeSupplier(window.user.date, period[0], period[1],
+        window.db.GetRangeSupplier(window.user.date, period[0], period[1],
             parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
                 for(let c in features[f].values_.categories) {
@@ -153,7 +158,7 @@ class Map {
 
                     let source = layer.values_.vector;
 
-                    if(source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
+                    if(features[f].values_.object.email===window.user.email)
                         continue;
                     if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
                         that.layers.AddCluster(layer, features[f]);
@@ -189,4 +194,9 @@ class Map {
             alert(ex);
         }
     }
+
+    SetFeatureGeometry(feature, loc){
+        feature.setGeometry( new Point(loc));
+    }
+
 }

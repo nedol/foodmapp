@@ -18,8 +18,8 @@ class Overlay {
         this.overlay = new _ol_Overlay_({
             element: element,
             position: coor,
-            positioning: 'bottom-center',
-            offset:[0,0]
+            positioning: 'center-center',
+            offset:[-20,-20]
         });
 
         element.ovl = this.overlay;

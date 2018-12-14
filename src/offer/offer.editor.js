@@ -6,6 +6,8 @@ require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 
+require('tablesorter/dist/js/jquery.tablesorter.js');
+require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
 
 let Dict = require('../dict/dict.js');
 const langs = require("../dict/languages");
@@ -16,7 +18,6 @@ var md5 = require('md5');
 var isJSON = require('is-json');
 
 import {Utils} from "../utils/utils";
-
 
 let utils = new Utils();
 
@@ -204,6 +205,8 @@ class OfferEditor{
                 $(menu_item).find('.order_ctrl').attr('data-toggle','collapse');
                 $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
 
+                $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + this.offer[tab][i].title);
+
             }
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
@@ -221,9 +224,17 @@ class OfferEditor{
             });
         }
 
+        if(window.user.date=== moment().format('YYYY-MM-DD')){
+            $('.notoday').removeClass('notoday');
+        }
+
+
+
+
         if(this.status==='published' || this.status==='approved') {
 
             window.db.GetOrders(date, window.user.email, function (res) {
+
                 for (let i in res) {
                     let data = JSON.parse(res[i].data);
                     let kAr = Object.keys(data);
@@ -243,6 +254,7 @@ class OfferEditor{
                     );
                     calcDistance.then(function (dist) {
                         for (let k in kAr) {
+
                             let checked = res[i].status === 'approved' ? 'checked' : '';
                             let cbdisabled='';
                             if(res[i].status==='approved')
@@ -253,19 +265,38 @@ class OfferEditor{
                                 "<td>" + parseInt(dist) + "</td>" +
                                 "<td>" + res[i].period + "</td>" +
                                 "<td>" + data[kAr[k]].qnty + "</td>" +
-                                "<td>    " +
-                                    "<textarea style=\'background-color: #0a0a0a\'>" + data[kAr[k]].comment + "</textarea>" +
-                                "</td>" +
-                                "<td>" +0+ "</td>" +
-                                "<td>" +
+                                "<td class='tablesorter-no-sort'>"+
+                                (data[kAr[k]].comment?"<textarea class='tacomment'>" + data[kAr[k]].comment + "</textarea>":'') +
+                                "</td>"+
+                                "<td>" +"0"+ "</td>" +
+                                "<td class='tablesorter-no-sort'>"+
                                     "<label  class=\"btn\">" +
                                     "<input type=\"checkbox\" class=\"checkbox-inline\" "+cbdisabled+" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
                                     "<i class=\"fa fa-square-o fa-2x\"></i>" +
                                     "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                                     "</label>" +
                                 "</td>" +
-                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').siblings('.orders').css('visibility','visible').find('tbody'));
+                                "<td class='tablesorter-no-sort notoday' >" +
+                                    "<label  class=\"btn\">" +
+                                    "<input type=\"checkbox\" class=\"checkbox-inline\">" +
+                                    "<i class=\"fa fa-square-o fa-2x\"></i>" +
+                                    "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
+                                    "</label>" +
+                                "</td>" +
+                                "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
 
+                                setTimeout(function () {
+
+                                    $('#ordtable_'+ kAr[k]).tablesorter({
+                                        theme: 'blue',
+                                        widgets: ['zebra', 'column'],
+                                        usNumberFormat: false,
+                                        sortReset: true,
+                                        sortRestart: true,
+                                        sortInitialOrder: 'desc'
+                                    });
+
+                                },1000);
                         }
                     })
                         .catch(function (error) {
@@ -293,7 +324,6 @@ class OfferEditor{
         if(!evnts || !evnts['click'])
             $('#add_item').on('click', this, this.AddOfferItem);
 
-
         $('input:file').change(function(ev) {
             //listFiles(evt);
             let  files = $("input[type='file']")[0].files;
@@ -319,12 +349,21 @@ class OfferEditor{
             });
         });
 
-        $("#offer_editor").find('.publish_offer').off('click touchstart');
-        $("#offer_editor").find('.publish_offer').on('click touchstart',this,function (ev) {
+        $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
+        $("#offer_editor").find('.publish_offe_ctrl').on('click touchstart',this,function (ev) {
             window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),date, ev.data.location, function (obj) {
                 that.obj = obj;
                 that.status = obj[window.user.date].status;
             });
+        });
+
+        $("#offer_editor").find('.delete_offer_ctrl').off('click touchstart');
+        $("#offer_editor").find('.delete_offer_ctrl').on('click touchstart',this,function (ev) {
+            if(confirm($('#delete_offer').text())) {
+                window.user.DeleteOffer(date, function (obj) {
+
+                });
+            }
         });
     }
 
@@ -399,7 +438,7 @@ class OfferEditor{
         $(menu_item).find('.item_title').attr('contenteditable', 'true');
         $(menu_item).find('.item_price').attr('contenteditable', 'true');
 
-        $(menu_item).find('.item_title').text('item_title');
+        $(menu_item).find('.item_title').text($('#item_title').text());
         let hash = md5(new Date().getTime());
         //window.dict.dict[hash] = {};
         $(menu_item).find('.item_title').attr('data-translate',hash);
@@ -763,7 +802,7 @@ class OfferEditor{
         //if(ev.data.changed)
         that.SaveOffer(ev,window.sets.lang);
 
-        var r = confirm("Do Publish the Offer?");
+        var r = confirm($('#do_publish_offer').text());
         if (r == true) {
             window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),window.user.date, ev.data.location, function (obj) {
                 that.obj = obj;

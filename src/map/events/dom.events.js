@@ -2,6 +2,8 @@
 export {DOMEvents};
 
 import {Overlay} from "../overlay/overlay";
+var moment = require('moment/moment');
+
 import Extent from 'ol/extent';
 
 class DOMEvents {
@@ -28,9 +30,22 @@ class DOMEvents {
 
         });
 
-        $('#loc_ctrl').on('click ontouchstart', this, window.user.map.geo.StartLocation);
+        $('#loc_ctrl').on('click ontouchstart', this, ev=> {
+            window.user.map.geo.StartLocation(ev);
+            if(window.user.SendLocation && !window.user.isShare_loc){
+                if (window.user.date === moment().format('YYYY-MM-DD') &&
+                    window.user.store[window.user.date].status) {
+                    if (confirm("Share Your Location?")) {
+                        window.user.isShare_loc = true;
+                    }
+                }
+            }
+        });
 
-        $('#pin').on('click ontouchstart', this, window.user.map.geo.StopLocation);
+        $('#pin').on('click ontouchstart', this, ev=>{
+            window.user.map.geo.StopLocation(ev);
+            window.user.isShare_loc = false;
+        });
 
         $('#search_but').on('click ontouchstart', this, function (ev) {
 

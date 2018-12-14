@@ -108,7 +108,7 @@ class DB {
             };
     }
 
-    getSupplier( date, e1start, e1end, email, f) {
+    getSupplier( date, e1start, e1end, email, cb) {
 
         if (!email || !date)
             return;
@@ -123,8 +123,12 @@ class DB {
                     let period = this.result.period.split('-');
                     if(parseInt(e1start) >= parseInt(period[0]) && parseInt(e1start) <= parseInt(period[1])
                         || parseInt(period[0]) >= parseInt(e1start) && parseInt(period[0]) <= parseInt(e1end)) {
-                        f(this.result);
+                        cb(this.result);
+                    }else{
+                       cb(-1);
                     }
+                }else{
+                    cb(-1);
                 }
             }
         } catch (ex) {
@@ -132,7 +136,7 @@ class DB {
         }
     }
 
-    getRangeSupplier(date, e1start, e1end, lat_0, lon_0, lat_1, lon_1, f) {
+    GetRangeSupplier(date, e1start, e1end, lat_0, lon_0, lat_1, lon_1, f) {
 
         if(!this.DBcon)
             return;
@@ -241,14 +245,26 @@ class DB {
         }
     }
 
-    GetObject(id_str, f) {
+    GetObject(storeName, date, email,  cb) {
 
-        window.db.getSupplier(id_str, null, function (res) {
+        if (!email || !date)
+            return;
+        try {
+            let objectStore = this.DBcon.transaction(storeName, "readonly").objectStore(storeName);
+            let index = objectStore.index("dateemail");
+            var request = index.get([date,email]);
+            request.onerror = this.logerr;
+            request.onsuccess = function (ev) {
 
-            if (res !== -1) {
-                f(res);
+                if(this.result){
+                    cb(this.result);
+                }else{
+                    cb(-1);
+                }
             }
-        });
+        } catch (ex) {
+            console.log(ex);
+        }
     }
 
 }

@@ -25,6 +25,7 @@ class MapEvents{
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
                 that.map.geo.StopLocation();
+                window.user.isShare_loc = false;
             }
 
             var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
@@ -34,6 +35,9 @@ class MapEvents{
             // and add it to the Map
 
             window.sets.coords.cur = event.coordinate;
+
+            $('#datetimepicker').data("DateTimePicker").hide();
+
             var time = new Date().getTime();
             localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
                 "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");

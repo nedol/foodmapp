@@ -56,7 +56,7 @@ module.exports = class D2D {
                     case 'getsuppliers':
                         this.GetSuppliers(q, res);
                         break;
-                    case 'share_location':
+                    case 'sharelocation':
                         this.ShareLocation(q, res);
                         break;
 
@@ -427,7 +427,7 @@ module.exports = class D2D {
                 return;
             }
             let now = moment().format('YYYY-MM-DD');
-            sql = "UPDATE supplier SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
+            sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
 
             global.con_obj.query(sql, function (err, result) {
                 if (err) {
@@ -456,19 +456,17 @@ module.exports = class D2D {
 
     ShareLocation(q, res){
 
-        let sql = " SELECT sup.uid, sup.latitude as lat, sup.longitude as lon" +
-            " FROM supplier as sup, offers as off " +
-            " WHERE sup.uis=odd.sup_uid" +
-            " AND off.date=" +q.date+
-            " AND SPLIT_STR(sup.region,',',0)>"+q.latitude+ " AND SPLIT_STR(sup.region,',',1)<"+q.latitude+
-            " AND SPLIT_STR(sup.region,',',2)>"+q.longitude+ " AND SPLIT_STR(sup.region,',',3)<"+q.longitude+
+        let sql = " SELECT sup.email as email" +
+            " FROM supplier as sup" +
+            " WHERE" +
+            " SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
+            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
             " UNION" +
-            " SELECT uid, latitude as lat, longitude as lon" +
-            " FROM customer  " +
+            " SELECT cus.email as email" +
+            " FROM customer as cus" +
             " WHERE " +
-            " date=" +q.date+
-            " AND SPLIT_STR(region,',',0)>"+q.latitude+ " AND SPLIT_STR(region,',',1)<"+q.latitude+
-            " AND SPLIT_STR(region,',',2)>"+q.longitude+ " AND SPLIT_STR(region,',',3)<"+q.longitude;
+            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
+            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -478,13 +476,14 @@ module.exports = class D2D {
             }
             if(result.length>0){
                 for(let r in result){
-                    let sse = resObj[result[r].uid];
+                    let sse = resObj[result[r].email];
                     if(sse){
-                        sse.write(JSON.stringify({"func":"location","uid":md5(q.email),"location":q.location}));
+                        sse.write(utils.formatSSE({"func":"sharelocation","email":q.supem,"location":q.location}));
                     }
                 }
-                res.end();
+
             }
+            res.end(JSON.stringify({func: 'sharelocation',result:result.length}));
 
         });
     }

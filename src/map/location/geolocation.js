@@ -137,6 +137,8 @@ class Geo {
             this.SetCurPosition(that,window.sets.coords.gps);
             localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
                 "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
+            if(window.user.SendLocation)
+                window.user.SendLocation(window.sets.coords.gps);
         }
     }
     SetCurPosition(that,coordinate) {
@@ -152,7 +154,7 @@ class Geo {
             var latlon = proj.toLonLat(coordinate);
             window.sets.coords.gps = coordinate;
 
-            that.map.ol_map.dispatchEvent({'type': 'click', 'coordinate': coordinate, 'loc_mode': true});
+            $(that.map.ol_map).trigger('click', {'coordinate': coordinate, 'loc_mode': true});
 
             var pixel = that.map.ol_map.getPixelFromCoordinate(coordinate);
 

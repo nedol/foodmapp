@@ -15,6 +15,8 @@ import {DB} from "../map/storage/db"
 
 import {OfferOrder} from "../offer/offer.order";
 
+import proj from 'ol/proj';
+
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
@@ -330,6 +332,30 @@ class Customer{
         if(data.func ==='updateorderstatus'){
             window.db.SetObject('orderStore',data.order,res=>{
 
+            });
+        }
+        if(data.func ==='sharelocation'){
+            let loc = data.location;
+            window.db.GetObject('supplierStore',window.user.date,data.email, function (obj) {
+                if(obj!=-1) {
+                    obj.latitude = loc[1];
+                    obj.longitude = loc[0];
+                    let layers = window.user.map.ol_map.getLayers();
+                    window.db.SetObject('supplierStore', obj, function (res) {
+                        let catAr = JSON.parse(obj.categories);
+                        for (let c in catAr) {
+                            let l = layers.get(catAr[c])
+                            let feature = l.values_.vector.getFeatureById(obj.hash);
+                            if (feature) {
+                                let point = feature.getGeometry();
+                                let loc =  proj.fromLonLat([obj.longitude, obj.latitude]);
+                                if(point.flatCoordinates[0]!==loc[0] && point.flatCoordinates[1]!==loc[1])
+                                    window.user.map.SetFeatureGeometry(feature,loc);
+                            }
+                        }
+
+                    });
+                }
             });
         }
     }

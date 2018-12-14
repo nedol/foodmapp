@@ -4,8 +4,8 @@
     "ru":"Опубликовать"
   },
   "f479ee0428deb391dacad49e70199eb4":{
-    "en":"Cancel The Offer",
-    "ru":"Отменить"
+    "en":"Delete The Offer",
+    "ru":"Удалить предложение"
   },
   "ef6f6a1c0e002ecd1063b3ee0ac9302d": {
     "ru": "описание продукта",
@@ -84,8 +84,8 @@
     "ru": "Био"
   },
   "0ad4f20d1443d9529ab35534c1ba505b": {
-    "ru": "название",
-    "en": "name"
+    "ru": "название, минимальное количество",
+    "en": "product name, minimum delivery"
   },
   "ee4a528dce8d6fa440db5ab1cf78f939":{
     "ru": "Кол-во: ",
@@ -102,5 +102,45 @@
   "7442e29d7d53e549b78d93c46b8cdcfc":{
     "ru": "Заказы",
     "en": "Orders"
+  },
+  "46534fd998c8f508d0bc9d15f134a68a":{
+    "ru": "Опубликовать предложение?",
+    "en": "Do publish the offer?"
+  },
+  "6c7a42eaf1426625858250105dd12f86":{
+    "ru": "Удалить предложение?",
+    "en": "Do delete the offer?"
+  },
+  "884d9804999fc47a3c2694e49ad2536a":{
+    "ru": "Адрес",
+    "en": "Address"
+  },
+  "a74ec9c5b6882f79e32a8fbd8da90c1b":{
+    "ru": "Растояние до",
+    "en": "Distance"
+  },
+  "a0acfa46d86f7610b2c73dbb28f64701":{
+    "ru": "Период",
+    "en": "Period"
+  },
+  "31d1b8ef5ed469f7618d76144fffaa06":{
+    "ru": "Кол-во",
+    "en": "Q-nty"
+  },
+  "a5d491060952aa8ad5fdee071be752de":{
+    "ru": "Комментарии",
+    "en": "Comments"
+  },
+  "25ae4884275a34b33820d6e17013bed1":{
+    "ru": "История",
+    "en": "History"
+  },
+  "6f8063417ab31f38d864c28302f3de2f":{
+    "ru": "Подтверждено",
+    "en": "Approved"
+  },
+  "07ca5050e697392c9ed47e6453f1453f":{
+    "ru": "Выполнено",
+    "en": "Completed"
   }
 }
