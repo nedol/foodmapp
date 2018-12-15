@@ -261,14 +261,6 @@ class OfferEditor{
                                 cbdisabled = 'disabled';
                             $('.item_title[data-translate=' + kAr[k] + ']').siblings('.order_ctrl').css('visibility', 'visible');
                             $("<tr>" +
-                                "<td>" + res[i].address + "</td>" +
-                                "<td>" + parseInt(dist) + "</td>" +
-                                "<td>" + res[i].period + "</td>" +
-                                "<td>" + data[kAr[k]].qnty + "</td>" +
-                                "<td class='tablesorter-no-sort'>"+
-                                (data[kAr[k]].comment?"<textarea class='tacomment'>" + data[kAr[k]].comment + "</textarea>":'') +
-                                "</td>"+
-                                "<td>" +"0"+ "</td>" +
                                 "<td class='tablesorter-no-sort'>"+
                                     "<label  class=\"btn\">" +
                                     "<input type=\"checkbox\" class=\"checkbox-inline\" "+cbdisabled+" cusem=" + res[i].cusem + " " + checked + " style=\"display: none\">" +
@@ -276,6 +268,15 @@ class OfferEditor{
                                     "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                                     "</label>" +
                                 "</td>" +
+                                "<td>" + data[kAr[k]].qnty + "</td>" +
+                                "<td>" + res[i].address + "</td>" +
+                                "<td>" + parseInt(dist) + "</td>" +
+                                "<td>" + res[i].period + "</td>" +
+                                "<td class='tablesorter-no-sort'>"+
+                                (data[kAr[k]].comment?"<textarea class='tacomment'>" + data[kAr[k]].comment + "</textarea>":'') +
+                                "</td>"+
+                                "<td>" +"0"+ "</td>" +
+
                                 "<td class='tablesorter-no-sort notoday' >" +
                                     "<label  class=\"btn\">" +
                                     "<input type=\"checkbox\" class=\"checkbox-inline\">" +
