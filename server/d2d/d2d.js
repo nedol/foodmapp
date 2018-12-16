@@ -211,7 +211,7 @@ module.exports = class D2D {
             }
             let values, sql;
             if(result.length>0) {
-                if (q.dict && result[0].offer) {// && result[0].obj_data.length<q.dict.length){
+                if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
 
                     values = [urlencode.decode(q.offer), result[0].offer_id];
 
@@ -221,10 +221,9 @@ module.exports = class D2D {
                     global.con_obj.query(sql, values, function (err, result) {
                         if (result) {
                             values = [q.dict, q.uid];
-                            sql = "UPDATE supplier SET dict=?   WHERE id=?";
+                            sql = "UPDATE supplier SET dict=?   WHERE uid=?";
                             global.con_obj.query(sql, values, function (err, result) {
-                                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-                                res.end();
+
                             });
                         }
                     });
@@ -281,9 +280,9 @@ module.exports = class D2D {
                     return;
                 }
 
-                values = [q.order, status, sel[0].id];
+                values = [q.order, q.address, status, sel[0].id];
 
-                sql = "UPDATE orders SET data=?, status=? WHERE id=?";
+                sql = "UPDATE orders SET data=?, address=?, status=? WHERE id=?";
 
                 global.con_obj.query(sql, values, function (err, result) {
                     if (result) {

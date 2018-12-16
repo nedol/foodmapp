@@ -41,7 +41,7 @@ class OfferOrder {
         let that = this;
         this.email = em;
         this.offer = offer;
-        this.dict = new Dict(dict);
+        this.dict = new Dict(dict.dict);
 
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
@@ -204,8 +204,9 @@ class OfferOrder {
                 qnty: $(val).find('button[data-toggle=dropdown]').text()
             }
         });
+        obj.order.comment = $('#offer_order_clone').find('.comment')[0].value;
+        obj.order = JSON.stringify(obj.order);
         obj['email'] = this.email;
-        obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
         obj['date'] = this.date;
         obj['period'] = this.period;
         obj['address'] = $('#offer_order_clone').find('.address').text();

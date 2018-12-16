@@ -568,9 +568,10 @@
         }
         .item_title{
             width: 76%;
-            font-family:'Segoe Script';
+            font-family:'Courier New';
             font-size: x-large;
             word-wrap: break-word;
+            z-index: 10;
         }
         .item_price{
             width: 10%;
@@ -588,15 +589,15 @@
         }
         .item_content{
             position:relative;
-            height: 200px;
+            height: 280px;
             padding: 5px;
 
         }
         .content_text{
             font-family:'Segoe Script';
             font-size: medium;
-            /*height: 200px;*/
-            /*width:60%;*/
+            /*height: 240px;*/
+            width:60%;
             border-width: 0px;
             background-color: #030000;
             overflow:auto;
@@ -633,9 +634,9 @@
                 </label>
             </div>
 
-            <div class="col-sm-8 col-xs-7 input item_title"  tabindex="0" data-toggle="collapse">&nbsp;&nbsp;&nbsp;</div>
+            <div class="col-sm-8 col-xs-7 input item_title" data-translate  data-toggle="collapse">&nbsp;&nbsp;&nbsp;</div>
 
-            <div class="col-sm-2 col-xs-3 input item_price"><i class="fa fa-euro"></i></div>
+            <div class="col-sm-2 col-xs-3 input item_price">руб</div>
 
             <span class="col-sm-1 col-xs-1 glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden"></span>
 
@@ -644,10 +645,10 @@
         <div class="collapse item_content">
             <div class="row">
                 <div class="col-xs-8">
-                <textarea  class="input content_text"  contenteditable="true">&nbsp;&nbsp;&nbsp;</textarea>
+                    <textarea rows="10"  class="input content_text" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></textarea>
                 </div>
                 <div class="col-xs-4">
-                <img class="input img-fluid w3-image" draggable="false"  src="" >
+                    <img class="input img-fluid w3-image" draggable="false"  src="" >
                 </div>
             </div>
 
@@ -661,7 +662,7 @@
             <table class="table tablesorter">
             <thead>
                 <tr>
-                    <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approved</th>
+                    <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approve</th>
                     <th data-translate="31d1b8ef5ed469f7618d76144fffaa06">Qnty</th>
                     <th data-translate='884d9804999fc47a3c2694e49ad2536a'>Address</th>
                     <th data-translate="a74ec9c5b6882f79e32a8fbd8da90c1b">Distance</th>

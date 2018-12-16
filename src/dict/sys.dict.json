@@ -9,7 +9,7 @@
   },
   "ef6f6a1c0e002ecd1063b3ee0ac9302d": {
     "ru": "описание продукта",
-    "en": "description"
+    "en": "product description"
   },
   "4b310a8f25bcb1082f21fa8cde0b28e9": {
     "en": "Choose a region for delivery",
@@ -84,7 +84,7 @@
     "ru": "Био"
   },
   "0ad4f20d1443d9529ab35534c1ba505b": {
-    "ru": "название, минимальное количество",
+    "ru": "название, единица",
     "en": "product name, minimum delivery"
   },
   "ee4a528dce8d6fa440db5ab1cf78f939":{
@@ -116,7 +116,7 @@
     "en": "Address"
   },
   "a74ec9c5b6882f79e32a8fbd8da90c1b":{
-    "ru": "Растояние до",
+    "ru": "Расстояние до",
     "en": "Distance"
   },
   "a0acfa46d86f7610b2c73dbb28f64701":{
@@ -143,4 +143,5 @@
     "ru": "Выполнено",
     "en": "Completed"
   }
+
 }

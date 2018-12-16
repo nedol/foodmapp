@@ -54,8 +54,6 @@ class OfferEditor{
         $('#add_tab_li').css('visibility','visible');
         $('#add_item').css('visibility','visible');
 
-        localStorage.setItem('dict',JSON.stringify(window.dict.dict));
-
         let isEditable = true;
 
         $("#offer_editor").modal({
@@ -63,6 +61,8 @@ class OfferEditor{
             keyboard:true
         });
 
+        this.lang = window.sets.lang;
+        window.dict.set_lang(window.sets.lang,$("#menu_item_tmplt"));
 
         function selectText(el) {
             $(el).focus();
@@ -116,17 +116,14 @@ class OfferEditor{
                     ev.data.changed = true;
                 });
 
-
                 $(menu_item).find('.item_title').attr('contenteditable', isEditable);
-                $(menu_item).find('.item_price').attr('contenteditable', isEditable);
+
                 if(this.offer[tab][i].title){
-                   try {
-                       $(menu_item).find('.item_title').text(window.dict.dict[this.offer[tab][i].title][window.sets.lang]);
-                   }catch(ex){
-                       ;
-                    }
+
                     $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
                 }
+
+                $(menu_item).find('.item_price').attr('contenteditable', isEditable);
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
 
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
@@ -134,14 +131,14 @@ class OfferEditor{
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                $(menu_item).find('.content_text').attr('data-translate', this.offer[tab][i].content);
+                $(menu_item).find('.content_text').attr('data-translate',this.offer[tab][i].content);
                 if(this.offer[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
                 if(this.offer[tab][i].width)
                     $(menu_item).find('.content_text').css('width',(this.offer[tab][i].width));
 
-                // if(this.offer[tab][i].height)
-                //     $(menu_item).find('.content_text').css('height',(this.offer[tab][i].height));
+                if(this.offer[tab][i].height)
+                    $(menu_item).find('.content_text').css('height',(this.offer[tab][i].height));
 
                 $(menu_item).find('.content_text').on('dblclick', function (ev) {
                     let img = $(menu_item).find('.img-fluid')[0];
@@ -273,7 +270,7 @@ class OfferEditor{
                                 "<td>" + parseInt(dist) + "</td>" +
                                 "<td>" + res[i].period + "</td>" +
                                 "<td class='tablesorter-no-sort'>"+
-                                (data[kAr[k]].comment?"<textarea class='tacomment'>" + data[kAr[k]].comment + "</textarea>":'') +
+                                (data.comment?"<span class='tacomment'>" + data.comment + "</span>":'') +
                                 "</td>"+
                                 "<td>" +"0"+ "</td>" +
 
@@ -351,7 +348,7 @@ class OfferEditor{
         });
 
         $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
-        $("#offer_editor").find('.publish_offe_ctrl').on('click touchstart',this,function (ev) {
+        $("#offer_editor").find('.publish_offer_ctrl').on('click touchstart',this,function (ev) {
             window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),date, ev.data.location, function (obj) {
                 that.obj = obj;
                 that.status = obj[window.user.date].status;
@@ -443,8 +440,6 @@ class OfferEditor{
         let hash = md5(new Date().getTime());
         //window.dict.dict[hash] = {};
         $(menu_item).find('.item_title').attr('data-translate',hash);
-        $(menu_item).find('.item_price').text('1');
-        $(menu_item).find('.content_text').text('content_text');
 
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
@@ -452,8 +447,7 @@ class OfferEditor{
 
         hash = md5(new Date().getTime()+1);
         //window.dict.dict[hash] = {};
-        $(menu_item).find('.content_text').attr('data-translate', hash);
-        $(menu_item).find('.img-fluid').attr('src', '../dist/images/banner.png');
+        // $(menu_item).find('.content_text').attr('data-translate', hash);
         $(menu_item).find('.img-fluid').attr('id','img_'+tab.replace('#','')+'_'+pos);
 
         $(menu_item).find('.put_image').css('display', 'block');
@@ -689,113 +683,112 @@ class OfferEditor{
                     window.dict.dict[md5(value)] = {};
                 }
                 window.dict.dict[md5(value)][lang] = value;
+            }else{
+                return;
             }
 
-                let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
-                if (!checked && active) {
-                    delete that.arCat[parseInt(cat)];
-                    return;
-                } else {
-                    let miAr = $(this).find('.menu_item');
-                    offerObj[value] = [];
+            let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
 
-                    for (let i = 0; i < miAr.length; i++) {
-                        let item = {};
-                        item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
-                        if(active && item.checked==='false'){
-                            continue; //active only
-                        }
-                        let title = $(miAr[i]).find('.item_title');
-                        let hash = $(title).attr('data-translate');
-                        let text = $(miAr[i]).find('.item_title').text();
+            let miAr = $(this).find('.menu_item');
+            offerObj[value] = [];
 
-                        if (text.length === 0 || !text.trim())
-                            continue;
-                        if(!window.dict.dict[hash]) {
-                            window.dict.dict[hash] = {};
-                        }
-                        if (text !== window.dict.dict[hash][lang]) {
-                            let obj = Object.assign({},window.dict.dict[hash]);
-                            delete window.dict.dict[hash];
-                            hash = md5(text);
-                            window.dict.dict[hash] = obj;
-                            window.dict.dict[hash][lang] = text;
-                            $(title).attr('data-translate',hash);
-                        }
-                        item.title = hash;
-                        item.price = $(miAr[i]).find('.item_price').text();
+            for (let i = 0; i < miAr.length; i++) {
+                let item = {};
+                item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
 
-                        if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
-                            let cont_text = $(miAr[i]).find('.content_text');
-                            let w = $(cont_text).width();
-                            let h = $(cont_text).height();
-                            hash = $(cont_text).attr('data-translate');
-                            text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
-                            if(!window.dict.dict[hash]) {
-                                window.dict.dict[hash] = {};
-                            }
-                            if (text !== window.dict.dict[hash][lang]) {
-                                let obj = Object.assign({},window.dict.dict[hash]);
-                                //delete window.dict.dict[hash];
-                                hash = md5(text);
-                                window.dict.dict[hash] = obj;
-                                window.dict.dict[hash][lang] = text;
-                                $(cont_text).attr('data-translate',hash);
-                            }
-                            item.content = hash;
-                            item.width = w;
-                            item.height = h;
-                        }else{
-                            if(item.content)
-                                delete item.content;
-                        }
+                let title = $(miAr[i]).find('.item_title');
+                let hash = $(title).attr('data-translate');
+                let text = $(miAr[i]).find('.item_title').text();
 
-                        if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                            item.img = $(miAr[i]).find('.img-fluid').attr('src');
-                            if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
-                                item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
-                            if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
-                                item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
-                        }else {
-                            delete item.img;
-                        }
+                if (text.length === 0 || !text.trim())
+                    continue;
+                if(!window.dict.dict[hash]) {
+                    window.dict.dict[hash] = {};
+                }
+                if (text !== window.dict.dict[hash][lang]) {
+                    let obj = Object.assign({},window.dict.dict[hash]);
+                    delete window.dict.dict[hash];
+                    hash = md5(text);
+                    window.dict.dict[hash] = obj;
+                    window.dict.dict[hash][lang] = text;
+                    $(title).attr('data-translate',hash);
+                }
+                item.title = hash;
+                item.price = $(miAr[i]).find('.item_price').text();
 
-                        $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                            window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusem'),function (obj) {
-                                obj.status = 'approved';
-                                window.db.SetObject('orderStore', obj, function (res) {
-                                    let data_obj = {
-                                        "proj": "d2d",
-                                        "func": "updateorderstatus",
-                                        "uid": window.user.uid,
-                                        "cusem": $(el).attr('cusem'),
-                                        "supem": window.user.email,
-                                        "date": window.user.date,
-                                        "status":  'approved',
-                                        "lang": window.sets.lang
-                                    };
+                if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
+                    let cont_text = $(miAr[i]).find('.content_text');
+                    let w = $(cont_text).width();
+                    let h = $(cont_text).height();
+                    hash = $(cont_text).attr('data-translate');
+                    text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
+                    if(!window.dict.dict[hash]) {
+                        window.dict.dict[hash] = {};
+                    }
+                    if (text !== window.dict.dict[hash][lang]) {
+                        let obj = Object.assign({},window.dict.dict[hash]);
+                        //delete window.dict.dict[hash];
+                        hash = md5(text);
+                        window.dict.dict[hash] = obj;
+                        window.dict.dict[hash][lang] = text;
+                        $(cont_text).attr('data-translate',hash);
+                    }
+                    item.content = hash;
+                    item.width = w;
+                    item.height = h;
+                }else{
+                    if(item.content)
+                        delete item.content;
+                }
 
-                                    window.user.network.postRequest(data_obj, function (data) {
-                                        console.log(data);
-                                    });
-                                });
+                if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
+                    item.img = $(miAr[i]).find('.img-fluid').attr('src');
+                    if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
+                        item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
+                    if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
+                        item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
+                }else {
+                    delete item.img;
+                }
+
+                $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
+                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusem'),function (obj) {
+                        obj.status = 'approved';
+                        window.db.SetObject('orderStore', obj, function (res) {
+                            let data_obj = {
+                                "proj": "d2d",
+                                "func": "updateorderstatus",
+                                "uid": window.user.uid,
+                                "cusem": $(el).attr('cusem'),
+                                "supem": window.user.email,
+                                "date": window.user.date,
+                                "status":  'approved',
+                                "lang": window.sets.lang
+                            };
+
+                            window.user.network.postRequest(data_obj, function (data) {
+                                console.log(data);
                             });
                         });
+                    });
+                });
 
-                        offerObj[value].push(item);
-                }
-            }
+                offerObj[value].push(item);
+        }
+
         });
 
         return offerObj;
     }
 
     SaveOffer(ev, lang) {
+
         let active = $("li.tab_inserted.active").text();
-        if(active) {
-            let items = this.getTabItems(active, lang);
-            window.user.UpdateOfferLocal(active, items, this.location, window.dict.dict, this.status);
-        }
+        let items  = this.GetOfferItems(lang,active);
+        // if(active) {
+        //     items = this.getTabItems(active, lang);
+        // }
+        window.user.UpdateOfferLocal(null, items, this.location, window.dict.dict, this.status);
     }
 
     CloseMenu(ev) {

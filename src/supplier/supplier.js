@@ -259,7 +259,7 @@ class Supplier{
                                     //tooltip: cursor.value.title ? cursor.value.title : "",
                                     object: objs[o]
                                 });
-                                var id_str = md5(objs[o].cusem);
+                                var id_str = md5(window.user.date+objs[o].cusem);
                                 markerFeature.setId(id_str);
 
                                 let layer = that.map.ol_map.getLayers().get('customer');
@@ -338,6 +338,7 @@ class Supplier{
                             offer[tab][i].img_top = uObj[window.user.date].data[tab][i].img_top;
                     }
                     uObj[window.user.date].data[tab] = offer[tab];
+                    this.store[this.date].data[tab] = offer[tab];
                 }else {
                     uObj[window.user.date] = {
                         "period": $('.sel_time').text(),
@@ -346,7 +347,7 @@ class Supplier{
                         "status": status
                     };
                 }
-                this.store[this.date].data[tab] = offer[tab];
+                this.store[this.date].data = offer;
                 localStorage.setItem('supplier', JSON.stringify(uObj));
                 localStorage.setItem('dict',JSON.stringify(dict));
             }else{

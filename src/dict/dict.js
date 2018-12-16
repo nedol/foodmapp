@@ -21,24 +21,36 @@ class Dict {
         for (let i = 0; i < dtAr.length; i++) {
             let item = dtAr[i];
             let k = $(item).attr("data-translate").toLowerCase();
+
+            //замена по ключу
+            if(item.placeholder && this.dict[item.placeholder] && this.dict[item.placeholder][lang]){
+                item.placeholder = this.dict[item.placeholder][lang];
+            }
+            if(item.value && this.dict[item.value] && this.dict[item.value][lang]){
+                item.value = this.dict[item.value][lang];
+            }
+            if($(item).text() && this.dict[$(item).text()] && this.dict[$(item).text()][lang]){
+                $(item).text(this.dict[$(item).text()][lang]);
+            }
+            //замена по аргументу
             if (this.dict[k]) {
                 let val = this.dict[k][lang] ? this.dict[k][lang] : this.dict[k]['en'];
+                if(!val)
+                    continue;
                 try {
                     val = urlencode.decode(val);
                 }catch(ex){
                     ;
                 }
 
-                if(item.isEntity)
+                if(item.isEntity)//a-frame
                     item.setAttribute('text','value',val);
                 if($(item).text())
                     $(item).text(val);
-                if($(item).val())
+                //if($(item).val())
                     $(item).val(val);
                 if($(item).attr("title"))
                     $(item).attr("title", val);
-                if($(item).attr("placeholder"))
-                    $(item).attr("placeholder", val);
                 if($(item).attr("value"))
                     $(item).attr("value", val);
 

@@ -303,27 +303,20 @@ class Customer{
         });
     }
 
-    PublishOrder(data, adr){
+    PublishOrder(obj, adr){
         let that = this;
         if(!adr){
             this.PickRegion();
             return;
         }
-        let data_obj = {
-            "proj": "d2d",
-            "func": "updateorder",
-            "uid": that.uid,
-            "cusem": that.email,
-            "supem": data.email,
-            "date": $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'),
-            "period":$('.sel_time').text(),
-            "address": adr,
-            "order": JSON.stringify(data.order),
-            "status": "published",
-            "lang": window.sets.lang
-        };
+        obj.proj = "d2d";
+        obj.func = "updateorder";
+        obj.uid = that.uid;
+        obj.cusem = that.email;
+        obj.supem = obj.email;
+        obj.status = "published";
 
-        this.network.postRequest(data_obj, function (data) {
+        this.network.postRequest(obj, function (data) {
             console.log(data);
         });
     }
