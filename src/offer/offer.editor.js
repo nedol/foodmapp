@@ -743,10 +743,10 @@ class OfferEditor{
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                     item.img = $(miAr[i]).find('.img-fluid').attr('src');
-                    if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
-                        item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
-                    if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
-                        item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
+                    if(parseInt($(miAr[i]).find('.img-fluid').css('left'))!==0)
+                        item.img_left  = $(miAr[i]).find('.img-fluid').css('left');
+                    if(parseInt($(miAr[i]).find('.img-fluid').css('top'))!==0)
+                        item.img_top = $(miAr[i]).find('.img-fluid').css('top');// / window.innerHeight * 100))+'%';
                 }else {
                     delete item.img;
                 }
