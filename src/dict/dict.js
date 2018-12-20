@@ -23,8 +23,8 @@ class Dict {
             let k = $(item).attr("data-translate").toLowerCase();
 
             //замена по ключу
-            if(item.placeholder && this.dict[item.placeholder] && this.dict[item.placeholder][lang]){
-                item.placeholder = this.dict[item.placeholder][lang];
+            if(item.attributes.placeholder && this.dict[item.attributes.placeholder.value] && this.dict[item.attributes.placeholder.value][lang]){
+                $(item).attr('placeholder',this.dict[item.attributes.placeholder.value][lang]);
             }
             if(item.value && this.dict[item.value] && this.dict[item.value][lang]){
                 item.value = this.dict[item.value][lang];
@@ -45,10 +45,8 @@ class Dict {
 
                 if(item.isEntity)//a-frame
                     item.setAttribute('text','value',val);
-                if($(item).text())
-                    $(item).text(val);
-                //if($(item).val())
-                    $(item).val(val);
+                $(item).text(val);
+                $(item).val(val);
                 if($(item).attr("title"))
                     $(item).attr("title", val);
                 if($(item).attr("value"))
@@ -73,7 +71,7 @@ class Dict {
     getDictValue(lang, value) {
         let res = $.grep(Object.values(this.dict), function (a) {
             for (let l in Object.values(a))
-                if (a[Object.keys(a)[l]] === value)
+                if (a[Object.keys(a)[l]].toLowerCase() === value.toLowerCase())
                     return a[lang];
         });
 

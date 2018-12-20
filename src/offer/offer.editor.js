@@ -436,10 +436,10 @@ class OfferEditor{
         $(menu_item).find('.item_title').attr('contenteditable', 'true');
         $(menu_item).find('.item_price').attr('contenteditable', 'true');
 
-        $(menu_item).find('.item_title').text($('#item_title').text());
+        //$(menu_item).find('.item_title').text($('#item_title').text());
         let hash = md5(new Date().getTime());
         //window.dict.dict[hash] = {};
-        $(menu_item).find('.item_title').attr('data-translate',hash);
+        //$(menu_item).find('.item_title').attr('data-translate',hash);
 
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
@@ -663,9 +663,9 @@ class OfferEditor{
         return offerObj;
     }
 
-    GetOfferItems(lang,active){
+    GetOfferItems(lang){
         let that = this;
-        let offerObj = {};
+        let offerObj = {local:{}, remote:{}};
         that.arCat = [];
 
         $('.div_tab_inserted').each(function (index, val) {
@@ -684,56 +684,61 @@ class OfferEditor{
                 }
                 window.dict.dict[md5(value)][lang] = value;
             }else{
-                return;
+                $(val).empty();
+                return true;
             }
 
             let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
 
             let miAr = $(this).find('.menu_item');
-            offerObj[value] = [];
+            offerObj['local'][value] = [];
+            offerObj['remote'][value] = [];
 
             for (let i = 0; i < miAr.length; i++) {
                 let item = {};
                 item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
 
                 let title = $(miAr[i]).find('.item_title');
-                let hash = $(title).attr('data-translate');
+                let key = $(title).attr('data-translate');
                 let text = $(miAr[i]).find('.item_title').text();
+
 
                 if (text.length === 0 || !text.trim())
                     continue;
-                if(!window.dict.dict[hash]) {
-                    window.dict.dict[hash] = {};
+                if(!window.dict.dict[key]) {
+                    window.dict.dict[key] = {};
                 }
-                if (text !== window.dict.dict[hash][lang]) {
-                    let obj = Object.assign({},window.dict.dict[hash]);
-                    delete window.dict.dict[hash];
-                    hash = md5(text);
-                    window.dict.dict[hash] = obj;
-                    window.dict.dict[hash][lang] = text;
-                    $(title).attr('data-translate',hash);
+
+                if (text !== window.dict.dict[key][lang]) {
+                    let obj = Object.assign({},window.dict.dict[key]);
+                    delete window.dict.dict[key];
+                    key = md5(text);
+                    window.dict.dict[key] = obj;
+                    window.dict.dict[key][lang] = text;
+                    $(title).attr('data-translate',key);
                 }
-                item.title = hash;
+                item.title = key;
+
                 item.price = $(miAr[i]).find('.item_price').text();
 
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
                     let w = $(cont_text).width();
                     let h = $(cont_text).height();
-                    hash = $(cont_text).attr('data-translate');
+                    key = $(cont_text).attr('data-translate');
                     text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
-                    if(!window.dict.dict[hash]) {
-                        window.dict.dict[hash] = {};
+                    if(!window.dict.dict[key]) {
+                        window.dict.dict[key] = {};
                     }
-                    if (text !== window.dict.dict[hash][lang]) {
-                        let obj = Object.assign({},window.dict.dict[hash]);
-                        //delete window.dict.dict[hash];
-                        hash = md5(text);
-                        window.dict.dict[hash] = obj;
-                        window.dict.dict[hash][lang] = text;
-                        $(cont_text).attr('data-translate',hash);
+                    if (text !== window.dict.dict[key][lang]) {
+                        let obj = Object.assign({},window.dict.dict[key]);
+                        //delete window.dict.dict[key];
+                        key = md5(text);
+                        window.dict.dict[key] = obj;
+                        window.dict.dict[key][lang] = text;
+                        $(cont_text).attr('data-translate',key);
                     }
-                    item.content = hash;
+                    item.content = key;
                     item.width = w;
                     item.height = h;
                 }else{
@@ -773,8 +778,10 @@ class OfferEditor{
                     });
                 });
 
-                offerObj[value].push(item);
-        }
+                offerObj['local'][value].push(item);
+                if(item.checked==='true')
+                    offerObj['remote'][value].push(item);
+            }
 
         });
 
@@ -788,22 +795,26 @@ class OfferEditor{
         // if(active) {
         //     items = this.getTabItems(active, lang);
         // }
-        window.user.UpdateOfferLocal(null, items, this.location, window.dict.dict, this.status);
+        window.user.UpdateOfferLocal(null, items['local'], this.location, window.dict.dict, this.status);
+        return items;
     }
 
     CloseMenu(ev) {
         let that = ev.data;
         //if(ev.data.changed)
-        that.SaveOffer(ev,window.sets.lang);
+        let items = that.SaveOffer(ev,window.sets.lang);
 
-        var r = confirm($('#do_publish_offer').text());
-        if (r == true) {
-            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true),window.user.date, ev.data.location, function (obj) {
-                that.obj = obj;
-                that.status = obj[window.user.date].status;
-            });
-        } else {
+        if($('.menu_item').find('input:checked').length>0 && window.user.ValidateOffer(items['remote'])){
 
+            var r = confirm($('#do_publish_offer').text());
+            if (r == true) {
+                window.user.PublishOffer(items['remote'], window.user.date, ev.data.location, function (obj) {
+                    that.obj = obj;
+                    that.status = obj[window.user.date].status;
+                });
+            } else {
+
+            }
         }
 
         $("#offer_editor").find('.tab-pane').empty();

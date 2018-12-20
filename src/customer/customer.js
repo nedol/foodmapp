@@ -13,7 +13,7 @@ import {Network} from "../../network";
 import {Map} from '../map/map'
 import {DB} from "../map/storage/db"
 
-import {OfferOrder} from "../offer/offer.order";
+
 
 import proj from 'ol/proj';
 
@@ -34,7 +34,7 @@ class Customer{
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-        this.viewer = new OfferOrder();
+        this.viewer;
 
         this.uid = uObj.uid;
         this.email = uObj.email;
@@ -75,8 +75,6 @@ class Customer{
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
-
-        $('#main_menu').on('click touch', this, this.OpenOfferEditor);
 
         this.DateTimePickerEvents();
     }
@@ -255,15 +253,22 @@ class Customer{
 
     UpdateOrderLocal(obj){
 
-        this.viewer.order = obj.order;
         let uObj = JSON.parse(localStorage.getItem('customer'));
         if(!uObj[obj.date])
             uObj[obj.date] = {};
         if(!uObj[obj.date][obj.email])
             uObj[obj.date][obj.email] = {};
         uObj[obj.date][obj.email].order =  obj.order;
+        uObj[obj.date][obj.email].status = obj.status;
         uObj['address'] = obj.address;
         localStorage.setItem('customer', JSON.stringify(uObj));
+
+        let dbObj = {date:obj.date,supem:obj.supem, cusem:obj.cusem, data:obj};
+        window.db.SetObject('orderStore',dbObj,()=>{
+
+        });
+
+        this.viewer.order = obj.order;
     }
 
 
@@ -303,7 +308,7 @@ class Customer{
         });
     }
 
-    PublishOrder(obj, adr){
+    PublishOrder(obj, adr, cb){
         let that = this;
         if(!adr){
             this.PickRegion();
@@ -318,6 +323,12 @@ class Customer{
 
         this.network.postRequest(obj, function (data) {
             console.log(data);
+            if(data.status){
+                cb(data);
+                obj.proj = '';
+                obj.func= '';
+                that.UpdateOrderLocal(obj)
+            }
         });
     }
 
@@ -353,10 +364,54 @@ class Customer{
         }
     }
 
+    OnClickUserSelect(li){
+        if(li==='Customer') {
+            this.reg = new UserRegistry();
+            this.reg.OpenRegistry();
+        }
+    }
+
 }
 
 
+class UserRegistry {
+    constructor(){
 
+
+    }
+
+    OpenRegistry(){
+
+        $("#auth_dialog").modal({
+            show: true,
+            keyboard:true
+        });
+
+        $("#auth_dialog").find(':submit').on('click', function () {
+            $('#register').submit(function(e) {
+                e.preventDefault(); // avoid to execute the actual submit of the form.
+
+                let email = $(this).find('input[type="email"]').val();
+
+                var data_obj ={
+                    proj:"d2d",
+                    func:"auth",
+                    lang: window.sets.lang,
+                    uid: this.uid,
+                    email:email
+                }
+
+                this.network.postRequest(data_obj, function (data) {
+                    let str = JSON.stringify({"email": email});//JSON.stringify()
+                    localStorage.setItem('d2d_user',str);//
+                });
+
+                return false;
+            });
+        });
+    }
+
+}
 
 
 

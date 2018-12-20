@@ -20,10 +20,10 @@ import {utils} from "../utils/utils";
 
 class OfferViewer {
 
-    constructor(){
+    constructor(dict){
         this.changed = false;
         this.offer ;
-        this.dict;
+        this.dict = new Dict(dict);
 
         this.arCat = [];
 
@@ -31,19 +31,33 @@ class OfferViewer {
 
         this.active_class = 'w3-border w3-border-grey w3-round-large';
 
+        this.ovc = $("#offer_viewer").clone();
+        $(this.ovc).attr('id','offer_viewer_clone');
+        $(this.ovc).insertAfter($("#offer_viewer"));
+
+        this.ovc.modal({
+            show: true,
+            keyboard:true
+        });
+
+        this.ovc.find('.modal-title').text("Offer for ");
+        this.ovc.find('.modal-title').attr('data-translate', md5('Menu for'));
+        this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        this.ovc.off('hide.bs.modal');
+        this.ovc.on('hide.bs.modal', this,this.CloseMenu);
+
+        this.ovc.find('.toolbar').css('display', 'block');
+
     }
 
 
-    OpenOffer(em, period, offer, dict) {
+    OpenOffer(offer) {
 
-        this.email = em;
-        this.offer = offer;
-        this.dict = new Dict(dict);
-        this.period = period;
+        this.email = offer.email;
+        this.offer = JSON.parse(offer.data);
 
-        let ovc_2 = $("#offer_viewer").clone();
-        $(ovc_2).attr('id','offer_viewer_clone');
-        $(ovc_2).insertAfter($("#offer_viewer"));
+
+        this.period = $('.sel_time').text();
 
         $('.dropdown').css('visibility','hidden');
         $('#add_tab_li').css('visibility','hidden');
@@ -51,27 +65,14 @@ class OfferViewer {
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
-        ovc_2.modal({
-            show: true,
-            keyboard:true
-        });
-
-        ovc_2.find('.modal-title').text("Offer for ");
-        ovc_2.find('.modal-title').attr('data-translate', md5('Menu for'));
-        ovc_2.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        ovc_2.off('hide.bs.modal');
-        ovc_2.on('hide.bs.modal', this,this.CloseMenu);
-
-        ovc_2.find('.toolbar').css('display', 'block');
-
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0)
                 continue;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore(ovc_2.find('.add_tab_li'));
+                    '</li>').insertBefore(this.ovc.find('.add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore(ovc_2.find('.add_tab_div'));
+                    '</div>').insertBefore(this.ovc.find('.add_tab_div'));
             }
 
             for (let i in this.offer[tab]) {
@@ -123,7 +124,7 @@ class OfferViewer {
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
-                ovc_2.find('#' + tab).append(menu_item);
+                this.ovc.find('#' + tab).append(menu_item);
 
                 $(tmplt).insertAfter('#offer_viewer');
 
@@ -140,7 +141,7 @@ class OfferViewer {
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        this.dict.set_lang(window.sets.lang,ovc_2);
+        this.dict.set_lang(window.sets.lang,this.ovc);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {

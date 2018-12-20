@@ -36,7 +36,7 @@ module.exports = class D2D {
                         this.init(q, res);
                         break;
                     case 'auth':
-                        this.auth(q, res);
+                        this.Auth(q, res);
                         break;
                     case 'updateorderstatus':
                         this.UpdateOrderStatus(q, res);
@@ -103,10 +103,10 @@ module.exports = class D2D {
     }
 
 
-    auth(q, res) {
+    Auth(q, res) {
 
         var sql = "SELECT obj.id, obj.owner, obj.data as obj_data, o.data as menu_data" +
-            " FROM  objects as obj, orders as o" +
+            " FROM  orders as o" +
             " WHERE " +
             " obj.id=o.obj_id AND o.data<>''  AND o.data IS NOT NULL" +
             " ORDER BY o.date DESC LIMIT 1";
@@ -257,12 +257,12 @@ module.exports = class D2D {
         let that = this;
         let status = 'published';
         let sql =
-            "SELECT ord.*"+ //, sup.email as supem, cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
-            " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
-            " WHERE sup.email=\'"+q.supem+"\' AND cus.uid=\'"+q.uid+"\'" +
-                " AND of.sup_uid=sup.uid AND cus.email=ord.cusem AND of.date=\""+q.date+"\"" +
-                " AND ord.date=\'"+q.date+"\'"+
-            " ORDER BY of.id DESC";
+            "SELECT ord.*, tar.options as tariff"+ // cus.email as cusem,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            " FROM  customer as cus, orders as ord, tariff as tar"+
+            " WHERE ord.supem=\'"+q.supem+"\'  AND cus.uid=\'"+q.uid+"\'" +
+            " AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
+            " AND cus.email=ord.cusem AND ord.date=\""+q.date+"\"" +
+            " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -286,7 +286,7 @@ module.exports = class D2D {
 
                 global.con_obj.query(sql, values, function (err, result) {
                     if (result) {
-                        res.end(JSON.stringify({msg:'order updated'}));
+                        res.end(JSON.stringify({result: result, status:status}));
 
                         if(global.resObj[q.supem] && global.resObj[q.supem].connection.writable) {
                             sel[0].data = q.order;
@@ -304,7 +304,7 @@ module.exports = class D2D {
                 }
             }else {
                 status = 'published';
-                values = [q.cusem, q.supem, q.order, q.address.street+","+q.address.house, q.date, q.period,status];
+                values = [q.cusem, q.supem, q.order, q.address, q.date, q.period,status];
                 sql = 'INSERT INTO orders SET cusem=?, supem=?, data=?, address=?, date=?, period=?, status=?';
             }
             global.con_obj.query(sql, values, function (err, result) {
@@ -315,7 +315,7 @@ module.exports = class D2D {
                 if (result) {
                     if(global.resObj[q.supem] && global.resObj[q.supem].connection.writable)
                         resObj[q.supem].write(utils.formatSSE({func:'updateorder',order:sel[0]}));
-                    res.end(JSON.stringify({result: result}));
+                    res.end(JSON.stringify({result: result, status:status}));
                 }
             });
         });

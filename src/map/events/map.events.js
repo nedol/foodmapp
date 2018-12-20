@@ -1,7 +1,11 @@
+import {OrderViewer} from "../../order/order.viewer";
+
 export {MapEvents}
 
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
+import {OfferOrder} from "../../offer/offer.order";
+import {OfferViewer} from "../../offer/offer.viewer";
 
 class MapEvents{
 
@@ -55,13 +59,22 @@ class MapEvents{
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
                 let period = $('.sel_time').text().split(' - ');
                 if(feature.values_.features.length===1) {
-                    window.db.getSupplier(date, period[0],period[1],feature.values_.features[0].values_.object.email, function (obj) {
-                        if(obj!==-1)
-                        if (!window.user.viewer.offer) {
-                            let offer = JSON.parse(obj.data);
-                            window.user.viewer.OpenOffer(obj.email, obj.period, offer, JSON.parse(obj.dict),[obj.latitude, obj.longitude]);
-                        }
-                    });
+                    if(feature.values_.features[0].values_.type==='supplier') {
+                        window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.email, function (obj) {
+                            if (obj !== -1) {
+                                if(window.user.constructor.name==='Supplier')
+                                    window.user.viewer = new OfferViewer( JSON.parse(obj.dict));
+                                else if(window.user.constructor.name==='Customer')
+                                    window.user.viewer = new OfferOrder( JSON.parse(obj.dict));
+                                window.user.viewer.OpenOffer(obj);
+                            }
+                        });
+                    }else if(feature.values_.features[0].values_.type==='customer'){
+                        window.db.GetOrders(date,feature.values_.features[0].values_.object.supem,function (objs) {
+                            let orderViewer = new OrderViewer();
+                            orderViewer.OpenOrderCustomers(objs);
+                        });
+                    }
                 }else{//cluster
                     var coordinates = [];
                     $.each(feature.values_.features, function (key, feature) {

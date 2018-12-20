@@ -1,0 +1,83 @@
+{
+  "email": "customer@gmail.com",
+  "uid": "b4494ffad7521e6e3ee103440cab9093",
+  "2018-12-07": {
+    "order": {}
+  },
+  "2018-12-08": {
+    "example@gmail.com": {
+      "order": {
+        "1b2b1472ca35f2dd18c3ffaa2336c046": {
+          "qnty": "2"
+        }
+      }
+    }
+  },
+  "address": "улица Вавилова,13 с1",
+  "2018-12-04": {
+    "example_1@gmail.com": {
+      "order": {
+        "96d31d5a4564e01572fb431d53cae66e": {
+          "qnty": "1"
+        }
+      }
+    },
+    "example_2@gmail.com": {
+      "order": {}
+    }
+  },
+  "2018-12-10": {
+    "supplier@gmail.com": {
+      "order": {
+        "d95740eb35ab71890646d7611955d475": {
+          "qnty": "4"
+        },
+        "8b2f67d7879157fbd05d6958a9fbad52": {
+          "qnty": "1"
+        }
+      }
+    },
+    "example_0@gmail.com": {
+      "order": {
+        "88dbcef4b4b443ce35a7a59570dae498": {
+          "qnty": "1"
+        },
+        "96d31d5a4564e01572fb431d53cae66e": {
+          "qnty": "2"
+        }
+      }
+    }
+  },
+  "2018-12-13": {
+    "supplier@gmail.com": {
+      "order": {
+        "d95740eb35ab71890646d7611955d475": {
+          "qnty": "2"
+        }
+      }
+    }
+  },
+  "2018-12-15": {
+    "supplier@gmail.com": {
+      "order": {
+        "d95740eb35ab71890646d7611955d475": {
+          "qnty": "1"
+        },
+        "a1da1fa78702cb2299764adabb10b485": {
+          "qnty": "1"
+        }
+      }
+    }
+  },
+  "2018-12-17": {
+    "supplier_1@gmail.com": {
+      "order": "{\"333f42d2f67535b032b7c7df634eb1a1\":{\"qnty\":\"1\",\"price\":\"300\"},\"comment\":\"                 \"}"
+    },
+    "supplier@gmail.com": {
+      "order": "{\"comment\":\"                 \"}"
+    },
+    "supplier_2@gmail.com": {
+      "order": "{\"comment\":\"                 \"}"
+    }
+  }
+}

@@ -144,10 +144,12 @@ $(document).on('readystatechange', function () {
             localStorage.setItem('supplier',JSON.stringify(uObj));
         }else{
             uObj = JSON.parse(localStorage.getItem('supplier'));
-            if(!uObj[date]) {
-                let last = Object.keys(uObj)[Object.keys(uObj).length-2];
+            if(!uObj[date] || Object.keys(uObj[date].data).length===0) {
+                let last = Object.keys(uObj)[Object.keys(uObj).length-1];
                 let data = uObj[last]['data'];
-                uObj[date] = {data: data?data:{}};
+                let loc = uObj[last]['location'];
+                let per = uObj[last]['period'];
+                uObj[date] = {data: data?data:{},location:loc,period:per};
                 localStorage.setItem('supplier',JSON.stringify(uObj));
             }
         }

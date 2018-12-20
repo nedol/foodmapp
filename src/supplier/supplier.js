@@ -18,7 +18,7 @@ import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
 
 import {Overlay} from "../map/overlay/overlay";
-import {OfferViewer} from "../offer/offer.viewer";
+
 
 let md5 = require('md5');
 
@@ -42,7 +42,7 @@ class Supplier{
         this.my_truck_ovl;
 
         this.editor = new OfferEditor();
-        this.viewer = new OfferViewer();
+        this.viewer;
 
         this.store = uObj;
         //this.offer = uObj[this.date].data;
@@ -69,7 +69,7 @@ class Supplier{
 
         $.getJSON('../dict/sys.dict.json', function (data) {
             let dict = JSON.parse(localStorage.getItem('dict'));
-            dict = Object.assign(dict, data);
+            dict = Object.assign((dict?dict:{}), data);
             if(dict) {
                 window.dict = new Dict(dict);
 
@@ -223,7 +223,7 @@ class Supplier{
             }
 
             if(!that.store[that.date]) {
-                let last = Object.keys(that.store)[Object.keys(that.store).length-2];
+                let last = Object.keys(that.store)[Object.keys(that.store).length-1];
                 that.store[that.date]= {data :that.store[last].data?that.store[last].data:{},location:that.editor.location};
                 localStorage.setItem('supplier', JSON.stringify(that.store));
 
@@ -232,23 +232,25 @@ class Supplier{
                     that.store[that.date].data = that.store[that.date].data;
                 if(that.store[that.date].location && that.store[that.date].location.length===2) {
                     that.editor.location = that.store[that.date].location;
-                    that.map.MoveToLocation(that.store[that.date].location);
-                    let my_truck_2 = $('#my_truck').clone()[0];
-                    $(my_truck_2).attr('id','my_truck_2');
-                    let status = that.store[that.date].status;
-                    if(!that.store[that.date].status)
-                        status = 'unpublished';
-                    $(my_truck_2).addClass(status);
-                    that.my_truck_ovl = new Overlay(that.map,my_truck_2,that.store[that.date].location);
-                    $('#my_truck').css('visibility','hidden');
-
                 }
             }
+
+            that.map.MoveToLocation(that.store[that.date].location);
+            let my_truck_2 = $('#my_truck').clone()[0];
+            $(my_truck_2).attr('id','my_truck_2');
+            let status = that.store[that.date].status;
+            if(!that.store[that.date].status)
+                status = 'unpublished';
+            $(my_truck_2).addClass(status);
+            that.my_truck_ovl = new Overlay(that.map,my_truck_2,that.store[that.date].location);
+            $('#my_truck').css('visibility','hidden');
+
 
             that.map.import.DownloadOrders(function () {
 
                 window.db.GetOrders(window.user.date, window.user.email, function (objs) {
                     if(objs!=-1){
+                        let type = 'customer';
                         for(let o in objs) {
                             window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
                                 let loc = proj.fromLonLat([parseFloat(lon),parseFloat(lat)]);
@@ -257,14 +259,15 @@ class Supplier{
                                     labelPoint: new Point(loc),
                                     //name: cursor.value.title ? cursor.value.title : "",
                                     //tooltip: cursor.value.title ? cursor.value.title : "",
+                                    type:type,
                                     object: objs[o]
                                 });
                                 var id_str = md5(window.user.date+objs[o].cusem);
                                 markerFeature.setId(id_str);
 
-                                let layer = that.map.ol_map.getLayers().get('customer');
+                                let layer = that.map.ol_map.getLayers().get(type);
                                 if (!layer) {
-                                    layer = that.map.layers.CreateLayer('customer', '1');
+                                    layer = that.map.layers.CreateLayer(type, '1');
                                 }
                                 let source = layer.values_.vector;
 
@@ -366,6 +369,21 @@ class Supplier{
         }
     }
 
+    ValidateOffer(data){
+        for(let tab in data) {
+            if(data[tab].length===0)
+                return false;
+            for(let i in data[tab])
+            if (!data[tab][i].checked || !parseInt(data[tab][i].price) || !data[tab][i].title){
+                return false;
+            }
+
+        }
+
+        return true;
+    }
+
+
     PublishOffer(data, date, location, cb){
         let that = this;
         if(!location || location.length===0){
@@ -382,8 +400,7 @@ class Supplier{
             "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
             "offer": urlencode.encode(JSON.stringify(data)),
-            "dict": JSON.stringify(window.dict),
-            "lang": window.sets.lang
+            "dict": JSON.stringify(window.dict)
         };
 
         this.network.postRequest(data_obj, function (data) {

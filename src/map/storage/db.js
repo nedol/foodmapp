@@ -10,7 +10,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 13;
+        this.version = 14;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -61,12 +61,6 @@ class DB {
                         vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
                         vSupplierStore.createIndex("dateemail", ["date","email"], {unique: true});
                         vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
-                        vSupplierStore.createIndex("categories", "categories", {unique: false});
-                        vSupplierStore.createIndex("offer", "offer", {unique: false});
-                        vSupplierStore.createIndex("dict", "dict", {unique: false});
-                        vSupplierStore.createIndex("latitude", "latitude", {unique: false});
-                        vSupplierStore.createIndex("longitude", "longitude", {unique: false});
-                        vSupplierStore.createIndex("period", "period", {unique: false});
                     try{
                         db.deleteObjectStore(that.orderStore);
                     }catch(ex){
@@ -169,6 +163,7 @@ class DB {
                         //name: cursor.value.title ? cursor.value.title : "",
                         //tooltip: cursor.value.title ? cursor.value.title : "",
                         categories: JSON.parse(cursor.value.categories),
+                        type:'supplier',
                         object: cursor.value
                     });
                     var id_str = md5(cursor.value.email);

@@ -21,7 +21,7 @@ import {utils} from "../utils/utils";
 
 class OfferOrder {
 
-    constructor(){
+    constructor(dict){
         this.changed = false;
         this.offer ;
         this.dict;
@@ -32,24 +32,47 @@ class OfferOrder {
 
         this.address;
 
+        this.dict = new Dict(dict);
+
         this.active_class = 'w3-border w3-border-grey w3-round-large';
+
+        this.ovc = $("#offer_order").clone();
+        $(this.ovc).attr('id','offer_order_clone');
+        $(this.ovc).insertAfter($("#offer_order"));
+        this.ovc.modal({
+            show: true,
+            keyboard:true
+        });
+
+        this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        this.ovc.off('hide.bs.modal');
+        this.ovc.on('hide.bs.modal', this,this.CloseMenu);
+
+        $(this.ovc).find('.publish_order').off('click touchstart');
+        $(this.ovc).find('.publish_order').on('click touchstart',this,function (ev) {
+            window.user.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address, (data)=> {
+                let status = window.dict.getDictValue(window.sets.lang,data.status);
+                $(this.ovc).find('.ord_status').css('color','white');
+                $(this.ovc).find('.ord_status').text(status);
+            });
+        });
 
     }
 
 
-    OpenOffer(em, period, offer, dict, latlon) {
+    OpenOffer(obj) {
         let that = this;
-        this.email = em;
-        this.offer = offer;
-        this.dict = new Dict(dict.dict);
+        this.email = obj.email;
+        this.offer = JSON.parse(obj.data);
 
+        let latlon = [obj.latitude,obj.longitude];
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-        this.period = period;
+        this.period = obj.period;
         let order;
         let ls = JSON.parse(localStorage.getItem('customer'));
-        if(ls[this.date] && ls[this.date][em]){
-            order= ls[this.date][em];
+        if(ls[this.date] && ls[this.date][this.email]){
+            order= ls[this.date][this.email];
         }
 
         this.address = ls.address;
@@ -63,33 +86,31 @@ class OfferOrder {
         }
 
 
-        let ovc_2 = $("#offer_order").clone();
-        $(ovc_2).attr('id','offer_order_clone');
-        $(ovc_2).insertAfter($("#offer_order"));
+        if(order.status) {
+            this.status = order.status;
+            let status = window.dict.getDictValue(window.sets.lang,order.status);
+            $(this.ovc).find('.ord_status').css('color', 'white');
+            $(this.ovc).find('.ord_status').text(status);
+        }
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
 
-        ovc_2.modal({
-            show: true,
-            keyboard:true
-        });
+
         this.parent = event.data;
 
-        ovc_2.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        ovc_2.off('hide.bs.modal');
-        ovc_2.on('hide.bs.modal', this,this.CloseMenu);
 
-        window.dict.set_lang(window.sets.lang,ovc_2[0]);
 
-        ovc_2.find('.toolbar').css('display', 'block');
+        window.dict.set_lang(window.sets.lang,this.ovc[0]);
+
+        this.ovc.find('.toolbar').css('display', 'block');
 
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0) continue;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore(ovc_2.find('.add_tab_li'));
+                    '</li>').insertBefore(this.ovc.find('.add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore(ovc_2.find('.add_tab_div'));
+                    '</div>').insertBefore(this.ovc.find('.add_tab_div'));
             }
 
             for (let i in this.offer[tab]) {
@@ -101,7 +122,7 @@ class OfferOrder {
                 $(menu_item).css('display', 'block');
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
-                $(menu_item).find('.item_price').attr('contenteditable', 'false');
+                //$(menu_item).find('.item_price').attr('contenteditable', 'false');
 
 
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
@@ -140,11 +161,12 @@ class OfferOrder {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
                     $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_left);
+                    $(menu_item).find('.img-fluid').css('top',this.offer[tab][i].img_top);
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
-                ovc_2.find('#' + tab).append(menu_item);
+                this.ovc.find('#' + tab).append(menu_item);
 
                 $(tmplt).insertAfter('#offer_order');
 
@@ -161,7 +183,6 @@ class OfferOrder {
                     $(menu_item).find('.btn').removeClass('btn-default');
                     $(menu_item).find('.btn').addClass('btn-success');
                     $(menu_item).attr('ordered', ev.target.text);
-
                 });
             }
         }
@@ -170,19 +191,35 @@ class OfferOrder {
             $('.comment').text(order.order.comment);
         }
 
+        window.db.GetOrder(this.date, obj.email, window.user.email, function (res) {
+            if(res!==-1){
+                let obj_data = JSON.parse(res.data.order);
+                let keys =  Object.keys(obj_data);
+
+                for(let k in keys){
+                    if(keys[k]==='comment'){
+                        $('.comment').text(obj_data.comment);
+                    }else {
+                        let qnty = obj_data[keys[k]].qnty;
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.dropdown').find('button').text(qnty);
+                        let price = obj_data[keys[k]].price;
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.item_price').text(price);
+                        $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
+                    }
+                }
+            }
+        });
+
         // let sp = $('.sp_dlg');
         // $(sp).selectpicker();
         // let evnts = $._data($(sp).get(0), "events");
         //
-        this.dict.set_lang(window.sets.lang,ovc_2[0]);
+        this.dict.set_lang(window.sets.lang,this.ovc[0]);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         $($('.tab_inserted')[0]).find('a').trigger('click');
 
-        $(ovc_2).find('.publish_order').off('click touchstart');
-        $(ovc_2).find('.publish_order').on('click touchstart',this,function (ev) {
-            window.user.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address);
-        });
+
 
     }
 
@@ -193,7 +230,7 @@ class OfferOrder {
         $('#offer_order_clone').remove();
     }
 
-    GetOrderItems(lang){
+    GetOrderItems(){
         let that = this;
         let obj = {order:{}};
         $('.menu_item[ordered]').each(function (index, val) {
@@ -201,15 +238,18 @@ class OfferOrder {
                 return;
             }
             obj.order[$(val).find('.item_title').attr('data-translate')] = {
-                qnty: $(val).find('button[data-toggle=dropdown]').text()
+                qnty: $(val).find('button[data-toggle=dropdown]').text(),
+                price: $(val).find('.item_price').text()
             }
         });
         obj.order.comment = $('#offer_order_clone').find('.comment')[0].value;
         obj.order = JSON.stringify(obj.order);
-        obj['email'] = this.email;
+        obj['supem'] = this.email;
+        obj['cusem'] = window.user.email;
         obj['date'] = this.date;
         obj['period'] = this.period;
         obj['address'] = $('#offer_order_clone').find('.address').text();
+        obj['status'] = this.status;
         return obj;
     }
 
@@ -217,7 +257,7 @@ class OfferOrder {
 
         let that = ev.data;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
-        let items = this.GetOrderItems(lang);
+        let items = this.GetOrderItems();
         window.user.UpdateOrderLocal( items , that.email, date);
     }
 

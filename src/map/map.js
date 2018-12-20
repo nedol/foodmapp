@@ -7,12 +7,12 @@ import TileLayer from 'ol/layer/tile';
 import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
-import proj from 'ol/proj';
+
 import Point from 'ol/geom/point';
 import proj from 'ol/proj';
 
 import {Geo} from './location/geolocation';
-import {Menu} from './menu/menu';
+
 import {Categories} from "./categories/categories";
 import {Animate} from "./animate/animate";
 import {DB} from './storage/db';
@@ -69,7 +69,7 @@ class Map {
 
         this.marker = new Marker( this, document.getElementById('marker'));
         this.geo = new Geo(this);
-        this.menu = new Menu(this);
+
         this.animate = new Animate(this);
         this.categories = new Categories(this);
         this.layers = new Layers(this);

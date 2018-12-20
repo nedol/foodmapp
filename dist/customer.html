@@ -56,7 +56,7 @@
         filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
     }
 
-    #main_menu{
+    #reg_button{
         display: block;
         position: absolute;
         left: 10px;
@@ -275,10 +275,18 @@
 
 </div>
 
-<button id="main_menu" class="btn btn-default dropdown-toggle" type="button"
-        data-width="fit" style="display:inline-block;float:left">
-    <span class="caret"></span>
-</button>
+<div class="dropdown">
+    <button id="reg_button" class="btn btn-default dropdown-toggle scaled" type="button"
+            data-toggle="dropdown" data-width="fit" style="display:inline-block;float:left">
+    <a href="#">
+        <span class="glyphicon glyphicon-user"></span>
+    </a>
+    </button>
+    <ul class="dropdown-menu scaled"  role="menu" aria-labelledby="menu0" style="left: 50px;">
+        <li href="#"  onclick="window.user.OnClickUserSelect('Customer')"><a role="menuitem" tabindex="0" href="#">Customer</a></li>
+        <li href="#"  onclick="window.user.OnClickUserSelect('Supplier')"><a role="menuitem" tabindex="1" href="#">Supplier</a></li>
+    </ul>
+</div>
 
 <div id="category_include" style="display:none">
     <style>
@@ -349,12 +357,6 @@
                     <div>
                         <form action="#null" method="post" id="register">
                             <div>
-                                <h4  data-translate="f6039d44b29456b20f8f373155ae4973">Username</h4>
-                                <input type="text" placeholder="Put Username" name="uname" required>
-
-                                <!--<h4  data-translate="Password:">Password</h4>-->
-                                <!--<input type="password" placeholder="Enter Password" name="psw" required>-->
-
                                 <h4>E-mail</h4>
                                 <input type="email" placeholder="Put E-mail" name="email"  title="Please put a valid email" required>
 
@@ -495,32 +497,23 @@
                              data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
                     </ul>
                 </div>
-                <div style="display: inline-block; width:85%;margin: 0 auto;">
-                    <!--<div   data-translate="3492b62254e3625dee5ff96208e0e9d9"-->
-                           <!--style="-->
-                             <!--display: block;-->
-                             <!--font-family:'Courier New';-->
-                             <!--color: #c4e3f3;-->
-                             <!--float: right;-->
-                             <!--font-size: 12px;-->
-                             <!--word-wrap: break-word;">-->
-                        <!--<h6 class="modal-title-date" style=" color: #c4e3f3">Date</h6>-->
-                    <!--</div>-->
-                    <h5 class="modal-title address" contenteditable="true" style="text-align: center; color: #c4e3f3">Ленинский пр.</h5>
-                    <!--<h6 class="modal-title-date"-->
-                        <!--style="display: inline-block;-->
-                        <!--color: #c4e3f3">Date</h6>-->
-                </div>
+                <div class="row" style="display: inline-block; width:95%;margin: 0 auto;">
+                    <div class="col-sm-2 col-xs-2">
 
-                <button type="button" class="btn close" data-dismiss="modal">
-                    <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
-                </button>
-                <!--<div style="display: inline-block; position:absolute; right: 100px;padding: 0px;">-->
-                <!--<select class="sp_dlg" data-width="fit"></select>-->
-                <!--</div>-->
-                <!--<button type="button" class="btn btn-default btn-sm cancel_menu" style="display: none">-->
-                <!--<span class="glyphicon glyphicon-trash" data-translate="ea4788705e6873b424c65e91c2846b19">Cancel</span>-->
-                <!--</button>-->
+                    </div>
+                    <div class="col-sm-8 col-xs-8">
+                        <div style="text-align: center; color:white">Адрес:</div>
+                        <h5 class="modal-title address" contenteditable="true" style="text-align: center; color: #c4e3f3">Ленинский пр.</h5>
+                    </div>
+                    <div class="col-sm-2 col-xs-2">
+                        <div class="ord_status" style="text-align: center;">Опубликовано:</div>
+                        <div></div>
+                    </div>
+                </div>
+                <div style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
+                    <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+
+                </div>
 
             </div>
             <div class="modal-body">
@@ -540,9 +533,7 @@
 
                 <span class="glyphicon glyphicon-comment scaled" data-toggle="collapse" href=".tacollapse"></span>
 
-                 <textarea  class="comment tacollapse"
-                    style="display:block; text-align:left; width: 100%; color: #ff6d6b; font-family:'Segoe Script'; font-size: large;">
-                 </textarea>
+                 <textarea  class="comment tacollapse" style="display:block; text-align:left; width: 100%; color: #ff6d6b; font-family:'Segoe Script'; font-size: large;"></textarea>
                 <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
             </div>
         </div>
@@ -607,7 +598,7 @@
 
     </style>
 
-    <div  id="menu_item_tmplt" contenteditable="false">
+    <div  id="menu_item_tmplt">
 
         <div class="input item_title" data-toggle="collapse" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b"
              style="
@@ -617,7 +608,7 @@
              width: 65%;
              word-wrap: break-word;" >&nbsp;&nbsp;&nbsp;
         </div>
-        <div class="input item_price"><i class="fa fa-euro"></i></div>
+        <div class="input item_price" contenteditable="true"><i class="fa fa-euro"></i></div>
         <div class="dropdown" style="display: inline-block; float: right">
             <div class="qnty" style="padding-right: 10px" data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Q-nty</div>
 
