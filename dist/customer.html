@@ -483,27 +483,34 @@
                 .dropdown:hover .dropdown-content {
                     display: block;
                 }
+                textarea{
+                    background-color: #0e0e0e;
+                }
             </style>
             <div class="modal-header" style="position: relative;width: 100%;">
-                <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-sm dropdown-toggle"  data-toggle="dropdown"
-                        data-width="fit" type="button" style="background-color: #0a0a0a">
-                        <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
-                    </button>
-                    <ul class="dropdown-menu order_menu_options menu_list scaled">
-                        <li class="publish_order" data-width="fit"><a href="#"
-                              data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                        <li class="cancel_order" data-width="fit"><a href="#"
-                             data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
-                    </ul>
-                </div>
+
                 <div class="row" style="display: inline-block; width:95%;margin: 0 auto;">
-                    <div class="col-sm-2 col-xs-2">
+                    <div class="col-sm-1 col-xs-1 dropdown">
+                        <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
+                                data-width="fit" type="button" style="background-color: #0a0a0a">
+                            <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
+                        </button>
+                        <ul class="dropdown-menu order_menu_options menu_list scaled">
+                            <li class="publish_order" data-width="fit"><a href="#"
+                                                                          data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                            <li class="cancel_order" data-width="fit"><a href="#"
+                                                                         data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm- col-xs-3">
 
                     </div>
-                    <div class="col-sm-8 col-xs-8">
+                    <div class="col-sm-6 col-xs-6">
                         <div style="text-align: center; color:white">Адрес:</div>
-                        <h5 class="modal-title address" contenteditable="true" style="text-align: center; color: #c4e3f3">Ленинский пр.</h5>
+                        <div>
+                        <textarea name="address" class="form-control address" rows="1" contenteditable="true"
+                                  style="text-align: center; background-color:black;color: #c4e3f3">Ленинский пр.</textarea>
+                        </div>
                     </div>
                     <div class="col-sm-2 col-xs-2">
                         <div class="ord_status" style="text-align: center;">Опубликовано:</div>
@@ -595,6 +602,10 @@
             font-weight:normal;
             font-size:18px;
         }
+        [contentEditable=true]:empty:not(:focus):before{
+            content:attr(placeholder);
+            color:gray;
+        }
 
     </style>
 
@@ -612,7 +623,7 @@
         <div class="dropdown" style="display: inline-block; float: right">
             <div class="qnty" style="padding-right: 10px" data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Q-nty</div>
 
-            <button class="btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown">0
+            <button class="input btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown">0
                 <!--<span class="caret"></span>-->
             </button>
             <ul class="dropdown-menu scaled"  multiple>
@@ -646,6 +657,6 @@
 
 <data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
 
-
+<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7">Status change alert</data>
 </body>
 </html>

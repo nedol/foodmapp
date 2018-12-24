@@ -79,6 +79,7 @@ class Import {
                 if(data) {
                     processResult(data);
                 }
+
             });
 
         }catch (ex) {
@@ -95,6 +96,22 @@ class Import {
                         if(!obj)
                             continue;
                         obj = formatObject(obj);
+                        if(obj.email===window.user.email && obj.date===window.user.date){
+
+                            if(!Object.keys(window.user.offer.data)[0] && obj) {
+                                window.db.SetObject('dictStore',obj.dict, function (res) {
+
+                                });
+                                window.user.offer  = obj;
+                                window.user.offer.location = proj.fromLonLat([obj.longitude,obj.latitude]);
+                                obj.location = window.user.offer.location;
+                                window.db.SetObject('offerStore', obj, function (res) {
+                                    $('#datetimepicker').trigger("dp.change");
+                                });
+                            }
+
+                            continue;
+                        }
                         window.db.SetObject('supplierStore',obj, function (success) {
 
                         });
@@ -118,8 +135,8 @@ class Import {
                 longitude: obj.lon,
                 latitude: obj.lat,
                 logo: "../dist/images/truck.png",
-                data: obj.data,
-                dict: obj.dict,
+                data: JSON.parse(obj.data),
+                dict: JSON.parse(obj.dict),
                 hash: hash
             };
         }
@@ -153,6 +170,8 @@ class Import {
                             if(!obj)
                                 continue;
                             obj.logo =  "../dist/images/user.png";
+                            obj.data = JSON.parse(obj.data);
+                            obj.status = JSON.parse(obj.status);
                             window.db.SetObject('orderStore', obj, function (success) {
 
                             });

@@ -30,7 +30,7 @@ class OfferViewer {
         this.location = [];
 
         this.active_class = 'w3-border w3-border-grey w3-round-large';
-
+        this.period = $('.sel_time').text();
         this.ovc = $("#offer_viewer").clone();
         $(this.ovc).attr('id','offer_viewer_clone');
         $(this.ovc).insertAfter($("#offer_viewer"));
@@ -40,13 +40,18 @@ class OfferViewer {
             keyboard:true
         });
 
-        this.ovc.find('.modal-title').text("Offer for ");
-        this.ovc.find('.modal-title').attr('data-translate', md5('Menu for'));
+        this.ovc.find('.modal-title').text("Delivery for ");
+        this.ovc.find('.modal-title').attr('data-translate', md5('Delivery for'));
         this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
         this.ovc.off('hide.bs.modal');
         this.ovc.on('hide.bs.modal', this,this.CloseMenu);
 
         this.ovc.find('.toolbar').css('display', 'block');
+
+        this.lang = window.sets.lang;
+        window.sysdict.set_lang(window.sets.lang,$("#menu_item_tmplt"));
+        window.sysdict.set_lang(window.sets.lang,$(this.ovc));
+
 
     }
 
@@ -54,16 +59,13 @@ class OfferViewer {
     OpenOffer(offer) {
 
         this.email = offer.email;
-        this.offer = JSON.parse(offer.data);
-
-
-        this.period = $('.sel_time').text();
+        this.offer = offer.data;
 
         $('.dropdown').css('visibility','hidden');
         $('#add_tab_li').css('visibility','hidden');
         $('#add_item').css('visibility','hidden');
 
-        localStorage.setItem('dict',JSON.stringify(window.dict.dict));
+        this.dict = new Dict(offer.dict.dict);
 
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0)
@@ -93,7 +95,7 @@ class OfferViewer {
 
                 if(this.offer[tab][i].title){
                     try {
-                        $(menu_item).find('.item_title').text(window.dict.dict[this.offer[tab][i].title][window.sets.lang]);
+                        $(menu_item).find('.item_title').text(this.dict.dict[this.offer[tab][i].title][window.sets.lang]);
                     }catch(ex){
                         ;
                     }

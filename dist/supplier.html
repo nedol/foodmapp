@@ -563,12 +563,15 @@
                 font-family:'Segoe Script';
                 font-size: medium;
                 /*height: 240px;*/
-                width:100%;
+                /*width:100%;*/
                 border-width: 0px;
                 background-color: #030000;
-                overflow:auto;
+                /*overflow:auto;*/
                 user-select: none;
                 -webkit-appearance: textarea;
+                -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                box-sizing: border-box;         /* IE 8+ */
             }
             .image_div{
                 position: absolute;
@@ -601,9 +604,9 @@
                 </label>
             </div>
 
-            <div class="col-sm-8 col-xs-7 input item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+            <div class="col-sm-8 col-xs-7 input item_title" size="50" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
 
-            <div class="col-sm-2 col-xs-3 input item_price"  contentEditable="true" placeholder="руб"></div>
+            <div class="col-sm-2 col-xs-3 input item_price"  size="7" contentEditable="true" placeholder="руб"></div>
 
             <span class="col-sm-1 col-xs-1 glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden"></span>
 
@@ -611,10 +614,10 @@
 
         <div class="collapse item_content">
             <div class="row">
-                <div class="col-xs-8">
-                    <textarea rows="10"  class="input content_text" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></textarea>
+                <div class="col-xs-10">
+                    <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
                 </div>
-                <div class="col-xs-4">
+                <div class="col-xs-2">
                     <img class="input img-fluid w3-image" draggable="false"  src="" >
                 </div>
             </div>
@@ -631,6 +634,7 @@
                 <tr>
                     <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approve</th>
                     <th data-translate="31d1b8ef5ed469f7618d76144fffaa06">Qnty</th>
+                    <th data-translate="3601146c4e948c32b6424d2c0a7f0118">Price</th>
                     <th data-translate='884d9804999fc47a3c2694e49ad2536a'>Address</th>
                     <th data-translate="a74ec9c5b6882f79e32a8fbd8da90c1b">Distance</th>
                     <th data-translate="a0acfa46d86f7610b2c73dbb28f64701">Period</th>
@@ -756,6 +760,7 @@
                         <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approve</th>
                         <th data-translate="7d74f3b92b19da5e606d737d339a9679">Item</th>
                         <th data-translate="31d1b8ef5ed469f7618d76144fffaa06">Qnty</th>
+                        <th data-translate="3601146c4e948c32b6424d2c0a7f0118">Price</th>
                         <th data-translate='884d9804999fc47a3c2694e49ad2536a'>Address</th>
                         <th data-translate="a74ec9c5b6882f79e32a8fbd8da90c1b">Distance</th>
                         <th data-translate="a0acfa46d86f7610b2c73dbb28f64701">Period</th>
@@ -807,6 +812,7 @@
     <img id="pin" src="../dist/images/ic_pin.png">
 </section>
 <h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
 
 
 </body>

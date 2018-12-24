@@ -129,19 +129,20 @@ class Layers {
                                 vectorSource.removeFeature(feature);
                             }
                         });
-                        window.db.GetOrder(window.user.date,feature.values_.object.supem, feature.values_.object.cusem,function (res) {
-                            if(res!==-1) {
-                                if (feature.values_.object.date === window.user.date) {
-                                    let style = getObjectStyle(feature.values_.object);
-                                    if (style)
-                                        cluster_feature.setStyle(style);
+                        if(feature.values_.object.supem && feature.values_.object.cusem)
+                            window.db.GetOrder(window.user.date,feature.values_.object.supem, feature.values_.object.cusem,function (res) {
+                                if(res!==-1) {
+                                    if (feature.values_.object.date === window.user.date) {
+                                        let style = getObjectStyle(feature.values_.object);
+                                        if (style)
+                                            cluster_feature.setStyle(style);
+                                    }else{
+                                        vectorSource.removeFeature(feature);
+                                    }
                                 }else{
                                     vectorSource.removeFeature(feature);
                                 }
-                            }else{
-                                vectorSource.removeFeature(feature);
-                            }
-                        });
+                            });
                     });
                 }
 

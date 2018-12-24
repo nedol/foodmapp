@@ -8,8 +8,11 @@ require('dialog-polyfill');
 
 require("../../global");
 
+import proj from 'ol/proj';
 import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
+
+import {DB} from "../map/storage/db"
 
 const langs = require("../dict/languages");
 var countries = require("i18n-iso-countries");
@@ -135,28 +138,39 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').data("DateTimePicker").toggle();
     },200);
 
-    let uObj;
+    let uObj={};
+    let email = utils.getParameterByName('email');
+    window.db = new DB('Supplier', function () {
+        if(email) {
+            let uid = md5(date);
+            window.db.GetProfile(email,function (res) {
+                if(!res) {
+                    uObj['profile'] = {email: email, "uid": uid};
+                    window.db.SetObject('profileStore',uObj['profile'], function (res) {
 
-    if(utils.getParameterByName('email')) {
-        let uid = md5(date);
-        if(!localStorage.getItem('supplier')) {
-            uObj = {"email":utils.getParameterByName('email'),"uid":uid,[date]:{"data":{}}};
-            localStorage.setItem('supplier',JSON.stringify(uObj));
-        }else{
-            uObj = JSON.parse(localStorage.getItem('supplier'));
-            if(!uObj[date] || Object.keys(uObj[date].data).length===0) {
-                let last = Object.keys(uObj)[Object.keys(uObj).length-1];
-                let data = uObj[last]['data'];
-                let loc = uObj[last]['location'];
-                let per = uObj[last]['period'];
-                uObj[date] = {data: data?data:{},location:loc,period:per};
-                localStorage.setItem('supplier',JSON.stringify(uObj));
-            }
+                    });
+                }else{
+                    uObj['profile'] = res;
+                }
+
+                window.db.GetOffer(date, function (res) {
+                    if(!res) {
+                        //let loc = proj.fromLonLat([37.465,55.5975]);
+                        uObj['offer'] = {date:date,data:{},period:''};
+                        window.db.SetObject('offerStore',uObj['offer'], function () {
+
+                        });
+                    }else{
+                        uObj['offer']  = res;
+                    }
+
+                    window.user = new Supplier(uObj);
+                    window.user.IsAuth_test(function (data) {//TODO:
+
+                    });
+                });
+            });
         }
-    }
-    window.user = new Supplier(uObj);
-    window.user.IsAuth_test(function (data) {//TODO:
-
     });
 
 });

@@ -25,46 +25,53 @@ class OrderViewer {
         this.order ;
         this.dict;
 
-    }
 
+        this.ordv = $("#order_viewer").clone();
+        $(this.ordv).attr('id','order_viewer_clone');
+        $(this.ordv).insertAfter($("#order_viewer"));
 
-    OpenOrderCustomers(objs) {
-
-        this.orders = objs;
-
-        let ordv = $("#order_viewer").clone();
-        $(ordv).attr('id','order_viewer_clone');
-        $(ordv).insertAfter($("#order_viewer"));
-
-        ordv.modal({
+        this.ordv.modal({
             show: true,
             keyboard:true
         });
 
-        ordv.find('.modal-title-date').text(this.orders.date +" ("+this.orders.period+")");
 
-        ordv.off('hide.bs.modal');
-        ordv.on('hide.bs.modal', this,this.CloseMenu);
+        this.ordv.off('hide.bs.modal');
+        this.ordv.on('hide.bs.modal', this,this.CloseMenu);
 
-        ordv.find('.toolbar').css('display', 'block');
+        this.ordv.find('.toolbar').css('display', 'block');
+
+    }
+
+
+    OpenOrderCustomers(objs) {
+        let that = this;
+        this.orders = objs;
+        this.ordv.find('.modal-title-date').text(this.orders[0].date +" ("+this.orders[0].period+")");
 
         for(let c in this.orders) {
-            let data = JSON.parse(objs[c].data);
-            let cbdisabled = '';
-            if (objs[c].status === 'approved')
-                cbdisabled = 'disabled';
-            let checked = objs[c].status === 'approved' ? 'checked' : '';
+            let data = objs[c].data;
+
             for (let o in data) {
-                $("<tr>" +
+                if(o ==='comment'){
+                    continue;
+                }
+                let checked = objs[c].data[o].status === 'approved' ? 'checked' : '';
+                let cbdisabled = '';
+                if (objs[c].data[o].status === 'approved')
+                    cbdisabled = 'disabled';
+                let row = "<tr>" +
                     "<td class='tablesorter-no-sort'>" +
-                    "<label  class=\"btn\">" +
-                    "<input type=\"checkbox\" class=\"checkbox-inline\" " + cbdisabled + " cusem=" + objs[c].cusem + " " + checked + " style=\"display: none\">" +
-                    "<i class=\"fa fa-square-o fa-2x\"></i>" +
-                    "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
-                    "</label>" +
+                        "<label  class=\"btn\">" +
+                        "<input type=\"checkbox\" class=\"approved checkbox-inline\" " + cbdisabled + " cusem=" + objs[c].cusem + " " + checked + " " +
+                            "style=\"display: none\" order="+o+">" +
+                        "<i class=\"fa fa-square-o fa-2x\"></i>" +
+                        "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
+                        "</label>" +
                     "</td>" +
                     "<td data-translate='" + o + "'>Title</td>" +
                     "<td>" + data[o].qnty + "</td>" +
+                    "<td>" + data[o].price + "</td>" +
                     "<td>" + objs[c].address + "</td>" +
                     "<td>" + objs[c].dist + "</td>" +
                     "<td>" + objs[c].period + "</td>" +
@@ -79,12 +86,18 @@ class OrderViewer {
                     "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                     "</label>" +
                     "</td>" +
-                    "</tr>").appendTo($(ordv).find('.tablesorter').find('tbody'));
+                    "</tr>";
+                    $(row).appendTo($(this.ordv).find('.tablesorter').find('tbody'));
+                    $('input:checkbox').on('change', function (ev) {
+                        let checked = $(ev.target).is(':checked')?'approved':'';
+                        let ord = $(ev.target).attr('order');
+                        that.orders[c].data[ord].status = checked ;
+                    });
             }
         }
 
         setTimeout(function () {
-            $(ordv).find('.tablesorter').tablesorter({
+            $(that.ordv).find('.tablesorter').tablesorter({
                 theme: 'blue',
                 widgets: ['zebra', 'column'],
                 usNumberFormat: false,
@@ -101,7 +114,7 @@ class OrderViewer {
         // let evnts = $._data($(sp).get(0), "events");
         //
         this.lang = window.sets.lang;
-        window.dict.set_lang(window.sets.lang,ordv);
+        window.dict.set_lang(window.sets.lang,this.ordv);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         // if(!evnts['changed.bs.select']) {
@@ -126,8 +139,14 @@ class OrderViewer {
 
 
     CloseMenu(ev) {
+
+        ev.data.SaveOrder(ev);
         ev.data.offers = '';
         $('#order_viewer_clone').remove();
+    }
+
+    SaveOrder(ev) {
+        window.user.ApproveOrder(this.orders);
     }
 }
 

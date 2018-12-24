@@ -10,7 +10,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 14;
+        this.version = 16;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -20,7 +20,10 @@ class DB {
             this.IDBTransaction = window.IDBTransaction || window.webkitIDBTransaction || window.msIDBTransaction,
             this.baseName = user+ ".D2DStore",
             this.supplierStore = "supplierStore",
-            this.orderStore =  "orderStore";
+            this.orderStore =  "orderStore",
+            this.offerStore = "offerStore",
+            this.dictStore = "dictStore",
+            this.profileStore = "profileStore";
 
         if (!this.DBcon) {
             this.connectDB(function (con) {
@@ -48,31 +51,56 @@ class DB {
 
             request.onupgradeneeded = function (event) {
 
-                    var db = event.target.result;
-                    db.onerror = function (event) {
-                        console.log(event);
-                    };
-                    try {
-                        db.deleteObjectStore(that.supplierStore);
-                    }catch(ex){
+                var db = event.target.result;
+                db.onerror = function (event) {
+                    console.log(event);
+                };
 
-                    }
-                    let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "email"]});
-                        vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
-                        vSupplierStore.createIndex("dateemail", ["date","email"], {unique: true});
-                        vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
-                    try{
-                        db.deleteObjectStore(that.orderStore);
-                    }catch(ex){
+                try {
+                    let vProfileStore = db.createObjectStore(that.profileStore, {keyPath: ["email"]});
+                    vProfileStore.createIndex("email", "email", {unique: true});
+                    vProfileStore.createIndex("tariff", "tariff", {unique: false});
+                }catch(ex){
 
-                    }
-                    let vOrderStore = db.createObjectStore(that.orderStore, {keyPath: ["date", "supem", "cusem"]});
-                    vOrderStore.createIndex("data", "data", {unique: false});
-                    vOrderStore.createIndex("datesupemcusem", ["date","supem", "cusem"], {unique: true});
-                    vOrderStore.createIndex("datesupem", ["date","supem"], {unique: false});
-                    vOrderStore.createIndex("status", "status", {unique: false});
-                    vOrderStore.createIndex("period", "period", {unique: false});
-                    that.connectDB(f);
+                }
+
+                try {
+                    let vOfferStore = db.createObjectStore(that.offerStore, {keyPath: ["date"]});
+                    vOfferStore.createIndex("date", "date", {unique: false});
+                }catch(ex){
+
+                }
+
+                try {
+                    let vDictStore = db.createObjectStore(that.dictStore, {keyPath: ["hash"]});
+                    vDictStore.createIndex("hash", "hash", {unique: true});
+                }catch(ex){
+
+                }
+
+                try {
+                    db.deleteObjectStore(that.supplierStore);
+                }catch(ex){
+
+                }
+                let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "email"]});
+                    vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
+                    vSupplierStore.createIndex("dateemail", ["date","email"], {unique: true});
+                    vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
+
+
+                try{
+                    db.deleteObjectStore(that.orderStore);
+                }catch(ex){
+
+                }
+                let vOrderStore = db.createObjectStore(that.orderStore, {keyPath: ["date", "supem", "cusem"]});
+                vOrderStore.createIndex("data", "data", {unique: false});
+                vOrderStore.createIndex("datesupemcusem", ["date","supem", "cusem"], {unique: true});
+                vOrderStore.createIndex("datesupem", ["date","supem"], {unique: false});
+                vOrderStore.createIndex("status", "status", {unique: false});
+
+                that.connectDB(f);
             };
 
         } catch (ex) {
@@ -80,10 +108,10 @@ class DB {
         }
     }
 
-    getStorage(f) {
+    GetStorage(storeName, f) {
 
-        var rows = [],
-            store = DB.prototype.DBcon.transaction([this.storeName], "readonly").objectStore(storeName);
+        var rows = {},
+            store = DB.prototype.DBcon.transaction([storeName], "readonly").objectStore(storeName);
 
         if (store.mozGetAll)
             store.mozGetAll().onsuccess = function (e) {
@@ -93,7 +121,7 @@ class DB {
             store.openCursor().onsuccess = function (e) {
                 var cursor = e.target.result;
                 if (cursor) {
-                    rows.push(cursor.value);
+                    rows[cursor.value.hash] = cursor.value.obj;
                     cursor.continue();
                 }
                 else {
@@ -194,6 +222,23 @@ class DB {
         }
     }
 
+
+    GetDictValue(hash, cb){
+        let tx = this.DBcon.transaction([this.dictStore], "readonly");
+        let ind = objectStore.index("hash");
+        var request = ind.get([hash]);
+        request.onerror = function (ev) {
+            cb(-1);
+        }
+        request.onsuccess = function (ev) {
+            if(this.result){
+                cb(this.result);
+            }else{
+                cb(-1);
+            }
+        };
+    }
+
     GetOrders(date, supem,  cb){
         if(!this.DBcon)
             return;
@@ -250,16 +295,45 @@ class DB {
             var request = index.get([date,email]);
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {
-
-                if(this.result){
-                    cb(this.result);
-                }else{
-                    cb(-1);
-                }
+                cb(this.result);
             }
         } catch (ex) {
             console.log(ex);
         }
     }
 
+    GetProfile(email,  cb) {
+        try {
+            let objectStore = this.DBcon.transaction('profileStore', "readonly").objectStore('profileStore');
+            let index = objectStore.index('email');
+            var request = index.get(email);
+            request.onerror = this.logerr;
+            request.onsuccess = function (ev) {
+                cb(this.result);
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    GetOffer(date,  cb) {
+        try {
+            let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+            let index = objectStore.index("date");
+            var request = index.get(date);
+            request.onerror = this.logerr;
+            request.onsuccess = function (ev) {
+                cb(this.result);
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    GetAllOffers(cb) {
+        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        objectStore.getAll().onsuccess = function(event) {
+            cb(event.target.result);
+        };
+    }
 }

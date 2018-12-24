@@ -23,6 +23,10 @@
     "en": "Choose a region for delivery",
     "ru": "Выберите регион для доставки"
   },
+  "2b1bb9b86845c33c0e1dc289a714e9ac":{
+    "ru": "Ждите подтверждения доставки",
+    "en": "Wait for delivery approvement"
+  },
   "c5db61ffb92f10e3e72921a57b3ec421":{
     "en": "Input address for delivery",
     "ru": "Введите адрес доставки"
@@ -107,8 +111,16 @@
     "ru": "Заказать",
     "en": "Make Order"
   },
+  "b41e026d993eee7ba620c2177c4fa0e0":{
+    "ru": "Доставка на",
+    "en": "Delivery for "
+  },
   "3492b62254e3625dee5ff96208e0e9d9":{
-    "ru": "Заказ по доставке на",
+    "ru": "Предложение на",
+    "en": "Offer for "
+  },
+  "ebf76e067cabfab88118b3420289af42":{
+    "ru": "Заказ на доставку на",
     "en": "Order for "
   },
   "7442e29d7d53e549b78d93c46b8cdcfc":{
@@ -135,6 +147,10 @@
     "ru": "Период",
     "en": "Period"
   },
+  "3601146c4e948c32b6424d2c0a7f0118":{
+    "ru": "Цена",
+    "en": "Price"
+  },
   "31d1b8ef5ed469f7618d76144fffaa06":{
     "ru": "Кол-во",
     "en": "Q-nty"
@@ -144,8 +160,8 @@
     "en": "Comments"
   },
   "25ae4884275a34b33820d6e17013bed1":{
-    "ru": "История",
-    "en": "History"
+    "ru": "Лояльность",
+    "en": "Loyalty"
   },
   "6f8063417ab31f38d864c28302f3de2f":{
     "ru": "Подтверждено",

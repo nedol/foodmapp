@@ -1,5 +1,5 @@
 'use strict'
-export {Map}
+export {OLMap};
 
 import map from 'ol/map';
 import View from 'ol/view';
@@ -24,7 +24,7 @@ import {Import} from "./import/import";
 import {Marker} from "./marker/marker";
 
 
-class Map {
+class OLMap {
 
     constructor() {
         //let full_screen = new ol.control.FullScreen();
@@ -65,6 +65,7 @@ class Map {
             });
 
         }
+
 
 
         this.marker = new Marker( this, document.getElementById('marker'));

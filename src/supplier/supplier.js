@@ -10,8 +10,8 @@ import {Network} from "../../network";
 
 //import {RTCOperator} from "../rtc/rtc_operator"
 
-import {Map} from '../map/map'
-import {DB} from "../map/storage/db"
+import {OLMap} from '../map/map'
+
 
 import proj from 'ol/proj';
 import Point from 'ol/geom/point';
@@ -44,15 +44,12 @@ class Supplier{
         this.editor = new OfferEditor();
         this.viewer;
 
-        this.store = uObj;
-        //this.offer = uObj[this.date].data;
+        this.offer = uObj.offer;
 
-        this.uid = uObj.uid;
-        this.email = uObj.email;
+        this.uid = uObj.profile.uid;
+        this.email = uObj.profile.email;
 
-        window.db = new DB(this.constructor.name, function () {});
-
-        this.map = new Map();
+        this.map = new OLMap();
 
         this.isShare_loc = false;
 
@@ -68,18 +65,13 @@ class Supplier{
         });
 
         $.getJSON('../dict/sys.dict.json', function (data) {
-            let dict = JSON.parse(localStorage.getItem('dict'));
-            dict = Object.assign((dict?dict:{}), data);
-            if(dict) {
-                window.dict = new Dict(dict);
+            window.sysdict = new Dict(data);
+            window.sysdict.set_lang(window.sets.lang, $('body'));
+            window.sysdict.set_lang(window.sets.lang, $('#categories'));
 
-            }else{
-                localStorage.setItem("dict",'{}');
-                window.dict = new Dict({});
-            }
-            window.dict.set_lang(window.sets.lang, $('body'));
-            window.dict.set_lang(window.sets.lang, $('#categories'));
-            localStorage.setItem("lang", window.sets.lang);
+            window.db.GetStorage('dictStore', function (rows) {
+                window.dict = new Dict(rows);
+            });
 
             cb();
         });
@@ -180,7 +172,6 @@ class Supplier{
 
         });
 
-
         $('#date').on("click touchstart",this,function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
@@ -217,37 +208,42 @@ class Supplier{
 
             $('#my_truck').css('visibility','visible');
 
+
             if(that.my_truck_ovl) {
                 that.my_truck_ovl.RemoveOverlay();
                 that.my_truck_ovl = '';
             }
 
-            if(!that.store[that.date]) {
-                let last = Object.keys(that.store)[Object.keys(that.store).length-1];
-                that.store[that.date]= {data :that.store[last].data?that.store[last].data:{},location:that.editor.location};
-                localStorage.setItem('supplier', JSON.stringify(that.store));
+            window.db.GetOffer(that.date, function (res) {
 
-            }else {
-                if(that.store[that.date].data)
-                    that.store[that.date].data = that.store[that.date].data;
-                if(that.store[that.date].location && that.store[that.date].location.length===2) {
-                    that.editor.location = that.store[that.date].location;
+                if(!res) {//TODO:
+                    window.db.GetAllOffers(function (res) {
+                        that.offer.data = res[0].data;
+                    });
+
+                }else {
+                    if(res.data)
+                        that.offer.data = res.data;
+                    if(that.offer.location && that.offer.location.length===2) {
+                        that.editor.location = res.location;
+                    }
                 }
-            }
 
-            that.map.MoveToLocation(that.store[that.date].location);
-            let my_truck_2 = $('#my_truck').clone()[0];
-            $(my_truck_2).attr('id','my_truck_2');
-            let status = that.store[that.date].status;
-            if(!that.store[that.date].status)
-                status = 'unpublished';
-            $(my_truck_2).addClass(status);
-            that.my_truck_ovl = new Overlay(that.map,my_truck_2,that.store[that.date].location);
-            $('#my_truck').css('visibility','hidden');
+                if(that.offer.location) {
+                    that.map.MoveToLocation(that.offer.location);
+                    let my_truck_2 = $('#my_truck').clone()[0];
+                    $(my_truck_2).attr('id', 'my_truck_2');
+                    let status = that.offer.status;
+                    if (!that.offer.status)
+                        status = 'unpublished';
+                    $(my_truck_2).addClass(status);
+                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.location);
+                    $('#my_truck').css('visibility', 'hidden');
+                }
 
+            });
 
             that.map.import.DownloadOrders(function () {
-
                 window.db.GetOrders(window.user.date, window.user.email, function (objs) {
                     if(objs!=-1){
                         let type = 'customer';
@@ -278,8 +274,6 @@ class Supplier{
                     }
                 });
             });
-
-
         });
 
         $("#my_truck").on('dragstart',function (ev) {
@@ -300,8 +294,10 @@ class Supplier{
             let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
             window.user.editor.location = coor;
 
-            that.store[window.user.date].location = coor;
-            localStorage.setItem('supplier', JSON.stringify(that.store));
+            that.offer.location = coor;
+            window.db.SetObject('offerStore',that.offer,function (res) {
+
+            });
             $('#my_truck').css('visibility','visible');
             let my_truck_2 = $('#my_truck').clone()[0];
             $(my_truck_2).attr('id','my_truck_2');
@@ -309,6 +305,8 @@ class Supplier{
             $('#my_truck').css('visibility','hidden');
         });
     }
+
+
 
     OnClickTimeRange(ev){
         let from = $(ev).text().split(' - ')[0];
@@ -330,46 +328,45 @@ class Supplier{
 
     UpdateOfferLocal(tab, offer, location, dict, status){
 
-        if(window.demoMode) {
-            let uObj = JSON.parse(localStorage.getItem('supplier'));
-            if (uObj) {
-                if(tab){
-                    for(let i in offer[tab]){
-                        if(uObj[window.user.date].data[tab][i] && !offer[tab][i].img_left)
-                            offer[tab][i].img_left = uObj[window.user.date].data[tab][i].img_left;
-                        if(uObj[window.user.date].data[tab][i] && !offer[tab][i].img_top)
-                            offer[tab][i].img_top = uObj[window.user.date].data[tab][i].img_top;
-                    }
-                    uObj[window.user.date].data[tab] = offer[tab];
-                    this.store[this.date].data[tab] = offer[tab];
-                }else {
-                    uObj[window.user.date] = {
-                        "period": $('.sel_time').text(),
-                        "location": location,
-                        "data": offer,
-                        "status": status
-                    };
+        let uObj = this.offer;
+        if (uObj) {
+            if(tab){
+                for(let i in offer[tab]){
+                    if(!uObj.data[tab])
+                        uObj.data[tab] = {};
+                    if(uObj.data[tab][i] && !offer[tab][i].img_left)
+                        offer[tab][i].img_left = uObj.data[tab][i].img_left;
+                    if(uObj.data[tab][i] && !offer[tab][i].img_top)
+                        offer[tab][i].img_top = uObj.data[tab][i].img_top;
                 }
-                this.store[this.date].data = offer;
-                localStorage.setItem('supplier', JSON.stringify(uObj));
-                localStorage.setItem('dict',JSON.stringify(dict));
-            }else{
-                uObj['email'] = this.email;
-                uObj['uid'] = this.uid;
-                uObj[date] = {
+                uObj.data[tab] = offer[tab];
+                this.offer.data[tab] = offer[tab];
+            }else {
+                uObj = {
+                    "date":window.user.date,
                     "period": $('.sel_time').text(),
-                    "location":location,
+                    "location": location,
                     "data": offer,
                     "status": status
                 };
-
-                localStorage.setItem('supplier', JSON.stringify(uObj));
-                localStorage.setItem('dict',JSON.stringify(dict));
             }
+            this.offer.data = offer;
+            window.db.SetObject('offerStore',uObj, function () {
+                for(let i in dict){
+                    try {
+                        window.db.SetObject('dictStore', {hash: i, obj: dict[i]}, function (res) {
+
+                        });
+                    }catch(ex){
+                        console.log();
+                    }
+                }
+            });
         }
     }
 
     ValidateOffer(data){
+        return true;//TODO:
         for(let tab in data) {
             if(data[tab].length===0)
                 return false;
@@ -377,9 +374,7 @@ class Supplier{
             if (!data[tab][i].checked || !parseInt(data[tab][i].price) || !data[tab][i].title){
                 return false;
             }
-
         }
-
         return true;
     }
 
@@ -403,41 +398,61 @@ class Supplier{
             "dict": JSON.stringify(window.dict)
         };
 
-        this.network.postRequest(data_obj, function (data) {
-            if(data.result.affectedRows===1){
-                let obj = JSON.parse(localStorage.getItem('supplier'));
-                obj[window.user.date].status = 'published';
-                localStorage.setItem('supplier',JSON.stringify(obj));
-                $("#my_truck").addClass('published');
-                cb(obj);
+        this.network.postRequest(data_obj, function (res) {
+            let data = res;
+            if(data.err){
+                console.log(data.err);
+            }else if(data.result.affectedRows===1){
+                window.db.GetOffer(window.user.date,function (obj) {
+                    obj.status ='published';
+                    window.db.SetObject('offerStore', obj, function (res) {
+
+                    });
+                    cb(obj);
+                });
+                $("#my_truck_2").removeClass('unpublished');
+                $("#my_truck_2").addClass('published');
             }
         });
     }
 
     PickRegion(){
+        let that = this;
         alert($('#choose_region').text());
+        $('[data-dismiss=modal]').trigger('click');
+
+        let my_truck_2 = $('#my_truck').clone()[0];
+        $(my_truck_2).attr('id', 'my_truck_2');
+        let status = that.offer.status;
+        if (!that.offer.status)
+            status = 'unpublished';
+        $(my_truck_2).addClass(status);
+        that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.map.ol_map.getView().getCenter());
+        $('#my_truck').css('visibility', 'hidden');
     }
 
-    UpdateOrderStatus(date, supem, cusem){
-        window.db.GetOrder(date, supem, cusem,function (obj) {
-            obj.status = 'approved';
+    ApproveOrder(objs){
+        for(let o in objs){
+            let obj = objs[o];
             window.db.SetObject('orderStore', obj, function (res) {
                 let data_obj = {
                     "proj": "d2d",
-                    "func": "updateorderstatus",
+                    "func": "updateorder",
                     "uid": window.user.uid,
-                    "cusem": cusem,
-                    "supem": supem,
-                    "date": date,
-                    "status":  'approved',
-                    "lang": window.sets.lang
+                    "cusem": obj.cusem,
+                    "supem": obj.supem,
+                    "address":obj.address,
+                    "period":obj.period,
+                    "date": obj.date,
+                    "lang": window.sets.lang,
+                    "order":obj.data
                 };
 
                 window.user.network.postRequest(data_obj, function (data) {
                     console.log(data);
                 });
             });
-        });
+        }
     }
 
     SendLocation(loc){
@@ -470,10 +485,13 @@ class Supplier{
     }
 
     OnMessage(data){
-        if(data.func ==='updateorder'){
-            window.db.SetObject('orderStore',data.order,res=>{
-
+        if(data.func ==='ordered'){//TODO:
+            window.db.SetObject('orderStore',data.order,(res)=>{
+                for(let ord in data.order.data) {
+                    $('[data-translate='+ord+']').attr('status','ordered');
+                }
             });
+
         }
         if(data.func ==='sharelocation'){
             let loc = data.location;

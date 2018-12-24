@@ -32,8 +32,6 @@ class OfferOrder {
 
         this.address;
 
-        this.dict = new Dict(dict);
-
         this.active_class = 'w3-border w3-border-grey w3-round-large';
 
         this.ovc = $("#offer_order").clone();
@@ -50,10 +48,12 @@ class OfferOrder {
 
         $(this.ovc).find('.publish_order').off('click touchstart');
         $(this.ovc).find('.publish_order').on('click touchstart',this,function (ev) {
+            let that = ev.data;
             window.user.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address, (data)=> {
-                let status = window.dict.getDictValue(window.sets.lang,data.status);
-                $(this.ovc).find('.ord_status').css('color','white');
-                $(this.ovc).find('.ord_status').text(status);
+                let status = window.dict.getDictValue(window.sets.lang,Object.keys(data.status)[0]);
+                $(that.ovc).find('.ord_status').css('color','white');
+                $(that.ovc).find('.ord_status').text(status + "\r\n"+ data.status[Object.keys(data.status)[0]]);
+                that.status = data.status;
             });
         });
 
@@ -63,46 +63,22 @@ class OfferOrder {
     OpenOffer(obj) {
         let that = this;
         this.email = obj.email;
-        this.offer = JSON.parse(obj.data);
+        this.offer = obj.data;
 
         let latlon = [obj.latitude,obj.longitude];
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         this.period = obj.period;
-        let order;
-        let ls = JSON.parse(localStorage.getItem('customer'));
-        if(ls[this.date] && ls[this.date][this.email]){
-            order= ls[this.date][this.email];
-        }
-
-        this.address = ls.address;
-        if (!this.address) {
-            window.user.map.geo.SearchPlace(latlon, 18, function (obj) {
-                that.address = obj;
-                $('.address').text(obj.street + "," + obj.house);
-            });
-        } else {
-            $('.address').text(this.address);
-        }
-
-
-        if(order.status) {
-            this.status = order.status;
-            let status = window.dict.getDictValue(window.sets.lang,order.status);
-            $(this.ovc).find('.ord_status').css('color', 'white');
-            $(this.ovc).find('.ord_status').text(status);
-        }
 
         localStorage.setItem('dict',JSON.stringify(window.dict.dict));
-
-
-        this.parent = event.data;
-
-
-
+        
         window.dict.set_lang(window.sets.lang,this.ovc[0]);
 
+        this.dict = new Dict(obj.dict.dict);
+
         this.ovc.find('.toolbar').css('display', 'block');
+
+        this.ovc.find('li.publish_order').addClass('disabled');
 
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0) continue;
@@ -122,7 +98,7 @@ class OfferOrder {
                 $(menu_item).css('display', 'block');
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
-                //$(menu_item).find('.item_price').attr('contenteditable', 'false');
+                //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
 
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
@@ -136,12 +112,6 @@ class OfferOrder {
                         ;
                     }
                     $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
-                    if(order && order.order && order.order[this.offer[tab][i].title]){
-                        $(menu_item).find('.btn').text(order.order[this.offer[tab][i].title]['qnty']);
-                        $(menu_item).attr('ordered', order.order[this.offer[tab][i].title]['qnty']);
-                        $(menu_item).find('.btn').removeClass('btn-default');
-                        $(menu_item).find('.btn').addClass('btn-success');
-                    }
                 }
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
 
@@ -183,43 +153,79 @@ class OfferOrder {
                     $(menu_item).find('.btn').removeClass('btn-default');
                     $(menu_item).find('.btn').addClass('btn-success');
                     $(menu_item).attr('ordered', ev.target.text);
+           
                 });
             }
         }
 
-        if(order && order.order) {
-            $('.comment').text(order.order.comment);
-        }
-
         window.db.GetOrder(this.date, obj.email, window.user.email, function (res) {
             if(res!==-1){
-                let obj_data = JSON.parse(res.data.order);
-                let keys =  Object.keys(obj_data);
+                let keys =  Object.keys(res.order);
 
                 for(let k in keys){
                     if(keys[k]==='comment'){
-                        $('.comment').text(obj_data.comment);
+                        $('.comment').text(res.order.comment);
                     }else {
-                        let qnty = obj_data[keys[k]].qnty;
+                        let qnty = res.order[keys[k]].qnty;
                         $('.item_title[data-translate=' + keys[k] + ']').siblings('.dropdown').find('button').text(qnty);
-                        let price = obj_data[keys[k]].price;
+                        let price = res.order[keys[k]].price;
                         $('.item_title[data-translate=' + keys[k] + ']').siblings('.item_price').text(price);
                         $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
                     }
                 }
             }
-        });
 
-        // let sp = $('.sp_dlg');
-        // $(sp).selectpicker();
-        // let evnts = $._data($(sp).get(0), "events");
-        //
+            $('.menu_item').find('li').on('click', function (ev) {
+
+                if($(ev.target).text()!=='0'){
+                    $(that.ovc).find('.ord_status').text('');
+                    that.status = {inactive:that.date};
+                    $(this).closest('.menu_item').attr('ordered',$(ev.target).text());
+
+                    $('li.publish_order.disabled').removeClass('disabled');
+                }else{
+                    $(this).closest('.menu_item').removeAttr('ordered');
+                    if($('.menu_item[ordered]')[0]) {
+                        $('li.publish_order.disabled').removeClass('disabled');
+                    }else{
+                        $('li.publish_order').addClass('disabled');
+                    }
+                }
+            })
+        });
+        
         this.dict.set_lang(window.sets.lang,this.ovc[0]);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         $($('.tab_inserted')[0]).find('a').trigger('click');
 
+        window.db.GetOrders(this.date,obj.email,function (arObj) {
+            if(arObj.length>0){
+                for(let o in arObj) {
+                    let order = arObj[o];
+                    that.address = order.address;
+                    if (!that.address) {
+                        window.user.map.geo.SearchPlace(latlon, 18, function (obj) {
+                            that.address = obj;
+                            $('.address').text(obj.street + "," + obj.house);
+                        });
+                    } else {
+                        $('.address').text(that.address);
+                    }
 
+                    if(order.status) {
+                        that.status = order.status;
+                        let status = window.dict.getDictValue(window.sets.lang, Object.keys(order.status)[0]);
+                        $(that.ovc).find('.ord_status').css('color', 'white');
+                        let dt = Object.values(order.status)[0];
+
+                        $(that.ovc).find('.ord_status').text(status + " "+dt);
+                    }
+                }
+                if($('.menu_item[ordered]')[0])
+                    $('li.publish_order.disabled').removeClass('disabled');
+            }
+        });
 
     }
 
@@ -232,24 +238,26 @@ class OfferOrder {
 
     GetOrderItems(){
         let that = this;
-        let obj = {order:{}};
+        let obj = {data:{}};
         $('.menu_item[ordered]').each(function (index, val) {
             if($(this).attr('ordered')==='0'){
                 return;
             }
-            obj.order[$(val).find('.item_title').attr('data-translate')] = {
+            obj.data[$(val).find('.item_title').attr('data-translate')] = {
                 qnty: $(val).find('button[data-toggle=dropdown]').text(),
                 price: $(val).find('.item_price').text()
             }
+
         });
-        obj.order.comment = $('#offer_order_clone').find('.comment')[0].value;
-        obj.order = JSON.stringify(obj.order);
+
+        obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
         obj['supem'] = this.email;
         obj['cusem'] = window.user.email;
         obj['date'] = this.date;
         obj['period'] = this.period;
-        obj['address'] = $('#offer_order_clone').find('.address').text();
+        obj['address'] = $('#offer_order_clone').find('.address').val();
         obj['status'] = this.status;
+
         return obj;
     }
 

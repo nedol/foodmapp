@@ -26,13 +26,17 @@ class Overlay {
 
         $(element).on('map:pointerdrag', function (ev) {
 
-            var offset = $(this).offset();
-            var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-            var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
-            var x = utils.LatLonToMeters(center[0], 0, coor[0], 0);
-            x = center[0] > coor[0] ? x : -x;
-            var y = utils.LatLonToMeters(0, center[1], 0, coor[1]);
-            y = center[1] < coor[1] ? y : -y;
+            try {
+                var offset = $(this).offset();
+                var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+                var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
+                var x = utils.LatLonToMeters(center[0], 0, coor[0], 0);
+                x = center[0] > coor[0] ? x : -x;
+                var y = utils.LatLonToMeters(0, center[1], 0, coor[1]);
+                y = center[1] < coor[1] ? y : -y;
+            }catch(ex){
+            }
+
 
         });
 

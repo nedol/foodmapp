@@ -10,7 +10,7 @@ import {Network} from "../../network";
 
 //import {RTCOperator} from "../rtc/rtc_operator"
 
-import {Map} from '../map/map'
+import {OLMap} from '../map/map'
 import {DB} from "../map/storage/db"
 
 
@@ -43,7 +43,7 @@ class Customer{
             
         });
 
-        this.map = new Map();
+        this.map = new OLMap();
 
     }
 
@@ -252,23 +252,13 @@ class Customer{
     }
 
     UpdateOrderLocal(obj){
-
-        let uObj = JSON.parse(localStorage.getItem('customer'));
-        if(!uObj[obj.date])
-            uObj[obj.date] = {};
-        if(!uObj[obj.date][obj.email])
-            uObj[obj.date][obj.email] = {};
-        uObj[obj.date][obj.email].order =  obj.order;
-        uObj[obj.date][obj.email].status = obj.status;
-        uObj['address'] = obj.address;
-        localStorage.setItem('customer', JSON.stringify(uObj));
-
-        let dbObj = {date:obj.date,supem:obj.supem, cusem:obj.cusem, data:obj};
-        window.db.SetObject('orderStore',dbObj,()=>{
+        if(Object.keys(obj.data).length===0)
+            return;
+        window.db.SetObject('orderStore',obj,(res)=>{
 
         });
 
-        this.viewer.order = obj.order;
+        this.viewer.order = obj.data;
     }
 
 
@@ -310,16 +300,13 @@ class Customer{
 
     PublishOrder(obj, adr, cb){
         let that = this;
-        if(!adr){
-            this.PickRegion();
-            return;
-        }
+
         obj.proj = "d2d";
         obj.func = "updateorder";
         obj.uid = that.uid;
         obj.cusem = that.email;
-        obj.supem = obj.email;
-        obj.status = "published";
+        obj.supem = obj.supem;
+        obj.status = {published:window.user.date};
 
         this.network.postRequest(obj, function (data) {
             console.log(data);
@@ -333,33 +320,31 @@ class Customer{
     }
 
     OnMessage(data){
-        if(data.func ==='updateorderstatus'){
-            window.db.SetObject('orderStore',data.order,res=>{
+        if(data.func ==='updateorder'){
+            window.db.SetObject('orderStore',data,res=>{
 
             });
         }
         if(data.func ==='sharelocation'){
             let loc = data.location;
             window.db.GetObject('supplierStore',window.user.date,data.email, function (obj) {
-                if(obj!=-1) {
-                    obj.latitude = loc[1];
-                    obj.longitude = loc[0];
-                    let layers = window.user.map.ol_map.getLayers();
-                    window.db.SetObject('supplierStore', obj, function (res) {
-                        let catAr = JSON.parse(obj.categories);
-                        for (let c in catAr) {
-                            let l = layers.get(catAr[c])
-                            let feature = l.values_.vector.getFeatureById(obj.hash);
-                            if (feature) {
-                                let point = feature.getGeometry();
-                                let loc =  proj.fromLonLat([obj.longitude, obj.latitude]);
-                                if(point.flatCoordinates[0]!==loc[0] && point.flatCoordinates[1]!==loc[1])
-                                    window.user.map.SetFeatureGeometry(feature,loc);
-                            }
-                        }
 
-                    });
-                }
+                obj.latitude = loc[1];
+                obj.longitude = loc[0];
+                let layers = window.user.map.ol_map.getLayers();
+                window.db.SetObject('supplierStore', obj, function (res) {
+                    let catAr = JSON.parse(obj.categories);
+                    for (let c in catAr) {
+                        let l = layers.get(catAr[c])
+                        let feature = l.values_.vector.getFeatureById(obj.hash);
+                        if (feature) {
+                            let point = feature.getGeometry();
+                            let loc =  proj.fromLonLat([obj.longitude, obj.latitude]);
+                            if(point.flatCoordinates[0]!==loc[0] && point.flatCoordinates[1]!==loc[1])
+                                window.user.map.SetFeatureGeometry(feature,loc);
+                        }
+                    }
+                });
             });
         }
     }
