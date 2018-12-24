@@ -209,8 +209,10 @@ class Geo {
 
         let that = this;
 
+        let fadr = place.split(',');
+
         let nominatim =
-            "https://nominatim.openstreetmap.org";///reverse";
+            "https://nominatim.openstreetmap.org/search?q="+fadr[0]+"%2C+"+fadr[1]+"%2C+"+fadr[2]+"&format=json&polygon=1&addressdetails=1";///reverse";
         let query =
             "https://nominatim.openstreetmap.org/reverse?format=json&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1";
         let mapques =
@@ -218,20 +220,25 @@ class Geo {
         let locationiq =
             "https://locationiq.org/v1/search.php";
 
+        let photon =
+            "https://photon.komoot.de/api/?q=berlin&lat=52.3879&lon=13.0582";
+
         $.ajax({
-            url: locationiq,// nominatim,
-            data: {
-                key: 'f6b910f0af894f1746b1',//locationiq
-                format: "json",
-                q: place,
-                "accept-language": "en"
-            },
+            url:nominatim, //locationiq,//
+            // data: {
+            //     //key: 'f6b910f0af894f1746b1',//locationiq
+            //     format: "json",
+            //     q: place,
+            //     "accept-language": "en"
+            // },
             method: "GET",
             dataType: "json",
             success: function (data) {
-                let resp = JSON.stringify(data, null, 4);
-                if (!data[0].boundingbox)
+
+                if (!data[0] || !data[0].boundingbox) {
+                    cb(null);
                     return;
+                }
                 let bound = data[0].boundingbox;
                 let lat = data[0].lat;
                 let lon = data[0].lon;
@@ -284,7 +291,10 @@ class Geo {
     GetDistanceToPlace(loc, place, cb){
         let lonlat = proj.toLonLat(loc);
         this.SearchLocation(place, function (bound, lat, lon) {
-            cb(new Utils().LatLonToMeters(lonlat[1], lonlat[0], lat, lon));
+            if(!bound)
+                cb('undefined');
+            else
+                cb(new Utils().LatLonToMeters(lonlat[1], lonlat[0], lat, lon));
         });
     }
 }

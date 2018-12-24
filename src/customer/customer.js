@@ -325,10 +325,41 @@ class Customer{
 
             });
         }
+        if(data.func ==='supupdate'){
+            window.db.GetObject('supplierStore',data.obj.date,data.obj.email, function (res) {
+                let obj = res;
+                if(!obj) {
+                    obj = data.obj;
+                }
+                obj.data = JSON.parse(urlencode.decode(data.obj.offer));
+                obj.dict = JSON.parse(data.obj.dict);
+                let loc = data.obj.location;
+                obj.latitude = loc[1];
+                obj.longitude = loc[0];
+                delete obj.location; delete obj.offer; delete obj.proj; delete obj.func;
+                let layers = window.user.map.ol_map.getLayers();
+                window.db.SetObject('supplierStore',obj,function (res) {
+                    let catAr = JSON.parse(obj.categories);
+                    for (let c in catAr) {
+                        let l = layers.get(catAr[c])
+                        let feature = l.values_.vector.getFeatureById(obj.hash);
+                        if (feature) {
+                            let point = feature.getGeometry();
+                            let loc = proj.fromLonLat([obj.longitude, obj.latitude]);
+                            if (point.flatCoordinates[0] !== loc[0] && point.flatCoordinates[1] !== loc[1])
+                                window.user.map.SetFeatureGeometry(feature, loc);
+                        }
+                    }
+                });
+
+            });
+        }
         if(data.func ==='sharelocation'){
             let loc = data.location;
             window.db.GetObject('supplierStore',window.user.date,data.email, function (obj) {
-
+                if(!obj) {
+                    obj = {};
+                }
                 obj.latitude = loc[1];
                 obj.longitude = loc[0];
                 let layers = window.user.map.ol_map.getLayers();
@@ -339,12 +370,13 @@ class Customer{
                         let feature = l.values_.vector.getFeatureById(obj.hash);
                         if (feature) {
                             let point = feature.getGeometry();
-                            let loc =  proj.fromLonLat([obj.longitude, obj.latitude]);
-                            if(point.flatCoordinates[0]!==loc[0] && point.flatCoordinates[1]!==loc[1])
-                                window.user.map.SetFeatureGeometry(feature,loc);
+                            let loc = proj.fromLonLat([obj.longitude, obj.latitude]);
+                            if (point.flatCoordinates[0] !== loc[0] && point.flatCoordinates[1] !== loc[1])
+                                window.user.map.SetFeatureGeometry(feature, loc);
                         }
                     }
                 });
+
             });
         }
     }

@@ -198,28 +198,28 @@ module.exports = class D2D {
         let that = this;
         let now = moment().format('YYYY-MM-DD h:mm:ss');
         let sql =
-            "SELECT of.id as offer_id, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "SELECT of.id as offer_id, sup.email as supem, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of"+
             " WHERE of.sup_uid=sup.uid AND sup.uid=\""+q.uid+"\"" +
             " AND of.date=\""+q.date+"\""+
             " ORDER BY of.id DESC";
 
-        global.con_obj.query(sql, function (err, result) {
+        global.con_obj.query(sql, function (err, sel) {
             if (err) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({err: err}));
                 return;
             }
             let values, sql;
-            if(result.length>0) {
+            if(sel.length>0) {
                 if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
-                    values = [urlencode.decode(q.offer), result[0].offer_id,JSON.stringify({published:now})];
+                    values = [urlencode.decode(q.offer), sel[0].offer_id,JSON.stringify({published:now})];
                     sql = "UPDATE offers SET data=?   WHERE id=?";
                     //console.log(sql);
                 }
 
-                if (new Date(result[0].date) >= new Date(q.date)) {
-                    values = [urlencode.decode(q.offer), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period,JSON.stringify({published:now}), result[0].offer_id];
+                if (new Date(sel[0].date) >= new Date(q.date)) {
+                    values = [urlencode.decode(q.offer), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period,JSON.stringify({published:now}), sel[0].offer_id];
                     sql =
                         'UPDATE offers SET data=?, categories=?, longitude=?, latitude=?, period=?, status=? WHERE id=?';
                 }
@@ -236,7 +236,8 @@ module.exports = class D2D {
                     values = [q.dict, q.uid];
                     sql = "UPDATE supplier SET dict=?   WHERE uid=?";
                     global.con_obj.query(sql, values, function (err, result_2){
-                        that.ShareLocation(q, res, function () {
+                        q.email =  sel[0].supem;
+                        that.BroadcastOffer(q, res, function () {
                             if (!res._header)
                                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
                             if (res.writable)
@@ -245,6 +246,43 @@ module.exports = class D2D {
                     });
                 }
             });
+        });
+    }
+
+    BroadcastOffer(q, res, cb){
+
+        let sql = " SELECT sup.email as email" +
+            " FROM supplier as sup" +
+            " WHERE" +
+            " SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
+            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
+            " UNION" +
+            " SELECT cus.email as email" +
+            " FROM customer as cus" +
+            " WHERE " +
+            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
+            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (!res._header)
+                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+            if (err) {
+                res.end(JSON.stringify({'err': err}));
+                return;
+            }
+            if(result.length>0){
+                for(let r in result){
+                    let sse = resObj[result[r].email];
+                    if(sse){
+                        sse.write(utils.formatSSE({"func":"supupdate","obj":q}));
+                    }
+                }
+            }
+            if(cb) {
+                cb();
+            }else{
+                res.end(JSON.stringify({func: 'sharelocation', result: result.length}));
+            }
         });
     }
 

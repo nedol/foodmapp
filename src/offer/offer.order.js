@@ -9,6 +9,8 @@ require('bootstrap/js/tab.js');
 // require('font-awesome/css/font-awesome.css');
 
 import {Dict} from '../dict/dict.js';
+import AddressAutocomplete from 'google-address-autocomplete';
+
 const langs = require("../dict/languages");
 
 var moment = require('moment');
@@ -75,6 +77,29 @@ class OfferOrder {
         window.dict.set_lang(window.sets.lang,this.ovc[0]);
 
         this.dict = new Dict(obj.dict.dict);
+        const options = {
+            componentRestrictions: {country: "ru", "city":"Moscow"}
+        };
+        new AddressAutocomplete('.address', options, (results) => {
+            const addressObject = results;
+
+            // This is what the results object looks like
+            results = {
+                cityName: "Birmingham",
+                country: "United States",
+                countryAbbr: "US",
+                formattedAddress: "123 Shades Crest Rd, Birmingham, AL 35226, USA",
+                state: "Alabama",
+                stateAbbr: "AL",
+                streetName: "Shades Crest Road",
+                streetNumber: "123",
+                zipCode: "35226",
+                coordinates: {
+                    lat: -123.45678,
+                    lng: 98.76543
+                }
+            };
+        });
 
         this.ovc.find('.toolbar').css('display', 'block');
 
@@ -160,15 +185,15 @@ class OfferOrder {
 
         window.db.GetOrder(this.date, obj.email, window.user.email, function (res) {
             if(res!==-1){
-                let keys =  Object.keys(res.order);
+                let keys =  Object.keys(res.data);
 
                 for(let k in keys){
                     if(keys[k]==='comment'){
-                        $('.comment').text(res.order.comment);
+                        $('.comment').text(res.data.comment);
                     }else {
-                        let qnty = res.order[keys[k]].qnty;
+                        let qnty = res.data[keys[k]].qnty;
                         $('.item_title[data-translate=' + keys[k] + ']').siblings('.dropdown').find('button').text(qnty);
-                        let price = res.order[keys[k]].price;
+                        let price = res.data[keys[k]].price;
                         $('.item_title[data-translate=' + keys[k] + ']').siblings('.item_price').text(price);
                         $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
                     }

@@ -232,18 +232,12 @@ class OfferEditor{
                         if (!that.location)
                             resolve('undefined');
                         window.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
-                            if (res) {
-                                resolve(res);
-                            } else {
-                                var reason = 'undefined';
-                                reject(reason);
-                            }
+                            resolve(res);
                         });
                     }
                 );
                 calcDistance.then(function (dist) {
                     for (let k in kAr) {
-
                         let checked = res[i].data[kAr[k]].status === 'approved' ? 'checked' : '';
                         let cbdisabled='';
                         if(res[i].status==='approved')
@@ -765,7 +759,8 @@ class OfferEditor{
                                 "cusem": $(el).attr('cusem'),
                                 "supem": window.user.email,
                                 "date": window.user.date,
-                                "lang": window.sets.lang
+                                "lang": window.sets.lang,
+                                "data": obj.data
                             };
 
                             window.user.network.postRequest(data_obj, function (data) {
