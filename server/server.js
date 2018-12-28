@@ -112,7 +112,7 @@ module.exports = {
             case'd2d':
                 let D2D = require('./d2d/d2d');
                 let d2d = new D2D();
-                d2d.dispatch(q,res);
+                d2d.dispatch(q,res,req);
                 break;
             default:
                 console.log();

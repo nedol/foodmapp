@@ -82,8 +82,10 @@
     "popper.js": "^1.14.4",
     "sdp-jingle-json": "^3.0.3",
     "sdp-transform": "^2.4.1",
+    "shortid": "^2.2.14",
     "tablesort": "^5.1.0",
     "tablesorter": "^2.31.1",
+    "uniqid": "^5.0.3",
     "urlencode": "^1.1.0",
     "webpack-jquery-ui": "^2.0.1",
     "webrtc-adapter": "^6.3.2"

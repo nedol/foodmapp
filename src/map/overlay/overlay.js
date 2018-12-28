@@ -52,7 +52,7 @@ class Overlay {
         // }, 5);
 
         $(element).on('click touchstart', window.user, function (ev) {
-            window.user.editor.OpenOffer();
+            window.user.offer.editor.OpenOffer();
         });
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {

@@ -75,7 +75,7 @@ class Import {
                 "user":window.user.constructor.name
             };
 
-            window.user.network.postRequest(data_obj, function (data) {
+            window.network.postRequest(data_obj, function (data) {
                 if(data) {
                     processResult(data);
                 }
@@ -98,7 +98,7 @@ class Import {
                         obj = formatObject(obj);
                         if(obj.email===window.user.email && obj.date===window.user.date){
 
-                            if(!Object.keys(window.user.offer.data)[0] && obj) {
+                            if(!Object.keys(window.user.offer.stobj.data)[0] && obj) {
                                 window.db.SetObject('dictStore',obj.dict, function (res) {
 
                                 });
@@ -126,7 +126,7 @@ class Import {
         }
 
         function formatObject(obj) {
-            let hash = md5(JSON.stringify({offer: obj.data,dict: obj.dict}));
+            let hash = md5(JSON.stringify({longitude:obj.lon, latittude:obj.lat}));
             return {
                 email: obj.email,
                 date: obj.date,
@@ -154,7 +154,7 @@ class Import {
                 "date": date
             };
 
-            window.user.network.postRequest(data_obj, function (data) {
+            window.network.postRequest(data_obj, function (data) {
                 if(data) {
                     processResult(data);
                 }
@@ -170,8 +170,10 @@ class Import {
                             if(!obj)
                                 continue;
                             obj.logo =  "../dist/images/user.png";
-                            obj.data = JSON.parse(obj.data);
-                            obj.status = JSON.parse(obj.status);
+                            if(obj.data)
+                                obj.data = JSON.parse(obj.data);
+                            if(obj.status)
+                                obj.status = JSON.parse(obj.status);
                             window.db.SetObject('orderStore', obj, function (success) {
 
                             });

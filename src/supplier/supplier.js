@@ -4,7 +4,7 @@ export {Supplier};
 let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
-import {OfferEditor} from '../offer/offer.editor';
+import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
 
@@ -41,10 +41,7 @@ class Supplier{
 
         this.my_truck_ovl;
 
-        this.editor = new OfferEditor();
-        this.viewer;
-
-        this.offer = uObj.offer;
+        this.offer = new Offer(uObj);
 
         this.uid = uObj.profile.uid;
         this.email = uObj.profile.email;
@@ -58,9 +55,7 @@ class Supplier{
     IsAuth_test(cb){
 
         this.map.Init();
-
-        this.network = new Network(host_port);
-        this.network.InitSSE(this,function () {
+        window.network.InitSSE(this,function () {
 
         });
 
@@ -77,9 +72,9 @@ class Supplier{
         });
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
-        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
+        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
-        $('#main_menu').on('click touch', this, this.OpenOfferEditor);
+        $('#main_menu').on('click touch', this, this.offer.OpenOfferEditor);
 
         this.DateTimePickerEvents();
     }
@@ -88,8 +83,8 @@ class Supplier{
 
         try {
 
-            this.network = new Network(host_port);
-            this.network.InitSSE(this,function () {
+            window.network = new Network(host_port);
+            window.network.InitSSE(this,function () {
 
             });
             $('.dt_val').val(this.date);
@@ -105,7 +100,7 @@ class Supplier{
                 date:this.date
             }
 
-            this.network.postRequest(data_obj, function (data) {
+            window.network.postRequest(data_obj, function (data) {
                 if(typeof data =='string')
                     data = JSON.parse(data);
                 if(data) {
@@ -214,30 +209,32 @@ class Supplier{
                 that.my_truck_ovl = '';
             }
 
-            window.db.GetOffer(that.date, function (res) {
-
+            that.offer.GetOfferDB(that.date, function (res) {
                 if(!res) {//TODO:
-                    window.db.GetAllOffers(function (res) {
-                        that.offer.data = res[0].data;
+                    that.offer.GetAllOffersDB(function (res) {
+                        that.offer.stobj.data = res[0].data;
                     });
 
                 }else {
+                    that.offer.stobj.date = res.date;
                     if(res.data)
-                        that.offer.data = res.data;
-                    if(that.offer.location && that.offer.location.length===2) {
-                        that.editor.location = res.location;
+                        that.offer.stobj.data = res.data;
+                    if(that.offer.stobj.location && that.offer.stobj.location.length===2) {
+                        that.offer.editor.location = res.location;
                     }
                 }
 
-                if(that.offer.location) {
-                    that.map.MoveToLocation(that.offer.location);
+                if(that.offer.stobj.location) {
+                    that.map.MoveToLocation(that.offer.stobj.location);
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
-                    let status = that.offer.status;
-                    if (!that.offer.status)
+                    let status;
+                    if (!that.offer.stobj.published)
                         status = 'unpublished';
+                    else
+                        status = 'published';
                     $(my_truck_2).addClass(status);
-                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.location);
+                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj.location);
                     $('#my_truck').css('visibility', 'hidden');
                 }
 
@@ -292,12 +289,8 @@ class Supplier{
             }
             let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
             let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            window.user.editor.location = coor;
+            that.offer.stobj.location = coor;
 
-            that.offer.location = coor;
-            window.db.SetObject('offerStore',that.offer,function (res) {
-
-            });
             $('#my_truck').css('visibility','visible');
             let my_truck_2 = $('#my_truck').clone()[0];
             $(my_truck_2).attr('id','my_truck_2');
@@ -322,47 +315,33 @@ class Supplier{
         });
     }
 
-    OpenOfferEditor(ev) {
-        ev.data.editor.OpenOffer();
-    }
+    UpdateOfferLocal(tab, offer, location, dict){
 
-    UpdateOfferLocal(tab, offer, location, dict, status){
-
-        let uObj = this.offer;
+        let uObj = this.offer.stobj;
         if (uObj) {
-            if(tab){
-                for(let i in offer[tab]){
-                    if(!uObj.data[tab])
-                        uObj.data[tab] = {};
-                    if(uObj.data[tab][i] && !offer[tab][i].img_left)
-                        offer[tab][i].img_left = uObj.data[tab][i].img_left;
-                    if(uObj.data[tab][i] && !offer[tab][i].img_top)
-                        offer[tab][i].img_top = uObj.data[tab][i].img_top;
-                }
-                uObj.data[tab] = offer[tab];
-                this.offer.data[tab] = offer[tab];
+            for(let tab in offer)
+                if(!tab)
+                    continue;
+            for(let i in offer[tab]){
+                if(!uObj.data[tab])
+                    uObj.data[tab] = {};
+                if(uObj.data[tab][i] && !offer[tab][i].img_left)
+                    offer[tab][i].img_left = uObj.data[tab][i].img_left;
+                if(uObj.data[tab][i] && !offer[tab][i].img_top)
+                    offer[tab][i].img_top = uObj.data[tab][i].img_top;
+            }
+            uObj.data[tab] = offer[tab];
+            uObj.period = $('.sel_time').text();
+            this.offer.stobj.data[tab] = offer[tab];
             }else {
                 uObj = {
                     "date":window.user.date,
                     "period": $('.sel_time').text(),
                     "location": location,
-                    "data": offer,
-                    "status": status
+                    "data": offer
                 };
             }
-            this.offer.data = offer;
-            window.db.SetObject('offerStore',uObj, function () {
-                for(let i in dict){
-                    try {
-                        window.db.SetObject('dictStore', {hash: i, obj: dict[i]}, function (res) {
-
-                        });
-                    }catch(ex){
-                        console.log();
-                    }
-                }
-            });
-        }
+            this.offer.SetOfferDB(uObj,dict);
     }
 
     ValidateOffer(data){
@@ -381,7 +360,7 @@ class Supplier{
 
     PublishOffer(data, date, location, cb){
         let that = this;
-        if(!location || location.length===0){
+        if(!this.offer.stobj.location || location.length===0){
             this.PickRegion();
             return;
         }
@@ -390,7 +369,8 @@ class Supplier{
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
-            "categories": that.editor.arCat,
+            "email":that.email,
+            "categories": that.offer.editor.arCat,
             "date": date,
             "period": $('.sel_time').text(),
             "location": proj.toLonLat(location),
@@ -398,18 +378,17 @@ class Supplier{
             "dict": JSON.stringify(window.dict)
         };
 
-        this.network.postRequest(data_obj, function (res) {
+        window.network.postRequest(data_obj, function (res) {
             let data = res;
             if(data.err){
-                console.log(data.err);
+                console.log(data.err.code);
             }else if(data.result.affectedRows===1){
-                window.db.GetOffer(window.user.date,function (obj) {
-                    obj.status ='published';
-                    window.db.SetObject('offerStore', obj, function (res) {
-
-                    });
+                that.offer.GetOfferDB(window.user.date, function (obj) {
+                    obj.published = res.published;
+                    that.offer.SetOfferDB(obj);
                     cb(obj);
-                });
+                })
+
                 $("#my_truck_2").removeClass('unpublished');
                 $("#my_truck_2").addClass('published');
             }
@@ -423,36 +402,36 @@ class Supplier{
 
         let my_truck_2 = $('#my_truck').clone()[0];
         $(my_truck_2).attr('id', 'my_truck_2');
-        let status = that.offer.status;
-        if (!that.offer.status)
+        let status;
+        if (!that.offer.stobj.published)
             status = 'unpublished';
+        else
+            status = 'published';
         $(my_truck_2).addClass(status);
         that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.map.ol_map.getView().getCenter());
         $('#my_truck').css('visibility', 'hidden');
     }
 
-    ApproveOrder(objs){
-        for(let o in objs){
-            let obj = objs[o];
-            window.db.SetObject('orderStore', obj, function (res) {
-                let data_obj = {
-                    "proj": "d2d",
-                    "func": "updateorder",
-                    "uid": window.user.uid,
-                    "cusem": obj.cusem,
-                    "supem": obj.supem,
-                    "address":obj.address,
-                    "period":obj.period,
-                    "date": obj.date,
-                    "lang": window.sets.lang,
-                    "order":obj.data
-                };
+    ApproveOrder(date,title,obj){
 
-                window.user.network.postRequest(data_obj, function (data) {
-                    console.log(data);
-                });
-            });
+        let data_obj = {
+            "proj": "d2d",
+            "func": "approveorder",
+            "uid": window.user.uid,
+            "orderobj":{date:$(el).attr('orderdate'),supem:window.user.email, cusem:$(el).attr('cusem')},
+            "title":title,
+            "data": obj.data[title]
         }
+
+        window.user.network.postRequest(data_obj, function (resp) {
+            if(resp['err']){
+
+            }else {
+                obj.data[Object.keys(obj.data)[0]].approved = moment().format('YYYY-MM-DD h:mm:ss');
+                window.db.SetObject('approveStore', obj, function (res) {
+                });
+            }
+        });
     }
 
     SendLocation(loc){
@@ -480,9 +459,7 @@ class Supplier{
         }
     }
 
-    DeleteOffer(){
 
-    }
 
     OnMessage(data){
         if(data.func ==='ordered'){//TODO:

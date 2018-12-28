@@ -7,6 +7,11 @@
     "ru": "Логин",
     "en": "Login"
   },
+  "a38a2e843b153d64253d762e23696e17":{
+    "ru": "Оставить комментарий к заказу",
+    "en": "Put a comment to the order"
+
+  },
   "23d285609698e41e54306c4189c90569":{
     "en":"Publish The Offer",
     "ru":"Опубликовать"
@@ -103,10 +108,6 @@
     "ru": "название, единица",
     "en": "product name, minimum delivery"
   },
-  "ee4a528dce8d6fa440db5ab1cf78f939":{
-    "ru": "Кол-во: ",
-    "en": "Qnty: "
-  },
   "1545c78dc94617fdcf969b057ece6372":{
     "ru": "Заказать",
     "en": "Make Order"
@@ -148,12 +149,16 @@
     "en": "Period"
   },
   "3601146c4e948c32b6424d2c0a7f0118":{
-    "ru": "Цена",
-    "en": "Price"
+    "ru": "Цена:",
+    "en": "Price:"
   },
   "31d1b8ef5ed469f7618d76144fffaa06":{
     "ru": "Кол-во",
     "en": "Q-nty"
+  },
+  "ee4a528dce8d6fa440db5ab1cf78f939":{
+    "ru": "Кол-во: ",
+    "en": "Qnty: "
   },
   "a5d491060952aa8ad5fdee071be752de":{
     "ru": "Комментарии",

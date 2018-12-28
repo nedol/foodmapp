@@ -13,8 +13,6 @@ import {Network} from "../../network";
 import {OLMap} from '../map/map'
 import {DB} from "../map/storage/db"
 
-
-
 import proj from 'ol/proj';
 
 var urlencode = require('urlencode');
@@ -37,11 +35,7 @@ class Customer{
         this.viewer;
 
         this.uid = uObj.uid;
-        this.email = uObj.email;
-
-        window.db = new DB(this.constructor.name,function () {
-            
-        });
+        this.email = uObj.uid;//!!! no need to registrate
 
         this.map = new OLMap();
 
@@ -51,8 +45,8 @@ class Customer{
 
         this.map.Init();
 
-        this.network = new Network(host_port);
-        this.network.InitSSE(this,function () {
+
+        window.network.InitSSE(this,function () {
 
         });
 
@@ -74,7 +68,7 @@ class Customer{
         });
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
-        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", this.network);
+        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
         this.DateTimePickerEvents();
     }
@@ -83,8 +77,8 @@ class Customer{
 
         try {
 
-            this.network = new Network(host_port);
-            this.network.InitSSE(this,function () {
+            window.network = new Network(host_port);
+            window.network.InitSSE(this,function () {
 
             });
             $('.dt_val').val(this.date);
@@ -100,7 +94,7 @@ class Customer{
                 date:this.date
             }
 
-            this.network.postRequest(data_obj, function (data) {
+            window.network.postRequest(data_obj, function (data) {
                 if(typeof data =='string')
                     data = JSON.parse(data);
                 if(data) {
@@ -308,8 +302,7 @@ class Customer{
         obj.supem = obj.supem;
         obj.status = {published:window.user.date};
 
-        this.network.postRequest(obj, function (data) {
-            console.log(data);
+        window.network.postRequest(obj, function (data) {
             if(data.status){
                 cb(data);
                 obj.proj = '';
@@ -418,7 +411,7 @@ class UserRegistry {
                     email:email
                 }
 
-                this.network.postRequest(data_obj, function (data) {
+                window.network.postRequest(data_obj, function (data) {
                     let str = JSON.stringify({"email": email});//JSON.stringify()
                     localStorage.setItem('d2d_user',str);//
                 });

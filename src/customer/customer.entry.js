@@ -10,6 +10,8 @@ require("../../global");
 
 import {Utils} from "../utils/utils";
 import {Customer} from './customer'
+import {Network} from "../../network";
+import {DB} from "../map/storage/db"
 
 const langs = require("../dict/languages");
 var countries = require("i18n-iso-countries");
@@ -18,9 +20,13 @@ require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
 var isJSON = require('is-json');
-var md5 = require('md5');
 
-var moment = require('moment');
+const shortid = require('shortid');
+// module.uniqid_debug = true;
+//let uniqid = require('uniqid');
+//let md5 = require('md5');
+
+let moment = require('moment');
 require('../../lib/bootstrap-datetimepicker');
 
 let utils = new Utils();
@@ -47,7 +53,6 @@ $(document).on('readystatechange', function () {
     $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
     window.sets.lang = utils.getParameterByName('lang');
-
 
 
     $('#datetimepicker').datetimepicker({
@@ -131,25 +136,41 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').data("DateTimePicker").toggle();
     });
 
-    let uObj;
+    window.network = new Network(host_port);
 
-    if(utils.getParameterByName('email')) {
-        let uid = md5(date);
-        if(!localStorage.getItem('customer')) {
-            uObj = {"email":utils.getParameterByName('email'),"uid":uid,[date]:{"order":{}}};
-            localStorage.setItem('customer',JSON.stringify(uObj));
-        }else{
-            uObj = JSON.parse(localStorage.getItem('customer'));
-            if(!uObj)
-                uObj= {uid:uid};
-        }
-    }
+    let uObj = {};
+    window.db = new DB('Customer', function () {
+        window.db.GetProfile(function (res) {
+            if(res.length===0){
+                let data_obj ={
+                    proj:"d2d",
+                    func:"auth",
+                    user: "Customer",
+                    email:'',
+                    lang: window.sets.lang,
+                    date:date
+                }
+                window.network.postRequest(data_obj, function (data) {
+                    if (data.uid) {
+                        uObj.uid = data.uid;
+                        window.db.SetObject('profileStore', uObj, function (res) {
+                            window.user = new Customer(uObj);
+                            window.user.IsAuth_test(function (data) {//TODO:
 
-    window.user = new Customer(uObj);
-    window.user.IsAuth_test(function (data) {//TODO:
+                            });
+                        });
+                    }
+                });
+            }else{
+                uObj = res[0];
+                window.user = new Customer(uObj);
+                window.user.IsAuth_test(function (data) {//TODO:
 
+                });
+            }
+
+        });
     });
-
 });
 
 

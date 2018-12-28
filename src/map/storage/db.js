@@ -10,7 +10,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 16;
+        this.version = 18;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -21,6 +21,7 @@ class DB {
             this.baseName = user+ ".D2DStore",
             this.supplierStore = "supplierStore",
             this.orderStore =  "orderStore",
+            this.approveStore = "approveStore",
             this.offerStore = "offerStore",
             this.dictStore = "dictStore",
             this.profileStore = "profileStore";
@@ -42,7 +43,9 @@ class DB {
         var that = this;
         try {
             var request = this.iDB.open(this.baseName, this.version);
-            request.onerror = this.logerr;
+            request.onerror = function (err) {
+                
+            };
             request.onsuccess = function (e) {
                 console.log("DB open onsuccess");
                 //request.onupgradeneeded(e);
@@ -57,8 +60,9 @@ class DB {
                 };
 
                 try {
-                    let vProfileStore = db.createObjectStore(that.profileStore, {keyPath: ["email"]});
+                    let vProfileStore = db.createObjectStore(that.profileStore, {keyPath: ["uid"]});
                     vProfileStore.createIndex("email", "email", {unique: true});
+                    vProfileStore.createIndex("uid", "uid", {unique: true});
                     vProfileStore.createIndex("tariff", "tariff", {unique: false});
                 }catch(ex){
 
@@ -99,6 +103,13 @@ class DB {
                 vOrderStore.createIndex("datesupemcusem", ["date","supem", "cusem"], {unique: true});
                 vOrderStore.createIndex("datesupem", ["date","supem"], {unique: false});
                 vOrderStore.createIndex("status", "status", {unique: false});
+
+                try{
+                    db.deleteObjectStore(that.approveStore);
+                }catch(ex){
+
+                }
+                let vApproveStore = db.createObjectStore(that.approveStore, {keyPath: ["date", "supem", "cusem","title"]});
 
                 that.connectDB(f);
             };
@@ -302,11 +313,10 @@ class DB {
         }
     }
 
-    GetProfile(email,  cb) {
+    GetProfile(cb) {
         try {
             let objectStore = this.DBcon.transaction('profileStore', "readonly").objectStore('profileStore');
-            let index = objectStore.index('email');
-            var request = index.get(email);
+            var request = objectStore.getAll();
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {
                 cb(this.result);

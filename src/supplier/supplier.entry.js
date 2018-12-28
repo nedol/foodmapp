@@ -11,7 +11,7 @@ require("../../global");
 import proj from 'ol/proj';
 import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
-
+import {Network} from "../../network";
 import {DB} from "../map/storage/db"
 
 const langs = require("../dict/languages");
@@ -21,6 +21,8 @@ require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
 var isJSON = require('is-json');
+
+const shortid = require('shortid');
 var md5 = require('md5');
 
 var moment = require('moment');
@@ -138,30 +140,46 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').data("DateTimePicker").toggle();
     },200);
 
-    let uObj={};
-    let email = utils.getParameterByName('email');
-    window.db = new DB('Supplier', function () {
-        if(email) {
-            let uid = md5(date);
-            window.db.GetProfile(email,function (res) {
-                if(!res) {
-                    uObj['profile'] = {email: email, "uid": uid};
-                    window.db.SetObject('profileStore',uObj['profile'], function (res) {
+    window.network = new Network(host_port);
 
-                    });
-                }else{
-                    uObj['profile'] = res;
+    let uObj={};
+    window.db = new DB('Supplier', function () {
+        let uid = shortid.generate();
+        window.db.GetProfile(function (res) {
+            if(res.length===0) {
+                let data_obj ={
+                    proj:"d2d",
+                    func:"auth",
+                    user: "Supplier",
+                    email:'suppier@gmail.com',
+                    lang: window.sets.lang,
+                    date:date
                 }
+                window.network.postRequest(data_obj, function (data) {
+                    if (data.uid) {
+                        uObj['profile'] = {email: 'suppier@gmail.com', "uid": data.uid};
+                        window.db.SetObject('profileStore',uObj['profile'], function (res) {
+                            uObj['offer'] = {date: date, data: {}, period: ''};
+                            window.user = new Supplier(uObj);
+                            window.user.IsAuth_test(function (data) {//TODO:
+
+                            });
+                        });
+                    }
+                });
+
+            }else {
+                uObj['profile'] = res[0];
 
                 window.db.GetOffer(date, function (res) {
-                    if(!res) {
+                    if (!res) {
                         //let loc = proj.fromLonLat([37.465,55.5975]);
-                        uObj['offer'] = {date:date,data:{},period:''};
-                        window.db.SetObject('offerStore',uObj['offer'], function () {
+                        uObj['offer'] = {date: date, data: {}, period: ''};
+                        window.db.SetObject('offerStore', uObj['offer'], function () {
 
                         });
-                    }else{
-                        uObj['offer']  = res;
+                    } else {
+                        uObj['offer'] = res;
                     }
 
                     window.user = new Supplier(uObj);
@@ -169,8 +187,9 @@ $(document).on('readystatechange', function () {
 
                     });
                 });
-            });
-        }
+            }
+        });
+
     });
 
 });

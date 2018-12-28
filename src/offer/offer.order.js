@@ -9,7 +9,7 @@ require('bootstrap/js/tab.js');
 // require('font-awesome/css/font-awesome.css');
 
 import {Dict} from '../dict/dict.js';
-import AddressAutocomplete from 'google-address-autocomplete';
+
 
 const langs = require("../dict/languages");
 
@@ -80,26 +80,6 @@ class OfferOrder {
         const options = {
             componentRestrictions: {country: "ru", "city":"Moscow"}
         };
-        new AddressAutocomplete('.address', options, (results) => {
-            const addressObject = results;
-
-            // This is what the results object looks like
-            results = {
-                cityName: "Birmingham",
-                country: "United States",
-                countryAbbr: "US",
-                formattedAddress: "123 Shades Crest Rd, Birmingham, AL 35226, USA",
-                state: "Alabama",
-                stateAbbr: "AL",
-                streetName: "Shades Crest Road",
-                streetNumber: "123",
-                zipCode: "35226",
-                coordinates: {
-                    lat: -123.45678,
-                    lng: 98.76543
-                }
-            };
-        });
 
         this.ovc.find('.toolbar').css('display', 'block');
 
@@ -125,10 +105,8 @@ class OfferOrder {
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
                 //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
-
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
                 $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
-
 
                 if(this.offer[tab][i].title){
                     try {
@@ -139,6 +117,7 @@ class OfferOrder {
                     $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
                 }
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
+                $(menu_item).find('.item_price').attr('contenteditable',$('#price_editable').val());
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
@@ -155,8 +134,10 @@ class OfferOrder {
                 if(this.offer[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
-                    $(menu_item).find('.img-fluid').css('left',this.offer[tab][i].img_left);
-                    $(menu_item).find('.img-fluid').css('top',this.offer[tab][i].img_top);
+                    $(menu_item).find('.img-fluid').css('left',!this.offer[tab][i].img_left?0:this.offer[tab][i].img_left);
+                    $(menu_item).find('.img-fluid').css('top', this.offer[tab][i].img_top);
+                    this.MakeDraggable($(menu_item).find('.img-fluid'));
+
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
@@ -192,9 +173,9 @@ class OfferOrder {
                         $('.comment').text(res.data.comment);
                     }else {
                         let qnty = res.data[keys[k]].qnty;
-                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.dropdown').find('button').text(qnty);
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.qnty_div').find('button').text(qnty);
                         let price = res.data[keys[k]].price;
-                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.item_price').text(price);
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.price_div').find('.item_price').text(price);
                         $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
                     }
                 }
@@ -238,7 +219,7 @@ class OfferOrder {
                         $('.address').text(that.address);
                     }
 
-                    if(order.status) {
+                    if(order.status && order.status.published) {
                         that.status = order.status;
                         let status = window.dict.getDictValue(window.sets.lang, Object.keys(order.status)[0]);
                         $(that.ovc).find('.ord_status').css('color', 'white');
@@ -246,12 +227,33 @@ class OfferOrder {
 
                         $(that.ovc).find('.ord_status').text(status + " "+dt);
                     }
+
+                    if(order.comment){
+                        $(that.ovc).find('.comment').text(order.comment);
+                    }
                 }
                 if($('.menu_item[ordered]')[0])
                     $('li.publish_order.disabled').removeClass('disabled');
             }
         });
 
+    }
+
+    MakeDraggable(el){
+        $(el).draggable({
+            start: function () {
+                console.log("drag start");
+            },
+            drag: function () {
+                return false;//$(el).attr('drag', true);
+            },
+            stop: function () {
+                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
+                // $(el).css('right', rel_x + '%');
+                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
+                // $(el).css('bottom', rel_y + '%');
+            }
+        });
     }
 
     CloseMenu(ev) {

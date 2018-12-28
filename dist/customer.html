@@ -22,7 +22,7 @@
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="customer.js"></script>
 
-<script src="../lib/load-image.all.min.js"></script>
+<!--<script src="../lib/load-image.all.min.js"></script>-->
 
 <style>
 
@@ -497,24 +497,24 @@
                         </button>
                         <ul class="dropdown-menu order_menu_options menu_list scaled">
                             <li class="publish_order" data-width="fit"><a href="#"
-                                                                          data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                                 data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
                             <li class="cancel_order" data-width="fit"><a href="#"
-                                                                         data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
+                                 data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
                         </ul>
                     </div>
                     <div class="col-sm- col-xs-3">
 
                     </div>
                     <div class="col-sm-6 col-xs-6">
-                        <!--<div style="text-align: center; color:white">Адрес:</div>-->
-                        <label  for="address">Адрес:</label>
+                        <div style="text-align: center; color:white">Адрес:</div>
+                        <!--<label  for="address">Адрес:</label>-->
                         <div>
                         <textarea name="address" class="form-control address" rows="1" contenteditable="true"
                                   style="text-align: center; background-color:black;color: #c4e3f3">Ленинский пр.</textarea>
                         </div>
                     </div>
                     <div class="col-sm-2 col-xs-2">
-                        <div class="ord_status" style="text-align: center;">Опубликовано:</div>
+                        <div class="ord_status" style="text-align: center;"></div>
                         <div></div>
                     </div>
                 </div>
@@ -528,7 +528,7 @@
                 <div class="tab-content">
                     <ul class="nav nav-tabs menu_tabs">
                         <li class="add_tab_li" title="add tab" style="display: none;">
-                            <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="opacity: .5;font-size: 30px;"></span>
+                            <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
                             <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
                         </li>
                     </ul>
@@ -537,39 +537,59 @@
                     </div>
                 </div>
             </div>
+
             <div class="modal-footer">
-
-                <span class="glyphicon glyphicon-comment scaled" data-toggle="collapse" href=".tacollapse"></span>
-
-                 <textarea  class="comment tacollapse" style="display:block; text-align:left; width: 100%; color: #ff6d6b; font-family:'Segoe Script'; font-size: large;"></textarea>
-                <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
-            </div>
+                <span class="fa fa-comment-o scaled" data-toggle="collapse" href=".tacollapse"></span>
+                <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
+                    font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
         </div>
+    </div>
     </div>
 
     <style>
+        .menu_item{
+            position: relative;
+            border-radius: 5px;
+            border: 1px solid #343434;
+            padding: 5px;
+            margin-bottom: 5px;
+            width: 100%;
+            padding: 10px;
+        }
+        #menu_item_tmplt {
+            display: none;
+        }
         .item_title:focus{
             outline: none !important;
             border-color: #719ECE;
             box-shadow: 0 0 10px #719ECE;
         }
-
+        .item_title{
+            display: inline-block;
+            width: 65%;
+            font-family:'Courier New';
+            font-size: x-large;
+            word-wrap: break-word;
+            z-index: 10;
+        }
         .item_content{
             position:relative;
-            height: 200px;
+            height: 280px;
             padding: 5px;
 
         }
         .content_text{
             font-family:'Segoe Script';
             font-size: medium;
-            /*height: 200px;*/
-            /*width:60%;*/
+            /*height: 240px;*/
+            /*width:100%;*/
             border-width: 0px;
-            background-color:white;
-            overflow:auto;
+            /*overflow:auto;*/
             user-select: none;
             -webkit-appearance: textarea;
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* IE 8+ */
         }
         .image_div{
             position: absolute;
@@ -583,19 +603,9 @@
             position: relative;
             font-weight:normal;
             font-size:24px;
+            word-wrap:normal
         }
-        #menu_item_tmplt {
-            display: none;
-        }
-        .menu_item {
-            display: none;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            padding: 15px;
-            margin-top: 10px;
-            margin-bottom: 10px;
-            width: 100%;
-        }
+
         .qnty{
             display: inline-block;
             color: #0088bb;
@@ -610,38 +620,49 @@
 
     </style>
 
-    <div  id="menu_item_tmplt">
+    <div  id="menu_item_tmplt"   style="background-color: #262626">
 
-        <div class="input item_title" data-toggle="collapse" tabindex="0"  data-translate="0ad4f20d1443d9529ab35534c1ba505b"
-             style="
-             display: inline-block;
-             font-family:'Segoe Script';
-             font-size: x-large;
-             width: 65%;
-             word-wrap: break-word;" >&nbsp;&nbsp;&nbsp;
-        </div>
-        <div class="input item_price" contenteditable="true"><i class="fa fa-euro"></i></div>
-        <div class="dropdown" style="display: inline-block; float: right">
-            <div class="qnty" style="padding-right: 10px" data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Q-nty</div>
+        <div class="row" style="background-color: #262626;margin: 1px;">
+            <div class="col-sm-8 col-xs-7 input item_title" size="50" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
 
-            <button class="input btn btn-primary dropdown-toggle scaled" type="button" data-toggle="dropdown">0
-                <!--<span class="caret"></span>-->
-            </button>
-            <ul class="dropdown-menu scaled"  multiple>
-                <li><a href="#">0</a></li>
-                <li><a href="#">1</a></li>
-                <li><a href="#">2</a></li>
-                <li><a href="#">3</a></li>
-                <li><a href="#">4</a></li>
-                <li><a href="#">5</a></li>
-            </ul>
+            <div class="col-sm-2 col-xs-3 price_div" style="display: inline-block;">
+                <div data-translate="3601146c4e948c32b6424d2c0a7f0118">Цена</div>
+                <div class="input item_price" contenteditable="false"><i class="fa fa-euro"></i></div>
+            </div>
+            <div  class="col-sm-2 col-xs-3 qnty_div" style="display: inline-block; float: right">
+                <div data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Кол-во</div>
+                    <div class="dropdown">
+                    <button class="input btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
+                        style="font-size: large">0
+                        <!--<span class="caret"></span>-->
+                    </button>
+                    <ul class="dropdown-menu scaled"  multiple>
+                        <li><a href="#">0</a></li>
+                        <li><a href="#">1</a></li>
+                        <li><a href="#">2</a></li>
+                        <li><a href="#">3</a></li>
+                        <li><a href="#">4</a></li>
+                        <li><a href="#">5</a></li>
+                    </ul>
+                </div>
         </div>
+        </div>
+
         <div class="item_content collapse">
-            <textarea  class="input content_text" style="position:absolute;visibility: hidden;height:200px; width:100%;background-color: rgba(255,255,255,0); z-index: 11" contenteditable="false">&nbsp;&nbsp;&nbsp;</textarea>
-            <img class="input img-fluid w3-image" style="display:block;position:absolute;visibility: hidden; height:180px;right:5px;padding-left:10px;z-index: 10;"  draggable="false"  src="" >
+            <div class="row">
+                <div class="col-xs-10">
+                    <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+                </div>
+                <div class="col-xs-2">
+                    <img class="input img-fluid w3-image" draggable="false"  src="" >
+                </div>
+            </div>
         </div>
     </div>
+
 </div>
+
+<data class="tariff" id="price_editable" value="true"></data>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
 
@@ -658,6 +679,6 @@
 
 <data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
 
-<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7">Status change alert</data>
+<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
 </body>
 </html>

@@ -456,32 +456,34 @@
                 }
             </style>
             <div class="modal-header">
-                <div class="dropdown">
-                    <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"
-                            data-toggle="dropdown" data-width="fit" type="button">
-                        <span class="glyphicon glyphicon-option-vertical"></span>
-                    </button>
-                    <ul id="menu_list" class="dropdown-menu order_menu_options">
-                        <li class="publish_offer_ctrl" data-width="fit"><a href="#"
-                           data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                        <li class="delete_offer_ctrl" data-width="fit"><a href="#"
-                           data-translate="f479ee0428deb391dacad49e70199eb4">Delete The Offer</a></li>
-                    </ul>
+                <div class="row">
+                    <div class="col-sm-1 col-xs-1 dropdown">
+                        <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"
+                                data-toggle="dropdown" data-width="fit" type="button">
+                            <span class="glyphicon glyphicon-option-vertical"></span>
+                        </button>
+                        <ul id="menu_list" class="dropdown-menu order_menu_options">
+                            <li class="publish_offer_ctrl" data-width="fit"><a href="#"
+                               data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                            <li class="delete_offer_ctrl" data-width="fit"><a href="#"
+                               data-translate="f479ee0428deb391dacad49e70199eb4">Delete The Offer</a></li>
+                        </ul>
+                    </div>
+                    <div  class="col-sm-6 col-xs-6">
+                        <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
+                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
+                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
+                    </div>
+
+                    <div class="col-sm-4 col-xs-4">
+                        <h5 class="offer_status" style="text-align: center;"></h5>
+                        <h5></h5>
+                    </div>
+
+                    <div  class="col-sm-1 col-xs-1">
+                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+                    </div>
                 </div>
-
-                <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
-                <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                <h4 class="modal-menu-number"  style="display: none">Offer</h4>
-
-                <!--<span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal" title="Save & Close"-->
-                    <!--style="color: #c4e3f3"></span>-->
-                <!--button type="button" class="btn close" data-dismiss="modal">
-                    <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
-                </button-->
-
-                <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
-
-
                 <!--<span class="glyphicon glyphicon-trash" data-translate="ea4788705e6873b424c65e91c2846b19">Cancel</span>-->
                 <!--</button>-->
 
@@ -510,89 +512,89 @@
     </div>
 
 
+    <style>
+        #menu_item_tmplt{
+            display: none;
+        }
+        .menu_item{
+            position: relative;
+            border-radius: 5px;
+            border: 1px solid #343434;
+            padding: 5px;
+            margin-bottom: 5px;
+            width: 100%;
+            padding: 10px;
+        }
+        .item_cb{
+            width: 7%;
+        }
+        .item_title:focus{
+            outline: none !important;
+            border-color: #719ECE;
+            box-shadow: 0 0 10px #719ECE;
+        }
+        .item_title{
+            width: 76%;
+            font-family:'Courier New';
+            font-size: x-large;
+            word-wrap: break-word;
+            z-index: 10;
+        }
+        .item_price{
+            width: 10%;
+            color: #0088bb;
+            position: relative;
+            font-weight:normal;
+            font-size:24px;
+        }
+        .order_ctrl{
+            width: 7%;
+            position: relative;
+            color: #80afbb;
+            font-weight:normal;
+            font-size:30px;
+        }
+        .item_content{
+            position:relative;
+            height: 280px;
+            padding: 5px;
+
+        }
+        .content_text{
+            font-family:'Segoe Script';
+            font-size: medium;
+            /*height: 240px;*/
+            /*width:100%;*/
+            border-width: 0px;
+            /*overflow:auto;*/
+            user-select: none;
+            -webkit-appearance: textarea;
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* IE 8+ */
+        }
+        .image_div{
+            position: absolute;
+            padding:15px;
+            right:0px;
+            bottom:0;
+        }
+
+        .orders{
+            visibility: hidden;
+        }
+
+        .notoday{
+            display:none;!important;
+        }
+        [contentEditable=true]:empty:not(:focus):before{
+            content:attr(placeholder);
+            color:gray;
+        }
+
+    </style>
     <div  id="menu_item_tmplt">
 
-        <style>
-            #menu_item_tmplt{
-                display: none;
-            }
-            .menu_item{
-                position: relative;
-                border-radius: 5px;
-                border: 1px solid #343434;
-                padding: 5px;
-                margin-bottom: 5px;
-                width: 100%;
-                padding: 10px;
-            }
-            .item_cb{
-                width: 7%;
-            }
-            .item_title:focus{
-                outline: none !important;
-                border-color: #719ECE;
-                box-shadow: 0 0 10px #719ECE;
-            }
-            .item_title{
-                width: 76%;
-                font-family:'Courier New';
-                font-size: x-large;
-                word-wrap: break-word;
-                z-index: 10;
-            }
-            .item_price{
-                width: 10%;
-                color: #0088bb;
-                position: relative;
-                font-weight:normal;
-                font-size:24px;
-            }
-            .order_ctrl{
-                width: 7%;
-                position: relative;
-                color: #80afbb;
-                font-weight:normal;
-                font-size:30px;
-            }
-            .item_content{
-                position:relative;
-                height: 280px;
-                padding: 5px;
-
-            }
-            .content_text{
-                font-family:'Segoe Script';
-                font-size: medium;
-                /*height: 240px;*/
-                /*width:100%;*/
-                border-width: 0px;
-                /*overflow:auto;*/
-                user-select: none;
-                -webkit-appearance: textarea;
-                -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                box-sizing: border-box;         /* IE 8+ */
-            }
-            .image_div{
-                position: absolute;
-                padding:15px;
-                right:0px;
-                bottom:0;
-            }
-
-            .orders{
-                visibility: hidden;
-            }
-
-            .notoday{
-                display:none;!important;
-            }
-            [contentEditable=true]:empty:not(:focus):before{
-                content:attr(placeholder);
-                color:gray;
-            }
-
-        </style>
         <div class="row">
             <div class="col-sm-1 col-xs-1 item_cb">
                 <label  class="btn"  style="visibility:hidden">
@@ -606,7 +608,7 @@
 
             <div class="col-sm-2 col-xs-3 input item_price"  size="7" contentEditable="true" placeholder="руб"></div>
 
-            <span class="col-sm-1 col-xs-1 glyphicon glyphicon-th-list order_ctrl" style="visibility: hidden"></span>
+            <span class="col-sm-1 col-xs-1 fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
 
         </div>
 
@@ -621,8 +623,9 @@
             </div>
 
             <div class="toolbar" align="center" style="display:none; position:absolute;width:100%;bottom:0">
-                <span class="glyphicon glyphicon-comment add_content" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
-                <span class="glyphicon glyphicon-picture add_picture" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
+                <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                <span class="fa fa-file-photo-o add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
             </div>
         </div>
 
@@ -655,6 +658,8 @@
     <data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
     <data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
     <data class="alerts" id="delete_offer" data-translate="6c7a42eaf1426625858250105dd12f86" style="display: none">Delete Offer</data>
+
+    <data class="tariff" id="items_limit" value="5"></data>
 </div>
 
 <div id="offer_viewer" class="modal fade" role="dialog">
@@ -662,33 +667,30 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header" style="position: relative;width: 100%;">
-                <div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-default btn-sm order_menu_button dropdown-toggle"  data-toggle="dropdown"
-                            data-width="fit" type="button">
-                        <span class="glyphicon glyphicon-option-vertical"></span>
-                    </button>
-                    <ul class="dropdown-menu order_menu_options menu_list">
-                        <li class="publish_offer" data-width="fit"><a href="#"
-                              data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                        <li class="cancel_offer" data-width="fit"><a href="#"
-                             data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
-                    </ul>
+                <div class="row">
+                    <div class="col-sm-1 col-xs-1 dropdown" style="display: inline-block">
+                        <button class="btn btn-default btn-sm order_menu_button dropdown-toggle"  data-toggle="dropdown"
+                                data-width="fit" type="button">
+                            <span class="glyphicon glyphicon-option-vertical"></span>
+                        </button>
+                        <ul class="dropdown-menu order_menu_options menu_list">
+                            <li class="publish_offer" data-width="fit"><a href="#"
+                                  data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
+                            <li class="cancel_offer" data-width="fit"><a href="#"
+                                 data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-sm-5 col-xs-5">
+                        <h4 class="modal-title"  style="display: inline-block">Order for</h4>
+                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
+                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
+                    </div>
+
+
+                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
+                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+                    </div>
                 </div>
-
-                <h4 class="modal-title"  style="display: inline-block">Order for</h4>
-                <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                <h4 class="modal-menu-number"  style="display: none">Offer</h4>
-
-                <button type="button" class="btn close" data-dismiss="modal" data-translate="">
-                    <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
-                </button>
-                <!--<div style="display: inline-block; position:absolute; right: 100px;padding: 0px;">-->
-                <!--<select class="sp_dlg" data-width="fit"></select>-->
-                <!--</div>-->
-                <!--<button type="button" class="btn btn-default btn-sm cancel_menu" style="display: none">-->
-                <!--<span class="glyphicon glyphicon-trash" data-translate="ea4788705e6873b424c65e91c2846b19">Cancel</span>-->
-                <!--</button>-->
-
             </div>
             <div class="modal-body">
                 <div class="tab-content">
@@ -707,9 +709,6 @@
                  <textarea  class="comment"
                             style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
-                <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
-                <span class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 10px"></span>
-
             </div>
         </div>
     </div>
@@ -719,7 +718,7 @@
 </div>
 
 <style>
-    h4{
+    h4, h5{
         color: whitesmoke;
     }
 </style>

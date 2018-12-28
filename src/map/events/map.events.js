@@ -93,8 +93,8 @@ class MapEvents{
 
                         });
                 }
+                return true;
             });
-
         });
 
         this.map.ol_map.on('movestart', function (event) {
