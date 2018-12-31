@@ -288,7 +288,6 @@
             /*width: 50px;*/
         }
 
-
         #categories{
             position: fixed;
             top:0px;
@@ -454,6 +453,16 @@
                     color: #d51312;
                     opacity: 1;
                 }
+                .offer_status{
+                    color:white;
+                }
+                .modal-title{
+                    color:white;
+                }
+
+                .modal-title-date{
+                    color:white;
+                }
             </style>
             <div class="modal-header">
                 <div class="row">
@@ -469,15 +478,16 @@
                                data-translate="f479ee0428deb391dacad49e70199eb4">Delete The Offer</a></li>
                         </ul>
                     </div>
-                    <div  class="col-sm-6 col-xs-6">
-                        <h4 class="modal-title"  style="display: inline-block">Modal Header</h4>
-                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
+                    <div  class="col-sm-2 col-xs-2">
+                        <div class="modal-title">Modal Header</div>
+                        <div class="modal-title-date">Date</div>
                     </div>
 
-                    <div class="col-sm-4 col-xs-4">
-                        <h5 class="offer_status" style="text-align: center;"></h5>
-                        <h5></h5>
+                    <div class="col-sm-6 col-xs-6"></div>
+
+                    <div class="col-sm-2 col-xs-2">
+                        <div class="offer_status" style="text-align: center;"></div>
+                        <div></div>
                     </div>
 
                     <div  class="col-sm-1 col-xs-1">
@@ -513,6 +523,11 @@
 
 
     <style>
+        th {
+            text-align: center;
+            color: #c4e3f3;
+            font-size: 20px
+        }
         #menu_item_tmplt{
             display: none;
         }
@@ -594,10 +609,9 @@
 
     </style>
     <div  id="menu_item_tmplt">
-
         <div class="row">
             <div class="col-sm-1 col-xs-1 item_cb">
-                <label  class="btn"  style="visibility:hidden">
+                <label  class="btn" style="visibility:hidden">
                     <input type="checkbox" class="checkbox-inline" style="display: none">
                     <i class="fa fa-square-o fa-2x"></i>
                     <i class="fa fa-check-square-o fa-2x"></i>
@@ -615,7 +629,7 @@
         <div class="collapse item_content">
             <div class="row">
                 <div class="col-xs-10">
-                    <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+                    <div  class="input content_text" rows="20"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
                 </div>
                 <div class="col-xs-2">
                     <img class="input img-fluid w3-image" draggable="false"  src="" >
@@ -633,20 +647,39 @@
             <table class="table tablesorter">
             <thead>
                 <tr>
-                    <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approve</th>
-                    <th data-translate="31d1b8ef5ed469f7618d76144fffaa06">Qnty</th>
-                    <th data-translate="3601146c4e948c32b6424d2c0a7f0118">Price</th>
-                    <th data-translate='884d9804999fc47a3c2694e49ad2536a'>Address</th>
-                    <th data-translate="a74ec9c5b6882f79e32a8fbd8da90c1b">Distance</th>
-                    <th data-translate="a0acfa46d86f7610b2c73dbb28f64701">Period</th>
-                    <th data-translate="a5d491060952aa8ad5fdee071be752de">Comments</th>
-                    <th data-translate="25ae4884275a34b33820d6e17013bed1">Delivery History</th>
-                    <th data-translate="07ca5050e697392c9ed47e6453f1453f" class="notoday">Completed</th>
+                    <th>
+                        <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                    </th>
+                    <th>
+                        <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-commenting-o"  data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
+                    </th>
                 </tr>
             </thead>
-                <tbody>
-
-                </tbody>
+                <tbody></tbody>
             </table>
         </div>
 
@@ -707,7 +740,7 @@
             </div>
             <div class="modal-footer">
                  <textarea  class="comment"
-                            style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
+                    style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
             </div>
         </div>
@@ -726,7 +759,6 @@
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-
             <div class="modal-header" style="position: relative;width: 100%;">
                 <!--div class="dropdown" style="display: inline-block">
                     <button class="btn btn-default btn-sm order_menu_button dropdown-toggle" data-toggle="dropdown"
@@ -774,7 +806,7 @@
 
             <div class="modal-footer">
                  <textarea  class="comment"
-                            style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
+                    style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
             </div>
 

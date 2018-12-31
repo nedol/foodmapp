@@ -144,7 +144,7 @@ $(document).on('readystatechange', function () {
 
     let uObj={};
     window.db = new DB('Supplier', function () {
-        let uid = shortid.generate();
+
         window.db.GetProfile(function (res) {
             if(res.length===0) {
                 let data_obj ={
@@ -157,11 +157,11 @@ $(document).on('readystatechange', function () {
                 }
                 window.network.postRequest(data_obj, function (data) {
                     if (data.uid) {
-                        uObj['profile'] = {email: 'suppier@gmail.com', "uid": data.uid};
+                        uObj['profile'] = {uid: data.uid, psw: data.psw, email: 'suppier@gmail.com'};//TODO: email
                         window.db.SetObject('profileStore',uObj['profile'], function (res) {
                             uObj['offer'] = {date: date, data: {}, period: ''};
                             window.user = new Supplier(uObj);
-                            window.user.IsAuth_test(function (data) {//TODO:
+                            window.user.IsAuth_test(function (data) {
 
                             });
                         });

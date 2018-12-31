@@ -116,7 +116,7 @@ class Layers {
                 if (features.length > 0) {
                     $.each(features, function (key, feature) {
                         let id_str = feature.getId();
-                        window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.email,function (res) {
+                        window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.uid,function (res) {
                             if(res!==-1) {
                                 if (feature.values_.object.date === window.user.date) {
                                     let style = getObjectStyle(feature.values_.object);
@@ -129,8 +129,8 @@ class Layers {
                                 vectorSource.removeFeature(feature);
                             }
                         });
-                        if(feature.values_.object.supem && feature.values_.object.cusem)
-                            window.db.GetOrder(window.user.date,feature.values_.object.supem, feature.values_.object.cusem,function (res) {
+                        if(feature.values_.object.supuid && feature.values_.object.cusuid)
+                            window.db.GetOrder(window.user.date,feature.values_.object.supuid, feature.values_.object.cusuid,function (res) {
                                 if(res!==-1) {
                                     if (feature.values_.object.date === window.user.date) {
                                         let style = getObjectStyle(feature.values_.object);

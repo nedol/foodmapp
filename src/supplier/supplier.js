@@ -44,6 +44,7 @@ class Supplier{
         this.offer = new Offer(uObj);
 
         this.uid = uObj.profile.uid;
+        this.psw = uObj.profile.psw;
         this.email = uObj.profile.email;
 
         this.map = new OLMap();
@@ -212,16 +213,13 @@ class Supplier{
             that.offer.GetOfferDB(that.date, function (res) {
                 if(!res) {//TODO:
                     that.offer.GetAllOffersDB(function (res) {
-                        that.offer.stobj.data = res[0].data;
+                        that.offer.stobj = res;
+                        that.offer.stobj.date = that.date;
+                        delete that.offer.stobj.published;
                     });
 
                 }else {
-                    that.offer.stobj.date = res.date;
-                    if(res.data)
-                        that.offer.stobj.data = res.data;
-                    if(that.offer.stobj.location && that.offer.stobj.location.length===2) {
-                        that.offer.editor.location = res.location;
-                    }
+                    that.offer.stobj = res;
                 }
 
                 if(that.offer.stobj.location) {
@@ -240,7 +238,7 @@ class Supplier{
 
             });
 
-            that.map.import.DownloadOrders(function () {
+            that.map.import.DownloadOrderSupplier(function () {
                 window.db.GetOrders(window.user.date, window.user.email, function (objs) {
                     if(objs!=-1){
                         let type = 'customer';
@@ -255,7 +253,7 @@ class Supplier{
                                     type:type,
                                     object: objs[o]
                                 });
-                                var id_str = md5(window.user.date+objs[o].cusem);
+                                var id_str = md5(window.user.date+objs[o].cusuid);
                                 markerFeature.setId(id_str);
 
                                 let layer = that.map.ol_map.getLayers().get(type);
@@ -270,6 +268,10 @@ class Supplier{
                         }
                     }
                 });
+            });
+
+            that.map.import.GetApprovedSupplier(function (res) {
+
             });
         });
 
@@ -317,31 +319,32 @@ class Supplier{
 
     UpdateOfferLocal(tab, offer, location, dict){
 
-        let uObj = this.offer.stobj;
+        let uObj = Object.assign(this.offer.stobj);
+        uObj.data={};
         if (uObj) {
-            for(let tab in offer)
-                if(!tab)
-                    continue;
-            for(let i in offer[tab]){
-                if(!uObj.data[tab])
-                    uObj.data[tab] = {};
-                if(uObj.data[tab][i] && !offer[tab][i].img_left)
-                    offer[tab][i].img_left = uObj.data[tab][i].img_left;
-                if(uObj.data[tab][i] && !offer[tab][i].img_top)
-                    offer[tab][i].img_top = uObj.data[tab][i].img_top;
+            for (let tab in offer) {
+                for (let i in offer[tab]) {
+                    if (!this.offer.stobj.data[tab])
+                        uObj.data[tab] = {};
+                    if (this.offer.stobj.data[tab][i] && !offer[tab][i].img_left)
+                        offer[tab][i].img_left = this.offer.stobj.data[tab][i].img_left;
+                    if (this.offer.stobj.data[tab][i] && !offer[tab][i].img_top)
+                        offer[tab][i].img_top = this.offer.stobj.data[tab][i].img_top;
+                }
+                uObj.data[tab] = offer[tab];
+                uObj.period = $('.sel_time').text();
+                this.offer.stobj.data[tab] = offer[tab];
             }
-            uObj.data[tab] = offer[tab];
-            uObj.period = $('.sel_time').text();
-            this.offer.stobj.data[tab] = offer[tab];
-            }else {
-                uObj = {
-                    "date":window.user.date,
-                    "period": $('.sel_time').text(),
-                    "location": location,
-                    "data": offer
-                };
-            }
-            this.offer.SetOfferDB(uObj,dict);
+        }else {
+            uObj = {
+                "date":window.user.date,
+                "period": $('.sel_time').text(),
+                "location": location,
+                "data": offer
+            };
+        }
+
+        this.offer.SetOfferDB(uObj,dict);
     }
 
     ValidateOffer(data){
@@ -369,7 +372,7 @@ class Supplier{
             "proj": "d2d",
             "func": "updateoffer",
             "uid": that.uid,
-            "email":that.email,
+            "psw": that.psw,
             "categories": that.offer.editor.arCat,
             "date": date,
             "period": $('.sel_time').text(),
@@ -412,23 +415,29 @@ class Supplier{
         $('#my_truck').css('visibility', 'hidden');
     }
 
-    ApproveOrder(date,title,obj){
+    ApproveOrder(title,date,obj){
 
         let data_obj = {
             "proj": "d2d",
             "func": "approveorder",
             "uid": window.user.uid,
-            "orderobj":{date:$(el).attr('orderdate'),supem:window.user.email, cusem:$(el).attr('cusem')},
+            "psw": window.user.psw,
+            "date":obj.date,
+            "supuid":obj.supuid,
+            "cusuid":obj.cusuid,
             "title":title,
             "data": obj.data[title]
         }
 
-        window.user.network.postRequest(data_obj, function (resp) {
+        window.network.postRequest(data_obj, function (resp) {
             if(resp['err']){
 
             }else {
-                obj.data[Object.keys(obj.data)[0]].approved = moment().format('YYYY-MM-DD h:mm:ss');
-                window.db.SetObject('approveStore', obj, function (res) {
+                window.db.GetOrder(obj.date, obj.supuid, obj.cusuid, function (ord) {
+                    ord.data[title].approved = resp.approved;
+                    window.db.SetObject('orderStore', ord,function (res) {
+
+                    });
                 });
             }
         });
@@ -444,12 +453,12 @@ class Supplier{
                     "proj": "d2d",
                     "func": "sharelocation",
                     "uid": window.user.uid,
-                    "supem": this.email,
+                    "supuid": this.email,
                     "date": this.date,
                     "location": location
                 };
 
-                window.user.network.postRequest(data_obj, function (data) {
+                window.network.postRequest(data_obj, function (data) {
                     console.log(data);
                 });
 
@@ -495,7 +504,6 @@ class Supplier{
             });
         }
     }
-
 
 }
 

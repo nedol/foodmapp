@@ -63,7 +63,7 @@ class OrderViewer {
                 let row = "<tr>" +
                     "<td class='tablesorter-no-sort'>" +
                         "<label  class=\"btn\">" +
-                        "<input type=\"checkbox\" class=\"approved checkbox-inline\" " + cbdisabled + " cusem=" + objs[c].cusem + " " + checked + " " +
+                        "<input type=\"checkbox\" class=\"approved checkbox-inline\" " + cbdisabled + " cusuid=" + objs[c].cusuid + " " + checked + " " +
                             "style=\"display: none\" order="+o+">" +
                         "<i class=\"fa fa-square-o fa-2x\"></i>" +
                         "<i class=\"fa fa-check-square-o fa-2x\"></i>" +

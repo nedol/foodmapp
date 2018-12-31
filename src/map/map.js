@@ -106,9 +106,7 @@ class OLMap {
             // if (cl != null && cl.time < 1503824276869) {
             //     localStorage.clear();
             // }
-            that.import.DownloadOrders(function () {
 
-            });
 
             if (!localStorage.getItem("cur_loc")) {
 

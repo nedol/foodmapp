@@ -283,8 +283,8 @@
     </a>
     </button>
     <ul class="dropdown-menu scaled"  role="menu" aria-labelledby="menu0" style="left: 50px;">
-        <li href="#"  onclick="window.user.OnClickUserSelect('Customer')"><a role="menuitem" tabindex="0" href="#">Customer</a></li>
-        <li href="#"  onclick="window.user.OnClickUserSelect('Supplier')"><a role="menuitem" tabindex="1" href="#">Supplier</a></li>
+        <li href="#"  onclick="window.user.OnClickUserProfile()"><a role="menuitem" tabindex="0" href="#">My Profile</a></li>
+
     </ul>
 </div>
 
@@ -486,6 +486,10 @@
                 textarea{
                     background-color: #0e0e0e;
                 }
+                [href=".tacollapse"]{
+                    color: whitesmoke;
+                    font-size: 30px;
+                }
             </style>
             <div class="modal-header" style="position: relative;color:white;width: 100%;">
 
@@ -496,6 +500,8 @@
                             <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
                         </button>
                         <ul class="dropdown-menu order_menu_options menu_list scaled">
+                            <li class="supplier_profile" data-width="fit"><a href="#"
+                                  data-translate="ec136b444eede3bc85639fac0dd06229">Supplier</a></li>
                             <li class="publish_order" data-width="fit"><a href="#"
                                  data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
                             <li class="cancel_order" data-width="fit"><a href="#"
@@ -539,7 +545,7 @@
             </div>
 
             <div class="modal-footer">
-                <span class="fa fa-comment-o scaled" data-toggle="collapse" href=".tacollapse"></span>
+                <span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>
                 <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
                     font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
         </div>
@@ -622,14 +628,14 @@
 
     <div  id="menu_item_tmplt"   style="background-color: #262626">
 
-        <div class="row" style="background-color: #262626;margin: 1px;">
-            <div class="col-sm-8 col-xs-7 input item_title" size="50" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+        <div class="row" style="background-color: #262626;">
+            <div class="col-sm-7 col-xs-7 input item_title" size="40" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
 
-            <div class="col-sm-2 col-xs-3 price_div" style="display: inline-block;">
+            <div class="col-sm-2 col-xs-2 price_div" style="display: inline-block;">
                 <div data-translate="3601146c4e948c32b6424d2c0a7f0118">Цена</div>
                 <div class="input item_price" contenteditable="false"><i class="fa fa-euro"></i></div>
             </div>
-            <div  class="col-sm-2 col-xs-3 qnty_div" style="display: inline-block; float: right">
+            <div  class="col-sm-2 col-xs-2 qnty_div" style="display: inline-block; float: right">
                 <div data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Кол-во</div>
                     <div class="dropdown">
                     <button class="input btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
@@ -645,7 +651,10 @@
                         <li><a href="#">5</a></li>
                     </ul>
                 </div>
-        </div>
+            </div>
+            <div class="col-sm-1 col-xs-1 appr_div">
+                <span class="fa fa-handshake-o approved" style="display:none;font-size: 20px"></span>
+            </div>
         </div>
 
         <div class="item_content collapse">

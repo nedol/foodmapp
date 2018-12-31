@@ -51,11 +51,19 @@ class OfferOrder {
         $(this.ovc).find('.publish_order').off('click touchstart');
         $(this.ovc).find('.publish_order').on('click touchstart',this,function (ev) {
             let that = ev.data;
-            window.user.PublishOrder(ev.data.GetOrderItems(ev.data.lang,true),ev.data.address, (data)=> {
-                let status = window.dict.getDictValue(window.sets.lang,Object.keys(data.status)[0]);
+            let items = ev.data.GetOrderItems(ev.data.lang,true);
+            window.user.PublishOrder(items,ev.data.address, (data)=> {
+                let status = window.dict.getDictValue(window.sets.lang,Object.keys(data)[1]);
                 $(that.ovc).find('.ord_status').css('color','white');
-                $(that.ovc).find('.ord_status').text(status + "\r\n"+ data.status[Object.keys(data.status)[0]]);
-                that.status = data.status;
+                $(that.ovc).find('.ord_status').text(status + "\r\n"+ data.published);
+                that.status = Object.keys(data)[1];
+
+                window.db.GetProfile(function (obj) {
+                    obj[0].address = items.address;
+                    window.db.SetObject('profileStore',obj[0], function () {
+
+                    });
+                });
             });
         });
 
@@ -64,9 +72,9 @@ class OfferOrder {
 
     OpenOffer(obj) {
         let that = this;
-        this.email = obj.email;
+        this.uid = obj.uid;
         this.offer = obj.data;
-
+        obj.supuid = obj.email;
         let latlon = [obj.latitude,obj.longitude];
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
@@ -124,7 +132,7 @@ class OfferOrder {
                 $(menu_item).find('.content_text').attr('data-translate', this.offer[tab][i].content);
                 if(this.offer[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
-                if(this.offer[tab][i].width)
+                if(this.offer[tab][i].width)-
                     $(menu_item).find('.content_text').css('width',(this.offer[tab][i].width));
 
                 // if(this.offer[tab][i].height)
@@ -164,48 +172,14 @@ class OfferOrder {
             }
         }
 
-        window.db.GetOrder(this.date, obj.email, window.user.email, function (res) {
-            if(res!==-1){
-                let keys =  Object.keys(res.data);
+        this.RedrawOrder(obj);
 
-                for(let k in keys){
-                    if(keys[k]==='comment'){
-                        $('.comment').text(res.data.comment);
-                    }else {
-                        let qnty = res.data[keys[k]].qnty;
-                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.qnty_div').find('button').text(qnty);
-                        let price = res.data[keys[k]].price;
-                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.price_div').find('.item_price').text(price);
-                        $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
-                    }
-                }
-            }
-
-            $('.menu_item').find('li').on('click', function (ev) {
-
-                if($(ev.target).text()!=='0'){
-                    $(that.ovc).find('.ord_status').text('');
-                    that.status = {inactive:that.date};
-                    $(this).closest('.menu_item').attr('ordered',$(ev.target).text());
-
-                    $('li.publish_order.disabled').removeClass('disabled');
-                }else{
-                    $(this).closest('.menu_item').removeAttr('ordered');
-                    if($('.menu_item[ordered]')[0]) {
-                        $('li.publish_order.disabled').removeClass('disabled');
-                    }else{
-                        $('li.publish_order').addClass('disabled');
-                    }
-                }
-            })
-        });
-        
         this.dict.set_lang(window.sets.lang,this.ovc[0]);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
         $($('.tab_inserted')[0]).find('a').trigger('click');
 
-        window.db.GetOrders(this.date,obj.email,function (arObj) {
+        window.db.GetOrders(this.date,obj.uid,function (arObj) {
             if(arObj.length>0){
                 for(let o in arObj) {
                     let order = arObj[o];
@@ -219,18 +193,17 @@ class OfferOrder {
                         $('.address').text(that.address);
                     }
 
-                    if(order.status && order.status.published) {
-                        that.status = order.status;
-                        let status = window.dict.getDictValue(window.sets.lang, Object.keys(order.status)[0]);
+                    if(order.published) {
+                        that.published = order.published;
+                        let status = window.dict.getDictValue(window.sets.lang, "published");
                         $(that.ovc).find('.ord_status').css('color', 'white');
-                        let dt = Object.values(order.status)[0];
-
-                        $(that.ovc).find('.ord_status').text(status + " "+dt);
+                        $(that.ovc).find('.ord_status').text(status + " "+order.published);
                     }
 
                     if(order.comment){
                         $(that.ovc).find('.comment').text(order.comment);
                     }
+
                 }
                 if($('.menu_item[ordered]')[0])
                     $('li.publish_order.disabled').removeClass('disabled');
@@ -256,6 +229,44 @@ class OfferOrder {
         });
     }
 
+    RedrawOrder(obj){
+        window.db.GetOrder(this.date, obj.uid, window.user.uid, function (res) {
+            if(res!==-1){
+                let keys = Object.keys(res.data);
+                for(let k in keys){
+                    if(keys[k]==='comment'){
+                        $('.comment').text(res.data.comment);
+                    }else {
+                        let approved = res.data[keys[k]].approved;
+                        if(approved) {
+                            $('.item_title[data-translate=' + keys[k] + ']').siblings('.appr_div').find('.approved').attr('approved', approved);
+                            $('.item_title[data-translate=' + keys[k] + ']').siblings('.appr_div').find('.approved').css('display', 'block');
+                        }
+                        let qnty = res.data[keys[k]].qnty;
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.qnty_div').find('button').text(qnty);
+                        let price = res.data[keys[k]].price;
+                        $('.item_title[data-translate=' + keys[k] + ']').siblings('.price_div').find('.item_price').text(price);
+                        $('.item_title[data-translate='+keys[k]+']').closest('.menu_item').attr('ordered','');
+                    }
+                }
+            }
+
+            $('.menu_item').find('li').on('click', function (ev) {
+                if($(ev.target).text()!=='0'){
+                    $(this).closest('.menu_item').attr('ordered',$(ev.target).text());
+                    $('li.publish_order.disabled').removeClass('disabled');
+                }else{
+                    $(this).closest('.menu_item').removeAttr('ordered');
+                    if($('.menu_item[ordered]')[0]) {
+                        $('li.publish_order.disabled').removeClass('disabled');
+                    }else{
+                        $('li.publish_order').addClass('disabled');
+                    }
+                }
+            })
+        });
+    }
+
     CloseMenu(ev) {
         let that = ev.data;
         that.SaveOrder(ev,window.sets.lang);
@@ -272,18 +283,19 @@ class OfferOrder {
             }
             obj.data[$(val).find('.item_title').attr('data-translate')] = {
                 qnty: $(val).find('button[data-toggle=dropdown]').text(),
-                price: $(val).find('.item_price').text()
+                price: $(val).find('.item_price').text(),
+                approved:$(val).find('.approved').attr('approved')
             }
 
         });
 
         obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
-        obj['supem'] = this.email;
-        obj['cusem'] = window.user.email;
+        obj['supuid'] = this.uid;
+        obj['cusuid'] = window.user.uid;
         obj['date'] = this.date;
-        obj['period'] = this.period;
+        obj['period'] = $('.sel_time').text();
         obj['address'] = $('#offer_order_clone').find('.address').val();
-        obj['status'] = this.status;
+        obj['published'] = this.published;
 
         return obj;
     }
@@ -293,7 +305,7 @@ class OfferOrder {
         let that = ev.data;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
         let items = this.GetOrderItems();
-        window.user.UpdateOrderLocal( items , that.email, date);
+        window.user.UpdateOrderLocal( items );
     }
 
 

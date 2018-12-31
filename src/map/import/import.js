@@ -126,9 +126,9 @@ class Import {
         }
 
         function formatObject(obj) {
-            let hash = md5(JSON.stringify({longitude:obj.lon, latittude:obj.lat}));
+            let hash = md5(JSON.stringify({longitude:obj.lon, latitude:obj.lat}));
             return {
-                email: obj.email,
+                uid: obj.uid,
                 date: obj.date,
                 period: obj.period,
                 categories: obj.cats,
@@ -143,49 +143,123 @@ class Import {
     }
 
 
-    DownloadOrders(cb) {
-        try {
-            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+    DownloadOrderSupplier(cb) {
 
-            let data_obj = {
-                "proj": "d2d",
-                "func": "getorders",
-                "uid": window.user.uid,
-                "date": date
-            };
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-            window.network.postRequest(data_obj, function (data) {
-                if(data) {
-                    processResult(data);
-                }
+        let data_obj = {
+            "proj": "d2d",
+            "func": "getordersup",
+            "uid":window.user.uid,
+            "psw": window.user.psw,
+            "date": date
+        };
 
-                cb();
-            });
-
-            function processResult(res) {
-                try {
-                    if (res) {
-                        for (let i in res) {
-                            let obj = res[i];
-                            if(!obj)
-                                continue;
-                            obj.logo =  "../dist/images/user.png";
-                            if(obj.data)
-                                obj.data = JSON.parse(obj.data);
-                            if(obj.status)
-                                obj.status = JSON.parse(obj.status);
-                            window.db.SetObject('orderStore', obj, function (success) {
-
-                            });
-                        }
-
-                    }
-                }catch(ex){
-                    console.log();
-                }
+        window.network.postRequest(data_obj, function (data) {
+            if(data) {
+                processResult(data);
             }
-        }catch(ex){
-            
+
+            cb();
+        });
+
+        function processResult(res) {
+            try {
+                if (res) {
+                    for (let i in res) {
+                        let obj = res[i];
+                        if(!obj)
+                            continue;
+                        obj.logo =  "../dist/images/user.png";
+                        if(obj.data)
+                            obj.data = JSON.parse(obj.data);
+                        if(obj.status)
+                            obj.status = JSON.parse(obj.status);
+                        window.db.SetObject('orderStore', obj, function (success) {
+
+                        });
+                    }
+
+                }
+            }catch(ex){
+                console.log();
+            }
+        }
+    }
+
+    GetApprovedCustomer(){
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+        let data_obj = {
+            "proj": "d2d",
+            "func": "getapprovedcus",
+            "uid": window.user.uid,
+            "cusuid":window.user.email,
+            "date": date
+        };
+
+        window.network.postRequest(data_obj, function (data) {
+            if(data) {
+                processResult(data);
+            }
+        });
+
+        function processResult(res) {
+            try {
+                if (res) {
+                    for(let i in res) {
+                        let data_obj = JSON.parse(res[i].data);
+                        window.db.GetOrder(res[i].date, res[i].supuid, res[i].cusuid, function (ord) {
+                            if(ord!=-1 && ord.data[res[i].title]) {
+                                ord.data[res[i].title].approved = data_obj.approved;
+                                window.db.SetObject('orderStore', ord, function (res) {
+
+                                });
+                            }
+                        });
+                    }
+                }
+            }catch(ex){
+                console.log();
+            }
+        }
+    }
+
+    GetApprovedSupplier(){
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+        let data_obj = {
+            "proj": "d2d",
+            "func": "getapprovedsup",
+            "uid": window.user.uid,
+            "supuid":window.user.email,
+            "date": date
+        };
+
+        window.network.postRequest(data_obj, function (data) {
+            if(data) {
+                processResult(data);
+            }
+        });
+
+        function processResult(res) {
+            try {
+                if (res) {
+                    for(let i in res) {
+                        let data_obj = JSON.parse(res[i].data);
+                        window.db.GetOrder(res[i].date, res[i].supuid, res[i].cusuid, function (ord) {
+                            if(ord!=-1 && ord.data[res[i].title]) {
+                                ord.data[res[i].title].approved = data_obj.approved;
+                                window.db.SetObject('orderStore', ord, function (res) {
+
+                                });
+                            }
+                        });
+                    }
+                }
+            }catch(ex){
+                console.log();
+            }
         }
     }
 }

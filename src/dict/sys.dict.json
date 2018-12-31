@@ -1,4 +1,12 @@
 {
+  "ec136b444eede3bc85639fac0dd06229":{
+    "ru": "Поставщик",
+    "en": "Supplier"
+  },
+  "ce26601dac0dea138b7295f02b7620a7":{
+    "ru": "Покупатель",
+    "en": "Customer"
+  },
   "f6039d44b29456b20f8f373155ae4973":{
     "ru": "Имя пользователя",
     "en": "User Name"
@@ -10,7 +18,6 @@
   "a38a2e843b153d64253d762e23696e17":{
     "ru": "Оставить комментарий к заказу",
     "en": "Put a comment to the order"
-
   },
   "23d285609698e41e54306c4189c90569":{
     "en":"Publish The Offer",
@@ -163,6 +170,10 @@
   "a5d491060952aa8ad5fdee071be752de":{
     "ru": "Комментарии",
     "en": "Comments"
+  },
+  "9f121d1bcc2b246d18ba60b3390f8f4e":{
+    "ru": "Голосовая связь",
+    "en": "Voice connection"
   },
   "25ae4884275a34b33820d6e17013bed1":{
     "ru": "Лояльность",

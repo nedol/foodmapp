@@ -153,6 +153,7 @@ $(document).on('readystatechange', function () {
                 window.network.postRequest(data_obj, function (data) {
                     if (data.uid) {
                         uObj.uid = data.uid;
+                        uObj.psw = data.psw;
                         window.db.SetObject('profileStore', uObj, function (res) {
                             window.user = new Customer(uObj);
                             window.user.IsAuth_test(function (data) {//TODO:

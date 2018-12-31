@@ -30,7 +30,7 @@ class OfferEditor{
 
         this.obj;
         this.status;
-        this.location;
+
 
         this.arCat = [];
     }
@@ -41,7 +41,7 @@ class OfferEditor{
         let that = this;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-        this.offer =  window.user.offer.stobj.data;
+        this.offer =  window.user.offer.stobj;
         this.location = window.user.offer.stobj.location;
 
         $('.dropdown').css('visibility','visible');
@@ -68,7 +68,8 @@ class OfferEditor{
         $("#offer_editor").find('.modal-title').text("Offer for");
         $("#offer_editor").find('.modal-title').attr('data-translate', md5('Offer for'));
         $("#offer_editor").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        $("#offer_editor").find('.offer_status').text('Опубликовано');
+        if(that.offer.published)
+            $("#offer_editor").find('.offer_status').text('Опубликовано:\r\n'+that.offer.published);
 
         $("#offer_editor").off('hide.bs.modal');
         $("#offer_editor").on('hide.bs.modal', this,this.CloseMenu);
@@ -80,7 +81,7 @@ class OfferEditor{
         $('#add_item').css('display', 'block');
         $('#add_tab_li').css('display','block');
 
-        for (let tab in this.offer) {
+        for (let tab in this.offer.data) {
             if(!tab) continue;
 
             if($('[href="#'+tab+'"]').length===0) {
@@ -90,7 +91,7 @@ class OfferEditor{
                     '</div>').insertBefore($('#add_tab_div'));
             }
 
-            for (let i in this.offer[tab]) {
+            for (let i in this.offer.data[tab]) {
                 let tmplt = $('#menu_item_tmplt').clone();
                 $('#menu_item_tmplt').attr('id', tab + '_' + i);
                 let menu_item = $('#' + tab + '_' + i)[0];
@@ -103,7 +104,7 @@ class OfferEditor{
                 $('.btn').css('visibility','visible');
 
 
-                if (this.offer[tab][i].checked == 'true') {
+                if (this.offer.data[tab][i].checked == 'true') {
                     $(menu_item).find(':checkbox').prop('checked', true);
                     if(that.published)
                         isEditable = false;
@@ -117,34 +118,34 @@ class OfferEditor{
 
                 $(menu_item).find('.item_title').attr('contenteditable', isEditable);
 
-                if(this.offer[tab][i].title){
+                if(this.offer.data[tab][i].title){
 
-                    $(menu_item).find('.item_title').attr('data-translate', this.offer[tab][i].title);
+                    $(menu_item).find('.item_title').attr('data-translate', this.offer.data[tab][i].title);
                 }
 
                 $(menu_item).find('.item_price').attr('contenteditable', isEditable);
-                $(menu_item).find('.item_price').text(this.offer[tab][i].price);
+                $(menu_item).find('.item_price').text(this.offer.data[tab][i].price);
 
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
                 $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                $(menu_item).find('.content_text').attr('data-translate',this.offer[tab][i].content);
-                if(this.offer[tab][i].content)
+                $(menu_item).find('.content_text').attr('data-translate',this.offer.data[tab][i].content);
+                if(this.offer.data[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
-                if(this.offer[tab][i].width)
-                    $(menu_item).find('.content_text').css('width',(this.offer[tab][i].width));
+                if(this.offer.data[tab][i].width)
+                    $(menu_item).find('.content_text').css('width',(this.offer.data[tab][i].width));
 
-                if(this.offer[tab][i].height)
-                    $(menu_item).find('.content_text').css('height',(this.offer[tab][i].height));
+                if(this.offer.data[tab][i].height)
+                    $(menu_item).find('.content_text').css('height',(this.offer.data[tab][i].height));
 
 
-                if(this.offer[tab][i].img) {
+                if(this.offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    $(menu_item).find('.img-fluid').attr('src', this.offer[tab][i].img);
-                    $(menu_item).find('.img-fluid').css('left',!this.offer[tab][i].img_left?0:this.offer[tab][i].img_left);
-                    $(menu_item).find('.img-fluid').css('top', !this.offer[tab][i].img_top?0:this.offer[tab][i].img_top);
+                    $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img);
+                    $(menu_item).find('.img-fluid').css('left',!this.offer.data[tab][i].img_left?0:this.offer.data[tab][i].img_left);
+                    $(menu_item).find('.img-fluid').css('top', !this.offer.data[tab][i].img_top?0:this.offer.data[tab][i].img_top);
 
                     that.MakeDraggable($(menu_item).find('.img-fluid'));
                 }
@@ -193,7 +194,7 @@ class OfferEditor{
                 $(menu_item).find('.order_ctrl').attr('data-toggle','collapse');
                 $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
 
-                $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + this.offer[tab][i].title);
+                $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + this.offer.data[tab][i].title);
 
             }
 
@@ -232,18 +233,19 @@ class OfferEditor{
                 );
                 calcDistance.then(function (dist) {
                     for (let k in kAr) {
-                        let checked = res[i].data[kAr[k]].status === 'approved' ? 'checked' : '';
+                        let checked = res[i].data[kAr[k]].approved ? 'checked' : '';
 
                         $('.item_title[data-translate=' + kAr[k] + ']').siblings('.order_ctrl').css('visibility', 'visible');
-                        $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
-                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
-                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
-                        $("<tr>" +
+                        //if published:
+                        // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
+                        // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
+                        // $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
+                        $("<tr style='text-align: center'>" +
                             "<td class='tablesorter-no-sort'>"+
                                 "<label  class='btn'>" +
-                                "<input type='checkbox' class='checkbox-inline approve' title='"+kAr[k]+"' orderdate='"+res[i].date +"' cusem=" + res[i].cusem + " " + checked + " style='display: none'>" +
-                                "<i class='fa fa-square-o fa-2x'></i>" +
-                                "<i class='fa fa-check-square-o fa-2x'></i>" +
+                                "<input type='checkbox' class='checkbox-inline approve' title='"+kAr[k]+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " " + checked + " style='display: none'>" +
+                                "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                                "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
                                 "</label>" +
                             "</td>" +
                             "<td>" + data[kAr[k]].qnty + "</td>" +
@@ -254,6 +256,7 @@ class OfferEditor{
                             "<td class='tablesorter-no-sort'>"+
                             (res[i].comment?"<span class='tacomment'>" + res[i].comment + "</span>":'') +
                             "</td>"+
+                            "<td></td>" +
                             "<td>" +"0"+ "</td>" +
 
                             "<td class='tablesorter-no-sort notoday' >" +
@@ -266,7 +269,6 @@ class OfferEditor{
                             "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
 
                             setTimeout(function () {
-
                                 $('#ordtable_'+ kAr[k]).tablesorter({
                                     theme: 'blue',
                                     widgets: ['zebra', 'column'],
@@ -275,9 +277,18 @@ class OfferEditor{
                                     sortRestart: true,
                                     sortInitialOrder: 'desc'
                                 });
-
                             },1000);
+
                     }
+                    //зафиксировать подтвержденный заказ
+                    $(':checkbox.approve').on('click',function (ev) {
+                        if(!$(this).prop('checked')){
+                            event.preventDefault();
+                            event.stopPropagation();
+
+                            return false;
+                        }
+                    });
                 })
                     .catch(function (error) {
                         // ops, mom don't buy it
@@ -285,7 +296,6 @@ class OfferEditor{
                     });
             }
         });
-
 
         //
         this.lang = window.sets.lang;
@@ -301,8 +311,9 @@ class OfferEditor{
             $('#add_tab').on('click', this, this.AddTab);
 
         evnts = $._data($('#add_item').get(0), "events");
-        if(!evnts || !evnts['click'])
+        if(!evnts || !evnts['click']) {
             $('#add_item').on('click', this, this.AddOfferItem);
+        }
 
         $('input:file').change(function(ev) {
             //listFiles(evt);
@@ -394,6 +405,10 @@ class OfferEditor{
 
         let that = ev.data;
 
+        // if($('.menu_item').length>=parseInt($('#items_limit').val())) {
+        //    return true;
+        // }
+
         ev.data.changed = true;
 
         let tab = $('.nav-tabs').find('li.active').find('a').attr('href');
@@ -476,11 +491,6 @@ class OfferEditor{
         });
 
         $(tab).append(menu_item[0]);
-
-        if($('.menu_item').length>=parseInt($('#items_limit').val())) {
-            $('#add_item').prop('disabled', 'true');
-            return;
-        }
 
         $(menu_item).find('.toolbar').css('display', 'block');
 
@@ -640,7 +650,7 @@ class OfferEditor{
                 }
 
                 $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.user.ApproveOrder(window.user.date, window.user.email, $(el).attr('cusem'));
+                    window.user.ApproveOrder(window.user.date, window.user.email, $(el).attr('cusuid'));
                 });
 
                 offerObj[value].push(item);
@@ -747,16 +757,13 @@ class OfferEditor{
                 }
 
                 $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusem'),function (obj) {
+                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusuid'),function (obj) {
                         window.user.ApproveOrder($(el).attr('title'),$(el).attr('orderdate'),obj);
                     });
                 });
 
                 offerObj['local'][value].push(item);
                 if(item.checked==='true') {
-                    if(i>=parseInt($('#items_limit').val())) {
-                        continue;
-                    }
                     offerObj['remote'][value].push(item);
                 }
             }

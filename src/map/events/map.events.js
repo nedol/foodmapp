@@ -60,7 +60,7 @@ class MapEvents{
                 let period = $('.sel_time').text().split(' - ');
                 if(feature.values_.features.length===1) {
                     if(feature.values_.features[0].values_.type==='supplier') {
-                        window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.email, function (obj) {
+                        window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.uid, function (obj) {
                             if (obj !== -1) {
                                 if(window.user.constructor.name==='Supplier')
                                     window.user.viewer = new OfferViewer( obj.dict);
@@ -70,7 +70,7 @@ class MapEvents{
                             }
                         });
                     }else if(feature.values_.features[0].values_.type==='customer'){
-                        window.db.GetOrders(date,feature.values_.features[0].values_.object.supem,function (objs) {
+                        window.db.GetOrders(date,feature.values_.features[0].values_.object.supuid,function (objs) {
                             let orderViewer = new OrderViewer();
                             orderViewer.OpenOrderCustomers(objs);
                         });

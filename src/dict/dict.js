@@ -26,6 +26,9 @@ class Dict {
             if(item.attributes.placeholder && this.dict[item.attributes.placeholder.value] && this.dict[item.attributes.placeholder.value][lang]){
                 $(item).attr('placeholder',this.dict[item.attributes.placeholder.value][lang]);
             }
+            if(item.attributes.title && this.dict[item.attributes.title.value] && this.dict[item.attributes.title.value][lang]){
+                $(item).attr('title',this.dict[item.attributes.title.value][lang]);
+            }
             if(item.value && this.dict[item.value] && this.dict[item.value][lang]){
                 item.value = this.dict[item.value][lang];
             }

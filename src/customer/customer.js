@@ -10,9 +10,7 @@ import {Network} from "../../network";
 
 //import {RTCOperator} from "../rtc/rtc_operator"
 
-import {OLMap} from '../map/map'
-import {DB} from "../map/storage/db"
-
+import {OLMap} from '../map/map';
 import proj from 'ol/proj';
 
 var urlencode = require('urlencode');
@@ -35,7 +33,8 @@ class Customer{
         this.viewer;
 
         this.uid = uObj.uid;
-        this.email = uObj.uid;//!!! no need to registrate
+        this.psw = uObj.psw;
+        this.email = '';//!!! no need to registrate
 
         this.map = new OLMap();
 
@@ -44,7 +43,6 @@ class Customer{
     IsAuth_test(cb){
 
         this.map.Init();
-
 
         window.network.InitSSE(this,function () {
 
@@ -221,9 +219,9 @@ class Customer{
                 }
             });
 
-            let cust = JSON.parse(localStorage.getItem('customer'));
+            that.map.import.GetApprovedCustomer(function () {
 
-            //this.GetReserved();
+            });
         });
     }
 
@@ -254,7 +252,6 @@ class Customer{
 
         this.viewer.order = obj.data;
     }
-
 
     UpdateDict(dict, cb){
 
@@ -297,22 +294,32 @@ class Customer{
 
         obj.proj = "d2d";
         obj.func = "updateorder";
-        obj.uid = that.uid;
-        obj.cusem = that.email;
-        obj.supem = obj.supem;
-        obj.status = {published:window.user.date};
+        obj.psw = that.psw;
+        obj.cusuid = that.uid;
+        obj.supuid = obj.supuid;
 
         window.network.postRequest(obj, function (data) {
-            if(data.status){
+            if(data.published){
                 cb(data);
                 obj.proj = '';
                 obj.func= '';
+                obj.published = data.published;
                 that.UpdateOrderLocal(obj)
             }
         });
     }
 
     OnMessage(data){
+        if(data.func ==='approved'){
+            window.db.GetOrder(data.order.date, data.order.supuid,data.order.cusuid, function (ord) {
+                ord.data[data.order.title].approved = data.order.data.approved;
+                window.db.SetObject('orderStore', ord, function (res) {
+                    if(window.user.viewer){
+                        window.user.viewer.RedrawOrder(ord)
+                    }
+                });
+            });
+        }
         if(data.func ==='updateorder'){
             window.db.SetObject('orderStore',data,res=>{
 
@@ -374,11 +381,8 @@ class Customer{
         }
     }
 
-    OnClickUserSelect(li){
-        if(li==='Customer') {
-            this.reg = new UserRegistry();
-            this.reg.OpenRegistry();
-        }
+    OnClickUserProfile(li){
+
     }
 
 }
