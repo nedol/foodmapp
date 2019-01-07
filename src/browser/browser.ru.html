@@ -1,0 +1,171 @@
+<html xmlns="http://www.w3.org/1999/xhtml"  lang="ru">
+<head>
+    <meta content="width=device-width, minimum-scale=1, maximum-scale=3" name="viewport">
+    <!--<meta http-equiv-'X-UA-Compatible' content= ">-->
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta charset="UTF-8">
+    <meta name="author" content="InfoDesk" />
+    <!--base target="https://telegram.me/joinchat/C6197we1gLwO39Cx10yrIw"/-->
+    <title>Browser</title>
+
+</head>
+
+<link rel="stylesheet" type="text/css" href="./css/util.css">
+<link rel="stylesheet" type="text/css" href="./css/main.css">
+<link rel="stylesheet" type="text/css" href="./css/browser.css">
+<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">-->
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+<link rel="stylesheet" href="https://nedol.ru/rtc/lib/bootstrap/css/bootstrap.min.css">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"></script>
+<script src="https://nedol.ru/rtc/lib/bootstrap/js/bootstrap.min.js"></script>
+
+<script src="./browser.js"></script>
+
+<body>
+
+
+
+<div class="browser_div">
+    <ul class="nav justify-content-center">
+
+        <li class="nav-item">
+            <a class="nav-link  invisible" href="#">Invisible</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link  invisible" href="#">Invisible</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link disabled" href="#"></a>
+        </li>
+    </ul>
+
+    <div class="row" style="height: 50%; width: 100%;padding-left: 30px;">
+        <div id="text_container" class="h-100 d-inline-block" style="width:100%;background-color: #adadad">
+            <div class="input-group mb-3" style="position:sticky;width:100%;top:15px;">
+                <input type="text" id="chat_msg" class="form-control" placeholder="Ввод сообщения" aria-label="Recipient's username" aria-describedby="send_msg">
+                <div class="input-group-append">
+                    <button id="send_msg" class="btn input-group-text">Отправить</button>
+                </div>
+            </div>
+            <div id="chat_text"  style="height: 100%;overflow-y: auto;">
+                <div style="display: none"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .message {
+        border: 2px solid #dedede;
+        background-color: #f1f1f1;
+        border-radius: 5px;
+        padding: 2px;
+        margin: 2px 0;
+        font-size: 8px;
+    }
+
+    .darker {
+        border-color: #ccc;
+        background-color: #ddd;
+    }
+
+    .message::after {
+        content: "";
+        clear: both;
+        display: table;
+    }
+
+    .message img {
+        float: left;
+        max-width: 60px;
+        width: 100%;
+        margin-right: 20px;
+        border-radius: 50%;
+    }
+
+    .message img.right {
+        float: right;
+        margin-left: 20px;
+        margin-right:0;
+    }
+
+    .right .chat-msg{
+        font-size: 10px;
+        color: red;
+        text-align:right
+    }
+
+    .right .chat-time{
+        float: right;
+        color: #aaa;
+        font-size: 8px;
+    }
+
+    .left .chat-msg{
+        font-size: 10px;
+        color: blue;
+        text-align:left
+    }
+    .left chat-time{
+        float: left;
+        color: #999;
+        font-size: 8px;
+    }
+</style>
+
+<div  id="html_container" class="rtc_container"
+     style="display:none;position: relative;visibility: visible;
+     overflow-y: hidden;
+     background-color: #e8e8e8;
+     margin-top: 20px; padding:4px; border: solid 0px gray; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
+     align='center'>
+
+</div>
+
+
+
+<div id="img_container" class="rtc_container" style="display:none;position: relative; background-color: #e8e8e8; padding:4px;
+    width: auto; height: auto;
+    bottom: 0px;  border: solid 0px gray; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);"
+     align='center'>
+    <div class="title_div">
+        <img class="progress" src="https://nedol.ru/rtc/browser/images/XEupj.gif" style="display:inline;float: right;" width="28" height="28"/>
+        <!--<span class="title" style="display:inline-block;vertical-align: top; font-size: small;" >default</span>-->
+        <div class="title" contenteditable="true">No Title</div>
+    </div>
+    <div class="div_img">
+        <img id="img_0" src="https://nedol.ru/rtc/browser/images/ic_infodesk.png"/>
+    </div>
+</div>
+
+<div id="iframe_container" class="rtc_container" style="display:none; background-color: #e8e8e8; padding:4px; border: solid 0px darkgrey;
+     width: auto; overflow: hidden; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div class="title_div"  style="display:none; z-index:9; width: 100%; height:auto; padding-bottom: 10px;
+        border: solid 0px gray; text-align:center ; text-shadow: 1px 1px 2px rgba(0,0,0,0.6);">
+        <img class="progress" src="https://nedol.ru/rtc/browser/images/XEupj.gif" style="position: relative;display:inline; float: left; vertical-align: text-top; width:20px;
+            height:20px; left: 0px"/>
+        <div style="display: inline; width:95%; vertical-align: top;">
+            <div class="title" contenteditable="false"  data-translate="InfoDesk" style="display:inline; top: 0px;
+            font-size: small;vertical-align: top" >No Title</div>
+            <!--<span class="title"  style="display:inline; top: 0px;font-size: small;vertical-align: top"  align="center">InfoDesk</script></span>-->
+            <img class="owner_logo" src= "https://nedol.ru/rtc/browser/images/ic_logo_circle.gif" alt=""  style="display:inline; vertical-align: top; visibility:hidden;" width="16" height="16"/>
+        </div>
+
+    </div>
+    <div class="div_iframe" style="display:none; z-index:9; border-radius: 5px;width: auto; padding:4px;
+        background-color: #adb8c0">
+        <div id="scroll_div_right"></div>
+        <div id="scroll_div_left">
+            <img id="prev" src="https://nedol.ru/rtc/browser/images/ic_prev.png"  height="50" width="20" align="left" />
+        </div>
+        <iframe class="timeline" frameborder="0"></iframe>
+    </div>
+
+</div>
+
+<div id="bottom" style="display:none;top:0;height:10px; background-color:white; visibility: visible;"></div>
+
+<canvas width="0" height="0" style="display: none"></canvas>
+</body>
+</html>

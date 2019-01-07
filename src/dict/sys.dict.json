@@ -128,8 +128,8 @@
     "en": "Offer for "
   },
   "ebf76e067cabfab88118b3420289af42":{
-    "ru": "Заказ на доставку на",
-    "en": "Order for "
+    "ru": "Дата и время доставки",
+    "en": "Deleivery Date and Time"
   },
   "7442e29d7d53e549b78d93c46b8cdcfc":{
     "ru": "Заказы",
@@ -144,8 +144,8 @@
     "en": "Do delete the offer?"
   },
   "884d9804999fc47a3c2694e49ad2536a":{
-    "ru": "Адрес",
-    "en": "Address"
+    "ru": "Адрес доставки",
+    "en": "Delivery Address"
   },
   "a74ec9c5b6882f79e32a8fbd8da90c1b":{
     "ru": "Расстояние до",
@@ -166,6 +166,10 @@
   "ee4a528dce8d6fa440db5ab1cf78f939":{
     "ru": "Кол-во: ",
     "en": "Qnty: "
+  },
+  "41b0e839c21e82f25bffdb9dc82848fa":{
+    "ru": "Расфасовка",
+    "en": "Pack"
   },
   "a5d491060952aa8ad5fdee071be752de":{
     "ru": "Комментарии",

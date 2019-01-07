@@ -45,6 +45,6 @@ class Offer{
 
 
     OpenOfferEditor(ev) {
-        ev.data.editor.OpenOffer();
+        ev.data.offer.editor.OpenOffer();
     }
 }

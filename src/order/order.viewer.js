@@ -148,7 +148,7 @@ class OrderViewer {
     SaveOrder(ev) {
         for(let o in this.orders) {
             let obj = this.orders[o];
-            window.user.ApproveOrder(obj.title, obj.date,obj);
+            window.user.ApproveOrder(obj);
         }
     }
 }

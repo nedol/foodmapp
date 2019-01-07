@@ -96,7 +96,7 @@ class Import {
                         if(!obj)
                             continue;
                         obj = formatObject(obj);
-                        if(obj.email===window.user.email && obj.date===window.user.date){
+                        if(obj.uid ===window.user.uid && obj.date===window.user.date){
 
                             if(!Object.keys(window.user.offer.stobj.data)[0] && obj) {
                                 window.db.SetObject('dictStore',obj.dict, function (res) {
@@ -194,7 +194,7 @@ class Import {
             "proj": "d2d",
             "func": "getapprovedcus",
             "uid": window.user.uid,
-            "cusuid":window.user.email,
+            "cusuid":window.user.uid,
             "date": date
         };
 
@@ -208,14 +208,9 @@ class Import {
             try {
                 if (res) {
                     for(let i in res) {
-                        let data_obj = JSON.parse(res[i].data);
-                        window.db.GetOrder(res[i].date, res[i].supuid, res[i].cusuid, function (ord) {
-                            if(ord!=-1 && ord.data[res[i].title]) {
-                                ord.data[res[i].title].approved = data_obj.approved;
-                                window.db.SetObject('orderStore', ord, function (res) {
+                        res[i].data = JSON.parse(res[i].data);
+                        window.db.SetObject('approvedStore',res[i],function (res) {
 
-                                });
-                            }
                         });
                     }
                 }

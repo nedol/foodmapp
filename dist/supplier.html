@@ -22,7 +22,7 @@
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
 
-<script src="../lib/load-image.all.min.js"></script>
+<script src="../node_modules/blueimp-load-image/js/load-image.all.min.js"></script>
 
 
 <style>
@@ -220,6 +220,15 @@
     <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
 </section>
 
+
+<style>
+    #feedback { font-size: 1.4em; }
+    #period_list .ui-selecting { background: #FECA40; }
+    #period_list .ui-selected { background: #F39814; color: white; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+</style>
+
 <div id="main_window" class="container">
     <div class="row">
         <div class="form-group scaled" style="position:absolute;width:250px;right:50px;z-index: 10;">
@@ -234,19 +243,18 @@
                         data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
-                <ul id="period_list" class="dropdown-menu period_list" role="menu" aria-labelledby="menu1">
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
+                <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                    <li href="#">06:00 - 08:00</li>
+                    <li href="#">08:00 - 10:00</li>
+                    <li href="#">10:00 - 12:00</li>
+                    <li href="#">12:00 - 14:00</li>
+                    <li href="#">14:00 - 16:00</li>
+                    <li href="#">16:00 - 18:00</li>
+                    <li href="#">18:00 - 20:00</li>
+                    <li href="#">20:00 - 22:00</li>
+                    <li href="#">22:00 - 24:00</li>
+                </ol>
 
-                </ul>
             </div>
         </div>
     </div>
@@ -455,6 +463,7 @@
                 }
                 .offer_status{
                     color:white;
+                    font-size: x-small;
                 }
                 .modal-title{
                     color:white;
@@ -463,6 +472,7 @@
                 .modal-title-date{
                     color:white;
                 }
+
             </style>
             <div class="modal-header">
                 <div class="row">
@@ -472,30 +482,24 @@
                             <span class="glyphicon glyphicon-option-vertical"></span>
                         </button>
                         <ul id="menu_list" class="dropdown-menu order_menu_options">
-                            <li class="publish_offer_ctrl" data-width="fit"><a href="#"
-                               data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
                             <li class="delete_offer_ctrl" data-width="fit"><a href="#"
                                data-translate="f479ee0428deb391dacad49e70199eb4">Delete The Offer</a></li>
                         </ul>
                     </div>
+                    <div  class="col-sm-3 col-xs-3">
+                        <div class="modal-title" style="text-align: center;"></div>
+                    </div>
+
+                    <div class="col-sm-5 col-xs-5"></div>
+
                     <div  class="col-sm-2 col-xs-2">
-                        <div class="modal-title">Modal Header</div>
-                        <div class="modal-title-date">Date</div>
+
                     </div>
-
-                    <div class="col-sm-6 col-xs-6"></div>
-
-                    <div class="col-sm-2 col-xs-2">
-                        <div class="offer_status" style="text-align: center;"></div>
-                        <div></div>
-                    </div>
-
-                    <div  class="col-sm-1 col-xs-1">
+                    <div class="col-sm-1 col-xs-1">
                         <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
                     </div>
                 </div>
-                <!--<span class="glyphicon glyphicon-trash" data-translate="ea4788705e6873b424c65e91c2846b19">Cancel</span>-->
-                <!--</button>-->
+                <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
 
             </div>
             <div id="modal-body" class="modal-body">
@@ -520,7 +524,6 @@
             </div>
         </div>
     </div>
-
 
     <style>
         th {
@@ -556,11 +559,8 @@
             z-index: 10;
         }
         .item_price{
-            width: 10%;
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
+
+
         }
         .order_ctrl{
             width: 7%;
@@ -598,7 +598,13 @@
         .orders{
             visibility: hidden;
         }
-
+        .gallery{
+            position: absolute;
+        }
+        .cert{
+            z-index: 50;
+            padding: 5px;
+        }
         .notoday{
             display:none;!important;
         }
@@ -610,7 +616,7 @@
     </style>
     <div  id="menu_item_tmplt">
         <div class="row">
-            <div class="col-sm-1 col-xs-1 item_cb">
+            <div class="col-sm-1 col-xs-1 item_cb" title="Опубликовать" >
                 <label  class="btn" style="visibility:hidden">
                     <input type="checkbox" class="checkbox-inline" style="display: none">
                     <i class="fa fa-square-o fa-2x"></i>
@@ -618,9 +624,14 @@
                 </label>
             </div>
 
-            <div class="col-sm-8 col-xs-7 input item_title" size="50" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+            <div class="col-sm-8 col-xs-8">
+                <div class="input item_title" size="80" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+            </div>
 
-            <div class="col-sm-2 col-xs-3 input item_price"  size="7" contentEditable="true" placeholder="руб"></div>
+            <div class="col-xs-2">
+                <div>Цена:</div>
+                <div class="input item_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+            </div>
 
             <span class="col-sm-1 col-xs-1 fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
 
@@ -628,20 +639,43 @@
 
         <div class="collapse item_content">
             <div class="row">
-                <div class="col-xs-10">
+                <div class="col-xs-9">
                     <div  class="input content_text" rows="20"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
                 </div>
-                <div class="col-xs-2">
-                    <img class="input img-fluid w3-image" draggable="false"  src="" >
+                <div class="col-xs-3">
+                    <div class="row pack_container">
+                        <div class="col-xs-5">
+                            <div data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
+                            <div class="item_pack input dropdown-toggle" data-toggle="dropdown" contentEditable="true" placeholder="     гр."
+                                 style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                            <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+                        </div>
+                        <div class="col-xs-5">
+                            <div>Цена:</div>
+                            <div class="input item_pack_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                        </div>
+                    </div>
+                    <div class="row pack_ctrl">
+                        <div class="col-xs-6">
+                            <span class="add_pack glyphicon glyphicon-plus-sign"   href="#add_pack" style="display:inline-block;opacity: .5;font-size: 30px;"></span>
+                        </div>
+                        <div class="col-xs-6">
+                            <span class="rem_pack glyphicon glyphicon-minus-sign"  href="#rem_pack" style="display:inline-block;opacity: .5;font-size: 30px;"></span>
+                        </div>
+                    </div>
                 </div>
             </div>
-
-            <div class="toolbar" align="center" style="display:none; position:absolute;width:100%;bottom:0">
+            <div>
+                <img class="input img-fluid w3-image" draggable="false"  src="" >
+            </div>
+            <div class="toolbar"  style="display:none; position:absolute;width:20%;bottom:0;right: 0">
                 <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
                 <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
-                <span class="fa fa-file-photo-o add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                <span class="glyphicon glyphicon-modal-window add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
             </div>
+            <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
         </div>
+
 
         <div  class="collapse orders">
             <table class="table tablesorter">
@@ -666,7 +700,7 @@
                         <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
                     </th>
                     <th>
-                        <span class="fa fa-commenting-o"  data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                        <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
                     </th>
                     <th>
                         <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>

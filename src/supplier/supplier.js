@@ -54,6 +54,8 @@ class Supplier{
     }
 
     IsAuth_test(cb){
+        let that = this;
+
 
         this.map.Init();
         window.network.InitSSE(this,function () {
@@ -78,6 +80,30 @@ class Supplier{
         $('#main_menu').on('click touch', this, this.offer.OpenOfferEditor);
 
         this.DateTimePickerEvents();
+
+        $( "#period_list" ).selectable({
+            stop: function() {
+                var result;
+                $( ".ui-selected", this ).each(function(i) {
+                    let index = $( "#period_list li" ).index( this );
+                    if(i===0)
+                        result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    if($( ".ui-selected").length===i+1)
+                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                });
+                $('.sel_time').text(result);
+
+                window.db.GetOffer(that.date, function (off) {
+                    if(off) {
+                        off.period = result;
+                        window.db.SetObject('offerStore', off, function (res) {
+
+                        });
+                    }
+                });
+
+            }
+        });
     }
 
     IsAuth(cb) {
@@ -157,30 +183,10 @@ class Supplier{
     DateTimePickerEvents(){
         let that = this;
 
-        let time = $('.period_list').find('a')[0].text;
-        $('.sel_time').text(time);
-
-        $('.sel_time').on("change",this,function (ev) {
-            let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
-            let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];
-            $('#dt_from').val(from);
-            $('#dt_to').val(to);
-
-        });
-
         $('#date').on("click touchstart",this,function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
-        $('.period').find('.from').on("click touchstart",this,function (ev) {
-            if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
-                $('#dt_from').data("DateTimePicker").toggle();
-        });
-
-        $('.period').find('.to').on("click touchstart", this,function (ev) {
-            if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
-                $('#dt_to').data("DateTimePicker").toggle();
-        });
 
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
@@ -191,6 +197,12 @@ class Supplier{
             $('.sel_time').find('option').css('visibility','visible');
 
             $(this).data("DateTimePicker").toggle();
+
+            window.db.GetOffer(that.date, function (off) {
+                if(off) {
+                    $('.sel_time').text(off.period );
+                }
+            });
 
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
@@ -304,6 +316,7 @@ class Supplier{
 
 
     OnClickTimeRange(ev){
+        let that = this;
         let from = $(ev).text().split(' - ')[0];
         let to = $(ev).text().split(' - ')[1];
         $('.sel_time').text($(ev).text());
@@ -315,6 +328,14 @@ class Supplier{
                 layer.getSource().refresh();
             }
         });
+        window.db.GetOffer(that.date, function (off) {
+            if(off) {
+                off.period = $(ev).text();
+                window.db.SetObject('offerStore', off, function (res) {
+
+                });
+            }
+        })
     }
 
     UpdateOfferLocal(tab, offer, location, dict){
@@ -415,7 +436,7 @@ class Supplier{
         $('#my_truck').css('visibility', 'hidden');
     }
 
-    ApproveOrder(title,date,obj){
+    ApproveOrder(obj){
 
         let data_obj = {
             "proj": "d2d",
@@ -423,21 +444,19 @@ class Supplier{
             "uid": window.user.uid,
             "psw": window.user.psw,
             "date":obj.date,
+            "period": $('.sel_time').text(),
             "supuid":obj.supuid,
             "cusuid":obj.cusuid,
-            "title":title,
-            "data": obj.data[title]
+            "title":obj.title,
+            "data": obj.data[obj.title]
         }
 
         window.network.postRequest(data_obj, function (resp) {
             if(resp['err']){
 
             }else {
-                window.db.GetOrder(obj.date, obj.supuid, obj.cusuid, function (ord) {
-                    ord.data[title].approved = resp.approved;
-                    window.db.SetObject('orderStore', ord,function (res) {
+                window.db.SetObject('approvedStore', data_obj,function (res) {
 
-                    });
                 });
             }
         });

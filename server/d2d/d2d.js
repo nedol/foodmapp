@@ -188,8 +188,8 @@ module.exports = class D2D {
                 if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
                     let offer = urlencode.decode(q.offer);
                     that.replaceImg(offer,function (offer) {
-                        values = [offer, sel[0].offer_id, JSON.stringify({published: now})];
-                        sql = "UPDATE offers SET data=?   WHERE id=?";
+                        values = [offer, q.location[1], q.location[0], sel[0].offer_id];
+                        sql = "UPDATE offers SET data=?, latitude=?, longitude=?   WHERE id=?";
                         that.updateOfferDB(q, res, sql, values, now);
                     });
                 }
@@ -237,12 +237,12 @@ module.exports = class D2D {
         let ofobj = JSON.parse(offer);
         for(let tab in ofobj) {
             for (let item in ofobj[tab]) {
-                const base64Data = ofobj[tab][item].img.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+                const base64Data = ofobj[tab][item].img.src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
                 const hash = md5(base64Data);
                 fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
 
                 });
-                offer = offer.replace(ofobj[tab][item].img,'../server/images/'+hash);
+                offer = offer.replace(ofobj[tab][item].img.src,'../server/images/'+hash);
             }
             cb(offer);
         }
@@ -309,11 +309,11 @@ module.exports = class D2D {
             }
             let values, sql;
             if(sel.length>0) {
-                values = [JSON.stringify(q.data), q.period, q.address, now, sel[0].id];
-                sql = 'UPDATE orders SET data=?, period=?, address=?, published=? WHERE id=?';
+                values = [JSON.stringify(q.data), q.comment, q.period, q.address, now, sel[0].id];
+                sql = 'UPDATE orders SET data=?, comment=?, period=?, address=?, published=? WHERE id=?';
             }else {
-                values = [q.cusuid, q.supuid, JSON.stringify(q.data), q.address, q.date, q.period,now];
-                sql = 'INSERT INTO orders SET cusuid=?, supuid=?, data=?, address=?, date=?, period=?, published=?';
+                values = [q.cusuid, q.supuid, JSON.stringify(q.data), q.comment,q.address, q.date, q.period,now];
+                sql = 'INSERT INTO orders SET cusuid=?, supuid=?, data=?, comment=?, address=?, date=?, period=?, published=?';
             }
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
@@ -335,8 +335,8 @@ module.exports = class D2D {
 
     ApproveOrder(q,res){
         let now = moment().format('YYYY-MM-DD h:mm:ss');
-        let values = [q.date, q.supuid, q.cusuid, q.title, JSON.stringify(q.data)];
-        let sql = "REPLACE INTO approved SET date=?, supuid=?, cusuid=?, title=?, data=?";
+        let values = [q.date,q.period, q.supuid, q.cusuid, q.title, JSON.stringify(q.data)];
+        let sql = "REPLACE INTO approved SET date=?, period=?, supuid=?, cusuid=?, title=?, data=?";
         global.con_obj.query(sql, values, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {

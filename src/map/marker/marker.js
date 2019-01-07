@@ -30,8 +30,9 @@ class Marker{
             // $('#kolobot').attr('position', x / zoom + ' ' + 0 + ' ' + y / zoom);
         });
 
-        $('#marker').on('touchstart', function (ev) {
-            $('#browser_container').css('display','inline-block');
+        $('#marker').on('touchstart click', function (ev) {
+            //$('#browser_container').css('display','inline-block');
+
         });
 
         this.overlay.on('change:position', function (e) {
@@ -51,7 +52,7 @@ class Marker{
 
         $('#marker').on('stop_location', function (e, param1, param2) {
             if(!window.sets.loc_mode)
-                $('#marker>img').attr("src", "../src/map/marker/images/kolobot.png?v=4.71");
+                $('#marker>img').attr("src", "../src/map/marker/images/kolobot.png");
         });
 
         $("#marker").on("change:cur_pos",function ( evt, coor, param2) {

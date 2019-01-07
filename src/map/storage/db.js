@@ -14,7 +14,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 19;
+        this.version = 20;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -25,6 +25,7 @@ class DB {
             this.baseName = user+ ".D2DStore",
             this.supplierStore = "supplierStore",
             this.orderStore =  "orderStore",
+            this.apprStore = "approvedStore",
             this.offerStore = "offerStore",
             this.dictStore = "dictStore",
             this.profileStore = "profileStore";
@@ -106,6 +107,14 @@ class DB {
                 vOrderStore.createIndex("datesupuid", ["date","supuid"], {unique: false});
                 vOrderStore.createIndex("status", "status", {unique: false});
 
+                try{
+                    db.deleteObjectStore(that.approveStore);
+                }catch(ex){
+
+                }
+                let vApprStore = db.createObjectStore(that.apprStore, {keyPath: ["date", "supuid", "cusuid","title"]});
+                vApprStore.createIndex("datesupcustitle", ["date","supuid", "cusuid", "title"], {unique: true});
+
                 that.connectDB(f);
             };
 
@@ -113,6 +122,21 @@ class DB {
             console.log('connectDB:' + ex);
         }
     }
+
+    //unified storage function
+    SetObject(storeName, obj, f) {
+
+        var objectStore = this.DBcon.transaction([storeName], "readwrite").objectStore(storeName);
+        var request = objectStore.put(obj);
+        request.onerror = function (err) {
+            console.log(err);
+            f(false);
+        };
+        request.onsuccess = function () {
+            f(true);
+        }
+    }
+
 
     GetStorage(storeName, f) {
 
@@ -215,18 +239,6 @@ class DB {
 
     }
 
-    SetObject(storeName, obj, f) {
-
-        var objectStore = this.DBcon.transaction([storeName], "readwrite").objectStore(storeName);
-        var request = objectStore.put(obj);
-        request.onerror = function (err) {
-            console.log(err);
-            f(false);
-        };
-        request.onsuccess = function () {
-            f(true);
-        }
-    }
 
 
     GetDictValue(hash, cb){
@@ -281,14 +293,16 @@ class DB {
             }
         };
     }
+    DeleteOrder(date, supuid, cusuid) {
 
-    delObject(storeName,file) {
-
-        var request = DB.prototype.DBcon.transaction([storeName], "readwrite").objectStore(storeName).delete(file);
-        request.onerror = logerr;
+        var request = DB.prototype.DBcon.transaction('orderStore', "readwrite").objectStore('orderStore').delete([date, supuid,cusuid]);
+        request.onerror = function (ev) {
+            console.log(ev);
+        };
         request.onsuccess = function () {
-            console.log("File delete from DB:", file);
+            console.log("File delete from DB:");
         }
+
     }
 
     GetObject(storeName, date, email,  cb) {
@@ -341,5 +355,19 @@ class DB {
 
             cb(event.target.result[event.target.result.length-1]);
         };
+    }
+
+    GetApproved(date, supuid, cusuid, title, cb){
+        try {
+            let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
+            let index = objectStore.index("datesupcustitle");
+            var request = index.get([date,supuid, cusuid, title]);
+            request.onerror = this.logerr;
+            request.onsuccess = function (ev) {
+                cb(this.result);
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
     }
 }

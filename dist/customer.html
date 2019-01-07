@@ -227,6 +227,13 @@
     <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
 </section>
 
+<style>
+    #period_list .ui-selecting { background: #FECA40; }
+    #period_list .ui-selected { background: #F39814; color: white; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+</style>
+
 <div id="main_window" class="container">
     <div class="row">
         <div class="form-group scaled">
@@ -238,23 +245,24 @@
                 </span>
 
                 <button class="btn btn-default dropdown-toggle sel_time" type="button" data-toggle="dropdown"
-                        data-width="fit" style="display:inline-block;float:right">
+                    data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
-                <ul id="period_list" class="dropdown-menu period_list" role="menu" aria-labelledby="menu1">
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 24:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">06:00 - 08:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">08:00 - 10:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">10:00 - 12:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">12:00 - 14:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">14:00 - 16:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">16:00 - 18:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">18:00 - 20:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">20:00 - 22:00</a></li>
-                    <li href="#"  onclick="window.user.OnClickTimeRange(this)"><a role="menuitem" tabindex="-1" href="#">22:00 - 24:00</a></li>
-                </ul>
+                <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                    <li href="#">06:00 - 08:00</li>
+                    <li href="#">08:00 - 10:00</li>
+                    <li href="#">10:00 - 12:00</li>
+                    <li href="#">12:00 - 14:00</li>
+                    <li href="#">14:00 - 16:00</li>
+                    <li href="#">16:00 - 18:00</li>
+                    <li href="#">18:00 - 20:00</li>
+                    <li href="#">20:00 - 22:00</li>
+                    <li href="#">22:00 - 24:00</li>
+                </ol>
+
             </div>
         </div>
+    </div>
     </div>
 
     <div id="dtp_container"
@@ -277,15 +285,11 @@
 
 <div class="dropdown">
     <button id="reg_button" class="btn btn-default dropdown-toggle scaled" type="button"
-            data-toggle="dropdown" data-width="fit" style="display:inline-block;float:left">
+            onclick="window.user.OnClickUserProfile()"  data-toggle="dropdown" data-width="fit" style="display:inline-block;float:left">
     <a href="#">
         <span class="glyphicon glyphicon-user"></span>
     </a>
     </button>
-    <ul class="dropdown-menu scaled"  role="menu" aria-labelledby="menu0" style="left: 50px;">
-        <li href="#"  onclick="window.user.OnClickUserProfile()"><a role="menuitem" tabindex="0" href="#">My Profile</a></li>
-
-    </ul>
 </div>
 
 <div id="category_include" style="display:none">
@@ -377,179 +381,173 @@
     </div>
 </div>
 
-
 <div id="offer_order" class="modal fade" role="dialog">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <style>
-                .modal-header{
-                    padding:9px 15px;
-                    border-bottom:1px solid #5e5e5e;
-                    background-color: #0e0e0e;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                    font-family: Arial, Helvetica, sans-serif;
-                }
-                .modal-body{
-                    position:sticky;
-                    padding:9px 15px;
-                    border-bottom:1px solid black;
-                    border-top:1px solid black;
-                    border-right:1px solid black;
-                    border-left:1px solid black;
-                    color: #ffffff;
-                    background-color: black ;
-                    -webkit-border-top-left-radius: 0px;
-                    -webkit-border-top-right-radius: 0px;
-                    -moz-border-radius-topleft: 0px;
-                    -moz-border-radius-topright: 0px;
-                    border-top-left-radius: 0px;
-                    border-top-right-radius: 0px;
-                }
-                .modal-footer {
-                    padding: 9px 15px;
-                    border-bottom: 1px solid black;
-                    border-top: 0px;
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <style>
+                    .modal-header{
+                        padding:9px 15px;
+                        border-bottom:1px solid #5e5e5e;
+                        background-color: #0e0e0e;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                        font-family: Arial, Helvetica, sans-serif;
+                    }
+                    .modal-body{
+                        position:sticky;
+                        padding:9px 15px;
+                        border-bottom:1px solid black;
+                        border-top:1px solid black;
+                        border-right:1px solid black;
+                        border-left:1px solid black;
+                        color: #ffffff;
+                        background-color: black ;
+                        -webkit-border-top-left-radius: 0px;
+                        -webkit-border-top-right-radius: 0px;
+                        -moz-border-radius-topleft: 0px;
+                        -moz-border-radius-topright: 0px;
+                        border-top-left-radius: 0px;
+                        border-top-right-radius: 0px;
+                    }
+                    .modal-footer {
+                        padding: 9px 15px;
+                        border-bottom: 1px solid black;
+                        border-top: 0px;
 
-                    color: #5e5e5e;
-                    background-color: black;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-                .comment{
-                    text-align:left;
-                    width: 100%;
-                    color: red;
-                    font-family:'Segoe Script';
-                    font-size: large;
-                    background-color: #0a0a0a
-                }
-                textarea:focus {
-                    outline: none !important;
-                    border-color: #719ECE;
-                    box-shadow: 0 0 10px #719ECE;
-                }
-                .tab-content::-webkit-scrollbar {
-                    width: 0 !important;
-                }
-                li {
-                    float: left;
-                }
+                        color: #5e5e5e;
+                        background-color: black;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                    }
+                    .comment{
+                        text-align:left;
+                        width: 100%;
+                        color: red;
+                        font-family:'Segoe Script';
+                        font-size: large;
+                        background-color: #0a0a0a
+                    }
+                    textarea:focus {
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .tab-content::-webkit-scrollbar {
+                        width: 0 !important;
+                    }
+                    li {
+                        float: left;
+                    }
 
-                li a, .dropbtn {
-                    display: inline-block;
-                    color: white;
-                    text-align: center;
-                    padding: 14px 16px;
-                    text-decoration: none;
-                }
+                    li a, .dropbtn {
+                        display: inline-block;
+                        color: white;
+                        text-align: center;
+                        padding: 14px 16px;
+                        text-decoration: none;
+                    }
 
-                li a:hover, .dropdown:hover .dropbtn {
-                    background-color: red;
-                }
+                    li a:hover, .dropdown:hover .dropbtn {
+                        background-color: red;
+                    }
 
-                li.dropdown {
-                    display: inline-block;
-                }
+                    li.dropdown {
+                        display: inline-block;
+                    }
 
-                .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    background-color: #f9f9f9;
-                    min-width: 160px;
-                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                    z-index: 1;
-                }
+                    .dropdown-content {
+                        display: none;
+                        position: absolute;
+                        background-color: #f9f9f9;
+                        min-width: 160px;
+                        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                        z-index: 1;
+                    }
 
-                .dropdown-content a {
-                    color: black;
-                    padding: 12px 16px;
-                    text-decoration: none;
-                    display: block;
-                    text-align: left;
-                }
+                    .dropdown-content a {
+                        color: black;
+                        padding: 12px 16px;
+                        text-decoration: none;
+                        display: block;
+                        text-align: left;
+                    }
 
-                .dropdown-content a:hover {background-color: #f1f1f1}
+                    .dropdown-content a:hover {background-color: #f1f1f1}
 
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-                textarea{
-                    background-color: #0e0e0e;
-                }
-                [href=".tacollapse"]{
-                    color: whitesmoke;
-                    font-size: 30px;
-                }
-            </style>
-            <div class="modal-header" style="position: relative;color:white;width: 100%;">
-
-                <div class="row" style="display: inline-block; width:95%;margin: 0 auto;">
-                    <div class="col-sm-1 col-xs-1 dropdown">
-                        <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
-                                data-width="fit" type="button" style="background-color: #0a0a0a">
-                            <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
-                        </button>
-                        <ul class="dropdown-menu order_menu_options menu_list scaled">
-                            <li class="supplier_profile" data-width="fit"><a href="#"
+                    .dropdown:hover .dropdown-content {
+                        display: block;
+                    }
+                    textarea{
+                        background-color: #0e0e0e;
+                    }
+                    [href=".tacollapse"]{
+                        color: whitesmoke;
+                        font-size: 30px;
+                    }
+                </style>
+                <div class="modal-header" style="position: relative;color:white;width: 100%;">
+                    <div class="row" style="display: inline-block; width:95%;margin: 0 auto;">
+                        <div class="col-sm-1 col-xs-1 dropdown">
+                            <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
+                                    data-width="fit" type="button" style="background-color: #0a0a0a">
+                                <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
+                            </button>
+                            <ul class="dropdown-menu order_menu_options menu_list scaled">
+                                <li class="supplier_profile" data-width="fit"><a href="#"
                                   data-translate="ec136b444eede3bc85639fac0dd06229">Supplier</a></li>
-                            <li class="publish_order" data-width="fit"><a href="#"
-                                 data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                            <li class="cancel_order" data-width="fit"><a href="#"
+                                <li class="cancel_order" data-width="fit"><a href="#"
                                  data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-sm- col-xs-3">
+                            </ul>
+                        </div>
+                        <div class="col-sm-3 col-xs-3">
+                            <div class="order_div" style="white-space: pre; text-align: center">Order for</div>
+                        </div>
+                        <div class="col-sm-6 col-xs-6">
+                            <div data-translate="884d9804999fc47a3c2694e49ad2536a" style="text-align: center; color:white">Адрес</div>
+                            <!--<label  for="address">Адрес:</label>-->
+                            <div>
+                            <textarea name="address" class="form-control address" rows="1" contenteditable="true"
+                                      style="text-align: center; background-color:black;color: #c4e3f3">Ленинский пр.</textarea>
+                            </div>
+                        </div>
+                        <div class="col-sm-2 col-xs-2">
 
-                    </div>
-                    <div class="col-sm-6 col-xs-6">
-                        <div style="text-align: center; color:white">Адрес:</div>
-                        <!--<label  for="address">Адрес:</label>-->
-                        <div>
-                        <textarea name="address" class="form-control address" rows="1" contenteditable="true"
-                                  style="text-align: center; background-color:black;color: #c4e3f3">Ленинский пр.</textarea>
                         </div>
                     </div>
-                    <div class="col-sm-2 col-xs-2">
-                        <div class="ord_status" style="text-align: center;"></div>
-                        <div></div>
+                    <div style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
+                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
                     </div>
+                    <div class="ord_status" style="position: absolute;right: 0;bottom: 0; font-size: x-small;"></div>
                 </div>
-                <div style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
-                    <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
-
-                </div>
-
-            </div>
-            <div class="modal-body">
-                <div class="tab-content">
-                    <ul class="nav nav-tabs menu_tabs">
-                        <li class="add_tab_li" title="add tab" style="display: none;">
-                            <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
-                            <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
-                        </li>
-                    </ul>
+                <div class="modal-body">
                     <div class="tab-content">
-                        <div class="tab-pane fade add_tab_div" style="border: none"></div>
+                        <ul class="nav nav-tabs menu_tabs">
+                            <li class="add_tab_li" title="add tab" style="display: none;">
+                                <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
+                                <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade add_tab_div" style="border: none"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="modal-footer">
-                <span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>
-                <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
-                    font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
+                <div class="modal-footer">
+                    <span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>
+                    <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
+                        font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
+            </div>
         </div>
-    </div>
     </div>
 
     <style>
@@ -557,10 +555,8 @@
             position: relative;
             border-radius: 5px;
             border: 1px solid #343434;
-            padding: 5px;
             margin-bottom: 5px;
             width: 100%;
-            padding: 10px;
         }
         #menu_item_tmplt {
             display: none;
@@ -571,7 +567,7 @@
             box-shadow: 0 0 10px #719ECE;
         }
         .item_title{
-            display: inline-block;
+
             width: 65%;
             font-family:'Courier New';
             font-size: x-large;
@@ -604,16 +600,26 @@
             bottom:0;
         }
         .item_price{
-            display: inline-block;
+
             color: #0088bb;
             position: relative;
             font-weight:normal;
             font-size:24px;
             word-wrap:normal
         }
+        .item_pack{
 
+            color: #0088bb;
+            position: relative;
+            font-weight:normal;
+            font-size:24px;
+            word-wrap:normal
+        }
+        .qnty_div{
+
+        }
         .qnty{
-            display: inline-block;
+
             color: #0088bb;
             position: relative;
             font-weight:normal;
@@ -628,33 +634,52 @@
 
     <div  id="menu_item_tmplt"   style="background-color: #262626">
 
-        <div class="row" style="background-color: #262626;">
-            <div class="col-sm-7 col-xs-7 input item_title" size="40" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+        <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
 
-            <div class="col-sm-2 col-xs-2 price_div" style="display: inline-block;">
-                <div data-translate="3601146c4e948c32b6424d2c0a7f0118">Цена</div>
-                <div class="input item_price" contenteditable="false"><i class="fa fa-euro"></i></div>
+            <div class="col-xs-6">
+                <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
             </div>
-            <div  class="col-sm-2 col-xs-2 qnty_div" style="display: inline-block; float: right">
-                <div data-translate="ee4a528dce8d6fa440db5ab1cf78f939">Кол-во</div>
-                    <div class="dropdown">
-                    <button class="input btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
-                        style="font-size: large">0
-                        <!--<span class="caret"></span>-->
-                    </button>
-                    <ul class="dropdown-menu scaled"  multiple>
-                        <li><a href="#">0</a></li>
-                        <li><a href="#">1</a></li>
-                        <li><a href="#">2</a></li>
-                        <li><a href="#">3</a></li>
-                        <li><a href="#">4</a></li>
-                        <li><a href="#">5</a></li>
-                    </ul>
+
+            <div class="price_container" style="display: none">
+                <div class="price_div" data-translate="3601146c4e948c32b6424d2c0a7f0118">Цена</div>
+                <div class="input item_price" contenteditable="false" style="white-space: nowrap;"></div>
+            </div>
+            <div class="pack_container  row"  style="display: none">
+                <div class="col-xs-5">
+                    <div data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
+                    <div class="item_pack input dropdown-toggle" data-toggle="dropdown" contentEditable="true" placeholder="     гр."
+                         style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                    <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+                </div>
+                <div class="col-xs-5">
+                    <div>Цена:</div>
+                    <div class="input item_pack_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                </div>
+                <div class="col-xs-1">
+                    <div class="qnty_div" data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="white-space: nowrap;">Кол-во</div>
+                    <div class="dropdown" style="text-align: center">
+                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
+                                style="font-size: large">0
+                            <!--<span class="caret"></span>-->
+                        </button>
+                        <ul class="dropdown-menu scaled"  multiple>
+                            <li><a href="#" role="qntyitem">0</a></li>
+                            <li><a href="#" role="qntyitem">1</a></li>
+                            <li><a href="#" role="qntyitem">2</a></li>
+                            <li><a href="#" role="qntyitem">3</a></li>
+                            <li><a href="#" role="qntyitem">4</a></li>
+                            <li><a href="#" role="qntyitem">5</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="col-xs-1">
+                    <span class="appr_div fa fa-handshake-o approved scaled" style="display:block;position:absolute; top:30px; right:5px;font-size: 20px; visibility: hidden"></span>
                 </div>
             </div>
-            <div class="col-sm-1 col-xs-1 appr_div">
-                <span class="fa fa-handshake-o approved" style="display:none;font-size: 20px"></span>
-            </div>
+
+
+
         </div>
 
         <div class="item_content collapse">
@@ -662,16 +687,33 @@
                 <div class="col-xs-10">
                     <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
                 </div>
-                <div class="col-xs-2">
-                    <img class="input img-fluid w3-image" draggable="false"  src="" >
-                </div>
+                <div class="col-xs-2"></div>
             </div>
+            <div>
+                <img class="input img-fluid w3-image" draggable="false"  src="" >
+            </div>
+            <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
         </div>
     </div>
 
 </div>
 
 <data class="tariff" id="price_editable" value="true"></data>
+
+<div class="browser_container" id="profile_container"
+     style="display:none;   position: fixed;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+        width:75%;  height: 90%; left: 0%; top: 0%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <input type="image" class="move_browser" src="https://nedol.ru/rtc/browser/images/ic_move.png"  draggable="false" style="position: absolute;
+              display:block; top:0px; left:0px; width:40px; height:40px;  z-index:2;opacity: .3"/>\n' +
+    <input type="image" class="resize_browser" src="https://nedol.ru/rtc/browser/images/ic_resize.png" width=40px; height=40px;   draggable="false"
+           style="position: absolute; display:block; bottom:0px; right:0px; z-index:2;opacity: .3"/>
+    <input type="image" class="close_browser" src="https://nedol.ru/rtc/browser/images/ic_stop.png"  style="position: absolute;
+              display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
+    <iframe class="browser" src="html/profile/profile.supplier.html" style="position:absolute;overflow:hidden;" width="100%" height="100%"></iframe>
+</div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
 
@@ -689,5 +731,6 @@
 <data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
 
 <data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
+
 </body>
 </html>

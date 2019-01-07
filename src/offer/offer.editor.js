@@ -1,7 +1,7 @@
 'use strict'
 export {OfferEditor}
 
-var urlencode = require('urlencode');
+
 require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
@@ -34,7 +34,16 @@ class OfferEditor{
 
         this.arCat = [];
     }
-
+    onClickCert(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(!$(this).attr('height'))
+            $(this).attr('height','50');
+        else {
+            $(this).removeAttr('height');
+        }
+        return false;
+    };
 
     OpenOffer() {
 
@@ -64,10 +73,8 @@ class OfferEditor{
         $(".content_text").dblclick(function () {
             selectText($(this));
         });
-
-        $("#offer_editor").find('.modal-title').text("Offer for");
-        $("#offer_editor").find('.modal-title').attr('data-translate', md5('Offer for'));
-        $("#offer_editor").find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        let str = "Предложение по доставке \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_time').text()+")";
+        $("#offer_editor").find('.modal-title').text(str);
         if(that.offer.published)
             $("#offer_editor").find('.offer_status').text('Опубликовано:\r\n'+that.offer.published);
 
@@ -119,7 +126,6 @@ class OfferEditor{
                 $(menu_item).find('.item_title').attr('contenteditable', isEditable);
 
                 if(this.offer.data[tab][i].title){
-
                     $(menu_item).find('.item_title').attr('data-translate', this.offer.data[tab][i].title);
                 }
 
@@ -140,17 +146,35 @@ class OfferEditor{
                 if(this.offer.data[tab][i].height)
                     $(menu_item).find('.content_text').css('height',(this.offer.data[tab][i].height));
 
-
                 if(this.offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img);
-                    $(menu_item).find('.img-fluid').css('left',!this.offer.data[tab][i].img_left?0:this.offer.data[tab][i].img_left);
-                    $(menu_item).find('.img-fluid').css('top', !this.offer.data[tab][i].img_top?0:this.offer.data[tab][i].img_top);
+                    $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img.src);
+                    $(menu_item).find('.img-fluid').css('left',!this.offer.data[tab][i].img.left?0:this.offer.data[tab][i].img.left);
+                    $(menu_item).find('.img-fluid').css('top', !this.offer.data[tab][i].img.top?0:this.offer.data[tab][i].img.top);
 
                     that.MakeDraggable($(menu_item).find('.img-fluid'));
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
+
+                $.each(this.offer.data[tab][i].packlist, function (i, data) {
+                    $(menu_item).find('.pack_list').append("<li href='#'><a role='menuitem' >" + data.pack + " " + data.price + "</a></li>");
+                    $(menu_item).find('.item_pack').text(data.pack);
+                    $(menu_item).find('.item_pack_price').text(data.price);
+                });
+                $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(this.offer.data[tab][i].packlist));
+
+                $(menu_item).find('.gallery').attr('id', 'gallery_' + tab + '_' + i);
+
+                $.each(this.offer.data[tab][i].cert, function (i, data) {
+                    let img = new Image();
+                    img.src = data.src;
+                    //$(img).offset(data.pos);TODO:
+                    img.height = '50';
+                    $(menu_item).find('.gallery').append(img);
+                    $(img).on('click', that.onClickCert);
+                    that.MakeDraggable(img);
+                });
 
                 $('#' + tab).append(menu_item);
 
@@ -161,7 +185,6 @@ class OfferEditor{
                     && $(menu_item).find('.content_text').text()===""){
                     $(menu_item).find('.item_content').slideToggle("fast");
                 }
-
 
                 $(menu_item).find('.add_picture').attr('id', 'ap_' + tab + '_' + i);
                 $(menu_item).find('.add_picture').on('click',this,function (ev) {
@@ -175,6 +198,7 @@ class OfferEditor{
                         $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
                     }
                 });
+
                 $(menu_item).find('.add_content').on('click touchstart',menu_item,function (ev) {
                     let menu_item = $(ev.data);
                     $(menu_item).find('.item_content').slideDown("slow");
@@ -186,6 +210,38 @@ class OfferEditor{
                     }
                     $(menu_item).find('.content_text').css('visibility',vis);
                     $(menu_item).find('.content_text').focus();
+                });
+
+                $(menu_item).find('.add_cert').attr('id', 'ac_' + tab + '_' + i);
+                $(menu_item).find('.add_cert').on('click',this,function (ev) {
+                    let menu_item = $(this).closest('.menu_item');
+                    ev.target = $(menu_item).find('.gallery')[0];
+                    that.OnClickAddCert(ev);
+                    $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
+                });
+
+                $(menu_item).find('.add_pack').attr('id', 'pack_' + tab + '_' + i);
+                $(menu_item).find('.add_pack').on('click', function (ev) {
+                    let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
+                    let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
+                    $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li><a>"+pack+"  "+price+"</a></li>");
+                    let pl = $(menu_item).find('.item_pack').attr('packlist');
+                    if(pl)
+                        pl = JSON.parse(pl);
+                    else pl = [];
+                    pl.push({pack:pack,price:price});
+                    $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
+                });
+
+                $(menu_item).find('.rem_pack').on('click', function (ev) {
+
+                    let list = $(this).closest('.row').siblings('.pack_container').find('.pack_list');
+                    list[0].removeChild(list[0].childNodes[list[0].childNodes.length-1]);
+                    let pl = $(menu_item).find('.item_pack').attr('packlist');
+                    if(pl)
+                        pl = JSON.parse(pl);
+                    pl.pop();
+                    $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
                 });
 
                 $(menu_item).find('.toolbar').css('display', 'block');
@@ -217,7 +273,7 @@ class OfferEditor{
             $('.notoday').removeClass('notoday');
         }
 
-        window.db.GetOrders(date, window.user.email, function (res) {
+        window.db.GetOrders(date, window.user.uid, function (res) {
 
             for (let i in res) {
                 let data = res[i].data;
@@ -233,9 +289,7 @@ class OfferEditor{
                 );
                 calcDistance.then(function (dist) {
                     for (let k in kAr) {
-                        let checked = res[i].data[kAr[k]].approved ? 'checked' : '';
-
-                        $('.item_title[data-translate=' + kAr[k] + ']').siblings('.order_ctrl').css('visibility', 'visible');
+                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_ctrl').css('visibility', 'visible');
                         //if published:
                         // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
                         // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
@@ -243,7 +297,7 @@ class OfferEditor{
                         $("<tr style='text-align: center'>" +
                             "<td class='tablesorter-no-sort'>"+
                                 "<label  class='btn'>" +
-                                "<input type='checkbox' class='checkbox-inline approve' title='"+kAr[k]+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " " + checked + " style='display: none'>" +
+                                "<input type='checkbox' class='checkbox-inline approve' title='"+kAr[k]+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " style='display: none'>" +
                                 "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
                                 "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
                                 "</label>" +
@@ -256,7 +310,12 @@ class OfferEditor{
                             "<td class='tablesorter-no-sort'>"+
                             (res[i].comment?"<span class='tacomment'>" + res[i].comment + "</span>":'') +
                             "</td>"+
-                            "<td></td>" +
+                            "<td>" +
+                                // "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
+                                // "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
+                                // "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
+                                // "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
+                            "</td>" +
                             "<td>" +"0"+ "</td>" +
 
                             "<td class='tablesorter-no-sort notoday' >" +
@@ -268,27 +327,58 @@ class OfferEditor{
                             "</td>" +
                             "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
 
+                            window.db.GetApproved(date, window.user.uid,res[i].cusuid, kAr[k],function (appr) {
+                                if(appr && appr.data.qnty===res[i].data[kAr[k]].qnty &&
+                                    appr.data.price===res[i].data[kAr[k]].price) {
+                                    $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
+                                }
+                            });
+
                             setTimeout(function () {
+                                let pagerOptions = {
+                                    // target the pager markup - see the HTML block below
+                                    container: $(".pager"),
+                                    ajaxUrl: null,
+                                    customAjaxUrl: function(table, url) { return url; },
+                                    ajaxError: null,
+                                    ajaxObject: { dataType: 'json' },
+                                    ajaxProcessing: null,
+                                    processAjaxOnInit: true,
+                                    output: '{startRow:input} – {endRow} / {totalRows} rows',
+                                    updateArrows: true,
+                                    page: 0,
+                                    size: 10,
+                                    savePages : true,
+                                    storageKey:'tablesorter-pager',
+                                    pageReset: 0,
+                                    fixedHeight: true,
+                                    removeRows: false,
+                                    countChildRows: false,
+                                    cssNext: '.next', // next page arrow
+                                    cssPrev: '.prev', // previous page arrow
+                                    cssFirst: '.first', // go to first page arrow
+                                    cssLast: '.last', // go to last page arrow
+                                    cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+                                    cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+                                    cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+                                    // class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+                                    cssDisabled: 'disabled', // Note there is no period "." in front of this class name
+                                    cssErrorRow: 'tablesorter-errorRow' // ajax error information row
+                                };
                                 $('#ordtable_'+ kAr[k]).tablesorter({
                                     theme: 'blue',
                                     widgets: ['zebra', 'column'],
                                     usNumberFormat: false,
                                     sortReset: true,
                                     sortRestart: true,
-                                    sortInitialOrder: 'desc'
-                                });
+                                    sortInitialOrder: 'desc',
+                                    widthFixed: true
+                                })
+                                //.tablesorterPager(pagerOptions);
                             },1000);
 
                     }
-                    //зафиксировать подтвержденный заказ
-                    $(':checkbox.approve').on('click',function (ev) {
-                        if(!$(this).prop('checked')){
-                            event.preventDefault();
-                            event.stopPropagation();
 
-                            return false;
-                        }
-                    });
                 })
                     .catch(function (error) {
                         // ops, mom don't buy it
@@ -318,26 +408,64 @@ class OfferEditor{
         $('input:file').change(function(ev) {
             //listFiles(evt);
             let  files = $("input[type='file']")[0].files;
-            let el = $(ev.target).attr('el_id');
-            utils.HandleFileSelect(ev, files, el, function (data, el, smt) {
+            let el = JSON.parse($(ev.target).attr('func_el'));
+            utils.HandleFileSelect(ev, files, function (data, smt) {
                 if(data) {
-                    $("#" + el).attr('src', data);
-                    let thumb = false;
-                    $("#" + el).css('visibility','visible');
-                    $("#" + el).closest('.menu_item').find('.item_content').slideDown("slow");
+                    if(el.func==='load_img') {
+                        $("#" + el.id).attr('src', data);
+                        let thumb = false;
+                        $("#" + el.id).css('visibility', 'visible');
+                        $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
+                        $("#" + el.id).on('load', function (ev) {
+                            if (!thumb) {
+                                let k = 200/$("#" + el.id).height();
+                                utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
+                                    thumb = true;
+                                    $("#" + el.id).attr('src', thmb.src);
+                                });
+                            }
+                            that.MakeDraggable(this);
+                        });
+                    }else if(el.func==='add_cert') {
+                        let img  = new Image();//'<img src="'+data+'" height="50" >';
+                        img.class = 'cert';
+                        img.src = data;
+                        img.height = '50';
+                        $("#" + el.id).append(img);
+                        $(img).on('click',that.onClickCert);
+                        that.MakeDraggable(img);
 
-                    $("#" + el).on('load', {el:el}, function (ev) {
-                        if(!thumb)
-                            utils.createThumb($("#" + ev.data.el)[0], $("#" + ev.data.el).width(), $("#" + ev.data.el).height(), el, function (thmb, el) {
-                                thumb = true;
-                                $("#" + el).attr('src', thmb.src);
-                            });
+                        // loadImage(
+                        //     files[0],
+                        //     function (img) {
+                        //         $(img).attr('org', data);
+                        //         $("#" + el.id).append($(img));
+                        //         $(img).on('click',that.onClickCert);
+                        //     },
+                        //     {maxHeight: 700,maxWidth:1000} // Options
+                        // );
 
-                        that.MakeDraggable(this);
-                    })
+                        // let img  = new Image();//'<img src="'+data+'" height="50" >';
+                        // img.src = data;
+                        // $(img).on('load', function (ev) {
+                        //     let thumb = false;
+                        //     if (!thumb) {
+                        //         let k = 700/$(this).height();
+                        //         utils.createThumb(img, $(img).width()*k, $(img).height()*k, function (thmb) {
+                        //             thumb = true;
+                        //             $(img).attr('src', thmb.src);
+                        //         });
+                        //     }
+                        // });
+
+                    }
 
                 }
             });
+        });
+
+        $('.input').click(function (ev) {
+            that.changed = true;
         });
 
         $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
@@ -355,6 +483,33 @@ class OfferEditor{
                 });
             }
         });
+    }
+
+    OnClickImport(ev){
+        let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
+        let addr = prompt(text);
+        if(addr) {
+            $(ev.target).attr('src', addr);
+        }else{
+            $('.modal').find('.file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
+            $('.modal').find('.file').trigger('click');
+        }
+
+        this.changed = true;
+    }
+
+
+    OnClickAddCert(ev){
+        let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
+        let addr = prompt(text);
+        if(addr) {
+            $(ev.target).attr('src', addr);
+        }else{
+            $('.modal').find('.file').attr('func_el', JSON.stringify({func:'add_cert',id:$(ev.target).attr('id')}));
+            $('.modal').find('.file').trigger('click');
+        }
+
+        this.changed = true;
     }
 
     MakeDraggable(el){
@@ -490,6 +645,10 @@ class OfferEditor{
             $(menu_item).find('.img-fluid').css('right','5px');
         });
 
+        $(menu_item).find('.input').click(function (ev) {
+            that.changed = true;
+        });
+
         $(tab).append(menu_item[0]);
 
         $(menu_item).find('.toolbar').css('display', 'block');
@@ -517,27 +676,6 @@ class OfferEditor{
 
             this.changed = true;
         }
-    }
-
-    OnClickImport(ev){
-        let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
-        let addr = prompt(text);
-        if(addr) {
-
-            $(ev.target).attr('src', addr);
-            // $(ev.target).on('load', {el:ev.target}, function (ev) {
-            //     createThumb($(ev.data.el)[0], $(ev.data.el).width(), $(ev.data.el).height(), ev.data.img, function (thmb, el) {
-            //         $(el).attr('src', thmb.src);
-            //         $(el).css('visibility', 'visible');
-            //     });
-            // })
-
-        }else{
-            $('.modal').find('.file').attr('el_id', $(ev.target).attr('id'));
-            $('.modal').find('.file').trigger('click');
-        }
-
-        this.changed = true;
     }
 
     CancelMenu(ev){
@@ -640,17 +778,24 @@ class OfferEditor{
                 }
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                    item.img = $(miAr[i]).find('.img-fluid').attr('src');
-                    if(parseInt($(miAr[i]).find('.img-fluid').position().left)!=0)
-                        item.img_left = parseInt($(miAr[i]).find('.img-fluid').position().left);
-                    if(parseInt($(miAr[i]).find('.img-fluid').position().top)!=0)
-                        item.img_top = parseInt($(miAr[i]).find('.img-fluid').position().top);// / window.innerHeight * 100))+'%';
+                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
+                    if(parseInt($(miAr[i]).find('.img-fluid').css('left'))!==0)
+                        item.img.left  = $(miAr[i]).find('.img-fluid').css('left');
+                    if(parseInt($(miAr[i]).find('.img-fluid').css('top'))!==0)
+                        item.img.top = $(miAr[i]).find('.img-fluid').css('top');// / window.innerHeight * 100))+'%';
+
                 }else {
                     delete item.img;
                 }
 
                 $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.user.ApproveOrder(window.user.date, window.user.email, $(el).attr('cusuid'));
+                    window.user.ApproveOrder({
+                        title: item.title,
+                        date:window.user.date,
+                        period:$('.sel_time'),
+                        supuid:window.user.uid,
+                        cusuid:$(el).attr('cusuid')
+                    });
                 });
 
                 offerObj[value].push(item);
@@ -700,7 +845,6 @@ class OfferEditor{
                 let key = $(title).attr('data-translate');
                 let text = $(miAr[i]).find('.item_title').text();
 
-
                 if (text.length === 0 || !text.trim())
                     continue;
                 if(!window.dict.dict[key]) {
@@ -720,6 +864,7 @@ class OfferEditor{
                 item.price = $(miAr[i]).find('.item_price').text();
                 if(!item.price)
                     continue;
+
 
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
@@ -747,18 +892,27 @@ class OfferEditor{
                 }
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                    item.img = $(miAr[i]).find('.img-fluid').attr('src');
+                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
                     if(parseInt($(miAr[i]).find('.img-fluid').css('left'))!==0)
-                        item.img_left  = $(miAr[i]).find('.img-fluid').css('left');
+                        item.img.left  = $(miAr[i]).find('.img-fluid').css('left');
                     if(parseInt($(miAr[i]).find('.img-fluid').css('top'))!==0)
-                        item.img_top = $(miAr[i]).find('.img-fluid').css('top');// / window.innerHeight * 100))+'%';
+                        item.img.top = $(miAr[i]).find('.img-fluid').css('top');// / window.innerHeight * 100))+'%';
                 }else {
                     delete item.img;
                 }
 
+                item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
+                if(item.packlist)
+                    item.packlist = JSON.parse(item.packlist);
+
+                item.cert = [];
+                $.each($(miAr[i]).find('.gallery').children(), function (i, el) {
+                    item.cert.push({src:el.src,pos:$(el).position()});
+                });
+
                 $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.db.GetOrder(window.user.date, window.user.email, $(el).attr('cusuid'),function (obj) {
-                        window.user.ApproveOrder($(el).attr('title'),$(el).attr('orderdate'),obj);
+                    window.db.GetOrder(window.user.date, window.user.uid, $(el).attr('cusuid'),function (obj) {
+                        window.user.ApproveOrder(obj);
                     });
                 });
 
@@ -790,15 +944,11 @@ class OfferEditor{
         //if(ev.data.changed)
         let items = that.SaveOffer(ev,window.sets.lang);
 
-        if($('.menu_item').find('input:checked').length>0 && window.user.ValidateOffer(items['remote'])){
-
-            var r = confirm($('#do_publish_offer').text());
-            if (r == true) {
+        if(that.changed) {
+            if ($('.menu_item').find('input:checked').length > 0 && window.user.ValidateOffer(items['remote'])) {
                 window.user.PublishOffer(items['remote'], window.user.date, ev.data.location, function (obj) {
                     window.user.offer.stobj = obj;
                 });
-            } else {
-
             }
         }
 

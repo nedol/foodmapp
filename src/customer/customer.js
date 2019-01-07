@@ -41,6 +41,7 @@ class Customer{
     }
 
     IsAuth_test(cb){
+        let that = this;
 
         this.map.Init();
 
@@ -65,9 +66,41 @@ class Customer{
             cb();
         });
 
+        $( "#period_list" ).selectable({
+            stop: function() {
+                var result;
+                $( ".ui-selected", this ).each(function(i) {
+                    let index = $( "#period_list li" ).index( this );
+                    if(i===0)
+                    result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    if($( ".ui-selected").length===i+1)
+                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                });
+                $('.sel_time').text(result);
+
+                let layers = that.map.ol_map.getLayers();
+                layers.forEach(function (layer, i, layers) {
+                    if(layer.constructor.name==="_ol_layer_Vector_") {
+                        layer.getSource().refresh();
+                    }
+                });
+                //not offer but selected period store
+                window.db.SetObject('offerStore',{date:that.date,period:result},function (res) {
+
+                });
+            }
+        });
+
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
-
+        window.db.GetOffer(this.date,function (res) {
+            if(res){
+                $('.sel_time').text(res.period);
+            }else{
+                let time = $('.period_list').find('a')[0].text;
+                $('.sel_time').text(time);
+            }
+        });
         this.DateTimePickerEvents();
     }
 
@@ -148,9 +181,6 @@ class Customer{
     DateTimePickerEvents(){
         let that = this;
 
-        let time = $('.period_list').find('a')[0].text;
-        $('.sel_time').text(time);
-
         $('#dt_from').on("dp.change",this, function (ev) {
 
             let date_from =  new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
@@ -167,7 +197,7 @@ class Customer{
             $(this).data("DateTimePicker").toggle();
         });
 
-        $('.sel_time').on("change",this,function (ev) {
+        $('.sel_time').on("dp.change",this,function (ev) {
             let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
             let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];
             $('#dt_from').val(from);
@@ -218,7 +248,15 @@ class Customer{
                     layer.getSource().refresh();
                 }
             });
+            window.db.GetOffer(that.date ,function (res) {
+                if(res){
+                    $('.sel_time').text(res.period);
+                }else{
+                    window.db.SetObject('offerStore',{date:that.date,period:$('.sel_time').text()},function (res) {
 
+                    });
+                }
+            });
             that.map.import.GetApprovedCustomer(function () {
 
             });
@@ -226,6 +264,7 @@ class Customer{
     }
 
     OnClickTimeRange(ev){
+        let that = this;
         let from = $(ev).text().split(' - ')[0];
         let to = $(ev).text().split(' - ')[1];
         $('.sel_time').text($(ev).text());
@@ -237,6 +276,10 @@ class Customer{
                 layer.getSource().refresh();
             }
         });
+        //not offer but selected period store
+        window.db.SetObject('offerStore',{date:that.date,period:$(ev).text()},function (res) {
+
+        });
     }
 
     PickRegion(){
@@ -244,8 +287,10 @@ class Customer{
     }
 
     UpdateOrderLocal(obj){
-        if(Object.keys(obj.data).length===0)
+        if(Object.keys(obj.data).length===0) {
+            window.db.DeleteOrder(obj.date, obj.supuid, obj.cusuid);
             return;
+        }
         window.db.SetObject('orderStore',obj,(res)=>{
 
         });
@@ -289,7 +334,7 @@ class Customer{
         });
     }
 
-    PublishOrder(obj, adr, cb){
+    PublishOrder(obj,cb){
         let that = this;
 
         obj.proj = "d2d";
@@ -315,7 +360,7 @@ class Customer{
                 ord.data[data.order.title].approved = data.order.data.approved;
                 window.db.SetObject('orderStore', ord, function (res) {
                     if(window.user.viewer){
-                        window.user.viewer.RedrawOrder(ord)
+                        //window.user.viewer.RedrawOrder(ord)
                     }
                 });
             });
@@ -382,7 +427,7 @@ class Customer{
     }
 
     OnClickUserProfile(li){
-
+        $('#profile_container').css('display','block')
     }
 
 }

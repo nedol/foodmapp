@@ -75,7 +75,7 @@ class Utils{
         return deferred.promise();
     }
 
-    createThumb(base, w, h, logo, callback) {
+    createThumb(base, w, h, callback) {
         var c = document.createElement("canvas"),    // create a canvas
             ctx = c.getContext("2d"),                // get context
             img = new Image();                       // final image
@@ -84,7 +84,7 @@ class Utils{
         c.height = h;
         ctx.drawImage(base, 0, 0, w, h);            // draw in frame
         img.onload = function() {                    // handle async loading
-            callback(this, logo);                // provide image to callback
+            callback(this);                // provide image to callback
         };
         img.src = c.toDataURL();                     // convert canvas to URL
     }
@@ -123,7 +123,7 @@ class Utils{
         return d * 1000; // meters
     }
 
-    HandleFileSelect(evt, files, el, cb) {
+    HandleFileSelect(evt, files, cb) {
         evt.stopPropagation();
         evt.preventDefault();
         let that = this;
@@ -138,7 +138,7 @@ class Utils{
                 case "audio/mp3": case "audio/amr": case "audio/wav":  case "video/mp4": case "ogg":
 
                 that.LoadFile(f, function (obj) {
-                    cb(obj, el);
+                    cb(obj);
                 });
                 break;
                 case "image/jpeg":   case "image/jpg":
@@ -147,7 +147,7 @@ class Utils{
                     that.LoadImage(f, function (obj) {
                         if(!obj)
                             return null;
-                        cb(obj, el);
+                        cb(obj);
                     });
                     break;
             }
@@ -175,9 +175,9 @@ class Utils{
             },
             {
                 orientation:true,
-                canvas:true
+                canvas:true,
                 //maxWidth: 600,
-                //maxHeight: 300
+                maxHeight: 300
             }// Options
         );
 

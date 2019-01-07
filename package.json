@@ -42,6 +42,7 @@
     "array-intersection": "^0.1.2",
     "axios": "^0.18.0",
     "axios-cancel": "^0.2.2",
+    "blueimp-load-image": "^2.20.1",
     "bootstrap": "^3.3.7",
     "bootstrap-datetimepicker": "0.0.7",
     "bootstrap-datetimepicker-npm": "^4.17.37-npm",
