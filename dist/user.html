@@ -1,0 +1,505 @@
+<html>
+<head>
+    <title>D2D User</title>
+    <link rel="shortcut icon" type="image/x-icon" href="../src/user/images/ic_infodesk_32.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" >
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
+    <meta charset="UTF-8">
+
+</head>
+
+<link rel="stylesheet" href="https://openlayers.org/en/v4.2.0/css/ol.css" type="text/css">
+<!-- The line below is only needed for old environments like Internet Explorer and Android 4.x -->
+
+<!--<script src="../lib/load-image.all.min.js"></script>-->
+<link rel="stylesheet" type="text/css" href="../src/user/css/dialog-polyfill.css" />
+
+<script src="https://cdn.polyfill.io/v2/polyfill.min.js?features=fetch,requestAnimationFrame,Element.prototype.classList,URL" defer async></script>
+<!--<script src="https://aframe.io/releases/0.5.0/aframe.min.js"></script>-->
+<!--<script src="../lib/aframe-extras.js"></script>-->
+
+
+
+<script type="text/javascript" src="host.js"></script>
+<script type="text/javascript" src="user.js"></script>
+
+<body>
+
+<style>
+
+    html, body{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .map{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        z-index: 0;
+    }
+
+    /*#map:focus {*/
+    /*outline: #4A74A8 solid 0.15em;*/
+    /*}*/
+
+    /*
+
+    .ui-content {
+        position: absolute;
+        top: 40px;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        padding: 0 !important;
+    }
+
+    .ui-loader {
+        display: none !important;
+    }
+
+    .ol-control button{
+        background-color: rgba(40, 40, 40, 0.8) !important;
+    }
+    .ol-control button:hover{
+        background-color: rgba(40, 40, 40, 1) !important;
+    }
+
+    .ol-popup {
+        position: absolute;
+        min-width: 180px;
+        background-color: white;
+        -webkit-filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        filter: drop-shadow(0 1px 4px rgba(0,0,0,0.2));
+        padding: 15px;
+        border-radius: 10px;
+        border: 1px solid #ccc;
+        bottom: 12px;
+        left: -50px;
+    }
+    .ol-popup:after, .ol-popup:before {
+        top: 100%;
+        border: solid transparent;
+        content: " ";
+        height: 0;
+        width: 0;
+        position: absolute;
+        pointer-events: none;
+    }
+    .ol-popup:after {
+        border-top-color: white;
+        border-width: 10px;
+        left: 48px;
+        margin-left: -10px;
+    }
+    .ol-popup:before {
+        border-top-color: #cccccc;
+        border-width: 11px;
+        left: 48px;
+        margin-left: -11px;
+    }
+    .ol-popup-closer {
+        text-decoration: none;
+        position: absolute;
+        top: 2px;
+        right: 8px;
+    }
+    .ol-popup-closer:after {
+        content: "✖";
+    }
+    a.skiplink {
+        position: absolute;
+        clip: rect(1px, 1px, 1px, 1px);
+        padding: 0;
+        border: 0;
+        height: 1px;
+        width: 1px;
+        overflow: hidden;
+    }
+    a.skiplink:focus {
+        clip: auto;
+        height: auto;
+        width: auto;
+        background-color: #fff;
+        padding: 0.3em;
+    }*/
+
+
+    #app_but{
+        display: block;
+        position: absolute;
+        cursor: pointer;
+        right: 5px;
+        bottom: 5px;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        /*background-color: rgba(200,200,200,0.7);*/
+        z-index:2;
+
+    }
+
+
+
+    #locText{
+        display: inline-block;
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 100px;
+        /*text-align: right;*/
+        /*left: 400px;*/
+        color:red;
+        font-size: small;
+        z-index:1;
+    }
+    #mouse_pos_div{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        left: 10px;
+        color:dimgrey;
+        font-size: small;
+    }
+
+    .thumb {
+        height: 75px;
+        border: 1px solid #000;
+        margin: 10px 5px 0 0;
+    }
+
+    #browser{
+        height: 100%;
+        width:100%;
+        border-radius: 15px 15px;
+        background-color: white;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        padding: 0px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index:10;
+    }
+
+    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
+
+    @-webkit-keyframes bounce {
+        0%       { -webkit-transform:  scale(1, 1);}
+        25%      { -webkit-transform:  scale(1.2, 1.2);}
+        50%      { -webkit-transform:  scale(0.7, 0.7);}
+        75%      { -webkit-transform:  scale(1.1, 1.1);}
+        100%     { -webkit-transform:  scale(1, 1);}
+    }
+    .grow { transition: all .2s ease-in-out; }
+    .grow:hover { transform: scale(1.75); }
+
+    #zoom_but{
+        display:block;
+        position: absolute;
+        /*z-index:30;*/
+        color: #1b1b1b;
+        top: 50%;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        /*line-height: auto;*/
+        border: solid 1px grey;
+        text-align:center;
+        vertical-align:middle;
+        font-size: 170%;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: whitesmoke;
+        cursor: n-resize;
+    }
+
+    #search_but{
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #loc_ctrl {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 30%;
+        width: 40px;
+        height: 40px;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #location_img {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:10;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #pin {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: transparent;
+        z-index:12;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+</style>
+<div id="map" class="map"></div>
+
+
+<div id="category_include" style="display:none">
+    <style>
+        .category{
+            padding-left: 30px;
+            padding-right: 30px;
+            height: 40px;
+            /*width: 40px;*/
+            /*align:"left";*/
+        }
+
+        .category:hover{
+            /*height: 50px;*/
+            /*width: 50px;*/
+        }
+
+
+        #categories{
+            position: fixed;
+            top:0px;
+            width:100%;
+            padding-top: 5px;
+            background-color: rgba(0, 140, 201, 1.0);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index:20;
+        }
+    </style>
+
+    <div id="category_container">
+        <img src="../src/user/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px;
+        right: 50%; left:50%"/>
+    </div>
+
+    <div align="center" id="categories">
+        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../src/user/images/ic_0.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../src/user/images/ic_10.png" state="1" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../src/user/images/ic_20.png" state="1" />
+        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../src/user/images/ic_30.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../src/user/images/ic_40.png" state="1" />
+        <input type="image" class="category" cat="fish" id="50" title="Fresh fish" src="../src/user/images/ic_50.png" state="1" />
+        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../src/user/images/ic_60.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../src/user/images/ic_70.png" state="1" />
+        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../src/user/images/ic_80.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../src/user/images/ic_90.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../src/user/images/ic_100.png" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../src/user/images/ic_110.png" state="0" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../src/user/images/ic_120.png" state="0" style="opacity: 0.3;" />
+    </div>
+
+</div>
+
+<div id="menu_include">
+
+    <style>
+        [data-tip] {
+            position:relative;
+
+        }
+        [data-tip]:before {
+            content:'';
+            /* hides the tooltip when not hovered */
+            display:none;
+            content:'';
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+            border-bottom: 5px solid #1a1a1a;
+            position:absolute;
+            top:30px;
+            left:35px;
+            z-index:8;
+            font-size:0;
+            line-height:0;
+            width:0;
+            height:0;
+        }
+        [data-tip]:after {
+            display:none;
+            content:attr(data-tip);
+            position:absolute;
+            top:35px;
+            left:0px;
+            padding:5px 8px;
+            background:#1a1a1a;
+            color:#fff;
+            z-index:9;
+            font-size: 0.75em;
+            height:18px;
+            line-height:18px;
+            -webkit-border-radius: 3px;
+            -moz-border-radius: 3px;
+            border-radius: 3px;
+            white-space:nowrap;
+            word-wrap:normal;
+        }
+        [data-tip]:hover:before,
+        [data-tip]:hover:after {
+            display:block;
+        }
+        .menu_item{
+            padding-left: 30px;
+            padding-right: 30px;
+            height: 40px;
+        }
+        #menu_container {
+            position: absolute;
+            display: block;
+            bottom: 0px;
+            width: 100%;
+            background-color: transparent;
+            height: 60px;
+            visibility: visible;
+        }
+        #menu_items{
+            position: fixed;
+            bottom:0px;
+            overflow-x: auto;
+            width:100%;
+            height: 50px;
+            padding-top: 10px;
+            background-color: rgba(250, 250, 250, .8);
+            white-space: nowrap;
+            z-index:20;
+        }
+    </style>
+
+    <div id="menu_container">
+        <img src="../src/user/images//ic_menu.png" style="position: absolute;width: auto; height: 15px;  bottom: 10px;
+            right: 50%; left:50%"/>
+    </div>
+
+
+    <div align="center" id="menu_items">
+        <!--<input type="image" class="menu_item" id="bucket"  title="Bucket" src="./images/ic_bucket_list.png" onclick="OnClickBucket(this);" >-->
+        <input type="image" class="menu_item" id="ar"  title="AR" src="../src/user/images/butterfly_net.png" >
+        <input type="image" class="menu_item" id="settings" title="Settings" src="../src/user/images/ic_settings.png" />
+        <input type="image"  class="menu_item" id="favourites" title="Favourites" src="../src/user/images/ic_heart_red.png"/>
+        <input type="image" class="menu_item" id="audio_list" title="My Records" src="../src/user/images/ic_mic_list.png"/>
+        <input type="image" class="menu_item" id="photo_list" title="My Photos" src="../src/user/images/ic_photo_list.png"/>
+        <input type="image" class="menu_item" id="import" title="Import" src="../src/user/images/ic_import.png" />
+        <input type="image" class="menu_item" id="auth" title="Regestry" src="../src/user/images/ic_register.png" style="visibility: hidden"/>
+
+    </div>
+    <input type="file" id="file" multiple style="display: none; height: 60px;"/>
+
+</div>
+
+
+<div id="settings_include" style="display: none">
+    <!-- The Modal -->
+    <dialog id="settings_modal" class="w3-modal" role="dialog">
+        <link rel="stylesheet" href="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css" />
+        <script src="https://code.jquery.com/jquery-1.11.1.min.js"></script>
+        <script src="https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.js"></script>
+        <img id="close_settings" src="../src/user/images//ic_stop.png"
+             style="float: right; width: 28px; height: 28px;
+				vertical-align: top"/>
+        <!-- Modal content -->
+        <div class="w3-modal-content">
+            <div class="w3-container">
+                <h3 align="center" data-translate="Settings">Settings</h3>
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend  data-translate="Language:">Language:</legend>
+                    <input type="radio" name="radio-choice-lang" id="radio-choice-lang-1a" lang="en" value="on">
+                    <label for="radio-choice-lang-1a">
+                        <img  src="../src/user/images//flag_uk.png" width="40px" height="30px" />
+                    </label>
+                    <input type="radio" name="radio-choice-lang" id="radio-choice-lang-1b" lang="ru" value="off">
+                    <label for="radio-choice-lang-1b">
+                        <img  src="../src/user/images//flag_ru.png" width="40px" height="30px" />
+                    </label>
+                </fieldset>
+            </div>
+            <div class="w3-container">
+                <fieldset data-role="controlgroup" data-type="horizontal" style="padding-right: 10px">
+                    <legend  data-translate="Data Sources:">Data Sources:</legend>
+                    <input type="checkbox" name="checkbox-h-2a" id="checkbox-h-2a" data_src="osm" >
+                    <label for="checkbox-h-2a">
+                        <img  for="checkbox-h-2a" src="../src/user/images//osm_logo.png" width="30px" height="30px"/>
+                    </label>
+                    <input type="checkbox" name="checkbox-h-2b" id="checkbox-h-2b" data_src="google" >
+                    <label for="checkbox-h-2b">
+                        <img src="../src/user/images//google.png" width="30px" height="30px" />
+                    </label>
+                    <input type="checkbox" name="checkbox-h-2c" id="checkbox-h-2c" data_src="facebook" >
+                    <label for="checkbox-h-2c">
+                        <img  src="../src/user/images//fb_logo.png" width="30px" height="30px"/>
+                    </label>
+                </fieldset>
+
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend  data-translate="Maps:">Maps:</legend>
+                    <input type="radio" name="radio-choice-map" id="radio-choice-map-2a" map="bing" value="on" checked="checked">
+                    <label for="radio-choice-map-2a">
+                        <img  src="../src/user/images//bing_logo.png" width="30px" height="30px" />
+                    </label>
+                    <input type="radio" name="radio-choice-map" id="radio-choice-map-2b" map="osm" value="off">
+                    <label for="radio-choice-map-2b">
+                        <img  src="../src/user/images//osm_logo.png" width="30px" height="30px" />
+                    </label>
+                </fieldset>
+            </div>
+            <div class="w3-container">
+                <fieldset data-role="controlgroup" data-type="horizontal">
+                    <legend  data-translate="Draggable Marker:">Draggable Marker:</legend>
+                    <input type="checkbox" name="checkbox-h-3a" id="checkbox-h-3a" drag="false">
+                    <label for="checkbox-h-3a">
+                        <img  for="checkbox-h-3a" src="../src/user/images//drag_marker.png" width="30px" height="30px"
+                              style="padding: 0px" />
+                    </label>
+                </fieldset>
+            </div>
+        </div>
+    </dialog>
+</div>
+
+<span id="locText" style="font-family: serif">Lat Lon</span>
+
+
+<div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
+
+<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;
+    visibility: visible" align="center"/>
+
+<img id="search_but"  src="../src/user/images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="../src/user/images/ic_location.png">
+    <img id="pin" src="../src/user/images/ic_pin.png">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
+</body>
+</html>

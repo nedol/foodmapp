@@ -1,8 +1,9 @@
 'use strict'
 export {OfferEditor}
 
+require('webpack-jquery-ui/draggable');
+require('jquery-ui-touch-punch');
 
-require('bootstrap/js/modal.js');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 
@@ -60,10 +61,9 @@ class OfferEditor{
 
         let isEditable = true;
 
-        $("#offer_editor").modal({
-            show: true,
-            keyboard:true
-        });
+
+        $("#offer_editor").css('display','block');
+
 
         function selectText(el) {
             $(el).focus();
@@ -78,8 +78,6 @@ class OfferEditor{
         if(that.offer.published)
             $("#offer_editor").find('.offer_status').text('Опубликовано:\r\n'+that.offer.published);
 
-        $("#offer_editor").off('hide.bs.modal');
-        $("#offer_editor").on('hide.bs.modal', this,this.CloseMenu);
 
         this.lang = window.sets.lang;
         window.sysdict.set_lang(window.sets.lang,$("#menu_item_tmplt"));
@@ -90,9 +88,9 @@ class OfferEditor{
 
         for (let tab in this.offer.data) {
             if(!tab) continue;
-
+            let active = (tab==='0'?' active':'');
             if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="'+isEditable+'" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+                $('<li class="tab_inserted"+active><a data-toggle="tab"  contenteditable="'+isEditable+'" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
                     '</li>').insertBefore($('#add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
                     '</div>').insertBefore($('#add_tab_div'));
@@ -109,7 +107,6 @@ class OfferEditor{
                 $(menu_item).find(':checkbox').attr('pos', i);
                 $(menu_item).find(':checkbox').attr('tab', tab);
                 $('.btn').css('visibility','visible');
-
 
                 if (this.offer.data[tab][i].checked == 'true') {
                     $(menu_item).find(':checkbox').prop('checked', true);
@@ -134,15 +131,16 @@ class OfferEditor{
 
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
                 $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
+                $(menu_item).find('.item_title').attr('contenteditable', 'true');
 
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
+
                 $(menu_item).find('.content_text').attr('contenteditable', 'true');
                 $(menu_item).find('.content_text').attr('data-translate',this.offer.data[tab][i].content);
                 if(this.offer.data[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
                 if(this.offer.data[tab][i].width)
                     $(menu_item).find('.content_text').css('width',(this.offer.data[tab][i].width));
-
                 if(this.offer.data[tab][i].height)
                     $(menu_item).find('.content_text').css('height',(this.offer.data[tab][i].height));
 
@@ -396,6 +394,10 @@ class OfferEditor{
         //     $(sp).on('changed.bs.select', this, this.OnChangeLang);
         // }
 
+        $('.content_text').draggable();
+        //$('.content_text').resizable();
+
+
         let evnts = $._data($('#add_tab').get(0), "events");
         if(!evnts || !evnts['click'])
             $('#add_tab').on('click', this, this.AddTab);
@@ -466,6 +468,7 @@ class OfferEditor{
 
         $('.input').click(function (ev) {
             that.changed = true;
+            $(this).focus();
         });
 
         $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
@@ -483,6 +486,14 @@ class OfferEditor{
                 });
             }
         });
+
+        $('.close_browser').off('click touchstart');
+        $('.close_browser').on('click touchstart', this,  that.CloseMenu);
+
+        that.MakeDraggable($("#offer_editor"));
+
+        // $("#offer_editor").resizable();//TODO: do we need it?
+
     }
 
     OnClickImport(ev){
@@ -491,8 +502,8 @@ class OfferEditor{
         if(addr) {
             $(ev.target).attr('src', addr);
         }else{
-            $('.modal').find('.file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
-            $('.modal').find('.file').trigger('click');
+            $('input.file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
+            $('input.file').trigger('click');
         }
 
         this.changed = true;
@@ -518,7 +529,7 @@ class OfferEditor{
                 console.log("drag start");
             },
             drag: function () {
-                $(el).attr('drag', true);
+                //$(el).attr('drag', true);
             },
             stop: function () {
                 // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
@@ -647,6 +658,19 @@ class OfferEditor{
 
         $(menu_item).find('.input').click(function (ev) {
             that.changed = true;
+        });
+
+        $(menu_item).find('.add_pack').attr('id', 'pack_' + tab);
+        $(menu_item).find('.add_pack').on('click', function (ev) {
+            let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
+            let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
+            $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li><a>"+pack+"  "+price+"</a></li>");
+            let pl = $(menu_item).find('.item_pack').attr('packlist');
+            if(pl)
+                pl = JSON.parse(pl);
+            else pl = [];
+            pl.push({pack:pack,price:price});
+            $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
         });
 
         $(tab).append(menu_item[0]);
@@ -951,6 +975,8 @@ class OfferEditor{
                 });
             }
         }
+
+        $("#offer_editor").css('display','none');
 
         $("#offer_editor").find('.tab-pane').empty();
 

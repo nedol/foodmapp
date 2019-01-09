@@ -2,7 +2,9 @@
 export {OfferOrder}
 
 var urlencode = require('urlencode');
-require('bootstrap/js/modal.js');
+require('jquery-ui')
+require('jquery-ui-touch-punch');
+require('jquery.ui.touch');
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 // require('bootstrap/dist/css/bootstrap.css');
@@ -40,16 +42,12 @@ class OfferOrder {
         $(this.ovc).attr('id','offer_order_clone');
         $(this.ovc).insertAfter($("#offer_order"));
 
-        this.ovc.modal({
-            show: true,
-            keyboard:true
-        });
-
-
+        this.ovc.css('display','block');
+        this.ovc.draggable();
+        this.ovc.resizable();//TODO: do we need it?
+        $(this.ovc).addTouch();
 
         this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
-        this.ovc.off('hide.bs.modal');
-        this.ovc.on('hide.bs.modal', this,this.CloseMenu);
 
         $(this.ovc).find('.publish_order').off('click touchstart');
         $(this.ovc).find('.publish_order').on('click touchstart',this,function (ev) {
@@ -61,13 +59,19 @@ class OfferOrder {
                 $(that.ovc).find('.ord_status').text(status + "\r\n"+ data.published);
                 that.status = Object.keys(data)[1];
 
-                window.db.GetProfile(function (obj) {
+                window.db.GetSettings(function (obj) {
                     obj[0].address = items.address;
-                    window.db.SetObject('profileStore',obj[0], function () {
+                    window.db.SetObject('setStore',obj[0], function () {
 
                     });
                 });
             });
+        });
+        $('.close_browser').on('click touchstart', this, function (ev) {
+            let that = ev.data;
+            that.SaveOrder(ev,window.sets.lang);
+            that.offer = '';
+            $(that.ovc).remove();
         });
     }
 
@@ -310,13 +314,6 @@ class OfferOrder {
         });
     }
 
-    CloseMenu(ev) {
-        let that = ev.data;
-        that.SaveOrder(ev,window.sets.lang);
-        that.offer = '';
-        $('#offer_order_clone').remove();
-    }
-
     GetOrderItems(){
         let that = this;
         let obj = {data:{}};
@@ -356,9 +353,9 @@ class OfferOrder {
                 $(that.ovc).find('.ord_status').css('color', 'white');
                 $(that.ovc).find('.ord_status').text(status + "\r\n" + data.published);
                 that.status = Object.keys(data)[1];
-                window.db.GetProfile(function (obj) {
+                window.db.GetSettings(function (obj) {
                     obj[0].address = items.address;
-                    window.db.SetObject('profileStore', obj[0], function () {
+                    window.db.SetObject('setStore', obj[0], function () {
 
                     });
                 });

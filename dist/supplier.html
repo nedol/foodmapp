@@ -12,7 +12,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
@@ -21,9 +21,6 @@
 
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
-
-<script src="../node_modules/blueimp-load-image/js/load-image.all.min.js"></script>
-
 
 <style>
 
@@ -340,8 +337,12 @@
 
 </div>
 
-<div id="offer_editor" class="modal fade" role="dialog">
-    <div class="modal-dialog modal-lg">
+<div id="offer_editor" style="display: none; position: fixed;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       width:75%;  height: auto; left: 0%; top: 0%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div>
         <div class="modal-content">
             <style>
                 .modal-header{
@@ -490,14 +491,12 @@
                         <div class="modal-title" style="text-align: center;"></div>
                     </div>
 
-                    <div class="col-sm-5 col-xs-5"></div>
+                    <div class="col-sm-7 col-xs-7"></div>
 
-                    <div  class="col-sm-2 col-xs-2">
-
-                    </div>
-                    <div class="col-sm-1 col-xs-1">
-                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
-                    </div>
+                    <div class="col-xs-1"></div>
+                </div>
+                <div style="display: inline-block; position:absolute; top:0;right: 10px; padding-left: 20px;color: white">
+                    <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
                 </div>
                 <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
 
@@ -544,7 +543,7 @@
             padding: 10px;
         }
         .item_cb{
-            width: 7%;
+            width: 4%;
         }
         .item_title:focus{
             outline: none !important;
@@ -552,11 +551,18 @@
             box-shadow: 0 0 10px #719ECE;
         }
         .item_title{
-            width: 76%;
+
             font-family:'Courier New';
             font-size: x-large;
-            word-wrap: break-word;
-            z-index: 10;
+            /*height: 240px;*/
+            /*width:100%;*/
+            border-width: 0px;
+            /*overflow:auto;*/
+            /*user-select: none;*/
+            -webkit-appearance: textarea;
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* IE 8+ */
         }
         .item_price{
 
@@ -570,9 +576,9 @@
             font-size:30px;
         }
         .item_content{
-            position:relative;
-            height: 280px;
-            padding: 5px;
+            /*position:relative;*/
+            /*height: 280px;*/
+            /*padding: 5px;*/
 
         }
         .content_text{
@@ -582,8 +588,8 @@
             /*width:100%;*/
             border-width: 0px;
             /*overflow:auto;*/
-            user-select: none;
-            -webkit-appearance: textarea;
+            /*user-select: none;*/
+            /*-webkit-appearance: textarea;*/
             -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
             -moz-box-sizing: border-box;    /* Firefox, other Gecko */
             box-sizing: border-box;         /* IE 8+ */
@@ -616,31 +622,31 @@
     </style>
     <div  id="menu_item_tmplt">
         <div class="row">
-            <div class="col-sm-1 col-xs-1 item_cb" title="Опубликовать" >
-                <label  class="btn" style="visibility:hidden">
-                    <input type="checkbox" class="checkbox-inline" style="display: none">
-                    <i class="fa fa-square-o fa-2x"></i>
-                    <i class="fa fa-check-square-o fa-2x"></i>
-                </label>
+            <div class="col-sm-1 col-xs-1">
+                <div class="item_cb" title="Опубликовать" >
+                    <label  class="btn" style="visibility:hidden">
+                        <input type="checkbox" class="checkbox-inline" style="display: none">
+                        <i class="fa fa-square-o fa-2x"></i>
+                        <i class="fa fa-check-square-o fa-2x"></i>
+                    </label>
+                </div>
             </div>
-
-            <div class="col-sm-8 col-xs-8">
-                <div class="input item_title" size="80" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
+            <div class="col-xs-8">
+                <div class="input item_title" rows="2"  contentEditable="true"  data-toggle="collapse"></div>
             </div>
-
             <div class="col-xs-2">
                 <div>Цена:</div>
-                <div class="input item_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                <div class="input item_price"  contenteditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
             </div>
-
-            <span class="col-sm-1 col-xs-1 fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
-
+            <div class="col-sm-1 col-xs-1">
+                <span class="fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
+            </div>
         </div>
 
         <div class="collapse item_content">
             <div class="row">
                 <div class="col-xs-9">
-                    <div  class="input content_text" rows="20"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+                    <div  class="input content_text" rows="20"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contentEditable="true"></div>
                 </div>
                 <div class="col-xs-3">
                     <div class="row pack_container">
@@ -657,16 +663,16 @@
                     </div>
                     <div class="row pack_ctrl">
                         <div class="col-xs-6">
-                            <span class="add_pack glyphicon glyphicon-plus-sign"   href="#add_pack" style="display:inline-block;opacity: .5;font-size: 30px;"></span>
+                            <span class="add_pack glyphicon glyphicon-plus-sign"   href="#add_pack" style="z-index:20;display:inline-block;opacity: .5;font-size: 30px;"></span>
                         </div>
                         <div class="col-xs-6">
-                            <span class="rem_pack glyphicon glyphicon-minus-sign"  href="#rem_pack" style="display:inline-block;opacity: .5;font-size: 30px;"></span>
+                            <span class="rem_pack glyphicon glyphicon-minus-sign"  href="#rem_pack" style="z-index:20;display:inline-block;opacity: .5;font-size: 30px;"></span>
                         </div>
                     </div>
                 </div>
             </div>
             <div>
-                <img class="input img-fluid w3-image" draggable="false"  src="" >
+                <img class="input img-fluid w3-image"  src="" >
             </div>
             <div class="toolbar"  style="display:none; position:absolute;width:20%;bottom:0;right: 0">
                 <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
@@ -675,7 +681,6 @@
             </div>
             <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
         </div>
-
 
         <div  class="collapse orders">
             <table class="table tablesorter">

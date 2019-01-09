@@ -16,18 +16,13 @@ import {DB} from "../map/storage/db"
 const langs = require("../dict/languages");
 var countries = require("i18n-iso-countries");
 
+require('bootstrap');
+
 require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
-var isJSON = require('is-json');
-
-const shortid = require('shortid');
-// module.uniqid_debug = true;
-//let uniqid = require('uniqid');
-//let md5 = require('md5');
 
 let moment = require('moment');
-require('../../lib/bootstrap-datetimepicker');
 
 let utils = new Utils();
 
@@ -140,7 +135,7 @@ $(document).on('readystatechange', function () {
 
     let uObj = {};
     window.db = new DB('Customer', function () {
-        window.db.GetProfile(function (res) {
+        window.db.GetSettings(function (res) {
             if(res.length===0){
                 let data_obj ={
                     proj:"d2d",
@@ -154,7 +149,7 @@ $(document).on('readystatechange', function () {
                     if (data.uid) {
                         uObj.uid = data.uid;
                         uObj.psw = data.psw;
-                        window.db.SetObject('profileStore', uObj, function (res) {
+                        window.db.SetObject('setStore', uObj, function (res) {
                             window.user = new Customer(uObj);
                             window.user.IsAuth_test(function (data) {//TODO:
 

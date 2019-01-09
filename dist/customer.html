@@ -9,18 +9,17 @@
     <title>Delivery Customer</title>
 </head>
 
-<!--<link rel="stylesheet" type="text/css" href="./css/dialog-polyfill.css"/>-->
-<!--<link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
 <!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
 <link rel="stylesheet" href="../lib/style.css">
 
 
+
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="customer.js"></script>
+
 
 <!--<script src="../lib/load-image.all.min.js"></script>-->
 
@@ -280,7 +279,6 @@
         <div id="datetimepicker" style="display: inline-block"></div>
     </div>
 
-
 </div>
 
 <div class="dropdown">
@@ -352,41 +350,17 @@
 
 </div>
 
-<div id="auth_dialog" class="modal fade"  role="dialog">
-    <div class="modal-dialog modal-sm">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="btn close" data-dismiss="modal" >&times;</button>
-                <div id="auth_body" class="modal-body">
-                    <div>
-                        <form action="#null" method="post" id="register">
-                            <div>
-                                <h4>E-mail</h4>
-                                <input type="email" placeholder="Put E-mail" name="email"  title="Please put a valid email" required>
-
-                                <button type="submit" data-translate="99dea78007133396a7b8ed70578ac6ae"  style="background-color: grey">Login</button>
-
-                                <!--a href="#"><p class="psw" align="right" data-translate="Forgot ">Forgot password?</p></a-->
-                            </div>
-
-                            <!--<div class="container" style="background-color:#f1f1f1">-->
-                            <!--<button type="button" class="cancelbtn" onclick="OnClickCancel();">Cancel</button>-->
-                            <!--<span class="psw">Forgot <a href="#">password?</a></span>-->
-                            <!--</div>-->
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="offer_order" class="modal fade" role="dialog">
+<div id="offer_order" class="order_container"
+     style="display:none;   position: fixed;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       width:75%;  height: auto; left: 0%; top: 0%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
+        <div>
+            <div>
                 <style>
-                    .modal-header{
+                    .order-header{
                         padding:9px 15px;
                         border-bottom:1px solid #5e5e5e;
                         background-color: #0e0e0e;
@@ -398,7 +372,7 @@
                         border-top-right-radius: 5px;
                         font-family: Arial, Helvetica, sans-serif;
                     }
-                    .modal-body{
+                    .order-body{
                         position:sticky;
                         padding:9px 15px;
                         border-bottom:1px solid black;
@@ -414,11 +388,10 @@
                         border-top-left-radius: 0px;
                         border-top-right-radius: 0px;
                     }
-                    .modal-footer {
+                    .order-footer {
                         padding: 9px 15px;
                         border-bottom: 1px solid black;
                         border-top: 0px;
-
                         color: #5e5e5e;
                         background-color: black;
                         -webkit-border-top-left-radius: 5px;
@@ -494,7 +467,7 @@
                         font-size: 30px;
                     }
                 </style>
-                <div class="modal-header" style="position: relative;color:white;width: 100%;">
+                <div class="order-header" style="position: relative;color:white;width: 100%;">
                     <div class="row" style="display: inline-block; width:95%;margin: 0 auto;">
                         <div class="col-sm-1 col-xs-1 dropdown">
                             <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
@@ -524,11 +497,11 @@
                         </div>
                     </div>
                     <div style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
-                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
                     </div>
                     <div class="ord_status" style="position: absolute;right: 0;bottom: 0; font-size: x-small;"></div>
                 </div>
-                <div class="modal-body">
+                <div class="order-body">
                     <div class="tab-content">
                         <ul class="nav nav-tabs menu_tabs">
                             <li class="add_tab_li" title="add tab" style="display: none;">
@@ -541,8 +514,7 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="modal-footer">
+                <div class="order-footer">
                     <span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>
                     <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
                         font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
@@ -635,8 +607,7 @@
     <div  id="menu_item_tmplt"   style="background-color: #262626">
 
         <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
-
-            <div class="col-xs-6">
+            <div class="col-xs-8">
                 <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
             </div>
 
@@ -645,17 +616,17 @@
                 <div class="input item_price" contenteditable="false" style="white-space: nowrap;"></div>
             </div>
             <div class="pack_container  row"  style="display: none">
-                <div class="col-xs-5">
+                <div class="col-xs-4">
                     <div data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
                     <div class="item_pack input dropdown-toggle" data-toggle="dropdown" contentEditable="true" placeholder="     гр."
                          style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
                     <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
                 </div>
-                <div class="col-xs-5">
+                <div class="col-xs-4">
                     <div>Цена:</div>
                     <div class="input item_pack_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
                 </div>
-                <div class="col-xs-1">
+                <div class="col-xs-2">
                     <div class="qnty_div" data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="white-space: nowrap;">Кол-во</div>
                     <div class="dropdown" style="text-align: center">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
@@ -673,12 +644,10 @@
                     </div>
                 </div>
 
-                <div class="col-xs-1">
+                <div class="col-xs-2">
                     <span class="appr_div fa fa-handshake-o approved scaled" style="display:block;position:absolute; top:30px; right:5px;font-size: 20px; visibility: hidden"></span>
                 </div>
             </div>
-
-
 
         </div>
 
@@ -706,13 +675,10 @@
         width:75%;  height: 90%; left: 0%; top: 0%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <input type="image" class="move_browser" src="https://nedol.ru/rtc/browser/images/ic_move.png"  draggable="false" style="position: absolute;
-              display:block; top:0px; left:0px; width:40px; height:40px;  z-index:2;opacity: .3"/>\n' +
-    <input type="image" class="resize_browser" src="https://nedol.ru/rtc/browser/images/ic_resize.png" width=40px; height=40px;   draggable="false"
-           style="position: absolute; display:block; bottom:0px; right:0px; z-index:2;opacity: .3"/>
+
     <input type="image" class="close_browser" src="https://nedol.ru/rtc/browser/images/ic_stop.png"  style="position: absolute;
               display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
-    <iframe class="browser" src="html/profile/profile.supplier.html" style="position:absolute;overflow:hidden;" width="100%" height="100%"></iframe>
+    <iframe class="browser" style="position:absolute;overflow:hidden;z-index: 10" width="100%" height="96%"></iframe>
 </div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
@@ -731,6 +697,7 @@
 <data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
 
 <data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
+
 
 </body>
 </html>

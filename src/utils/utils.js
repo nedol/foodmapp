@@ -153,33 +153,15 @@ class Utils{
             }
         }
     }
-    LoadImage(f, callback){
+    LoadImage(f, cb){
 
-        loadImage(
-            f,
-            function (img) {
-                let or = (img.width >= img.height) ? 'l' : 'p';
-                let options = [];
-                options['canvas'] = true;
-                options['orientation'] = true;
-                if (or === 'l') {
-                    options['minWidth'] = 70;
-                    options['maxHeight'] = 50;
-                } else if (or === 'p') {
-                    options['minHeight'] = 70;
-                    options['maxWidth'] = 50;
-                }
+        var reader = new FileReader();
 
-                callback(img.toDataURL(f.type));
+        reader.onload = function (e) {
+            cb(e.target.result);
+        }
 
-            },
-            {
-                orientation:true,
-                canvas:true,
-                //maxWidth: 600,
-                maxHeight: 300
-            }// Options
-        );
+        reader.readAsDataURL(f);
 
     }
     LoadFile(f, callback) {

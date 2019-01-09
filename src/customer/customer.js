@@ -4,6 +4,10 @@ export {Customer};
 let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
+require('jquery-ui')
+require('jquery-ui-touch-punch');
+require('jquery.ui.touch');
+
 import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
@@ -13,15 +17,15 @@ import {Network} from "../../network";
 import {OLMap} from '../map/map';
 import proj from 'ol/proj';
 
+
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
 require('bootstrap');
-require('bootstrap-select');
+import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 var moment = require('moment/moment');
-
-require('bootstrap/js/modal.js');
 
 
 class Customer{
@@ -97,7 +101,7 @@ class Customer{
             if(res){
                 $('.sel_time').text(res.period);
             }else{
-                let time = $('.period_list').find('a')[0].text;
+                let time = $($('.period_list li')[0]).text();
                 $('.sel_time').text(time);
             }
         });
@@ -427,7 +431,14 @@ class Customer{
     }
 
     OnClickUserProfile(li){
-        $('#profile_container').css('display','block')
+
+        $('#profile_container').css('display','block');
+        $('#profile_container iframe').attr('src',"html/settings.customer.html");
+        $('#profile_container').draggable();
+        $( "#profile_container" ).resizable({});
+        $('.close_browser').on('touchstart click', function (ev) {
+            $(this).parent().css('display', 'none');
+        });
     }
 
 }

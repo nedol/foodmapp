@@ -14,7 +14,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 20;
+        this.version = 21;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -28,7 +28,7 @@ class DB {
             this.apprStore = "approvedStore",
             this.offerStore = "offerStore",
             this.dictStore = "dictStore",
-            this.profileStore = "profileStore";
+            this.settingsStore = "setStore";
 
         if (!this.DBcon) {
             this.connectDB(function (con) {
@@ -65,9 +65,8 @@ class DB {
                 };
 
                 try {
-                    let vProfileStore = db.createObjectStore(that.profileStore, {keyPath: ["uid"]});
-                    vProfileStore.createIndex("uid", "uid", {unique: true});
-                    vProfileStore.createIndex("tariff", "tariff", {unique: false});
+                    let vSetStore = db.createObjectStore(that.settingsStore, {keyPath: ["uid"]});
+                    vSetStore.createIndex("uid", "uid", {unique: true});
                 }catch(ex){
 
                 }
@@ -322,9 +321,9 @@ class DB {
         }
     }
 
-    GetProfile(cb) {
+    GetSettings(cb) {
         try {
-            let objectStore = this.DBcon.transaction('profileStore', "readonly").objectStore('profileStore');
+            let objectStore = this.DBcon.transaction('setStore', "readonly").objectStore('setStore');
             var request = objectStore.getAll();
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {

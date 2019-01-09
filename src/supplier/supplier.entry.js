@@ -8,7 +8,6 @@ require('dialog-polyfill');
 
 require("../../global");
 
-import proj from 'ol/proj';
 import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
 import {Network} from "../../network";
@@ -26,7 +25,7 @@ const shortid = require('shortid');
 var md5 = require('md5');
 
 var moment = require('moment');
-require('../../lib/bootstrap-datetimepicker');
+require('../../lib/datetimepicker/bootstrap-datetimepicker');
 
 let utils = new Utils();
 
@@ -145,7 +144,7 @@ $(document).on('readystatechange', function () {
     let uObj={};
     window.db = new DB('Supplier', function () {
 
-        window.db.GetProfile(function (res) {
+        window.db.GetSettings(function (res) {
             if(res.length===0) {
                 let data_obj ={
                     proj:"d2d",
@@ -158,7 +157,7 @@ $(document).on('readystatechange', function () {
                 window.network.postRequest(data_obj, function (data) {
                     if (data.uid) {
                         uObj['profile'] = {uid: data.uid, psw: data.psw, email: 'suppier@gmail.com'};//TODO: email
-                        window.db.SetObject('profileStore',uObj['profile'], function (res) {
+                        window.db.SetObject('setStore',uObj['profile'], function (res) {
                             uObj['offer'] = {date: date, data: {}, period: ''};
                             window.user = new Supplier(uObj);
                             window.user.IsAuth_test(function (data) {

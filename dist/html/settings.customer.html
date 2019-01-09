@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<!--https://bootsnipp.com/snippets/4Mm5R-->
+
+<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<script src="../customer_settings.js"></script>
+
+<div class="container bootstrap snippet">
+    <div class="row">
+        <div class="col-sm-10"><h1>Мой профиль</h1></div>
+        <div class="col-sm-2"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-3"><!--left col-->
+            <div class="text-center">
+                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="img-circle img-thumbnail avatar" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
+                <h6>Upload a your photo...</h6>
+                <input type="file" class="center-block file-upload" style="display: none">
+            </div>
+        </div><!--/col-3-->
+        <div class="col-sm-9">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#profile">Профиль</a></li>
+                <li><a data-toggle="tab" href="#settings">Настройки</a></li>
+                <li><a data-toggle="tab" href="#menu">Menu 2</a></li>
+            </ul>
+
+            <div class="tab-content">
+                <div class="tab-pane active" id="profile">
+                    <form class="form" action="##" method="post">
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="last_name"><h4>Имя</h4></label>
+                                <input type="text" id="last_name" class="form-control" name="last_name"  placeholder="last name" title="enter your last name if any.">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="email"><h4>Email</h4></label>
+                                <input type="email" id="email" class="form-control" name="email"  placeholder="you@email.com" title="enter your email.">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="mobile"><h4>Телефон</h4></label>
+                                <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="address"><h4>Адрес доставки</h4></label>
+                                <input type="address" class="form-control"  id="address" placeholder="somewhere" title="enter a location">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="col-xs-12">
+                                <br>
+                                <button class="btn btn-lg" type="reset"><i class="glyphicon glyphicon-repeat"></i> Reset</button>
+                            </div>
+                        </div>
+                    </form>
+
+                </div><!--/tab-pane-->
+                <div class="tab-pane" id="settings">
+
+                    <h2></h2>
+                    <form class="form" action="##" method="post">
+                        <div class="form-group">
+
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                    </form>
+
+                </div><!--/tab-pane-->
+                <div class="tab-pane" id="menu">
+                    <form class="form" action="##" method="post" id="registrationForm">
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                    </form>
+                </div>
+
+            </div><!--/tab-pane-->
+        </div><!--/tab-content-->
+
+    </div><!--/col-9-->
+</div><!--/row-->
