@@ -125,6 +125,8 @@ class OfferOrder {
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
                 //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
+                $(menu_item).find('.item_price').text(this.offer[tab][i].price);
+
                 $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
                 $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
 
@@ -140,10 +142,6 @@ class OfferOrder {
                         $(menu_item).find('.item_price').text(data);
                         $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(data));
                     });
-                }else {
-                    $(menu_item).find('.price_container').css('display','block').addClass('col-xs-4');
-                    $(menu_item).find('.item_price').text(this.offer[tab][i].price);
-                    $(menu_item).find('.item_price').attr('contenteditable', $('#price_editable').val());
                 }
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
@@ -294,7 +292,7 @@ class OfferOrder {
 
                         let qnty = res.data[keys[k]].qnty;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('button').text(qnty);
-                        let price = res.data[keys[k]].packprice;
+                        let price = res.data[keys[k]].price;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.item_price').text(price);
                         let pack = res.data[keys[k]].pack;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.item_pack').text(pack);
