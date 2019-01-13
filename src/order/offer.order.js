@@ -42,9 +42,13 @@ class OfferOrder {
         $(this.ovc).attr('id','offer_order_clone');
         $(this.ovc).insertAfter($("#offer_order"));
 
-        this.ovc.css('display','block');
+        this.ovc.css('display','inline-block');
         this.ovc.draggable();
-        this.ovc.resizable();//TODO: do we need it?
+
+        $(this.ovc).find('.comment').on('click',this.ovc,function (ev) {
+            $(ev.data).css('width','auto');
+        });
+
         $(this.ovc).addTouch();
 
         this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
@@ -99,6 +103,8 @@ class OfferOrder {
         let str = "Заказ на доставку\r\n"+$('.dt_val')[0].value+"\r\n("+$('.sel_time').text()+")";
         this.ovc.find('.order_div').text(str);
 
+        this.ovc.find('.address').text();
+
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0) continue;
             if($('[href="#'+tab+'"]').length===0) {
@@ -129,9 +135,9 @@ class OfferOrder {
                 if(this.offer[tab][i].packlist) {
                     $(menu_item).find('.pack_container').css('display','block').addClass('col-xs-4');
                     $.each(this.offer[tab][i].packlist, function (i, data) {
-                        $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + data.pack + ";" + data.price + "</a></li>");
-                        $(menu_item).find('.item_pack').text(data.pack);
-                        $(menu_item).find('.item_pack_price').text(data.price);
+                        $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
+                        $(menu_item).find('.item_pack').text(i);
+                        $(menu_item).find('.item_price').text(data);
                         $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(data));
                     });
                 }else {
@@ -188,12 +194,11 @@ class OfferOrder {
                     $(menu_item).attr('ordered', ev.target.text);
            
                 });
-                $(menu_item).find('li>a[role=packitem]').on('click', function(ev){
+                $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:this.offer[tab][i]},function(ev){
                     that.changed = true;
-                    let data = $(ev.target).text().split(';');
-                    $(menu_item).find('.item_pack').text(data[0]);
-                    $(menu_item).find('.item_pack_price').text(data[1]);
-
+                    let pl = ev.data.off.packlist;
+                    $(menu_item).find('.item_pack').text($(ev.target).text());
+                    $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
                 });
             }
         }
@@ -216,7 +221,8 @@ class OfferOrder {
                             $('.address').text(obj.street + "," + obj.house);
                         });
                     } else {
-                        $('.address').text(that.address);
+                        if(that.address)
+                            $('.address').text(that.address);
                     }
 
                     if(order.published) {
@@ -288,7 +294,7 @@ class OfferOrder {
 
                         let qnty = res.data[keys[k]].qnty;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('button').text(qnty);
-                        let price = res.data[keys[k]].price;
+                        let price = res.data[keys[k]].packprice;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.item_price').text(price);
                         let pack = res.data[keys[k]].pack;
                         $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.item_pack').text(pack);
@@ -324,13 +330,13 @@ class OfferOrder {
             obj.data[$(val).find('.item_title').attr('data-translate')] = {
                 qnty: $(val).find('button[data-toggle=dropdown]').text(),
                 price: $(val).find('.item_price').text(),
-                packprice:$(val).find('.item_pack_price').text(),
                 pack: $(val).find('.item_pack').text()
             }
 
         });
 
-        obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
+        if($('#offer_order_clone').find('.comment')[0])
+            obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
         obj['supuid'] = this.uid;
         obj['cusuid'] = window.user.uid;
         obj['date'] = this.date;

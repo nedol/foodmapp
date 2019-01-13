@@ -4,6 +4,7 @@ import {CustomerSettings} from "./customer.settings";
 
 import 'bootstrap'
 
+window.cs;
 $(document).ready(function () {
 
     if (!window.EventSource) {
@@ -11,7 +12,7 @@ $(document).ready(function () {
         return;
     }
     // parent
-    let cs = new CustomerSettings(parent.db, parent.user.uid);
+    window.cs = new CustomerSettings(parent.db, parent.user.uid);
     cs.Open();
 
     var readURL = function(input) {
@@ -20,6 +21,7 @@ $(document).ready(function () {
 
             reader.onload = function (e) {
                 $('.avatar').attr('src', e.target.result);
+                $('.avatar').siblings('input:file').attr('changed',true);
             }
 
             reader.readAsDataURL(input.files[0]);

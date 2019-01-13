@@ -156,9 +156,9 @@ class OfferEditor{
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
                 $.each(this.offer.data[tab][i].packlist, function (i, data) {
-                    $(menu_item).find('.pack_list').append("<li href='#'><a role='menuitem' >" + data.pack + " " + data.price + "</a></li>");
-                    $(menu_item).find('.item_pack').text(data.pack);
-                    $(menu_item).find('.item_pack_price').text(data.price);
+                    $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + i + "</a></li>");
+                    $(menu_item).find('.item_pack').text(i);
+                    $(menu_item).find('.item_price').text(data);
                 });
                 $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(this.offer.data[tab][i].packlist));
 
@@ -222,7 +222,7 @@ class OfferEditor{
                 $(menu_item).find('.add_pack').on('click', function (ev) {
                     let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
                     let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
-                    $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li><a>"+pack+"  "+price+"</a></li>");
+                    $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li href='#'><a role='packitem'>"+pack+";"+price+"</a></li>");
                     let pl = $(menu_item).find('.item_pack').attr('packlist');
                     if(pl)
                         pl = JSON.parse(pl);
@@ -250,6 +250,7 @@ class OfferEditor{
 
                 $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + this.offer.data[tab][i].title);
 
+                $(menu_item).find('li>a[role=packitem]').on('click',{that:that, mi:$(menu_item)}, that.OnClickPack);
             }
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
@@ -492,8 +493,49 @@ class OfferEditor{
 
         that.MakeDraggable($("#offer_editor"));
 
-        // $("#offer_editor").resizable();//TODO: do we need it?
+    }
 
+    OnClickPack(ev){
+        let menu_item = ev.data.mi;
+        let that = ev.data.that;
+        if($(ev.target).text()==="добавить"){
+            let pack = $(menu_item).find('.item_pack').text();
+            let price = $(menu_item).find('.item_price').text()
+
+            let pl = $(menu_item).find('.item_pack').attr('packlist');
+            if(pl)
+                pl = JSON.parse(pl);
+            else
+                pl = {};
+
+            let res = $.grep(pl, function (item,i) {
+                return (pack && item.pack===pack);
+            });
+            if(res.length===0) {
+                pl[pack]= price;
+            }
+            $(menu_item).find('.pack_list').empty();
+            $(menu_item).find('.pack_list').append("<li><a role='packitem' style='color: red'>добавить</a></li>");
+            for(let i in pl){
+                if(i) {
+                    $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
+                }
+            }
+            $(menu_item).find('li>a[role=packitem]').on('click', {
+                that: that,
+                mi: $(menu_item)
+            }, that.OnClickPack);
+
+            $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
+            $(menu_item).find('.item_pack').text('');
+            $(menu_item).find('.item_price').text('');
+        }else {
+            that.changed = true;
+            let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
+            let price = pl[$(ev.target).text()];
+            $(menu_item).find('.item_pack').text($(ev.target).text());
+            $(menu_item).find('.item_price').text(price);
+        }
     }
 
     OnClickImport(ev){
@@ -664,7 +706,7 @@ class OfferEditor{
         $(menu_item).find('.add_pack').on('click', function (ev) {
             let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
             let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
-            $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li><a>"+pack+"  "+price+"</a></li>");
+            $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>"+pack+";"+price+"</a></li>");
             let pl = $(menu_item).find('.item_pack').attr('packlist');
             if(pl)
                 pl = JSON.parse(pl);

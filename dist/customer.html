@@ -521,150 +521,150 @@
             </div>
         </div>
     </div>
+</div>
 
-    <style>
-        .menu_item{
-            position: relative;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            margin-bottom: 5px;
-            width: 100%;
-        }
-        #menu_item_tmplt {
-            display: none;
-        }
-        .item_title:focus{
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .item_title{
+<style>
+    .menu_item{
+        position: relative;
+        border-radius: 5px;
+        border: 1px solid #343434;
+        margin-bottom: 5px;
+        width: 100%;
+    }
+    #menu_item_tmplt {
+        display: none;
+    }
+    .item_title:focus{
+        outline: none !important;
+        border-color: #719ECE;
+        box-shadow: 0 0 10px #719ECE;
+    }
+    .item_title{
 
-            width: 65%;
-            font-family:'Courier New';
-            font-size: x-large;
-            word-wrap: break-word;
-            z-index: 10;
-        }
-        .item_content{
-            position:relative;
-            height: 280px;
-            padding: 5px;
+        width: 65%;
+        font-family:'Courier New';
+        font-size: x-large;
+        word-wrap: break-word;
+        z-index: 10;
+    }
+    .item_content{
+        position:relative;
+        height: 280px;
+        padding: 5px;
 
-        }
-        .content_text{
-            font-family:'Segoe Script';
-            font-size: medium;
-            /*height: 240px;*/
-            /*width:100%;*/
-            border-width: 0px;
-            /*overflow:auto;*/
-            user-select: none;
-            -webkit-appearance: textarea;
-            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-            box-sizing: border-box;         /* IE 8+ */
-        }
-        .image_div{
-            position: absolute;
-            padding:15px;
-            right:0px;
-            bottom:0;
-        }
-        .item_price{
+    }
+    .content_text{
+        font-family:'Segoe Script';
+        font-size: medium;
+        /*height: 240px;*/
+        /*width:100%;*/
+        border-width: 0px;
+        /*overflow:auto;*/
+        user-select: none;
+        -webkit-appearance: textarea;
+        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+        box-sizing: border-box;         /* IE 8+ */
+    }
+    .image_div{
+        position: absolute;
+        padding:15px;
+        right:0px;
+        bottom:0;
+    }
+    .item_price{
 
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .item_pack{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .item_pack{
 
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .qnty_div{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .qnty_div{
 
-        }
-        .qnty{
+    }
+    .qnty{
 
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:18px;
-        }
-        [contentEditable=true]:empty:not(:focus):before{
-            content:attr(placeholder);
-            color:gray;
-        }
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:18px;
+    }
+    [contentEditable=true]:empty:not(:focus):before{
+        content:attr(placeholder);
+        color:gray;
+    }
 
-    </style>
+</style>
+<div  id="menu_item_tmplt"   style="background-color: #262626">
 
-    <div  id="menu_item_tmplt"   style="background-color: #262626">
-
-        <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
-            <div class="col-xs-8">
-                <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
-            </div>
-
-            <div class="price_container" style="display: none">
-                <div class="price_div" data-translate="3601146c4e948c32b6424d2c0a7f0118">Цена</div>
-                <div class="input item_price" contenteditable="false" style="white-space: nowrap;"></div>
-            </div>
-            <div class="pack_container  row"  style="display: none">
-                <div class="col-xs-4">
-                    <div data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
-                    <div class="item_pack input dropdown-toggle" data-toggle="dropdown" contentEditable="true" placeholder="     гр."
-                         style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
-                    <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
-                </div>
-                <div class="col-xs-4">
-                    <div>Цена:</div>
-                    <div class="input item_pack_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
-                </div>
-                <div class="col-xs-2">
-                    <div class="qnty_div" data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="white-space: nowrap;">Кол-во</div>
-                    <div class="dropdown" style="text-align: center">
-                        <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
-                                style="font-size: large">0
-                            <!--<span class="caret"></span>-->
-                        </button>
-                        <ul class="dropdown-menu scaled"  multiple>
-                            <li><a href="#" role="qntyitem">0</a></li>
-                            <li><a href="#" role="qntyitem">1</a></li>
-                            <li><a href="#" role="qntyitem">2</a></li>
-                            <li><a href="#" role="qntyitem">3</a></li>
-                            <li><a href="#" role="qntyitem">4</a></li>
-                            <li><a href="#" role="qntyitem">5</a></li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="col-xs-2">
-                    <span class="appr_div fa fa-handshake-o approved scaled" style="display:block;position:absolute; top:30px; right:5px;font-size: 20px; visibility: hidden"></span>
-                </div>
-            </div>
-
+    <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
+        <div class="col-xs-8">
+            <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
         </div>
 
-        <div class="item_content collapse">
-            <div class="row">
-                <div class="col-xs-10">
-                    <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+        <div class="pack_container  row"  style="display: none">
+            <div class="col-xs-4">
+                <div class="dropdown-toggle"  data-toggle="dropdown">
+                    <div style="display: inline-block" data-translate="41b0e839c21e82f25bffdb9dc82848fa"></div>
+                    <span class="caret" style="display: inline-block;"></span>
                 </div>
-                <div class="col-xs-2"></div>
+
+                <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+
+                <div class="item_pack input" contentEditable="true" placeholder="     гр."
+                     style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+
             </div>
-            <div>
-                <img class="input img-fluid w3-image" draggable="false"  src="" >
+            <div class="col-xs-4">
+                <div>Цена:</div>
+                <div class="input item_price"  contentEditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
             </div>
-            <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
+            <div class="col-xs-2">
+                <div class="qnty_div" data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="white-space: nowrap;">Кол-во</div>
+                <div class="dropdown" style="text-align: center">
+                    <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
+                            style="font-size: large">0
+                        <!--<span class="caret"></span>-->
+                    </button>
+                    <ul class="dropdown-menu scaled"  multiple>
+                        <li><a href="#" role="qntyitem">0</a></li>
+                        <li><a href="#" role="qntyitem">1</a></li>
+                        <li><a href="#" role="qntyitem">2</a></li>
+                        <li><a href="#" role="qntyitem">3</a></li>
+                        <li><a href="#" role="qntyitem">4</a></li>
+                        <li><a href="#" role="qntyitem">5</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="col-xs-2">
+                <span class="appr_div fa fa-handshake-o approved scaled" style="display:block;position:absolute; top:30px; right:5px;font-size: 20px; visibility: hidden"></span>
+            </div>
         </div>
+
     </div>
 
+    <div class="item_content collapse">
+        <div class="row">
+            <div class="col-xs-10">
+                <div  class="input content_text" rows="20" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+            </div>
+            <div class="col-xs-2"></div>
+        </div>
+        <div>
+            <img class="input img-fluid w3-image" draggable="false"  src="" >
+        </div>
+        <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
+    </div>
 </div>
 
 <data class="tariff" id="price_editable" value="true"></data>

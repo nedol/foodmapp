@@ -34,8 +34,6 @@ class Customer{
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-        this.viewer;
-
         this.uid = uObj.uid;
         this.psw = uObj.psw;
         this.email = '';//!!! no need to registrate
@@ -437,6 +435,7 @@ class Customer{
         $('#profile_container').draggable();
         $( "#profile_container" ).resizable({});
         $('.close_browser').on('touchstart click', function (ev) {
+            $('#profile_container iframe')[0].contentWindow.cs.Close();
             $(this).parent().css('display', 'none');
         });
     }

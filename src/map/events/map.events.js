@@ -4,7 +4,7 @@ export {MapEvents}
 
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
-import {OfferOrder} from "../../offer/offer.order";
+import {OfferOrder} from "../../order/offer.order";
 import {OfferViewer} from "../../offer/offer.viewer";
 
 class MapEvents{
