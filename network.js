@@ -68,4 +68,13 @@ class Network{
 
     }
 
+    RegSupplier(obj, cb){
+        obj.proj = 'd2d';
+        obj.func = 'regsupplier';
+
+        this.postRequest(obj, function (res) {
+            cb();
+        });
+    }
+
 }

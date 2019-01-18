@@ -2,6 +2,7 @@ export {Utils}
 let http = require('http');
 let https = require('https');
 
+
 $.fn.setCursorPosition = function(pos) {
     this.each(function(index, elem) {
         if (elem.setSelectionRange) {
@@ -133,7 +134,6 @@ class Utils{
             files = evt.originalEvent.dataTransfer.files; // FileList object.
         // files is a FileList of File objects. List some properties.
         for (let i = 0, f; f = files[i]; i++) {
-            console.log('HandleFileSelect:'+f.type);
             switch (f.type) {
                 case "audio/mp3": case "audio/amr": case "audio/wav":  case "video/mp4": case "ogg":
 
@@ -153,7 +153,8 @@ class Utils{
             }
         }
     }
-    LoadImage(f, cb){
+
+    LoadImage_new(f, cb){
 
         var reader = new FileReader();
 
@@ -162,8 +163,38 @@ class Utils{
         }
 
         reader.readAsDataURL(f);
+    }
+
+    LoadImage(f, callback){
+
+        loadImage(
+            f,
+            function (img) {
+                let or = (img.width >= img.height) ? 'l' : 'p';
+                let options = [];
+                options['canvas'] = true;
+                options['orientation'] = true;
+                if (or === 'l') {
+                    options['minWidth'] = 70;
+                    options['maxHeight'] = 50;
+                } else if (or === 'p') {
+                    options['minHeight'] = 70;
+                    options['maxWidth'] = 50;
+                }
+
+                callback(img.toDataURL(f.type));
+
+            },
+            {
+                orientation:true,
+                canvas:true,
+                maxWidth: 600,
+                maxHeight: 300
+            }// Options
+        );
 
     }
+
     LoadFile(f, callback) {
 
         this.reader.onerror = errorHandler;

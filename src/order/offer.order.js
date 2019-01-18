@@ -71,6 +71,7 @@ class OfferOrder {
                 });
             });
         });
+
         $('.close_browser').on('click touchstart', this, function (ev) {
             let that = ev.data;
             that.SaveOrder(ev,window.sets.lang);
@@ -82,6 +83,7 @@ class OfferOrder {
     OpenOffer(obj) {
         let that = this;
         this.uid = obj.uid;
+        this.profile = obj.profile;
         this.offer = obj.data;
         obj.supuid = obj.email;
         let latlon = [obj.latitude,obj.longitude];
@@ -100,10 +102,14 @@ class OfferOrder {
 
         this.ovc.find('li.publish_order').addClass('disabled');
 
-        let str = "Заказ на доставку\r\n"+$('.dt_val')[0].value+"\r\n("+$('.sel_time').text()+")";
+        let str = "Заказ на доставку\r\n"+$('.dt_val')[0].value+"("+$('.sel_period').text()+")";
         this.ovc.find('.order_div').text(str);
 
-        this.ovc.find('.address').text();
+        window.db.GetSettings(function (obj) {
+            if(obj[0].profile && obj[0].profile.address)
+                that.ovc.find('.address').text(obj[0].profile.address);
+        });
+
 
         for (let tab in this.offer) {
             if(!tab || this.offer[tab].length===0) continue;
@@ -240,6 +246,11 @@ class OfferOrder {
             }
         });
 
+        $(this.ovc).find('.supplier_profile').on('click touchstart',function () {
+            $('.browser_container').css('display','block');
+        });
+
+
     }
 
     onClickCert(ev) {
@@ -275,18 +286,21 @@ class OfferOrder {
         window.db.GetOrder(this.date, obj.uid, window.user.uid, function (res) {
             if(res!==-1){
                 let keys = Object.keys(res.data);
-                //$('.sel_time').text(res.period);
+                //$('.sel_period').text(res.period);
                 for(let k in keys){
                     if(keys[k]==='comment'){
                         $('.comment').text(that.dict.getDictValue(window.user.lang, res.data.comment));
                     }else {
                         window.db.GetApproved(that.date,obj.uid,window.user.uid,keys[k],function (appr) {
                             if(appr &&
-                                res.period ===appr.period &&
+                                //res.period ===appr.period &&
                                 res.data[keys[k]].price===appr.data.price &&
+                                res.data[keys[k]].pack===appr.data.pack &&
                                 res.data[keys[k]].qnty===appr.data.qnty) {
+                                $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.ordperiod').text(appr.period );
                                 $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.appr_div').attr('approved', that.date);
                                 $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.appr_div').css('visibility', 'visible');
+                                $('.item_title[data-translate=' + keys[k] + ']').closest('.row').find('.ordperiod').css('visibility', 'visible');
                             }
                         });
 
@@ -338,7 +352,7 @@ class OfferOrder {
         obj['supuid'] = this.uid;
         obj['cusuid'] = window.user.uid;
         obj['date'] = this.date;
-        obj['period'] = $('.sel_time').text();
+        obj['period'] = $('.sel_period').text();
         obj['address'] = $('#offer_order_clone').find('.address').val();
         obj['published'] = this.published;
 
@@ -351,20 +365,19 @@ class OfferOrder {
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
         let items = this.GetOrderItems();
         window.user.UpdateOrderLocal( items );
-        if(this.changed){
-            window.user.PublishOrder(items, (data) => {
-                let status = window.dict.getDictValue(window.sets.lang, Object.keys(data)[1]);
-                $(that.ovc).find('.ord_status').css('color', 'white');
-                $(that.ovc).find('.ord_status').text(status + "\r\n" + data.published);
-                that.status = Object.keys(data)[1];
-                window.db.GetSettings(function (obj) {
-                    obj[0].address = items.address;
-                    window.db.SetObject('setStore', obj[0], function () {
 
-                    });
+        window.user.PublishOrder(items, (data) => {
+            let status = window.dict.getDictValue(window.sets.lang, Object.keys(data)[1]);
+            $(that.ovc).find('.ord_status').css('color', 'white');
+            $(that.ovc).find('.ord_status').text(status + "\r\n" + data.published);
+            that.status = Object.keys(data)[1];
+            window.db.GetSettings(function (obj) {
+                obj[0].address = items.address;
+                window.db.SetObject('setStore', obj[0], function () {
+
                 });
             });
-        }
+        });
     }
 }
 

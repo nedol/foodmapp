@@ -26,8 +26,6 @@ let moment = require('moment');
 
 let utils = new Utils();
 
-window.demoMode = (utils.getParameterByName('dm')==='0'?false:true);
-
 
 $(document).on('readystatechange', function () {
 

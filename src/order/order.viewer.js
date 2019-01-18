@@ -30,16 +30,12 @@ class OrderViewer {
         $(this.ordv).attr('id','order_viewer_clone');
         $(this.ordv).insertAfter($("#order_viewer"));
 
-        this.ordv.modal({
-            show: true,
-            keyboard:true
-        });
-
-
-        this.ordv.off('hide.bs.modal');
-        this.ordv.on('hide.bs.modal', this,this.CloseMenu);
+        $(this.ordv).css('display','inline-block');
+        $(this.ordv).draggable();
 
         this.ordv.find('.toolbar').css('display', 'block');
+
+        this.ordv.find('.close_browser').on('click starttouch',this,this.CloseMenu);
 
     }
 
@@ -48,6 +44,7 @@ class OrderViewer {
         let that = this;
         this.orders = objs;
         this.ordv.find('.modal-title-date').text(this.orders[0].date +" ("+this.orders[0].period+")");
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
         for(let c in this.orders) {
             let data = objs[c].data;
@@ -63,21 +60,23 @@ class OrderViewer {
                 let row = "<tr>" +
                     "<td class='tablesorter-no-sort'>" +
                         "<label  class=\"btn\">" +
-                        "<input type=\"checkbox\" class=\"approved checkbox-inline\" " + cbdisabled + " cusuid=" + objs[c].cusuid + " " + checked + " " +
-                            "style=\"display: none\" order="+o+">" +
+                        "<input type=\"checkbox\" class=\"approve checkbox-inline\" " + cbdisabled + " cusuid=" + objs[c].cusuid + " " + checked + " " +
+                            "style=\"display: none\" title="+o+">" +
                         "<i class=\"fa fa-square-o fa-2x\"></i>" +
                         "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                         "</label>" +
                     "</td>" +
                     "<td data-translate='" + o + "'>Title</td>" +
-                    "<td>" + data[o].qnty + "</td>" +
+                    "<td>" + data[o].pack + "</td>" +
                     "<td>" + data[o].price + "</td>" +
+                    "<td>" + data[o].qnty + "</td>" +
                     "<td>" + objs[c].address + "</td>" +
                     "<td>" + objs[c].dist + "</td>" +
                     "<td>" + objs[c].period + "</td>" +
                     "<td class='tablesorter-no-sort'>" +
-                    (objs[c].comment ? "<span class='tacomment'>" + objs[c].comment + "</span>" : '') +
+                    "<span class='tacomment'>" + objs[c].comment + "</span>" +
                     "</td>" +
+                    "<td>" + "" + "</td>" +
                     "<td>" + "0" + "</td>" +
                     "<td class='tablesorter-no-sort notoday' >" +
                     "<label  class=\"btn\">" +
@@ -93,6 +92,14 @@ class OrderViewer {
                         let ord = $(ev.target).attr('order');
                         that.orders[c].data[ord].status = checked ;
                     });
+
+                window.db.GetApproved(date, window.user.uid,objs[c].cusuid, o,function (appr) {
+                    if(appr && appr.data.qnty===data[o].qnty &&
+                        appr.data.price===data[o].price) {
+                        $(".approve[title='" + appr.title + "'][cusuid=" + objs[c].cusuid + "]").attr('checked', 'checked');
+                        $(".approve[title='" + appr.title + "'][cusuid=" + objs[c].cusuid + "]").attr('disabled', 'true');
+                    }
+                });
             }
         }
 
@@ -146,10 +153,11 @@ class OrderViewer {
     }
 
     SaveOrder(ev) {
-        for(let o in this.orders) {
-            let obj = this.orders[o];
+        let orders = this.orders;
+        $(':checkbox:checked').each(function (i,item) {
+            let obj = orders[i];
             window.user.ApproveOrder(obj);
-        }
+        })
     }
 }
 

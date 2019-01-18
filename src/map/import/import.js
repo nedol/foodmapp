@@ -70,7 +70,7 @@ class Import {
                 "uid": uid,
                 "categories": cats,
                 "date": date,
-                "period":$('.sel_time').text(),
+                "period":$('.sel_period').text(),
                 "areas": area,
                 "user":window.user.constructor.name
             };
@@ -137,6 +137,7 @@ class Import {
                 logo: "../dist/images/truck.png",
                 data: JSON.parse(obj.data),
                 dict: JSON.parse(obj.dict),
+                profile: obj.profile?JSON.parse(obj.profile):'',
                 hash: hash
             };
         }

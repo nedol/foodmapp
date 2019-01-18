@@ -52,19 +52,13 @@ class Customer{
         });
 
         $.getJSON('../dict/sys.dict.json', function (data) {
-            let dict = JSON.parse(localStorage.getItem('dict'));
-            dict = Object.assign(dict, data);
-            if(dict) {
-                window.dict = new Dict(dict);
+            window.sysdict = new Dict(data);
+            window.sysdict.set_lang(window.sets.lang, $('body'));
+            window.sysdict.set_lang(window.sets.lang, $('#categories'));
 
-            }else{
-                localStorage.setItem("dict",'{}');
-                window.dict = new Dict({});
-            }
-            window.dict.set_lang(window.sets.lang, $('body'));
-            window.dict.set_lang(window.sets.lang, $('#categories'));
-            localStorage.setItem("lang", window.sets.lang);
-
+            window.db.GetStorage('dictStore', function (rows) {
+                window.dict = new Dict(rows);
+            });
             cb();
         });
 
@@ -78,7 +72,7 @@ class Customer{
                     if($( ".ui-selected").length===i+1)
                         result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
                 });
-                $('.sel_time').text(result);
+                $('.sel_period').text(result);
 
                 let layers = that.map.ol_map.getLayers();
                 layers.forEach(function (layer, i, layers) {
@@ -97,10 +91,10 @@ class Customer{
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
         window.db.GetOffer(this.date,function (res) {
             if(res){
-                $('.sel_time').text(res.period);
+                $('.sel_period').text(res.period);
             }else{
                 let time = $($('.period_list li')[0]).text();
-                $('.sel_time').text(time);
+                $('.sel_period').text(time);
             }
         });
         this.DateTimePickerEvents();
@@ -194,12 +188,12 @@ class Customer{
             $('#period_1').find('.from')[0].setAttribute('text', 'value', $(this).data("DateTimePicker").date().format('HH:00'));
             //$('#period_1').find('.to')[0].setAttribute('text', 'value', mom.add(4, 'h').format('HH:00'));
 
-            let time = $('.sel_time').text();
+            let time = $('.sel_period').text();
 
             $(this).data("DateTimePicker").toggle();
         });
 
-        $('.sel_time').on("dp.change",this,function (ev) {
+        $('.sel_period').on("dp.change",this,function (ev) {
             let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
             let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];
             $('#dt_from').val(from);
@@ -240,7 +234,7 @@ class Customer{
 
             $('.dt_val').val(that.date);
 
-            $('.sel_time').find('option').css('visibility','visible');
+            $('.sel_period').find('option').css('visibility','visible');
 
             $(this).data("DateTimePicker").toggle();
 
@@ -252,9 +246,9 @@ class Customer{
             });
             window.db.GetOffer(that.date ,function (res) {
                 if(res){
-                    $('.sel_time').text(res.period);
+                    $('.sel_period').text(res.period);
                 }else{
-                    window.db.SetObject('offerStore',{date:that.date,period:$('.sel_time').text()},function (res) {
+                    window.db.SetObject('offerStore',{date:that.date,period:$('.sel_period').text()},function (res) {
 
                     });
                 }
@@ -269,7 +263,7 @@ class Customer{
         let that = this;
         let from = $(ev).text().split(' - ')[0];
         let to = $(ev).text().split(' - ')[1];
-        $('.sel_time').text($(ev).text());
+        $('.sel_period').text($(ev).text());
         $('#dt_from').val(from);
         $('#dt_to').val(to);
         let layers = this.map.ol_map.getLayers();

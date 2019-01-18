@@ -243,7 +243,7 @@
                         <span class="glyphicon glyphicon-calendar"></span>
                 </span>
 
-                <button class="btn btn-default dropdown-toggle sel_time" type="button" data-toggle="dropdown"
+                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
                     data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
@@ -353,7 +353,7 @@
 <div id="offer_order" class="order_container"
      style="display:none;   position: fixed;
      overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:75%;  height: auto; left: 0%; top: 0%;
+       width:75%;  height: auto; left: 20%; top: 5%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
@@ -474,7 +474,7 @@
                                     data-width="fit" type="button" style="background-color: #0a0a0a">
                                 <span class="glyphicon glyphicon-option-vertical" style="color:white; background-color: #0a0a0a !important;"></span>
                             </button>
-                            <ul class="dropdown-menu order_menu_options menu_list scaled">
+                            <ul class="dropdown-menu order_menu_options menu_list">
                                 <li class="supplier_profile" data-width="fit"><a href="#"
                                   data-translate="ec136b444eede3bc85639fac0dd06229">Supplier</a></li>
                                 <li class="cancel_order" data-width="fit"><a href="#"
@@ -488,8 +488,8 @@
                             <div data-translate="884d9804999fc47a3c2694e49ad2536a" style="text-align: center; color:white">Адрес</div>
                             <!--<label  for="address">Адрес:</label>-->
                             <div>
-                            <textarea name="address" class="form-control address" rows="1" contenteditable="true"
-                                      style="text-align: center; background-color:black;color: #c4e3f3">Ленинский пр.</textarea>
+                            <textarea name="address" class="address form-control" rows="1" contenteditable="true"
+                                      style="text-align: center; background-color:black;color: #c4e3f3;border-color: #2b2b2b">Ленинский пр.</textarea>
                             </div>
                         </div>
                         <div class="col-sm-2 col-xs-2">
@@ -517,7 +517,7 @@
                 <div class="order-footer">
                     <span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>
                     <textarea  class="input collapse in tacollapse comment" style="text-align:left; width: 100%; color: #ff6d6b;
-                        font-family:'Segoe Script'; font-size: large;" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
+                        font-family:'Segoe Script'; font-size: large;border-color: #0f192a" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
             </div>
         </div>
     </div>
@@ -611,7 +611,7 @@
                 <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
             </div>
 
-            <div class="pack_container  row"  style="display: none">
+            <div class="col-xs-4 pack_container  row">
                 <div class="col-xs-4">
                     <div class="dropdown-toggle"  data-toggle="dropdown">
                         <div style="display: inline-block" data-translate="41b0e839c21e82f25bffdb9dc82848fa"></div>
@@ -647,6 +647,7 @@
                 </div>
 
                 <div class="col-xs-2">
+                    <div class="ordperiod" style="white-space: nowrap;visibility: hidden">Время доставки</div>
                     <span class="appr_div fa fa-handshake-o approved scaled" style="display:block;position:absolute; top:30px; right:5px;font-size: 20px; visibility: hidden"></span>
                 </div>
             </div>
@@ -674,13 +675,13 @@
 <div class="browser_container" id="profile_container"
      style="display:none;   position: fixed;
      overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-        width:75%;  height: 90%; left: 0%; top: 0%;
+       width:60%;  height: 50%; left: 20%; top: 20%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
     <input type="image" class="close_browser" src="https://nedol.ru/rtc/browser/images/ic_stop.png"  style="position: absolute;
               display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
-    <iframe class="browser" style="position:absolute;overflow:hidden;z-index: 10" width="100%" height="96%"></iframe>
+    <iframe class="browser" style="position:absolute;overflow:hidden;z-index: 10" width="100%" height="94%"></iframe>
 </div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>

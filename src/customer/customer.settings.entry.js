@@ -3,17 +3,19 @@
 import {CustomerSettings} from "./customer.settings";
 
 import 'bootstrap'
+import {DB} from "../map/storage/db"
 
-window.cs;
-$(document).ready(function () {
+$(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
         alert('В этом браузере нет поддержки EventSource.');
         return;
     }
-    // parent
-    window.cs = new CustomerSettings(parent.db, parent.user.uid);
-    cs.Open();
+
+    window.db = new DB('Customer', function () {
+        window.cs = new CustomerSettings(window.db);
+        window.cs.Open();
+    });
 
     var readURL = function(input) {
         if (input.files && input.files[0]) {

@@ -21,6 +21,7 @@ module.exports = {
         'supplier': __dirname+'/src/supplier/supplier.entry.js'
         ,'customer': __dirname+'/src/customer/customer.entry.js'
         ,'customer_settings':__dirname+'/src/customer/customer.settings.entry.js'
+        ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.entry.js'
 
 
     },

@@ -11,7 +11,7 @@ class Categories {
         this.map = map;
 
         $('#category_include').css('display', 'block');
-        //TODO: разобраться
+
         let catAr = [
             {"id": "0", "state": "1"},
             {"id": "10", "state": "1"},
@@ -21,7 +21,7 @@ class Categories {
             {"id": "40", "state": "0"},
             {"id": "50", "state": "0"},
             {"id": "60", "state": "0"},
-            {"id": "70", "state": "1"},
+            {"id": "70", "state": "0"},
             {"id": "80", "state": "0"},
             {"id": "90","state": "0"},
             {"id": "100","state": "0"},

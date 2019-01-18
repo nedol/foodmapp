@@ -22,6 +22,7 @@ import {Events} from './events/events';
 import {Feature} from "./events/feature.events";
 import {Import} from "./import/import";
 import {Marker} from "./marker/marker";
+import {Menu} from "../menu/menu";
 
 
 class OLMap {
@@ -77,14 +78,13 @@ class OLMap {
         this.feature = new Feature(this);
         this.import = new Import(this);
 
+
     }
 
     Init() {
         let that = this;
 
         this.events = new Events(this);
-
-
 
         if (window.sets.app_mode !== 'demo') {
 
@@ -143,7 +143,7 @@ class OLMap {
 
     GetObjectsFromStorage(cats, area) {
         let that = this;
-        let period = $('.sel_time').text().split(' - ');
+        let period = $('.sel_period').text().split(' - ');
         window.db.GetRangeSupplier(window.user.date, period[0], period[1],
             parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
@@ -157,7 +157,7 @@ class OLMap {
 
                     let source = layer.values_.vector;
 
-                    if(features[f].values_.object.email===window.user.email)
+                    if(features[f].values_.object.uid===window.user.uid)
                         continue;
                     if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
                         that.layers.AddCluster(layer, features[f]);

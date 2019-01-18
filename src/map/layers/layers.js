@@ -110,7 +110,7 @@ class Layers {
             cluster: clusterSource,
             style: function (cluster_feature, atr) {
 
-                let period = $('.sel_time').text().split(' - ');
+                let period = $('.sel_period').text().split(' - ');
                 let features = cluster_feature.values_.features;
                 let rem_feat = [];
                 if (features.length > 0) {

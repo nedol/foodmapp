@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap-theme.min.css" integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+
+</head>
+<body>
+<style>
+    html {
+        font-size: 14px;
+    }
+    @media (min-width: 768px) {
+        html {
+            font-size: 16px;
+        }
+    }
+
+    .container {
+        max-width: 960px;
+    }
+
+    .pricing-header {
+        max-width: 700px;
+    }
+
+    .card-deck .card {
+        min-width: 220px;
+    }
+    .demo{
+        padding: 100px 0;
+    }
+    .heading-title{
+        margin-bottom: 100px;
+
+    }
+    .pricingTable{
+        border: 2px solid #f7959f;
+        padding: 40px 0;
+        text-align: center;
+    }
+    .pricingTable .title{
+        font-size: 18px;
+        color: #727cb6;
+        text-transform: uppercase;
+        margin: 0 0 16px 0;
+    }
+    .pricingTable .amount{
+        display: block;
+        font-size: 50px;
+        color: #333;
+        line-height: 1;
+    }
+    .pricingTable .month{
+        display: block;
+        font-size: 13px;
+        color: #999;
+        text-transform: uppercase;
+        margin: 5px 0 20px 0;
+    }
+    .pricingTable .icon{
+        margin-bottom: 30px;
+        position: relative;
+    }
+    .pricingTable .icon:before,
+    .pricingTable .icon:after{
+        content: "";
+        width: 30px;
+        height: 1px;
+        background: #dadada;
+        position: absolute;
+        top: 50%;
+    }
+    .pricingTable .icon:before{
+        left: 0;
+    }
+    .pricingTable .icon:after{
+        right: 0;
+    }
+    .pricingTable .icon i{
+        font-size: 25px;
+        color: #333;
+        line-height: 40px;
+        position: relative;
+    }
+    .pricingTable .pricing-content{
+        list-style: none;
+        padding: 0;
+        margin: 0 0 40px 0;
+    }
+    .pricingTable .pricing-content li{
+        font-size: 14px;
+        color: #333;
+        line-height: 15px;
+        margin-bottom: 25px;
+    }
+    .pricingTable .pricingTable-signup{
+        display: inline-block;
+        padding: 10px 37px;
+        border-radius: 50px;
+        font-size: 14px;
+        color: #666;
+        line-height: 1.5;
+        border: 2px solid #ccc;
+        text-transform: uppercase;
+        transition: all 0.2s ease-in-out 0s;
+    }
+    .pricingTable .pricingTable-signup:hover{
+        border-color: #b3b3b3;
+    }
+    .pricingTable.middle{
+        border-color: #727cb6;
+        background: #727cb6;
+        box-shadow: 0 0 15px 0 rgba(0, 0, 0, 0.25);
+        color: #fff;
+    }
+    .pricingTable.middle .title,
+    .pricingTable.middle .amount,
+    .pricingTable.middle .month,
+    .pricingTable.middle .icon i,
+    .pricingTable.middle .pricing-content li{
+        color: #fff;
+    }
+    .pricingTable.middle .pricingTable-signup{
+        background: #f7959f;
+        border-color: #f7959f;
+        color: #fff;
+    }
+    .pricingTable.middle .pricingTable-signup:hover{
+        background: #e67c86;
+        border-color: #e67c86;
+    }
+    @media only screen and (max-width: 990px){
+        .pricingTable{ margin-bottom: 30px; }
+    }
+</style>
+<div class="demo">
+    <div class="container">
+        <div class="row text-center">
+            <h1 class="heading-title">Планы по подписке</h1>
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 col-sm-6">
+                <div class="pricingTable">
+                    <h4 class="title">Standard</h4>
+                    <span class="amount">0 руб</span>
+                    <span class="month">в месяц</span>
+                    <div class="icon"><i class="fa fa-calendar"></i></div>
+                    <ul class="pricing-content">
+                        <li>5 наименований продуктов</li>
+                    </ul>
+                    <a class="pricingTable-signup" href="#">sign up</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="pricingTable middle">
+                    <h4 class="title">Business</h4>
+                    <span class="amount">100</span>
+                    <span class="month">в месяц</span>
+                    <div class="icon"><i class="fa fa-calendar"></i></div>
+                    <ul class="pricing-content">
+                        <li>10 наименований продуктов</li>
+                        <li>Загрузка 2 сертификатов</li>
+                        <li>Голосовая связь с Заказчиками</li>
+                    </ul>
+                    <a class="pricingTable-signup" href="#">sign up</a>
+                </div>
+            </div>
+
+            <div class="col-md-4 col-sm-6">
+                <div class="pricingTable">
+                    <h4 class="title">Premium</h4>
+                    <span class="amount">1000 руб</span>
+                    <span class="month">в месяц</span>
+                    <div class="icon"><i class="fa fa-calendar"></i></div>
+                    <ul class="pricing-content">
+                        <li>Неограниченное количество продуктов</li>
+                        <li>Неограниченное количество сертификатов</li>
+                        <li>Видео-связь</li>
+                    </ul>
+                    <a class="pricingTable-signup" href="#">sign up</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

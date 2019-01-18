@@ -19,6 +19,7 @@
 <link rel="stylesheet" href="../lib/style.css">
 <link rel="stylesheet" href="../node_modules/tablesorter/dist/css/theme.default.min.css">
 
+<script src="../lib/load-image/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="supplier.js"></script>
 
@@ -236,7 +237,7 @@
                         <span class="glyphicon glyphicon-calendar"></span>
                 </span>
 
-                <button class="btn btn-default dropdown-toggle sel_time" type="button" data-toggle="dropdown"
+                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
                         data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
@@ -273,10 +274,31 @@
 
 </div>
 
-<button id="main_menu" class="btn btn-default dropdown-toggle" type="button"
-        data-width="fit" style="display:inline-block;float:left">
-    <span class="caret"></span>
-</button>
+<div class="menu_container">
+    <button  class="toggle_menu btn btn-default btn-lg" data-width="fit" type="button">
+        <span class="glyphicon glyphicon-option-vertical"></span>
+    </button>
+
+    <div class="sup_menu"
+         style="
+         display: block;
+         position: fixed;
+         top:0px; left: 0px;
+         width:10%; height: 100%;
+         padding-left: 5px;
+         color: white;
+         background-color: rgb(3,0,0);
+         white-space: nowrap;
+         z-index:20;">
+        <div class="list-group">
+            <a href="#" class="open_off_editor list-group-item" style="border: hidden;color: white;background-color: black">Редактор предложений</a>
+            <a href="#" class="list-group-item" style="border: hidden;color: white;background-color: black">Профиль</a>
+            <a href="#" class="list-group-item" style="border: hidden;color: white;background-color: black">Настройки</a>
+        </div>
+    </div>
+</div>
+
+
 
 <div id="category_include" style="display:none">
     <style>
@@ -306,8 +328,7 @@
     </style>
 
     <div id="category_container">
-        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px;
-        right: 50%; left:50%"/>
+        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px; right: 50%; left:50%"/>
     </div>
 
     <div align="center" id="categories">
@@ -339,7 +360,7 @@
 
 <div id="offer_editor" style="display: none; position: fixed;
      overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:75%;  height: auto; left: 0%; top: 0%;
+       width:75%;  height: auto; left: 15%; top: 5%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div>
@@ -454,11 +475,11 @@
                 .dropdown:hover .dropdown-content {
                     display: block;
                 }
-                .close {
+                .close_browser {
                     color: #ffffff;
                     opacity: 1;
                 }
-                .close:hover {
+                .close_browser:hover {
                     color: #d51312;
                     opacity: 1;
                 }
@@ -483,11 +504,11 @@
                             <span class="glyphicon glyphicon-option-vertical"></span>
                         </button>
                         <ul id="menu_list" class="dropdown-menu order_menu_options">
-                            <li class="delete_offer_ctrl" data-width="fit"><a href="#"
-                               data-translate="f479ee0428deb391dacad49e70199eb4">Delete The Offer</a></li>
+                            <li class="show_orders_ctrl" data-width="fit"><a href="#"
+                               data-translate="54a228ac1da8df4602aa2052461c1349">Show Orders</a></li>
                         </ul>
                     </div>
-                    <div  class="col-sm-3 col-xs-3">
+                    <div  class="col-sm-2 col-xs-2">
                         <div class="modal-title" style="text-align: center;"></div>
                     </div>
 
@@ -508,9 +529,8 @@
                 <div class="tab-content">
                     <ul class="nav nav-tabs" id="menu_tabs">
                         <li id="add_tab_li" title="add tab" style="display: none;">
-                            <span id="add_tab" class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab"
-                                  style="opacity: .5;font-size: 30px;"></span>
-                            <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
+                            <span id="add_tab" class="add_tab" href="#add_tab"
+                                  style="visibility: hidden;"></span>
                         </li>
                     </ul>
                     <div class="tab-content" id="tab_content">
@@ -554,7 +574,7 @@
             box-shadow: 0 0 10px #719ECE;
         }
         .item_title{
-
+            display: inline-block;
             font-family:'Courier New';
             font-size: x-large;
             /*height: 240px;*/
@@ -566,6 +586,10 @@
             -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
             -moz-box-sizing: border-box;    /* Firefox, other Gecko */
             box-sizing: border-box;         /* IE 8+ */
+        }
+        li.active a{
+            color:blue;
+            background-color:grey;
         }
         .item_price{
 
@@ -625,33 +649,36 @@
     </style>
     <div  id="menu_item_tmplt">
         <div class="row">
-            <div class="col-sm-1 col-xs-1">
-                <div class="item_cb" title="Опубликовать" >
-                    <label  class="btn" style="visibility:hidden">
-                        <input type="checkbox" class="checkbox-inline" style="display: none">
-                        <i class="fa fa-square-o fa-2x"></i>
-                        <i class="fa fa-check-square-o fa-2x"></i>
-                    </label>
-                </div>
+            <div class="col-xs-7">
+                <label  class="item_cb btn" title="Опубликовать" style="margin-right:10px;visibility:hidden">
+                    <input type="checkbox" class="checkbox-inline" style="display: none">
+                    <i class="fa fa-square-o fa-2x"></i>
+                    <i class="fa fa-check-square-o fa-2x"></i>
+                </label>
+                <div class="input item_title" rows="2" contentEditable="true"  data-toggle="collapse"></div>
             </div>
-            <div class="col-xs-6">
-                <div class="input item_title" rows="2"  contentEditable="true"  data-toggle="collapse"></div>
-            </div>
-            <div class="col-xs-2 dropup">
+           <div class="pack_container col-xs-2 dropup">
                 <div style="display: inline-block"  class="dropdown-toggle"  data-toggle="dropdown" data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
                 <span class="caret" style="display: inline-block;"></span>
-                <div class="item_pack input" contentEditable="true" placeholder="     гр."
-                     style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+               <div>
+                   <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="display: inline-block; visibility:hidden; float: right"></span>
+
+                   <div class="item_pack input" contentEditable="true" placeholder="..... гр."
+                     style="font-weight:normal;font-size:24px;white-space: nowrap;">
+                   </div>
+               </div>
                 <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit">
-                    <li><a role="packitem" style="color: red">добавить</a></li>
+                    <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
                 </ul>
             </div>
             <div class="col-xs-2">
                 <div>Цена:</div>
-                <div class="input item_price"  contenteditable="true" placeholder="руб" style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                <div class="input item_price"  contenteditable="true" placeholder="руб"
+                     style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
             </div>
             <div class="col-sm-1 col-xs-1">
                 <span class="fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
+                <span class="order_amnt badge" style="position: absolute;left:0px;visibility: hidden">0</span>
             </div>
         </div>
 
@@ -680,6 +707,9 @@
                 <tr>
                     <th>
                         <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                    </th>
+                    <th>
+                        <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
                     </th>
                     <th>
                         <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
@@ -721,58 +751,42 @@
     <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
     <data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
     <data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
-    <data class="alerts" id="delete_offer" data-translate="6c7a42eaf1426625858250105dd12f86" style="display: none">Delete Offer</data>
+    <data class="alerts" id="show_orders" data-translate="54a228ac1da8df4602aa2052461c1349" style="display: none">Show Orders</data>
 
     <data class="tariff" id="items_limit" value="5"></data>
 </div>
 
-<div id="offer_viewer" class="modal fade" role="dialog">
+<div id="offer_viewer" class="order_container"
+     style="display:none;   position: fixed;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       width:70%;  height: auto; left: 20%; top: 5%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div class="modal-dialog modal-lg">
+    <div>
         <div class="modal-content">
             <div class="modal-header" style="position: relative;width: 100%;">
                 <div class="row">
-                    <div class="col-sm-1 col-xs-1 dropdown" style="display: inline-block">
-                        <button class="btn btn-default btn-sm order_menu_button dropdown-toggle"  data-toggle="dropdown"
-                                data-width="fit" type="button">
-                            <span class="glyphicon glyphicon-option-vertical"></span>
-                        </button>
-                        <ul class="dropdown-menu order_menu_options menu_list">
-                            <li class="publish_offer" data-width="fit"><a href="#"
-                                  data-translate="23d285609698e41e54306c4189c90569">Publish The Offer</a></li>
-                            <li class="cancel_offer" data-width="fit"><a href="#"
-                                 data-translate="f479ee0428deb391dacad49e70199eb4">Cancel The Offer</a></li>
-                        </ul>
-                    </div>
-                    <div class="col-sm-5 col-xs-5">
+                    <div class="col-sm-6 col-xs-6">
                         <h4 class="modal-title"  style="display: inline-block">Order for</h4>
                         <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
                         <h4 class="modal-menu-number"  style="display: none">Offer</h4>
                     </div>
-
-
-                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
-                        <span class="glyphicon glyphicon-remove-sign close scaled" data-dismiss="modal"></span>
+                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; top:0;right: 5px;color: white">
+                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
                     </div>
                 </div>
             </div>
             <div class="modal-body">
-                <div class="tab-content">
+                <div class="tab-content dropup">
                     <ul class="nav nav-tabs menu_tabs">
-                        <li class="add_tab_li" title="add tab" style="display: none;">
-                            <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="opacity: .5;font-size: 30px;"></span>
-                            <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
+                        <li class="add_tab_li" title="add tab">
                         </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane fade add_tab_div" style="border: none"></div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                 <textarea  class="comment"
-                    style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
-                 </textarea>
             </div>
         </div>
     </div>
@@ -786,9 +800,13 @@
         color: whitesmoke;
     }
 </style>
-<div id="order_viewer" class="modal fade" role="dialog">
+<div id="order_viewer" style="display:none;   position: fixed;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       width:60%;  height: 50%; left: 20%; top: 20%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div class="modal-dialog modal-lg">
+    <div>
         <div class="modal-content">
             <div class="modal-header" style="position: relative;width: 100%;">
                 <!--div class="dropdown" style="display: inline-block">
@@ -803,31 +821,57 @@
                     </ul>
                 </div-->
 
-                <h4 class="modal-title"  style="display: inline-block" data-translate="3492b62254e3625dee5ff96208e0e9d9">Type</h4>
+                <h4 class="modal-title"  style="display: inline-block" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Type</h4>
                 <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
                 <h4 class="modal-menu-number"  style="display: none">Order</h4>
 
-                <button type="button" class="btn close" data-dismiss="modal" data-translate="">
-                    <img  src="./images/ic_stop.png"  style="display: block; height: 30px" title="Save & Close">
-                </button>
+                <div style="display: inline-block; position:absolute; right: 10px;  color:white">
+                    <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
+                </div>
             </div>
 
             <div class="modal-body table-responsive">
 
                 <table class="table tablesorter">
                     <thead>
-                    <tr>
-                        <th data-translate="6f8063417ab31f38d864c28302f3de2f">Approve</th>
-                        <th data-translate="7d74f3b92b19da5e606d737d339a9679">Item</th>
-                        <th data-translate="31d1b8ef5ed469f7618d76144fffaa06">Qnty</th>
-                        <th data-translate="3601146c4e948c32b6424d2c0a7f0118">Price</th>
-                        <th data-translate='884d9804999fc47a3c2694e49ad2536a'>Address</th>
-                        <th data-translate="a74ec9c5b6882f79e32a8fbd8da90c1b">Distance</th>
-                        <th data-translate="a0acfa46d86f7610b2c73dbb28f64701">Period</th>
-                        <th data-translate="a5d491060952aa8ad5fdee071be752de">Comments</th>
-                        <th data-translate="25ae4884275a34b33820d6e17013bed1">Delivery History</th>
-                        <th data-translate="07ca5050e697392c9ed47e6453f1453f" class="notoday">Completed</th>
-                    </tr>
+                        <tr>
+                            <th>
+                                <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                            </th>
+                            <th>
+                                <span class="glyphicon glyphicon-apple"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                            </th>
+                            <th>
+                                <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
+                            </th>
+                        </tr>
                     </thead>
                     <tbody>
 

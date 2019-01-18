@@ -1,4 +1,5 @@
 'use strict'
+let Email = require( "../email/email");
 let moment = require('moment');
 
 let utils = require('../utils');
@@ -34,8 +35,11 @@ module.exports = class D2D {
         } else {
             try {
                 switch (q.func) {
-                    case 'init':
-                        this.init(q, res);
+                    case 'confirmem':
+                        this.ConfirmEmail(q, res);
+                        break;
+                    case 'regsupplier':
+                        this.RegSupplier(q, res);
                         break;
                     case 'auth':
                         this.Auth(q, res);
@@ -83,12 +87,12 @@ module.exports = class D2D {
         }
     }
 
-    init(q, res) {
+    ConfirmEmail(q, res) {
 
-        var sql =  "SELECT obj.id, obj.owner, obj.data as obj_data, obj.ddd as ddd, o.data as order_data, DATE_FORMAT(o.date,'%Y-%m-%d') as date"+
-            " FROM  objects as obj, orders as o"+
-            " WHERE obj.latitude="+q.lat+" AND obj.longitude="+q.lon+
-            " AND obj.id=o.obj_id AND (o.data IS NOT NULL OR o.data='') ORDER BY o.date DESC";
+        let that = this;
+        let sql = "SELECT user.*" +
+            " FROM "+q.user.toLowerCase()+" as user" +
+            " WHERE user.email='" + q.email + "'";
 
         global.con_obj.query(sql, function (err, result) {
             if (err)
@@ -96,36 +100,83 @@ module.exports = class D2D {
 
             if (result.length > 0) {
 
-                //res.writeHead(200, {'Content-Type': 'application/json'});
-                res.writeHead(200,{'Content-Type': 'text/event-stream'});
-                res.end(JSON.stringify({
-                    data: result[0].obj_data,
-                    ddd: result[0].ddd,
-                    offer: result[0].order_data,
-                    maxdate:result[0].date
-                }));
+                res.writeHead(200, {
+                    'Content-Type': 'text/event-stream; charset=utf-8',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive'
+                });
+                res.end(JSON.stringify({"msg":"msg"}));
 
-            }else {
+            } else {
+                let values, sql, uid;
+                let psw = shortid.generate();
+                uid = md5(q.email);
+
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({msg: 'Initialization is impossible'}));
+
+                let em = new Email();
+                let html = "<a href='http://localhost:63342/door2door/dist/"+q.user.toLowerCase()+".html?uid=" + uid + "&email=" + q.email + "&lang=ru'><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+
+                em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
+                    res.end(JSON.stringify({email: q.email}));
+                });
             }
         });
+    }
 
+    RegSupplier(q, res) {
+
+        let that = this;
+
+        var sql =  "SELECT sup.*"+
+            " FROM  supplier as sup"+
+            " WHERE sup.email='"+q.email+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (err)
+                throw err;
+
+            if (result.length > 0) {
+
+                res.writeHead(200, {
+                    'Content-Type': 'text/event-stream; charset=utf-8',
+                    'Cache-Control': 'no-cache',
+                    'Connection': 'keep-alive'
+                });
+                res.end(JSON.stringify({"msg":"msg"}));
+
+            } else {
+                let values, sql;
+                that.replaceImg_2(q.profile.avatar,function (avatar) {
+                    q.profile.avatar = avatar
+                    values = [q.uid, q.psw, JSON.stringify(q.profile), 'tariff'];
+                    sql = "INSERT INTO supplier SET  uid=?, psw=?, profile=?, tariff=?";
+                    global.con_obj.query(sql, values, function (err, result) {
+                        res.writeHead(200, {'Content-Type': 'application/json'});
+                        if (err) {
+                            res.end();
+                            return;
+                        }
+                        res.end(JSON.stringify(values));
+                    });
+                });
+
+            }
+        });
     }
 
 
     Auth(q, res, req) {
-        let values, sql;
-        let uid;
+        let values, sql, uid;
         let psw = shortid.generate();
         if(q.user==='Customer'){
             uid = md5(new Date())
             values = [uid, psw,'tariff'];
-            sql = "INSERT INTO customer SET  uid=?, psw=?, tariff=?";
+            sql = "REPLACE INTO customer SET  uid=?, psw=?, tariff=?";
         }else if(q.user==='Supplier'){
             uid = md5(q.email);
             values = [uid, psw, q.email,'tariff'];
-            sql = "INSERT INTO supplier SET uid=?, psw=?, email=?, tariff=?";
+            sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
         }
         global.con_obj.query(sql, values, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -189,16 +240,10 @@ module.exports = class D2D {
                     let offer = urlencode.decode(q.offer);
                     that.replaceImg(offer,function (offer) {
                         values = [offer, q.location[1], q.location[0], sel[0].offer_id];
-                        sql = "UPDATE offers SET data=?, latitude=?, longitude=?   WHERE id=?";
+                        sql = "UPDATE offers SET data='"+offer+"', latitude='"+q.location[1]+"', longitude='"+q.location[0]+"' WHERE id='"+sel[0].offer_id+"'";
                         that.updateOfferDB(q, res, sql, values, now);
                     });
                 }
-
-                // if (new Date(sel[0].date) >= new Date(q.date)) {
-                //     values = [urlencode.decode(q.offer), JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.period, sel[0].offer_id];
-                //     sql ='UPDATE offers SET data=?, categories=?, longitude=?, latitude=?, period=? WHERE id=?';
-                //     that.updateOfferDB(q, res, sql, values, now);
-                // }
 
             }else {
                 let offer = urlencode.decode(q.offer);
@@ -233,6 +278,7 @@ module.exports = class D2D {
             }
         });
     }
+
     replaceImg(offer, cb) {
         let ofobj = JSON.parse(offer);
         for(let tab in ofobj) {
@@ -242,11 +288,31 @@ module.exports = class D2D {
                 fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
 
                 });
+                for(let c in ofobj[tab][item].cert){
+                    const base64Data = ofobj[tab][item].cert[c].src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+                    const hash = md5(base64Data);
+                    fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
+
+                    });
+                    offer = offer.replace(ofobj[tab][item].cert[c].src,'../server/images/'+hash);
+                }
                 offer = offer.replace(ofobj[tab][item].img.src,'../server/images/'+hash);
             }
             cb(offer);
         }
 
+    }
+
+    replaceImg_2(src, cb) {
+        if(!src) {
+            cb(src);
+            return;
+        }
+        const base64Data = src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+        const hash = md5(base64Data);
+        fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
+            cb('../server/images/'+hash);
+        });
     }
 
     BroadcastOffer(q, res, cb){
@@ -446,7 +512,7 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT of.date as date, of.period as period, sup.uid as uid, of.categories as cats, " +
-            " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict"+
+            " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict, sup.profile as profile"+
             " FROM  supplier as sup, offers as of"+
             " WHERE sup.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +

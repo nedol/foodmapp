@@ -18,6 +18,7 @@ import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
 
 import {Overlay} from "../map/overlay/overlay";
+import {SupplierMenu} from "../menu/SupplierMenu";
 
 
 let md5 = require('md5');
@@ -43,11 +44,12 @@ class Supplier{
 
         this.offer = new Offer(uObj);
 
-        this.uid = uObj.profile.uid;
-        this.psw = uObj.profile.psw;
-        this.email = uObj.profile.email;
+        this.uid = uObj.set.uid;
+        this.psw = uObj.set.psw;
+        this.email = uObj.set.profile.email;
 
         this.map = new OLMap();
+        this.menu = new SupplierMenu(this);//TODO:
 
         this.isShare_loc = false;
 
@@ -55,7 +57,6 @@ class Supplier{
 
     IsAuth_test(cb){
         let that = this;
-
 
         this.map.Init();
         window.network.InitSSE(this,function () {
@@ -77,7 +78,7 @@ class Supplier{
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
-        $('#main_menu').on('click touch', this, this.offer.OpenOfferEditor);
+        $('.open_off_editor').on('click touch', this, this.offer.OpenOfferEditor);
 
         this.DateTimePickerEvents();
 
@@ -91,7 +92,7 @@ class Supplier{
                     if($( ".ui-selected").length===i+1)
                         result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
                 });
-                $('.sel_time').text(result);
+                $('.sel_period').text(result);
 
                 window.db.GetOffer(that.date, function (off) {
                     if(off) {
@@ -104,6 +105,7 @@ class Supplier{
 
             }
         });
+
     }
 
     IsAuth(cb) {
@@ -194,13 +196,15 @@ class Supplier{
 
             $('.dt_val').val(that.date);
 
-            $('.sel_time').find('option').css('visibility','visible');
+            $('.sel_period').find('option').css('visibility','visible');
 
             $(this).data("DateTimePicker").toggle();
 
             window.db.GetOffer(that.date, function (off) {
                 if(off) {
-                    $('.sel_time').text(off.period );
+                    if(!off.period)
+                        off.period = '06:00 - 24:00';
+                    $('.sel_period').text(off.period );
                 }
             });
 
@@ -251,31 +255,33 @@ class Supplier{
             });
 
             that.map.import.DownloadOrderSupplier(function () {
-                window.db.GetOrders(window.user.date, window.user.email, function (objs) {
+                window.db.GetOrders(window.user.date, window.user.uid, function (objs) {
                     if(objs!=-1){
                         let type = 'customer';
                         for(let o in objs) {
                             window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
-                                let loc = proj.fromLonLat([parseFloat(lon),parseFloat(lat)]);
-                                var markerFeature = new Feature({
-                                    geometry: new Point(loc),
-                                    labelPoint: new Point(loc),
-                                    //name: cursor.value.title ? cursor.value.title : "",
-                                    //tooltip: cursor.value.title ? cursor.value.title : "",
-                                    type:type,
-                                    object: objs[o]
-                                });
-                                var id_str = md5(window.user.date+objs[o].cusuid);
-                                markerFeature.setId(id_str);
+                                if(lat && lon) {
+                                    let loc = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+                                    var markerFeature = new Feature({
+                                        geometry: new Point(loc),
+                                        labelPoint: new Point(loc),
+                                        //name: cursor.value.title ? cursor.value.title : "",
+                                        //tooltip: cursor.value.title ? cursor.value.title : "",
+                                        type: type,
+                                        object: objs[o]
+                                    });
+                                    var id_str = md5(window.user.date + objs[o].cusuid);
+                                    markerFeature.setId(id_str);
 
-                                let layer = that.map.ol_map.getLayers().get(type);
-                                if (!layer) {
-                                    layer = that.map.layers.CreateLayer(type, '1');
+                                    let layer = that.map.ol_map.getLayers().get(type);
+                                    if (!layer) {
+                                        layer = that.map.layers.CreateLayer(type, '1');
+                                    }
+                                    let source = layer.values_.vector;
+
+                                    if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date === window.user.date)
+                                        that.map.layers.AddCluster(layer, markerFeature);
                                 }
-                                let source = layer.values_.vector;
-
-                                if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date===window.user.date)
-                                    that.map.layers.AddCluster(layer, markerFeature);
                             });
                         }
                     }
@@ -313,13 +319,11 @@ class Supplier{
         });
     }
 
-
-
     OnClickTimeRange(ev){
         let that = this;
         let from = $(ev).text().split(' - ')[0];
         let to = $(ev).text().split(' - ')[1];
-        $('.sel_time').text($(ev).text());
+        $('.sel_period').text($(ev).text());
         $('#dt_from').val(from);
         $('#dt_to').val(to);
         let layers = this.map.ol_map.getLayers();
@@ -353,13 +357,13 @@ class Supplier{
                         offer[tab][i].img_top = this.offer.stobj.data[tab][i].img_top;
                 }
                 uObj.data[tab] = offer[tab];
-                uObj.period = $('.sel_time').text();
+                uObj.period = $('.sel_period').text();
                 this.offer.stobj.data[tab] = offer[tab];
             }
         }else {
             uObj = {
                 "date":window.user.date,
-                "period": $('.sel_time').text(),
+                "period": $('.sel_period').text(),
                 "location": location,
                 "data": offer
             };
@@ -396,7 +400,7 @@ class Supplier{
             "psw": that.psw,
             "categories": that.offer.editor.arCat,
             "date": date,
-            "period": $('.sel_time').text(),
+            "period": $('.sel_period').text(),
             "location": proj.toLonLat(location),
             "offer": urlencode.encode(JSON.stringify(data)),
             "dict": JSON.stringify(window.dict)
@@ -444,11 +448,11 @@ class Supplier{
             "uid": window.user.uid,
             "psw": window.user.psw,
             "date":obj.date,
-            "period": $('.sel_time').text(),
+            "period": obj.period,
             "supuid":obj.supuid,
             "cusuid":obj.cusuid,
-            "title":obj.title,
-            "data": obj.data[obj.title]
+            "title": Object.keys(obj.data)[0],
+            "data": obj.data[Object.keys(obj.data)[0]]
         }
 
         window.network.postRequest(data_obj, function (resp) {
@@ -517,7 +521,6 @@ class Supplier{
                                     window.user.map.SetFeatureGeometry(feature,loc);
                             }
                         }
-
                     });
                 }
             });

@@ -19,6 +19,7 @@ var md5 = require('md5');
 var isJSON = require('is-json');
 
 import {Utils} from "../utils/utils";
+import {OrderViewer} from "../order/order.viewer";
 
 let utils = new Utils();
 
@@ -29,12 +30,10 @@ class OfferEditor{
 
         this.changed = false;
 
-        this.obj;
-        this.status;
-
-
         this.arCat = [];
+
     }
+
     onClickCert(ev) {
         ev.preventDefault();
         ev.stopPropagation();
@@ -50,6 +49,15 @@ class OfferEditor{
 
         let that = this;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+        $(".category[state='1']").each(function (i, cat) {
+            let tab = cat.title;
+            $('<li class="tab_inserted"><a cat="'+cat.id+'" data-toggle="tab" contenteditable="true"  data-translate="'+md5(tab)+'"  href="#'+tab+'"' +
+                ' style="margin:1px;color:white; background-color:black">'+cat.title+'</a>' +
+                '</li>').insertBefore($('#add_tab_li'));
+            $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
+                '</div>').insertBefore($('#add_tab_div'));
+        });
 
         this.offer =  window.user.offer.stobj;
         this.location = window.user.offer.stobj.location;
@@ -73,7 +81,7 @@ class OfferEditor{
         $(".content_text").dblclick(function () {
             selectText($(this));
         });
-        let str = "Предложение по доставке \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_time').text()+")";
+        let str = "Предложение по доставке \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
         $("#offer_editor").find('.modal-title').text(str);
         if(that.offer.published)
             $("#offer_editor").find('.offer_status').text('Опубликовано:\r\n'+that.offer.published);
@@ -88,13 +96,13 @@ class OfferEditor{
 
         for (let tab in this.offer.data) {
             if(!tab) continue;
-            let active = (tab==='0'?' active':'');
-            if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted"+active><a data-toggle="tab"  contenteditable="'+isEditable+'" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore($('#add_tab_li'));
-                $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore($('#add_tab_div'));
-            }
+            // let active = (tab==='0'?' active':'');
+            // if($('[href="#'+tab+'"]').length===0) {
+            //     $('<li class="tab_inserted"+active><a data-toggle="tab"  contenteditable="'+isEditable+'" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+            //         '</li>').insertBefore($('#add_tab_li'));
+            //     $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
+            //         '</div>').insertBefore($('#add_tab_div'));
+            // }
 
             for (let i in this.offer.data[tab]) {
                 let tmplt = $('#menu_item_tmplt').clone();
@@ -154,12 +162,47 @@ class OfferEditor{
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
-
-                $.each(this.offer.data[tab][i].packlist, function (i, data) {
+                $(menu_item).find('.item_pack').on('focusin', that,(ev)=> {
+                    $('.add_pack').css('visibility', 'visible');
+                });
+                let pl = this.offer.data[tab][i].packlist;
+                for(let i in pl){
+                    let data = pl[i];
+                    $(menu_item).find('.pack_container').css('visibility','visible');
                     $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + i + "</a></li>");
                     $(menu_item).find('.item_pack').text(i);
+                    $(menu_item).find('.item_pack').attr('pack',i);
+
+                    $(menu_item).find('.item_pack').on('focusout',that,(ev)=> {
+                        let that = ev.data;
+                        let pack = $(menu_item).find('.item_pack').attr('pack');
+                        if($(this).text()==='') {
+                            $(menu_item).find('a:contains(' + pack + ')').remove();
+                            let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
+                            delete pl[pack];
+                            $(this).attr('packlist', JSON.stringify(pl));
+                        }
+                    });
+
+
                     $(menu_item).find('.item_price').text(data);
-                });
+                    $(menu_item).find('.item_price').on('focusout',that, function (ev) {
+                        // let that = ev.data;
+                        // if($(this).text()===''){
+                        //     //удалить из списка
+                        //    let pack = $(this).closest('.row').find('.item_pack').text();
+                        //    $(menu_item).find('a:contains('+pack+')').remove();
+                        // }else if($(this).closest('.row').find('.item_pack').text()){
+                        //     //добавить в список
+                        //     let pl = JSON.parse($(this).closest('.row').find('.item_pack').attr('packlist'));
+                        //     if(!pl[$(this).closest('.row').find('.item_pack').text()]) {
+                        //         $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + $(this).closest('.row').find('.item_pack').text() + "</a></li>");
+                        //         pl[$(this).closest('.row').find('.item_pack').text()] = $(this).text();
+                        //         $(this).closest('.row').find('.item_pack').attr('packlist', JSON.stringify(pl));
+                        //     }
+                        // }
+                    });
+                }
                 $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(this.offer.data[tab][i].packlist));
 
                 $(menu_item).find('.gallery').attr('id', 'gallery_' + tab + '_' + i);
@@ -174,7 +217,7 @@ class OfferEditor{
                     that.MakeDraggable(img);
                 });
 
-                $('#' + tab).append(menu_item);
+                $('#' + tab).append(menu_item);//добавить продукт в закладку
 
                 $(tmplt).insertAfter('#offer_editor');
 
@@ -219,17 +262,7 @@ class OfferEditor{
                 });
 
                 $(menu_item).find('.add_pack').attr('id', 'pack_' + tab + '_' + i);
-                $(menu_item).find('.add_pack').on('click', function (ev) {
-                    let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
-                    let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
-                    $(this).closest('.row').siblings('.pack_container').find('.pack_list').append("<li href='#'><a role='packitem'>"+pack+";"+price+"</a></li>");
-                    let pl = $(menu_item).find('.item_pack').attr('packlist');
-                    if(pl)
-                        pl = JSON.parse(pl);
-                    else pl = [];
-                    pl.push({pack:pack,price:price});
-                    $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
-                });
+                $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:this}, this.OnClickAddPack);
 
                 $(menu_item).find('.rem_pack').on('click', function (ev) {
 
@@ -255,8 +288,8 @@ class OfferEditor{
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
                 if(ev.relatedTarget) {
-                    let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
-                    window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
+                    //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                    //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
                 }
             });
 
@@ -274,8 +307,13 @@ class OfferEditor{
 
         window.db.GetOrders(date, window.user.uid, function (res) {
 
-            for (let i in res) {
-                let data = res[i].data;
+            $.each(res, function (i, item) {
+
+               let data = res[i].data;
+               let inv_period = "";
+               if(res[i].period!==that.offer.period){
+                   inv_period = "style='color:red'";
+               }
                 let kAr = Object.keys(data);
                 let calcDistance = new Promise(
                     function (resolve, reject) {
@@ -289,6 +327,13 @@ class OfferEditor{
                 calcDistance.then(function (dist) {
                     for (let k in kAr) {
                         $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_ctrl').css('visibility', 'visible');
+                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_amnt').css('visibility', 'visible');
+                        let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.item_price').text();
+                        let inv_price="";
+                        if(data[kAr[k]].price!==price){
+                            inv_price = "style='color:red'";
+                        }
+
                         //if published:
                         // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
                         // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
@@ -302,10 +347,11 @@ class OfferEditor{
                                 "</label>" +
                             "</td>" +
                             "<td>" + data[kAr[k]].qnty + "</td>" +
-                            "<td>" + data[kAr[k]].price + "</td>" +
+                            "<td>" + data[kAr[k]].pack + "</td>" +
+                            "<td "+inv_price+">" + data[kAr[k]].price + "</td>" +
                             "<td>" + res[i].address + "</td>" +
                             "<td>" + parseInt(dist) + "</td>" +
-                            "<td>" + res[i].period + "</td>" +
+                            "<td "+inv_period+">" + res[i].period + "</td>" +
                             "<td class='tablesorter-no-sort'>"+
                             (res[i].comment?"<span class='tacomment'>" + res[i].comment + "</span>":'') +
                             "</td>"+
@@ -330,8 +376,11 @@ class OfferEditor{
                                 if(appr && appr.data.qnty===res[i].data[kAr[k]].qnty &&
                                     appr.data.price===res[i].data[kAr[k]].price) {
                                     $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
+                                    $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
                                 }
                             });
+
+                            $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_amnt').text(parseInt(k+1));
 
                             setTimeout(function () {
                                 let pagerOptions = {
@@ -378,94 +427,32 @@ class OfferEditor{
 
                     }
 
+
+
                 })
                     .catch(function (error) {
                         // ops, mom don't buy it
                         console.log(error.message);
                     });
-            }
+            });
         });
 
         //
         this.lang = window.sets.lang;
         window.dict.set_lang(window.sets.lang,$("#offer_editor"));
-        // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
-
-        // if(!evnts['changed.bs.select']) {
-        //     $(sp).on('changed.bs.select', this, this.OnChangeLang);
-        // }
 
         $('.content_text').draggable();
         //$('.content_text').resizable();
 
 
         let evnts = $._data($('#add_tab').get(0), "events");
-        if(!evnts || !evnts['click'])
-            $('#add_tab').on('click', this, this.AddTab);
 
         evnts = $._data($('#add_item').get(0), "events");
         if(!evnts || !evnts['click']) {
             $('#add_item').on('click', this, this.AddOfferItem);
         }
 
-        $('input:file').change(function(ev) {
-            //listFiles(evt);
-            let  files = $("input[type='file']")[0].files;
-            let el = JSON.parse($(ev.target).attr('func_el'));
-            utils.HandleFileSelect(ev, files, function (data, smt) {
-                if(data) {
-                    if(el.func==='load_img') {
-                        $("#" + el.id).attr('src', data);
-                        let thumb = false;
-                        $("#" + el.id).css('visibility', 'visible');
-                        $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
-                        $("#" + el.id).on('load', function (ev) {
-                            if (!thumb) {
-                                let k = 200/$("#" + el.id).height();
-                                utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
-                                    thumb = true;
-                                    $("#" + el.id).attr('src', thmb.src);
-                                });
-                            }
-                            that.MakeDraggable(this);
-                        });
-                    }else if(el.func==='add_cert') {
-                        let img  = new Image();//'<img src="'+data+'" height="50" >';
-                        img.class = 'cert';
-                        img.src = data;
-                        img.height = '50';
-                        $("#" + el.id).append(img);
-                        $(img).on('click',that.onClickCert);
-                        that.MakeDraggable(img);
-
-                        // loadImage(
-                        //     files[0],
-                        //     function (img) {
-                        //         $(img).attr('org', data);
-                        //         $("#" + el.id).append($(img));
-                        //         $(img).on('click',that.onClickCert);
-                        //     },
-                        //     {maxHeight: 700,maxWidth:1000} // Options
-                        // );
-
-                        // let img  = new Image();//'<img src="'+data+'" height="50" >';
-                        // img.src = data;
-                        // $(img).on('load', function (ev) {
-                        //     let thumb = false;
-                        //     if (!thumb) {
-                        //         let k = 700/$(this).height();
-                        //         utils.createThumb(img, $(img).width()*k, $(img).height()*k, function (thmb) {
-                        //             thumb = true;
-                        //             $(img).attr('src', thmb.src);
-                        //         });
-                        //     }
-                        // });
-
-                    }
-
-                }
-            });
-        });
+        $('input:file').on('change', this, that.OnImportImage);
 
         $('.input').click(function (ev) {
             that.changed = true;
@@ -479,13 +466,12 @@ class OfferEditor{
             });
         });
 
-        $("#offer_editor").find('.delete_offer_ctrl').off('click touchstart');
-        $("#offer_editor").find('.delete_offer_ctrl').on('click touchstart',this,function (ev) {
-            if(confirm($('#delete_offer').text())) {
-                window.user.offer.DeleteOffer(date, function (obj) {
-
-                });
-            }
+        $("#offer_editor").find('.show_orders_ctrl').off('click touchstart');
+        $("#offer_editor").find('.show_orders_ctrl').on('click touchstart',this,function (ev) {
+            window.db.GetOrders(date,window.user.uid,function (objs) {
+                let orderViewer = new OrderViewer();
+                orderViewer.OpenOrderCustomers(objs);
+            });
         });
 
         $('.close_browser').off('click touchstart');
@@ -495,45 +481,54 @@ class OfferEditor{
 
     }
 
+    OnClickAddPack(ev) {
+
+        let menu_item = ev.data.mi;
+        let that = ev.data.that;
+
+        $('.add_pack').css('visibility', 'hidden');
+        let pack = $(menu_item).find('.item_pack').text();
+        let price = $(menu_item).find('.item_price').text()
+
+        let pl = $(menu_item).find('.item_pack').attr('packlist');
+        if (pl)
+            pl = JSON.parse(pl);
+        else
+            pl = {};
+
+        let res = $.grep(pl, function (item, i) {
+            return (pack && item.pack === pack);
+        });
+        if (res.length === 0) {
+            pl[pack] = price;
+        }
+        $(menu_item).find('.pack_list').empty();
+        // $(menu_item).find('.pack_list').append("<li><a role='packitem' style='color: red'>добавить</a></li>");
+        for (let i in pl) {
+            if (i) {
+                $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
+            }
+        }
+        $(menu_item).find('li>a[role=packitem]').on('click', {
+            that: that,
+            mi: $(menu_item)
+        }, that.OnClickPack);
+
+        $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
+        $(menu_item).find('.item_pack').text('');
+        $(menu_item).find('.item_price').text('');
+
+    }
+
     OnClickPack(ev){
         let menu_item = ev.data.mi;
         let that = ev.data.that;
-        if($(ev.target).text()==="добавить"){
-            let pack = $(menu_item).find('.item_pack').text();
-            let price = $(menu_item).find('.item_price').text()
-
-            let pl = $(menu_item).find('.item_pack').attr('packlist');
-            if(pl)
-                pl = JSON.parse(pl);
-            else
-                pl = {};
-
-            let res = $.grep(pl, function (item,i) {
-                return (pack && item.pack===pack);
-            });
-            if(res.length===0) {
-                pl[pack]= price;
-            }
-            $(menu_item).find('.pack_list').empty();
-            $(menu_item).find('.pack_list').append("<li><a role='packitem' style='color: red'>добавить</a></li>");
-            for(let i in pl){
-                if(i) {
-                    $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
-                }
-            }
-            $(menu_item).find('li>a[role=packitem]').on('click', {
-                that: that,
-                mi: $(menu_item)
-            }, that.OnClickPack);
-
-            $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
-            $(menu_item).find('.item_pack').text('');
-            $(menu_item).find('.item_price').text('');
-        }else {
+        {
             that.changed = true;
             let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
             let price = pl[$(ev.target).text()];
             $(menu_item).find('.item_pack').text($(ev.target).text());
+            $(menu_item).find('.item_pack').attr('pack',$(ev.target).text());
             $(menu_item).find('.item_price').text(price);
         }
     }
@@ -551,6 +546,42 @@ class OfferEditor{
         this.changed = true;
     }
 
+    OnImportImage(ev){
+        let that = ev.data;
+        let  files = $("input[type='file']")[0].files;
+        let el = JSON.parse($(ev.target).attr('func_el'));
+        utils.HandleFileSelect(ev, files, function (data, smt) {
+            if(data) {
+                if(el.func==='load_img') {
+                    $("#" + el.id).attr('src', data);
+                    let thumb = false;
+                    $("#" + el.id).css('visibility', 'visible');
+                    $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
+                    $("#" + el.id).on('load', function (ev) {
+                        if (!thumb) {
+                            let k = 200/$("#" + el.id).height();
+                            utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
+                                thumb = true;
+                                $("#" + el.id).attr('src', thmb.src);
+                            });
+                        }
+                        that.MakeDraggable(this);
+                    });
+                }else if(el.func==='add_cert') {
+                    let img  = new Image();//'<img src="'+data+'" height="50" >';
+                    img.class = 'cert';
+                    img.src = data;
+                    img.height = '50';
+                    $("#" + el.id).append(img);
+                    $(img).on('click',that.onClickCert);
+                    that.MakeDraggable(img);
+                }
+
+            }
+        });
+
+    }
+
 
     OnClickAddCert(ev){
         let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
@@ -558,8 +589,8 @@ class OfferEditor{
         if(addr) {
             $(ev.target).attr('src', addr);
         }else{
-            $('.modal').find('.file').attr('func_el', JSON.stringify({func:'add_cert',id:$(ev.target).attr('id')}));
-            $('.modal').find('.file').trigger('click');
+            $('input.file').attr('func_el', JSON.stringify({func:'add_cert',id:$(ev.target).attr('id')}));
+            $('input.file').trigger('click');
         }
 
         this.changed = true;
@@ -580,33 +611,6 @@ class OfferEditor{
                 // $(el).css('bottom', rel_y + '%');
             }
         });
-    }
-
-    AddTab(ev){
-
-        ev.preventDefault(); // avoid to execute the actual submit of the form.
-        ev.stopPropagation();
-        let tab = 'tab_'+String($('.tab-pane').length-1);
-
-        ev.data.changed = true;
-        let cats ='';
-        $(".category[state='1']").each(function (i, cat) {
-            let text =  md5(cat.title);
-            cats +='<a href="#" cat="'+cat.id+'" onclick="OnClickCat(this,)"' +
-                 //'$(this).parent().parent().find("a[data-toggle=tab]").text($(this).text());'+
-                 //+'$(this).parent().parent().find("a[data-toggle=tab]").attr("href","'+cat.id+'");' +
-                 '>'+cat.title+'</a>';
-        });
-
-        $('<li class="tab_inserted  dropdown"><a data-toggle="tab" contenteditable="true" data-translate="'+md5(tab)+'"  href="#'+tab+'"></a>' +
-                '<div class="dropdown-content">'+
-                    cats+
-                '</div>'+
-            '</li>').insertBefore($('#add_tab_li'));
-
-        $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
-            '</div>').insertBefore($('#add_tab_div'));
-
     }
 
     AddOfferItem(ev){
@@ -649,7 +653,6 @@ class OfferEditor{
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
 
-
         hash = md5(new Date().getTime()+1);
         //window.dict.dict[hash] = {};
         // $(menu_item).find('.content_text').attr('data-translate', hash);
@@ -660,7 +663,10 @@ class OfferEditor{
         $(menu_item).find('.checkbox').change(function () {
 
         });
-        $(menu_item).find('.add_picture').on('click',menu_item,function (ev) {
+        $(menu_item).find('.item_pack').on('focusin', that,(ev)=> {
+            $(menu_item).find('.add_pack').css('visibility', 'visible');
+        });
+        $(menu_item).find('.add_picture').on('click touchstart',menu_item,function (ev) {
             let menu_item = $(ev.data);
             let vis = $(menu_item).find('.img-fluid').css('visibility');
             if (vis === 'visible'){
@@ -702,20 +708,23 @@ class OfferEditor{
             that.changed = true;
         });
 
-        $(menu_item).find('.add_pack').attr('id', 'pack_' + tab);
-        $(menu_item).find('.add_pack').on('click', function (ev) {
-            let pack = $(this).closest('.row').siblings('.pack_container').find('.item_pack').text();
-            let price = $(this).closest('.row').siblings('.pack_container').find('.item_pack_price').text();
-            $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>"+pack+";"+price+"</a></li>");
-            let pl = $(menu_item).find('.item_pack').attr('packlist');
-            if(pl)
-                pl = JSON.parse(pl);
-            else pl = [];
-            pl.push({pack:pack,price:price});
-            $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
+        $(menu_item).find('.gallery').attr('id', 'gallery_' + tab.replace('#','') + '_' + pos);
+
+        $(menu_item).find('.add_cert').attr('id', 'ac_' + tab.replace('#','') + '_' + pos);
+        $(menu_item).find('.add_cert').on('click',this,function (ev) {
+            let menu_item = $(this).closest('.menu_item');
+            ev.target = $(menu_item).find('.gallery')[0];
+            that.OnClickAddCert(ev);
+            $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
         });
 
+
+        $(menu_item).find('.add_pack').attr('id', 'pack_' + tab.replace('#','') );
+        $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:that},that.OnClickAddPack);
+
         $(tab).append(menu_item[0]);
+
+        $(menu_item).find('.item_title').focus();
 
         $(menu_item).find('.toolbar').css('display', 'block');
 
@@ -751,7 +760,7 @@ class OfferEditor{
         if (isCancel) {
             let menu = ev.data.menu_id;
             let table = ev.data.table_id;
-            let time = $('.sel_time').text();
+            let time = $('.sel_period').text();
             ev.data = ev.data.parent;
             $("#offer_editor").find('.cancel_menu').off(ev);
             if(this.order[ev.data.uid][table][menu]){
@@ -764,111 +773,6 @@ class OfferEditor{
         }
 
         $('#order_menu_button').dropdown("toggle")
-    }
-
-    getTabItems(tab,lang,active){
-        let that = this;
-        let offerObj = {};
-        that.arCat = [];
-
-        let value = $('a[href="#'+tab+'"]').text();
-        let cat;
-        if(value) {
-            cat = $('.category[title='+value+']').attr('id');
-            if(!cat)
-                cat='1000';
-            that.arCat.push(parseInt(cat));
-
-            if(!window.dict.dict[md5(value)]){
-                window.dict.dict[md5(value)] = {};
-            }
-            window.dict.dict[md5(value)][lang] = value;
-        }
-
-        let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
-        if (!checked && active) {
-            delete that.arCat[parseInt(cat)];
-        } else {
-            let miAr = $('#'+tab).find('.menu_item');
-            offerObj[value] = [];
-
-            for (let i = 0; i < miAr.length; i++) {
-                let item = {};
-                item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
-                if(active && item.checked==='false'){
-                    continue; //active only
-                }
-                let title = $(miAr[i]).find('.item_title');
-                let hash = $(title).attr('data-translate');
-                let text = $(miAr[i]).find('.item_title').text();
-
-                if (text.length === 0 || !text.trim())
-                    continue;
-                if(!window.dict.dict[hash]) {
-                    window.dict.dict[hash] = {};
-                }
-                if (text !== window.dict.dict[hash][lang]) {
-                    let obj = Object.assign({},window.dict.dict[hash]);
-                    delete window.dict.dict[hash];
-                    hash = md5(text);
-                    window.dict.dict[hash] = obj;
-                    window.dict.dict[hash][lang] = text;
-                    $(title).attr('data-translate',hash);
-                }
-                item.title = hash;
-                item.price = $(miAr[i]).find('.item_price').text();
-
-                if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
-                    let cont_text = $(miAr[i]).find('.content_text');
-                    let w = $(cont_text).width();
-                    let h = $(cont_text).height();
-                    hash = $(cont_text).attr('data-translate');
-                    text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
-                    if(!window.dict.dict[hash]) {
-                        window.dict.dict[hash] = {};
-                    }
-                    if (text !== window.dict.dict[hash][lang]) {
-                        let obj = Object.assign({},window.dict.dict[hash]);
-                        //delete window.dict.dict[hash];
-                        hash = md5(text);
-                        window.dict.dict[hash] = obj;
-                        window.dict.dict[hash][lang] = text;
-                        $(cont_text).attr('data-translate',hash);
-                    }
-                    item.content = hash;
-                    item.width = w;
-                    item.height = h;
-                }else{
-                    if(item.content)
-                        delete item.content;
-                }
-
-                if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-                    if(parseInt($(miAr[i]).find('.img-fluid').css('left'))!==0)
-                        item.img.left  = $(miAr[i]).find('.img-fluid').css('left');
-                    if(parseInt($(miAr[i]).find('.img-fluid').css('top'))!==0)
-                        item.img.top = $(miAr[i]).find('.img-fluid').css('top');// / window.innerHeight * 100))+'%';
-
-                }else {
-                    delete item.img;
-                }
-
-                $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
-                    window.user.ApproveOrder({
-                        title: item.title,
-                        date:window.user.date,
-                        period:$('.sel_time'),
-                        supuid:window.user.uid,
-                        cusuid:$(el).attr('cusuid')
-                    });
-                });
-
-                offerObj[value].push(item);
-            }
-        }
-
-        return offerObj;
     }
 
     GetOfferItems(lang){
@@ -927,11 +831,6 @@ class OfferEditor{
                 }
                 item.title = key;
 
-                item.price = $(miAr[i]).find('.item_price').text();
-                if(!item.price)
-                    continue;
-
-
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
                     let w = $(cont_text).width();
@@ -968,15 +867,20 @@ class OfferEditor{
                 }
 
                 item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
-                if(item.packlist)
+                if(item.packlist) {
                     item.packlist = JSON.parse(item.packlist);
+                }else{
+                    item.price = $(miAr[i]).find('.item_price').text();
+                    if(!item.price)
+                        continue;
+                }
 
                 item.cert = [];
                 $.each($(miAr[i]).find('.gallery').children(), function (i, el) {
                     item.cert.push({src:el.src,pos:$(el).position()});
                 });
 
-                $.each($(miAr[i]).find('.orders').find('input:checked'), function (i, el) {
+                $.each($(miAr[i]).find('.orders').find('input:checkbox:checked'), function (i, el) {
                     window.db.GetOrder(window.user.date, window.user.uid, $(el).attr('cusuid'),function (obj) {
                         window.user.ApproveOrder(obj);
                     });
@@ -1027,7 +931,7 @@ class OfferEditor{
         //$('#add_item').off('click',this.AddOfferItem);
         //$('.modal-body').find('.add_tab').off('click', this.AddTab);
         $('.div_tab_inserted').remove();
-        $('.tab_inserted').remove();
+
         //$('.sp_dlg').off('changed.bs.select');
         $("#offer_editor").find('.toolbar').css('display', 'none');
         $('input:file').off('change');

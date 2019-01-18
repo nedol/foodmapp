@@ -50,6 +50,9 @@ class MapEvents{
                 $('#categories').slideToggle('slow', function () {
 
                 });
+            if (!event.loc_mode && $('.sup_menu').is(':visible')) {
+                $('.sup_menu').animate({'width': 'toggle'});
+            }
 
             if (!event.loc_mode && $('#menu_items').is(':visible'))
                 $('#menu_items').slideToggle('slow', function () {
@@ -57,7 +60,7 @@ class MapEvents{
 
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-                let period = $('.sel_time').text().split(' - ');
+                let period = $('.sel_period').text().split(' - ');
                 if(feature.values_.features.length===1) {
                     if(feature.values_.features[0].values_.type==='supplier') {
                         window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.uid, function (obj) {
