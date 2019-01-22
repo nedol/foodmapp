@@ -34,18 +34,7 @@ class OfferEditor{
 
     }
 
-    onClickCert(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        if(!$(this).attr('height'))
-            $(this).attr('height','50');
-        else {
-            $(this).removeAttr('height');
-        }
-        return false;
-    };
-
-    OpenOffer() {
+     OpenOffer() {
 
         let that = this;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
@@ -69,9 +58,7 @@ class OfferEditor{
 
         let isEditable = true;
 
-
         $("#offer_editor").css('display','block');
-
 
         function selectText(el) {
             $(el).focus();
@@ -96,13 +83,6 @@ class OfferEditor{
 
         for (let tab in this.offer.data) {
             if(!tab) continue;
-            // let active = (tab==='0'?' active':'');
-            // if($('[href="#'+tab+'"]').length===0) {
-            //     $('<li class="tab_inserted"+active><a data-toggle="tab"  contenteditable="'+isEditable+'" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-            //         '</li>').insertBefore($('#add_tab_li'));
-            //     $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-            //         '</div>').insertBefore($('#add_tab_div'));
-            // }
 
             for (let i in this.offer.data[tab]) {
                 let tmplt = $('#menu_item_tmplt').clone();
@@ -162,15 +142,19 @@ class OfferEditor{
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
-                $(menu_item).find('.item_pack').on('focusin', that,(ev)=> {
-                    $('.add_pack').css('visibility', 'visible');
-                });
+
                 let pl = this.offer.data[tab][i].packlist;
                 for(let i in pl){
+                    if(!i)
+                        continue;
                     let data = pl[i];
                     $(menu_item).find('.pack_container').css('visibility','visible');
                     $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + i + "</a></li>");
                     $(menu_item).find('.item_pack').text(i);
+                    $(menu_item).find('.caret').css('visibility', 'visible');
+                    $(menu_item).find('.pack_list').addClass('dropdown-menu');
+                    $(menu_item).find('.item_pack').attr('data-toggle','dropdown');
+                    //$(menu_item).find('.item_pack').addClass('dropdown-toggle');
                     $(menu_item).find('.item_pack').attr('pack',i);
 
                     $(menu_item).find('.item_pack').on('focusout',that,(ev)=> {
@@ -183,7 +167,6 @@ class OfferEditor{
                             $(this).attr('packlist', JSON.stringify(pl));
                         }
                     });
-
 
                     $(menu_item).find('.item_price').text(data);
                     $(menu_item).find('.item_price').on('focusout',that, function (ev) {
@@ -204,6 +187,26 @@ class OfferEditor{
                     });
                 }
                 $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(this.offer.data[tab][i].packlist));
+
+                $(menu_item).find('.item_pack').on('focusin', that,(ev)=> {
+                    $(menu_item).find('.add_pack').css('visibility', 'visible');
+                    $(this).focus();
+                });
+
+                $(menu_item).find('.add_pack').attr('id', 'pack_' + tab + '_' + i);
+
+                $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:this}, this.OnClickAddPack);
+
+                $(menu_item).find('.rem_pack').on('click', function (ev) {
+
+                    let list = $(this).closest('.row').siblings('.pack_container').find('.pack_list');
+                    list[0].removeChild(list[0].childNodes[list[0].childNodes.length-1]);
+                    let pl = $(menu_item).find('.item_pack').attr('packlist');
+                    if(pl)
+                        pl = JSON.parse(pl);
+                    pl.pop();
+                    $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
+                });
 
                 $(menu_item).find('.gallery').attr('id', 'gallery_' + tab + '_' + i);
 
@@ -261,20 +264,6 @@ class OfferEditor{
                     $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
                 });
 
-                $(menu_item).find('.add_pack').attr('id', 'pack_' + tab + '_' + i);
-                $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:this}, this.OnClickAddPack);
-
-                $(menu_item).find('.rem_pack').on('click', function (ev) {
-
-                    let list = $(this).closest('.row').siblings('.pack_container').find('.pack_list');
-                    list[0].removeChild(list[0].childNodes[list[0].childNodes.length-1]);
-                    let pl = $(menu_item).find('.item_pack').attr('packlist');
-                    if(pl)
-                        pl = JSON.parse(pl);
-                    pl.pop();
-                    $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(pl));
-                });
-
                 $(menu_item).find('.toolbar').css('display', 'block');
 
                 $(menu_item).find('.orders').attr('id', 'orders' + tab + '_' + i);
@@ -328,6 +317,9 @@ class OfferEditor{
                     for (let k in kAr) {
                         $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_ctrl').css('visibility', 'visible');
                         $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_amnt').css('visibility', 'visible');
+                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_amnt').text(data[kAr[k]].qnty);
+
+
                         let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.item_price').text();
                         let inv_price="";
                         if(data[kAr[k]].price!==price){
@@ -379,8 +371,6 @@ class OfferEditor{
                                     $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
                                 }
                             });
-
-                            $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.order_amnt').text(parseInt(k+1));
 
                             setTimeout(function () {
                                 let pagerOptions = {
@@ -481,6 +471,17 @@ class OfferEditor{
 
     }
 
+    onClickCert(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(!$(this).attr('height'))
+            $(this).attr('height','50');
+        else {
+            $(this).removeAttr('height');
+        }
+        return false;
+    };
+
     OnClickAddPack(ev) {
 
         let menu_item = ev.data.mi;
@@ -509,6 +510,11 @@ class OfferEditor{
                 $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
             }
         }
+
+        $(menu_item).find('.item_pack').attr('data-toggle','dropdown');
+        $(menu_item).find('.pack_list').addClass('dropdown-menu');
+        $(menu_item).find('.caret').css('visibility', 'visible');
+
         $(menu_item).find('li>a[role=packitem]').on('click', {
             that: that,
             mi: $(menu_item)

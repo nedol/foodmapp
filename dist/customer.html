@@ -167,8 +167,8 @@
 
     #search_but{
         display: block;
-        position: absolute;
-        right: 10px;
+        position: fixed;
+        right: 1%;
         bottom: 10%;
         width: 40px;
         height: 40px;
@@ -352,7 +352,7 @@
 
 <div id="offer_order" class="order_container"
      style="display:none;   position: fixed;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+     overflow-x: hidden; overflow-y: hidden; z-index:2147483645; margin: auto;
        width:75%;  height: auto; left: 20%; top: 5%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
@@ -413,6 +413,11 @@
                         outline: none !important;
                         border-color: #719ECE;
                         box-shadow: 0 0 10px #719ECE;
+                    }
+                    .div_tab_inserted{
+                        height:500px;
+                        overflow-y:scroll;
+                        width:100%;
                     }
                     .tab-content::-webkit-scrollbar {
                         width: 0 !important;
@@ -485,19 +490,18 @@
                             <div class="order_div" style="white-space: pre; text-align: center">Order for</div>
                         </div>
                         <div class="col-sm-6 col-xs-6">
-                            <div data-translate="884d9804999fc47a3c2694e49ad2536a" style="text-align: center; color:white">Адрес</div>
-                            <!--<label  for="address">Адрес:</label>-->
+                            <div data-translate="884d9804999fc47a3c2694e49ad2536a" style="text-align: center; color:white">Адрес доставки</div>
+
                             <div>
                             <textarea name="address" class="address form-control" rows="1" contenteditable="true"
-                                      style="text-align: center; background-color:black;color: #c4e3f3;border-color: #2b2b2b">Ленинский пр.</textarea>
+                                data-translate placeholder="Введите адрес доставки"
+                                style="text-align: center; background-color:black;color: #c4e3f3;border-color: #2b2b2b"></textarea>
                             </div>
                         </div>
-                        <div class="col-sm-2 col-xs-2">
-
-                        </div>
+                        <div class="col-sm-2 col-xs-2"></div>
                     </div>
                     <div style="display: inline-block; position:absolute; right: 10px; padding-left: 20px;">
-                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
+                        <span class="close glyphicon glyphicon-remove-sign scaled"></span>
                     </div>
                     <div class="ord_status" style="position: absolute;right: 0;bottom: 0; font-size: x-small;"></div>
                 </div>
@@ -506,7 +510,6 @@
                         <ul class="nav nav-tabs menu_tabs">
                             <li class="add_tab_li" title="add tab" style="display: none;">
                                 <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
-                                <!--<img id="add_tab" src="./images/ic_plus.png" style="opacity:.8;background-color: aliceblue;padding-left:20px;height: 25px">-->
                             </li>
                         </ul>
                         <div class="tab-content">
@@ -580,7 +583,6 @@
             word-wrap:normal
         }
         .item_pack{
-
             color: #0088bb;
             position: relative;
             font-weight:normal;
@@ -611,18 +613,21 @@
                 <div class="item_title" data-translate contentEditable="true" placeholder="название" data-toggle="collapse"></div>
             </div>
 
-            <div class="col-xs-4 pack_container  row">
-                <div class="col-xs-4">
-                    <div class="dropdown-toggle"  data-toggle="dropdown">
-                        <div style="display: inline-block" data-translate="41b0e839c21e82f25bffdb9dc82848fa"></div>
-                        <span class="caret" style="display: inline-block;"></span>
+            <div class="col-xs-4 row">
+                <div class="pack_container col-xs-4" style="visibility: hidden">
+                    <div>
+                        <div  data-translate="41b0e839c21e82f25bffdb9dc82848fa"></div>
                     </div>
 
-                    <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+                    <div class="dropdown">
+                        <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit">
+                        </ul>
 
-                    <div class="item_pack input" contentEditable="true" placeholder="     гр."
-                         style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
-
+                        <div class="item_pack input dropdown-toggle" data-toggle="dropdown"  placeholder="     гр."
+                            style="display:inline-block;font-weight:normal;font-size:24px;white-space: nowrap;">
+                        </div>
+                        <span class="caret" style="display:inline-block;"></span>
+                    </div>
                 </div>
                 <div class="col-xs-4">
                     <div>Цена:</div>
@@ -633,7 +638,6 @@
                     <div class="dropdown" style="text-align: center">
                         <button class="btn btn-sm btn-primary dropdown-toggle" type="button" data-toggle="dropdown"
                                 style="font-size: large">0
-                            <!--<span class="caret"></span>-->
                         </button>
                         <ul class="dropdown-menu scaled"  multiple>
                             <li><a href="#" role="qntyitem">0</a></li>
@@ -673,15 +677,19 @@
 <data class="tariff" id="price_editable" value="true"></data>
 
 <div class="browser_container" id="profile_container"
-     style="display:none;   position: fixed;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:60%;  height: 50%; left: 20%; top: 20%;
+     style="display:none;
+        overflow: visible; z-index:2147483646;
+        position: fixed;
+        height: auto;
+        max-height: 90% !important;
+        min-height: 50% !important;
+       width:80%; left: 10%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
     <input type="image" class="close_browser" src="https://nedol.ru/rtc/browser/images/ic_stop.png"  style="position: absolute;
-              display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
-    <iframe class="browser" style="position:absolute;overflow:hidden;z-index: 10" width="100%" height="94%"></iframe>
+          display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 94%;"></iframe>
 </div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>

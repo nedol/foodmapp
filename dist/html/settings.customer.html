@@ -21,79 +21,78 @@
             </ul>
             <div class="form">
                 <div class="tab-content">
-                <div class="tab-pane active" id="profile">
-                    <div class="row">
-                        <div class="col-sm-3 text-center">
-                            <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="img-circle img-thumbnail avatar" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
-                            <h6>Upload a your photo...</h6>
-                            <input type="file" class="center-block file-upload" style="display: none">
+                    <div class="tab-pane active" id="profile">
+                        <div class="row">
+                            <div class="col-sm-3 text-center">
+                                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="img-circle img-thumbnail avatar" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
+                                <h6>Upload a your photo...</h6>
+                                <input type="file" class="center-block file-upload" style="display: none">
+                            </div>
+                            <input type="hidden" id="proj" name="proj" value="d2d">
+                            <input type="hidden" id="func" name="func" value="confirmem">
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <div class="col-xs-6">
+                                        <label for="last_name"><h4>Имя</h4></label>
+                                        <input type="text" id="last_name" class="form-control" name="last_name"  placeholder="last name" title="enter your last name if any.">
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label for="email"><h4>Email</h4></label>
+                                        <input type="email" id="email" class="form-control" name="email"  placeholder="you@email.com" title="enter your email." data-toggle="tooltip">
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <div class="col-xs-6">
+                                        <label for="mobile"><h4>Телефон</h4></label>
+                                        <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label for="address"><h4>Адрес доставки</h4></label>
+                                        <input type="address" class="form-control"  id="address" placeholder="somewhere" title="enter a location">
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-12">
+                                        <br>
+                                        <button class="submit btn btn-sm"><i class="glyphicon glyphicon-repeat"></i>Сохранить</button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <input type="hidden" id="proj" name="proj" value="d2d">
-                        <input type="hidden" id="func" name="func" value="confirmem">
-                        <div class="col-sm-9">
-                            <div class="form-group">
-                                <div class="col-xs-6">
-                                    <label for="last_name"><h4>Имя</h4></label>
-                                    <input type="text" id="last_name" class="form-control" name="last_name"  placeholder="last name" title="enter your last name if any.">
-                                </div>
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane" id="settings">
 
-                                <div class="col-xs-6">
-                                    <label for="email"><h4>Email</h4></label>
-                                    <input type="email" id="email" class="form-control" name="email"  placeholder="you@email.com" title="enter your email." data-toggle="tooltip">
-                                </div>
-                            </div>
-
-                            <div class="form-group">
-                                <div class="col-xs-6">
-                                    <label for="mobile"><h4>Телефон</h4></label>
-                                    <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
-                                </div>
-
-                                <div class="col-xs-6">
-                                    <label for="address"><h4>Адрес доставки</h4></label>
-                                    <input type="address" class="form-control"  id="address" placeholder="somewhere" title="enter a location">
-                                </div>
-                            </div>
-                            <div class="form-group">
-                                <div class="col-xs-12">
-                                    <br>
-                                    <button class="submit btn btn-sm"><i class="glyphicon glyphicon-repeat"></i>Сохранить</button>
-                                </div>
-                            </div>
+                        <div class="input-group-text">
+                            <label class="checkbox-inline" style="margin-left:10px;">
+                                <input type="checkbox" value="" style="transform: scale(2.0)">Option 1</label>
                         </div>
-                    </div>
+
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+                        <div class="form-group">
+
+                        </div>
+
+                    </div><!--/tab-pane-->
                 </div><!--/tab-pane-->
-                <div class="tab-pane" id="settings">
-
-                    <div class="input-group-text">
-                        <label class="checkbox-inline" style="margin-left:10px;">
-                            <input type="checkbox" value="" style="transform: scale(2.0)">Option 1</label>
-                    </div>
-
-                    <div class="form-group">
-
-                    </div>
-
-                    <div class="form-group">
-
-                    </div>
-                    <div class="form-group">
-
-                    </div>
-
-                    <div class="form-group">
-
-                    </div>
-                    <div class="form-group">
-
-                    </div>
-                    <div class="form-group">
-
-                    </div>
-
-                </div><!--/tab-pane-->
-
-            </div><!--/tab-pane-->
             </div>
         </div><!--/tab-content-->
 

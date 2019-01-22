@@ -21,14 +21,15 @@ var md5 = require('md5');
 var isJSON = require('is-json');
 
 import {utils} from "../utils/utils";
+import {Profile} from "../../dist/html/profile/profile";
 
 
 class OfferOrder {
 
-    constructor(dict){
+    constructor(){
+        let that = this;
         this.changed = false;
         this.offer ;
-        this.dict;
 
         this.arCat = [];
 
@@ -43,8 +44,11 @@ class OfferOrder {
         $(this.ovc).insertAfter($("#offer_order"));
 
         this.ovc.css('display','inline-block');
-        this.ovc.draggable();
 
+        this.ovc.draggable();
+        this.ovc.resizable({
+            //aspectRatio: 16 / 9
+        });
         $(this.ovc).find('.comment').on('click',this.ovc,function (ev) {
             $(ev.data).css('width','auto');
         });
@@ -72,11 +76,49 @@ class OfferOrder {
             });
         });
 
-        $('.close_browser').on('click touchstart', this, function (ev) {
+        $(this.ovc).find('.close').on('click touchstart', this, function (ev) {
             let that = ev.data;
             that.SaveOrder(ev,window.sets.lang);
             that.offer = '';
             $(that.ovc).remove();
+        });
+
+        $('.close_browser').on('click touchstart', this, function (ev) {
+            let that = ev.data;
+            $('.browser_container').css('display','none')
+        });
+
+        $(this.ovc).find('.supplier_profile').on('click touchstart',function () {
+            $('.browser_container').css('display','block');
+            $('.browser_container iframe').attr('src','html/profile/supplier.html');
+            $('.browser_container iframe').on('load', function () {
+                $('.avatar',$('.browser_container iframe').contents()).attr('src',"../../"+that.profile.avatar);
+                $('#name',$('.browser_container iframe').contents()).val(that.profile.name);
+                $('#email',$('.browser_container iframe').contents()).val(that.profile.email);
+                $('#mobile',$('.browser_container iframe').contents()).val(that.profile.mobile);
+                $('#address',$('.browser_container iframe').contents()).val(that.profile.address);
+            });
+
+        });
+    }
+
+    OpenOfferIF(obj) {
+        let that = this;
+
+        $('#profile_container iframe').attr('src','./offer.order.html');
+
+        $('#profile_container').css('display','block');
+        $('#profile_container').draggable();
+        $('#profile_container').resizable({
+            //aspectRatio: 16 / 9
+        });
+
+        $('#profile_container iframe').on('load', function () {
+            $('#profile_container iframe').off();
+            $(this)[0].contentWindow.SetData(obj, new Dict(obj.dict.dict), md5);
+        });
+        $('#profile_container').find('.close_browser').on('click',function () {
+            $('#profile_container').css('display','none');
         });
     }
 
@@ -87,6 +129,11 @@ class OfferOrder {
         this.offer = obj.data;
         obj.supuid = obj.email;
         let latlon = [obj.latitude,obj.longitude];
+
+        window.user.map.geo.SearchPlace(latlon, 18, function (obj) {
+            that.address = obj;
+            $('.address').text(obj.city+ "," + obj.street + "," + obj.house);
+        });
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         this.period = obj.period;
@@ -141,7 +188,7 @@ class OfferOrder {
                 }
 
                 if(this.offer[tab][i].packlist) {
-                    $(menu_item).find('.pack_container').css('display','block').addClass('col-xs-4');
+                    $(menu_item).find('.pack_container').css('visibility','visible');
                     $.each(this.offer[tab][i].packlist, function (i, data) {
                         $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
                         $(menu_item).find('.item_pack').text(i);
@@ -149,6 +196,14 @@ class OfferOrder {
                         $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(data));
                     });
                 }
+
+                $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:this.offer[tab][i]},function(ev){
+                    that.changed = true;
+                    let pl = ev.data.off.packlist;
+                    $(menu_item).find('.item_pack').text($(ev.target).text());
+                    $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
+                });
+
                 //$(menu_item).find('.content_text').text(urlencode.decode(window.dict.dict[this.menu[tab][i].content][window.sets.lang]));
                 $(menu_item).find('.content_text').attr('contenteditable', 'false');
                 $(menu_item).find('.content_text').attr('data-translate', this.offer[tab][i].content);
@@ -198,13 +253,9 @@ class OfferOrder {
                     $(menu_item).attr('ordered', ev.target.text);
            
                 });
-                $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:this.offer[tab][i]},function(ev){
-                    that.changed = true;
-                    let pl = ev.data.off.packlist;
-                    $(menu_item).find('.item_pack').text($(ev.target).text());
-                    $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
-                });
+
             }
+
         }
 
         this.RedrawOrder(obj);
@@ -245,11 +296,6 @@ class OfferOrder {
                     $('li.publish_order.disabled').removeClass('disabled');
             }
         });
-
-        $(this.ovc).find('.supplier_profile').on('click touchstart',function () {
-            $('.browser_container').css('display','block');
-        });
-
 
     }
 
@@ -340,21 +386,21 @@ class OfferOrder {
                 return;
             }
             obj.data[$(val).find('.item_title').attr('data-translate')] = {
-                qnty: $(val).find('button[data-toggle=dropdown]').text(),
+                qnty: parseInt($(val).find('button[data-toggle=dropdown]').text()),
                 price: $(val).find('.item_price').text(),
-                pack: $(val).find('.item_pack').text()
+                pack: $(val).find('.item_pack').text().trim()
             }
 
-        });
+            if($('#offer_order_clone').find('.comment')[0])
+                obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
+            obj['supuid'] = that.uid;
+            obj['cusuid'] = window.user.uid;
+            obj['date'] = that.date;
+            obj['period'] = $('.sel_period').text();
+            obj['address'] = $('#offer_order_clone').find('.address').val();
+            obj['published'] = that.published;
 
-        if($('#offer_order_clone').find('.comment')[0])
-            obj['comment'] = $('#offer_order_clone').find('.comment')[0].value;
-        obj['supuid'] = this.uid;
-        obj['cusuid'] = window.user.uid;
-        obj['date'] = this.date;
-        obj['period'] = $('.sel_period').text();
-        obj['address'] = $('#offer_order_clone').find('.address').val();
-        obj['published'] = this.published;
+        });
 
         return obj;
     }
@@ -364,7 +410,8 @@ class OfferOrder {
         let that = ev.data;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');//class_obj.date;
         let items = this.GetOrderItems();
-        window.user.UpdateOrderLocal( items );
+
+        window.user.UpdateOrderLocal(items);
 
         window.user.PublishOrder(items, (data) => {
             let status = window.dict.getDictValue(window.sets.lang, Object.keys(data)[1]);

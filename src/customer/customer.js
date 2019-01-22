@@ -284,7 +284,7 @@ class Customer{
 
     UpdateOrderLocal(obj){
         if(Object.keys(obj.data).length===0) {
-            window.db.DeleteOrder(obj.date, obj.supuid, obj.cusuid);
+
             return;
         }
         window.db.SetObject('orderStore',obj,(res)=>{

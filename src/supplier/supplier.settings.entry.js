@@ -20,7 +20,6 @@ $(document).on('readystatechange', function () {
 
     window.db = new DB('Supplier', function () {
         window.cs = new SupplierSettings(window.db);
-
     });
 
     var readURL = function(input) {
@@ -31,7 +30,6 @@ $(document).on('readystatechange', function () {
                 $('.avatar').attr('src', e.target.result);
                 $('.avatar').siblings('input:file').attr('changed',true);
             }
-
             reader.readAsDataURL(input.files[0]);
         }
     }

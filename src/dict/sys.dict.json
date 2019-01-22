@@ -151,6 +151,10 @@
     "ru": "Адрес доставки",
     "en": "Delivery Address"
   },
+  "2940beae8a09ec93aadb2bddf21cee7d":{
+    "ru":"Введите адрес доставки",
+    "en": "Input Delivery Address"
+  },
   "a74ec9c5b6882f79e32a8fbd8da90c1b":{
     "ru": "Расстояние до",
     "en": "Distance"
@@ -165,15 +169,15 @@
   },
   "31d1b8ef5ed469f7618d76144fffaa06":{
     "ru": "Кол-во",
-    "en": "Q-nty"
+    "en": "Amount"
   },
   "ee4a528dce8d6fa440db5ab1cf78f939":{
     "ru": "Кол-во: ",
-    "en": "Qnty: "
+    "en": "Amount: "
   },
   "41b0e839c21e82f25bffdb9dc82848fa":{
-    "ru": "Расфасовка",
-    "en": "Pack"
+    "ru": "Расфасовка:",
+    "en": "Pack:"
   },
   "a5d491060952aa8ad5fdee071be752de":{
     "ru": "Комментарии",

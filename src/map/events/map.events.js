@@ -66,9 +66,14 @@ class MapEvents{
                         window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.uid, function (obj) {
                             if (obj !== -1) {
                                 if(window.user.constructor.name==='Supplier')
-                                    window.user.viewer = new OfferViewer( obj.dict);
-                                else if(window.user.constructor.name==='Customer')
-                                    window.user.viewer = new OfferOrder( obj.dict);
+                                    window.user.viewer = new OfferViewer(obj.dict);
+                                else if(window.user.constructor.name==='Customer') {
+                                    if(window.user.viewer) {
+                                        window.user.viewer.ovc.remove();
+                                        window.user.viewer = null;
+                                    }
+                                    window.user.viewer = new OfferOrder();
+                                }
                                 window.user.viewer.OpenOffer(obj);
                             }
                         });

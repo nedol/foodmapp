@@ -423,6 +423,11 @@
                     border-color: #719ECE;
                     box-shadow: 0 0 10px #719ECE;
                 }
+                .div_tab_inserted{
+                    height:500px;
+                    overflow-y:scroll;
+                    width:100%;
+                }
                 .tab-content::-webkit-scrollbar {
                     width: 0 !important;
                 }
@@ -534,6 +539,7 @@
                         </li>
                     </ul>
                     <div class="tab-content" id="tab_content">
+                        <!--div_tab_inserted-->
                         <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
                     </div>
                 </div>
@@ -591,9 +597,18 @@
             color:blue;
             background-color:grey;
         }
+        .item_pack{
+            display: inline-block;
+            color: #0088bb;
+            font-weight:normal;
+            font-size:24px;
+            white-space: nowrap;
+        }
         .item_price{
-
-
+            color: #0088bb;
+            font-weight:normal;
+            font-size:24px;
+            white-space: nowrap;
         }
         .order_ctrl{
             width: 7%;
@@ -656,28 +671,31 @@
                     <i class="fa fa-check-square-o fa-2x"></i>
                 </label>
                 <div class="input item_title" rows="2" contentEditable="true"  data-toggle="collapse"></div>
-            </div>
-           <div class="pack_container col-xs-2 dropup">
-                <div style="display: inline-block"  class="dropdown-toggle"  data-toggle="dropdown" data-translate="41b0e839c21e82f25bffdb9dc82848fa">Расфасовка:</div>
-                <span class="caret" style="display: inline-block;"></span>
+           </div>
+           <div class="pack_container col-xs-2">
                <div>
+                   <div data-translate="41b0e839c21e82f25bffdb9dc82848fa"></div>
+               </div>
+
+               <div class="dropup">
+                   <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
+                       <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
+                   </ul>
+
+                   <div  class="item_pack input" contenteditable="true"  placeholder="....."></div>
+                   <span class="caret" style="display: inline-block; visibility: hidden"></span>
+
                    <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="display: inline-block; visibility:hidden; float: right"></span>
 
-                   <div class="item_pack input" contentEditable="true" placeholder="..... гр."
-                     style="font-weight:normal;font-size:24px;white-space: nowrap;">
-                   </div>
                </div>
-                <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit">
-                    <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
-                </ul>
+
             </div>
             <div class="col-xs-2">
                 <div>Цена:</div>
-                <div class="input item_price"  contenteditable="true" placeholder="руб"
-                     style="font-weight:normal;font-size:24px;white-space: nowrap;"></div>
+                <div class="input item_price"  contenteditable="true" placeholder="руб"></div>
             </div>
             <div class="col-sm-1 col-xs-1">
-                <span class="fa fa-group order_ctrl" title="заказы" style="visibility: hidden"></span>
+                <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
                 <span class="order_amnt badge" style="position: absolute;left:0px;visibility: hidden">0</span>
             </div>
         </div>
@@ -831,7 +849,6 @@
             </div>
 
             <div class="modal-body table-responsive">
-
                 <table class="table tablesorter">
                     <thead>
                         <tr>
@@ -873,9 +890,7 @@
                             </th>
                         </tr>
                     </thead>
-                    <tbody>
-
-                    </tbody>
+                    <tbody> </tbody>
                 </table>
             </div>
 
@@ -884,7 +899,6 @@
                     style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
                  </textarea>
             </div>
-
         </div>
     </div>
 

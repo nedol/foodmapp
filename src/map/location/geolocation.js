@@ -264,7 +264,7 @@ class Geo {
     SearchPlace(latlon, zoom, cb) {
 
         let reverse =
-            "https://nominatim.openstreetmap.org/reverse?format=json&lat="+latlon[0]+"&lon="+latlon[1]+"&zoom="+zoom+"&addressdetails=2";
+            "https://nominatim.openstreetmap.org/reverse?format=json&lat="+latlon[0]+"&lon="+latlon[1]+"&zoom="+zoom+"&addressdetails=2&accept-language="+window.sets.lang;
         let mapques =
             "https://open.mapquestapi.com/geocoding/v1/reverse?key=KEY&location=30.333472,-81.470448&includeRoadMetadata=true&includeNearestIntersection=true";
         let locationiq =
@@ -278,7 +278,7 @@ class Geo {
             dataType: "json",
             success: function (data) {
                 let resp = JSON.stringify(data, null, 4);
-                let obj = {city:data.address.city,street: data.address.road,house:data.address.house_number};
+                let obj = {city:data.address.state,street: data.address.road,house:data.address.house_number?data.address.house_number:''};
                 cb(obj);
             },
             error: function (data) {

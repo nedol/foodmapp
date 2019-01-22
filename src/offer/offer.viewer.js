@@ -108,13 +108,38 @@ class OfferViewer {
                 }
 
                 $(menu_item).find('.item_price').text(this.offer[tab][i].price);
-                if(this.offer[tab][i].packlist) {
-                    $(menu_item).find('.pack_container').css('display','block').addClass('col-xs-4');
-                    $.each(this.offer[tab][i].packlist, function (i, data) {
-                        $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
-                        $(menu_item).find('.item_pack').text(i);
-                        $(menu_item).find('.item_price').text(data);
-                        $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(data));
+
+                let pl = this.offer[tab][i].packlist;
+                for(let i in pl){
+                    if(!i)
+                        continue;
+                    let data = pl[i];
+                    $(menu_item).find('.pack_container').css('visibility','visible');
+                    $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + i + "</a></li>");
+                    $(menu_item).find('.item_pack').text(i);
+                    $(menu_item).find('.caret').css('visibility', 'visible');
+                    $(menu_item).find('.pack_list').addClass('dropdown-menu');
+                    $(menu_item).find('.item_pack').attr('data-toggle','dropdown');
+                    //$(menu_item).find('.item_pack').addClass('dropdown-toggle');
+                    $(menu_item).find('.item_pack').attr('pack',i);
+
+
+                    $(menu_item).find('.item_price').text(data);
+                    $(menu_item).find('.item_price').on('focusout',that, function (ev) {
+                        // let that = ev.data;
+                        // if($(this).text()===''){
+                        //     //удалить из списка
+                        //    let pack = $(this).closest('.row').find('.item_pack').text();
+                        //    $(menu_item).find('a:contains('+pack+')').remove();
+                        // }else if($(this).closest('.row').find('.item_pack').text()){
+                        //     //добавить в список
+                        //     let pl = JSON.parse($(this).closest('.row').find('.item_pack').attr('packlist'));
+                        //     if(!pl[$(this).closest('.row').find('.item_pack').text()]) {
+                        //         $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + $(this).closest('.row').find('.item_pack').text() + "</a></li>");
+                        //         pl[$(this).closest('.row').find('.item_pack').text()] = $(this).text();
+                        //         $(this).closest('.row').find('.item_pack').attr('packlist', JSON.stringify(pl));
+                        //     }
+                        // }
                     });
                 }
 
