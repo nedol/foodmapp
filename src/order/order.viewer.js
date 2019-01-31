@@ -155,6 +155,8 @@ class OrderViewer {
     SaveOrder(ev) {
         let orders = this.orders;
         $(':checkbox:checked').each(function (i,item) {
+            if(!orders[i])
+                return;
             let obj = orders[i];
             window.user.ApproveOrder(obj);
         })

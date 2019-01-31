@@ -35,158 +35,137 @@ require('../../lib/datetimepicker/bootstrap-datetimepicker');
     //     $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
     // });
 
+$(document).on('readystatechange', function () {
+
+    if (!window.EventSource) {
+        alert('В этом браузере нет поддержки EventSource.');
+        return;
+    }
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+
+    //!!! jquery polyfill
+    $.ajaxPrefilter(function (options, original_Options, jqXHR) {
+        options.async = true;
+    });
+
+    $.fn.modal.Constructor.prototype.enforceFocus = function () {
+    };
+
     window.db = new DB('Supplier', function () {
 
         window.db.GetSettings(function (res) {
-            if(res.length>0) {
+            if (res.length > 0) {
 
-                $(document).on('readystatechange', function () {
+                let uObj = {};
+                window.network = new Network(host_port);
 
-                    if (!window.EventSource) {
-                        alert('В этом браузере нет поддержки EventSource.');
-                        return;
-                    }
+                initDP();
 
-                    if (document.readyState !== 'complete') {
-                        return;
-                    }
+                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-                    //!!! jquery polyfill
-                    $.ajaxPrefilter(function( options, original_Options, jqXHR ) {
-                        options.async = true;
-                    });
+                uObj['set'] = res[0];
 
-                    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
-
-                    let uObj={};
-                    window.network = new Network(host_port);
-
-                    initDP();
-
-                    let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-
-                    uObj['set'] = res[0];
-
-                    if( uObj['set']['profile'].email === utils.getParameterByName('email') &&
-                        utils.getParameterByName('uid') && utils.getParameterByName('uid')===uObj['set'].uid) {
-                        uObj['set']['profile'].email = utils.getParameterByName('email');
-                        window.db.SetObject('setStore',uObj.set,function (res) {
-
-                        });
-
-                        window.network.RegSupplier(uObj['set'],function () {
-
-                        });
-                    }
-
-                    if(!uObj['set']['profile'].email){
-                        return;//TODO: to pricing
-                    }
-                    window.db.GetOffer(date, function (res) {
-                        if (!res) {
-                            //let loc = proj.fromLonLat([37.465,55.5975]);
-                            uObj['offer'] = {date: date, data: {}, period: ''};
-                            window.db.SetObject('offerStore', uObj['offer'], function () {
-
-                            });
-                        } else {
-                            uObj['offer'] = res;
-                        }
-
-                        window.user = new Supplier(uObj);
-                        window.user.IsAuth_test(function (data) {//TODO:
-
-                        });
+                if (uObj['set']['profile'].email === utils.getParameterByName('email') &&
+                    utils.getParameterByName('uid') && utils.getParameterByName('uid') === uObj['set'].uid) {
+                    uObj['set']['profile'].email = utils.getParameterByName('email');
+                    window.db.SetObject('setStore', uObj.set, function (res) {
 
                     });
+
+                    window.network.RegSupplier(uObj['set'], function () {
+
+                    });
+                }
+
+                if (!uObj['set']['profile'].email) {
+                    return;//TODO: to pricing
+                }
+                window.db.GetOffer(date, function (res) {
+                    if (!res) {
+                        //let loc = proj.fromLonLat([37.465,55.5975]);
+                        uObj['offer'] = {date: date, data: {}, period: ''};
+                        window.db.SetObject('offerStore', uObj['offer'], function () {
+
+                        });
+                    } else {
+                        uObj['offer'] = res;
+                    }
+
+                    window.user = new Supplier(uObj);
+                    window.user.IsAuth_test(function (data) {//TODO:
+
+                    });
+
                 });
-            }else{
+
+            } else {
                 window.location.replace("https://localhost:63342/door2door/dist/html/pricing");
             }
 
 
-    });
-
-    function initDP(){
-
-        $('#datetimepicker').datetimepicker({
-            inline: true,
-            sideBySide: true,
-            locale: window.sets.lang,
-            format:'DD.MM.YYYY',
-            defaultDate: new Date(),
-            disabledDates: [
-                // moment("12/25/2018"),
-                //new Date(2018, 11 - 1, 21),
-                "2018-01-12"
-            ]
         });
-        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-        $('.dt_val').val(date);
 
-        let dt_w = $('#dtp_container').css('width');
-        let dt_h = $('#dtp_container').css('height');
-        let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
+        function initDP() {
 
-        $(window).on( "resize", function( event ) {
+            var today = new Date();
+            var week = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
+
+            $('#datetimepicker').datetimepicker({
+                inline: true,
+                sideBySide: true,
+                locale: window.sets.lang,
+                format: 'DD.MM.YYYY',
+                defaultDate: today,
+                //minDate:today,//TODO: uncomment for production
+                maxDate: week,
+                //daysOfWeekDisabled: [0, 6],
+                disabledDates: [
+                    //moment("12/25/2018"),
+                    //new Date(2018, 11 - 1, 21),
+                    "2019-02-01"
+                ]
+            });
+            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+            $('.dt_val').val(date);
+
             let dt_w = $('#dtp_container').css('width');
             let dt_h = $('#dtp_container').css('height');
-            scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
-            $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
-        });
+            let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
 
-        $('#datetimepicker').data("DateTimePicker").toggle();
+            $(window).on("resize", function (event) {
+                let dt_w = $('#dtp_container').css('width');
+                let dt_h = $('#dtp_container').css('height');
+                scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
+                $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+            });
 
-        $('#datetimepicker').on('dp.show',function (ev) {
-            $(this).css("background-color", "rgba(255,255,255,.8)");
-            $('#dtp_container').css('display', 'block');
-
-            $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
-        });
-
-        $('#datetimepicker').on('dp.hide',function (ev) {
-            $('#dtp_container').css('display', 'none');
-        })
-
-        $('#dt_from').datetimepicker({
-            inline: true,
-            sideBySide: true,
-            //locale: window.sets.lang,
-            format:'HH:00',
-            defaultDate:  '2018-01-01 19:00',
-            //maxDate: new Date(now + (24*60*60*1000) * 7),
-            // disabledDates: [
-            //     // moment("12/25/2018"),
-            //     //new Date(2018, 11 - 1, 21),
-            //     //"2018-01-12 00:53"
-            // ]
-            //,daysOfWeekDisabled: [0, 6]
-        });
-        $('#dt_to').datetimepicker({
-            inline: true,
-            sideBySide: true,
-            //locale: window.sets.lang,
-            format:'HH:00',
-            defaultDate: '2018-01-01 23:00',
-            //maxDate: new Date(now + (24*60*60*1000) * 7),
-            // disabledDates: [
-            //     // moment("12/25/2018"),
-            //     //new Date(2018, 11 - 1, 21),
-            //     //"2018-01-12 00:53"
-            // ]
-            //,daysOfWeekDisabled: [0, 6]
-        });
-
-        $('.glyphicon-calendar').on('click',function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
-        });
 
-        setTimeout(function () {
-            $('#datetimepicker').trigger("dp.change");
-            $('#datetimepicker').data("DateTimePicker").toggle();
-        },200);
-    }
+            $('#datetimepicker').on('dp.show', function (ev) {
+                $(this).css("background-color", "rgba(255,255,255,.8)");
+                $('#dtp_container').css('display', 'block');
 
+                $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+            });
+
+            $('#datetimepicker').on('dp.hide', function (ev) {
+                $('#dtp_container').css('display', 'none');
+            })
+
+            $('.glyphicon-calendar').on('click', function (ev) {
+                $('#datetimepicker').data("DateTimePicker").toggle();
+            });
+
+            setTimeout(function () {
+                $('#datetimepicker').trigger("dp.change");
+                $('#datetimepicker').data("DateTimePicker").toggle();
+            }, 200);
+        }
+
+    });
 });
 
 

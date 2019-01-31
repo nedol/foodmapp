@@ -78,7 +78,7 @@ class MapEvents{
                             }
                         });
                     }else if(feature.values_.features[0].values_.type==='customer'){
-                        window.db.GetOrders(date,feature.values_.features[0].values_.object.supuid,function (objs) {
+                        window.db.GetSupOrders(date,feature.values_.features[0].values_.object.supuid,function (objs) {
                             let orderViewer = new OrderViewer();
                             orderViewer.OpenOrderCustomers(objs);
                         });

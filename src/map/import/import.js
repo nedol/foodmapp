@@ -137,6 +137,7 @@ class Import {
                 logo: "../dist/images/truck.png",
                 data: JSON.parse(obj.data),
                 dict: JSON.parse(obj.dict),
+                rating: JSON.parse(obj.rating).value,
                 profile: obj.profile?JSON.parse(obj.profile):'',
                 hash: hash
             };
@@ -195,7 +196,6 @@ class Import {
             "proj": "d2d",
             "func": "getapprovedcus",
             "uid": window.user.uid,
-            "cusuid":window.user.uid,
             "date": date
         };
 

@@ -19,6 +19,7 @@ import Feature from 'ol/feature';
 
 import {Overlay} from "../map/overlay/overlay";
 import {SupplierMenu} from "../menu/SupplierMenu";
+import {Profile} from "../profile/profile";
 
 
 let md5 = require('md5');
@@ -47,6 +48,8 @@ class Supplier{
         this.uid = uObj.set.uid;
         this.psw = uObj.set.psw;
         this.email = uObj.set.profile.email;
+
+        this.profile = new Profile(uObj.set.profile);
 
         this.map = new OLMap();
         this.menu = new SupplierMenu(this);//TODO:
@@ -79,6 +82,7 @@ class Supplier{
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
         $('.open_off_editor').on('click touch', this, this.offer.OpenOfferEditor);
+        $('.open_my_profile').on('click touch', this, this.profile.OpenMyProfile);
 
         this.DateTimePickerEvents();
 
@@ -200,14 +204,6 @@ class Supplier{
 
             $(this).data("DateTimePicker").toggle();
 
-            window.db.GetOffer(that.date, function (off) {
-                if(off) {
-                    if(!off.period)
-                        off.period = '06:00 - 24:00';
-                    $('.sel_period').text(off.period );
-                }
-            });
-
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
                 if(layer.constructor.name==="_ol_layer_Vector_") {
@@ -226,9 +222,17 @@ class Supplier{
                 that.my_truck_ovl = '';
             }
 
+            window.db.GetOffer(that.date, function (off) {
+                if(off) {
+                    if(!off.period)
+                        off.period = '06:00 - 24:00';
+                    $('.sel_period').text(off.period );
+                }
+            });
+
             that.offer.GetOfferDB(that.date, function (res) {
                 if(!res) {//TODO:
-                    that.offer.GetAllOffersDB(function (res) {
+                    that.offer.GetOfferDB('tmplt',function (res) {
                         that.offer.stobj = res;
                         that.offer.stobj.date = that.date;
                         delete that.offer.stobj.published;
@@ -255,7 +259,7 @@ class Supplier{
             });
 
             that.map.import.DownloadOrderSupplier(function () {
-                window.db.GetOrders(window.user.date, window.user.uid, function (objs) {
+                window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
                     if(objs!=-1){
                         let type = 'customer';
                         for(let o in objs) {
@@ -370,6 +374,9 @@ class Supplier{
         }
 
         this.offer.SetOfferDB(uObj,dict);
+        //offer template store
+        uObj.date = 'tmplt';
+        this.offer.SetOfferDB(uObj,dict);
     }
 
     ValidateOffer(data){
@@ -387,6 +394,7 @@ class Supplier{
 
 
     PublishOffer(data, date, location, cb){
+
         let that = this;
         if(!this.offer.stobj.location || location.length===0){
             this.PickRegion();

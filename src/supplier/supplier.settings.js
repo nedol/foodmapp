@@ -1,8 +1,10 @@
 'use strict'
 
 export {SupplierSettings}
+
+require('jquery-ui')
 import {Network} from "../../network";
-import {Settings} from "../profile/settings";
+
 
 
 class SupplierSettings {

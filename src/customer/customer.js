@@ -7,6 +7,9 @@ var isJSON = require('is-json');
 require('jquery-ui')
 require('jquery-ui-touch-punch');
 require('jquery.ui.touch');
+require('bootstrap');
+
+require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
 
 import {OfferEditor} from '../offer/offer.editor';
 import {Dict} from '../dict/dict.js';
@@ -22,10 +25,18 @@ var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-require('bootstrap');
+
+
 import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import {Profile} from "../profile/profile";
 var moment = require('moment/moment');
+
+window.TriggerEvent = function (el, ev) {
+    $(el).trigger(ev);
+}
+
+
 
 
 class Customer{
@@ -37,7 +48,7 @@ class Customer{
         this.uid = uObj.uid;
         this.psw = uObj.psw;
         this.email = '';//!!! no need to registrate
-
+        this.profile = new Profile(uObj.profile);
         this.map = new OLMap();
 
     }
@@ -100,79 +111,6 @@ class Customer{
         this.DateTimePickerEvents();
     }
 
-    IsAuth(cb) {
-
-        try {
-
-            window.network = new Network(host_port);
-            window.network.InitSSE(this,function () {
-
-            });
-            $('.dt_val').val(this.date);
-
-            let that =this;
-
-            var data_obj ={
-                proj:"d2d",
-                func:"auth",
-                lang: window.sets.lang,
-                uid: this.uid,
-                email:this.email,
-                date:this.date
-            }
-
-            window.network.postRequest(data_obj, function (data) {
-                if(typeof data =='string')
-                    data = JSON.parse(data);
-                if(data) {
-                    if (data.reg =='OK') {
-                        var uObj = {
-                            "email": that.email,
-                            "uid": that.uid
-                        };
-                        localStorage.setItem("admin", JSON.stringify(uObj));
-
-                        window.dict = new Dict(JSON.parse(JSON.parse(data.data).dict));
-                        window.dict.set_lang(window.sets.lang, $('#main_window'));
-
-                        localStorage.setItem("lang", window.sets.lang);
-
-                        cb(data);
-
-                    }else if (data.auth){//TODO: =='OK') {
-                        localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.offer) {
-                            let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
-                            window.dict = new Dict(JSON.parse(data.data).dict);
-                            window.dict.set_lang(window.sets.lang, $('#main_window'));
-
-                            localStorage.setItem("lang", window.sets.lang);
-
-                            //class_obj.menu.menuObj = JSON.parse(data.menu);
-                        }
-
-                        //that.rtc_operator = new RTCOperator(that.uid, that.email,"browser",that.network);
-
-                        cb();
-                        that.DocReady();
-
-                    }else if(data.data){
-                        let str = data.data;
-                        let dict = JSON.parse(str).dict;
-                        window.dict = new Dict(dict);
-                        window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.offer.menuObj = JSON.parse(data.offer);
-                        that.DocReady();
-                    }else{
-                        let err = data.err;
-                    }
-                }
-            });
-            
-        }catch(ex){
-            console.log(ex);
-        }
-    }
 
     DateTimePickerEvents(){
         let that = this;
@@ -350,6 +288,49 @@ class Customer{
         });
     }
 
+
+    OnClickUserProfile(li){
+
+        $('#profile_container').css('display','block');
+        $('#profile_container iframe').attr('src',"../src/profile/customer.html");
+        $('#profile_container iframe').off();
+        $('#profile_container iframe').on('load',function () {
+            $('#profile_container iframe')[0].contentWindow.InitProfileUser();
+
+            $('.close_browser',$('#profile_container iframe').contents()).on('touchstart click', function (ev) {
+                $('#profile_container iframe')[0].contentWindow.profile_cus.Close();
+                $('#profile_container').css('display', 'none');
+            });
+        });
+        this.MakeDraggable($( "#profile_container" ));
+        $( "#profile_container" ).resizable({});
+
+
+
+        //this.MakeDraggable($('body', $('#profile_container iframe').contents()));
+
+    }
+
+    MakeDraggable(el){
+        $(el).draggable({
+            start: function (ev) {
+                console.log("drag start");
+
+            },
+            drag: function (ev) {
+                //$(el).attr('drag', true);
+
+            },
+            stop: function (ev) {
+
+                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
+                // $(el).css('right', rel_x + '%');
+                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
+                // $(el).css('bottom', rel_y + '%');
+            }
+        });
+    }
+
     OnMessage(data){
         if(data.func ==='approved'){
             window.db.GetOrder(data.order.date, data.order.supuid,data.order.cusuid, function (ord) {
@@ -417,22 +398,10 @@ class Customer{
                         }
                     }
                 });
-
             });
         }
     }
 
-    OnClickUserProfile(li){
-
-        $('#profile_container').css('display','block');
-        $('#profile_container iframe').attr('src',"html/settings.customer.html");
-        $('#profile_container').draggable();
-        $( "#profile_container" ).resizable({});
-        $('.close_browser').on('touchstart click', function (ev) {
-            $('#profile_container iframe')[0].contentWindow.cs.Close();
-            $(this).parent().css('display', 'none');
-        });
-    }
 
 }
 

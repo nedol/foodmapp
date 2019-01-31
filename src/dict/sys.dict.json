@@ -31,6 +31,10 @@
     "ru": "описание продукта",
     "en": "product description"
   },
+  "97d0437651ce07ca06f97bece11e313d":{
+    "ru": "Дата доставки",
+    "en": "Delivery Date"
+  },
   "4b310a8f25bcb1082f21fa8cde0b28e9": {
     "en": "Choose a region for delivery",
     "ru": "Выберите регион для доставки"
@@ -127,6 +131,10 @@
     "ru": "Предложение на",
     "en": "Offer for "
   },
+  "21e6c471bf5fa31fa235b6669e8943ca":{
+    "ru": "Общедоступная информация",
+    "en": "Shared Data"
+  },
   "ebf76e067cabfab88118b3420289af42":{
     "ru": "Дата и время доставки",
     "en": "Deleivery Date and Time"
@@ -198,6 +206,14 @@
   "07ca5050e697392c9ed47e6453f1453f":{
     "ru": "Выполнено",
     "en": "Completed"
+  },
+  "1c3fea01a64e56bd70c233491dd537aa":{
+    "ru": "Отзывы",
+    "en": "Reviews"
+  },
+  "a46c372347e02010f5ef45fe441e4349":{
+    "ru": "Профиль",
+    "en": "Profile"
   }
 
 }

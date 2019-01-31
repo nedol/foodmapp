@@ -9,17 +9,20 @@ const shortid = require('shortid');
 var isJSON = require('is-json');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
-
 var intersection = require('array-intersection');
 
 global.resObj = {};
+
+var requrl = '';
 
 module.exports = class D2D {
 
     constructor(){
 
     }
-    dispatch(q, res) {
+    dispatch(q, res, req) {
+
+        requrl = req.headers.origin;
 
         if (q.sse) {
             res.writeHead(200, {
@@ -43,6 +46,18 @@ module.exports = class D2D {
                         break;
                     case 'auth':
                         this.Auth(q, res);
+                        break;
+                    case 'getrating':
+                        this.GetRating(q, res);
+                        break;
+                    case 'ratesup':
+                        this.RateSupplier(q, res);
+                        break;
+                    case 'getcomments':
+                        this.GetComments(q,res);
+                        break;
+                    case 'setcomments':
+                        this.SetComments(q,res);
                         break;
                     case 'updateorderstatus':
                         this.UpdateOrderStatus(q, res);
@@ -310,8 +325,9 @@ module.exports = class D2D {
         }
         const base64Data = src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
         const hash = md5(base64Data);
+
         fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
-            cb('../server/images/'+hash);
+            cb(requrl+'/door2door/server/images/'+hash);
         });
     }
 
@@ -512,7 +528,8 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT of.date as date, of.period as period, sup.uid as uid, of.categories as cats, " +
-            " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict, sup.profile as profile"+
+            " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict, sup.profile as profile," +
+            " sup.rating as rating"+
             " FROM  supplier as sup, offers as of"+
             " WHERE sup.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
@@ -547,9 +564,76 @@ module.exports = class D2D {
             }
 
             res.end();
+        });
+    }
+
+    GetRating(q, res, cb){
+        let sql = " SELECT sup.rating as rating"+
+            " FROM  supplier as sup"+
+            " WHERE sup.uid = '"+ q.supuid+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                res.end(JSON.stringify({'err': err}));
+                return;
+            }
+            try {
+                let rating = JSON.parse(result[0].rating);
+                res.end(JSON.stringify({rating: rating.value}));
+
+            }catch(ex){
+                res.end();
+            }
 
         });
+    }
 
+    RateSupplier(q, res, cb){
+        let sql = " SELECT sup.rating as rating"+
+            " FROM  supplier as sup"+
+            " WHERE sup.uid = '"+ q.supuid+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                res.end(JSON.stringify({'err': err}));
+                return;
+            }
+            try {
+                let rating = {};
+                if(result[0].rating) {
+                    rating = JSON.parse(result[0].rating);
+                    rating[q.cusuid] = q.value;
+
+                }else{
+                    rating[q.cusuid]=q.value;
+                }
+
+                let sum = 0, cnt = 0;
+                for (let k in rating) {
+                    if(k==='value')
+                        continue;
+                    sum += parseFloat(rating[k]);
+                    cnt++;
+                }
+
+                rating.value = (sum/cnt).toFixed(1);
+
+                sql = " UPDATE   supplier  SET rating='" + JSON.stringify(rating) +"'"+
+                    " WHERE supplier.uid = '" + q.supuid+"'";
+                global.con_obj.query(sql, function (err, result) {
+                    if (err) {
+                        res.end(JSON.stringify({'err': err}));
+                        return;
+                    }
+                    res.end(JSON.stringify({rating: (sum/cnt).toFixed(1)}));
+                });
+            }catch(ex){
+                res.end();
+            }
+
+        });
     }
 
     ShareLocation(q, res, cb){
@@ -612,7 +696,6 @@ module.exports = class D2D {
         });
     }
 
-
     GetApprovedCustomer(q, res) {
 
         let sql =
@@ -654,4 +737,42 @@ module.exports = class D2D {
             res.end();
         });
     }
+
+    GetComments(q, res) {
+        let sql =
+            "SELECT data" +
+            " FROM comm" +
+            " WHERE supuid='"+q.supuid +"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                console.log(JSON.stringify({'err':err}));
+                res.end(JSON.stringify({'err':err}));
+            }
+            let array = [];
+            for(let d in result) {
+                array.push(JSON.parse(result[d].data));
+            }
+            res.end(JSON.stringify(array));
+        });
+
+    }
+
+    SetComments(q,res){
+
+        this.replaceImg_2(q.data.profile_picture_url, function (path) {
+            q.data.profile_picture_url = path;
+            let values = [q.supuid, JSON.stringify(q.data)];
+            let sql = "REPLACE INTO comm SET supuid=?, data=?";
+            global.con_obj.query(sql, values, function (err, result) {
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                if (err) {
+                    console.log(JSON.stringify({'err':err}));
+                }
+                res.end();
+            });
+        });
+    }
+
 }

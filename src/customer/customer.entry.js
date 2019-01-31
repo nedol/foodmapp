@@ -47,17 +47,26 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
+    $('.date_ctrl').draggable();
+
+    let now = new Date();
+
+    var today = new Date();
+    var week = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
 
     $('#datetimepicker').datetimepicker({
         inline: true,
         sideBySide: true,
         locale: window.sets.lang,
-        format:'DD.MM.YYYY',
-        defaultDate: new Date(),
+        format: 'DD.MM.YYYY',
+        defaultDate: today,
+        //minDate:today,//TODO: uncomment for production
+        maxDate: week,
+        //daysOfWeekDisabled: [0, 6],
         disabledDates: [
-            // moment("12/25/2018"),
+            //moment("12/25/2018"),
             //new Date(2018, 11 - 1, 21),
-            "2018-01-12"
+            "2019-02-01"
         ]
     });
 
@@ -77,7 +86,10 @@ $(document).on('readystatechange', function () {
         $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
     });
 
-    $('#datetimepicker').data("DateTimePicker").toggle();
+    setTimeout(function () {
+        $('#datetimepicker').trigger("dp.change");
+        $('#datetimepicker').data("DateTimePicker").toggle();
+    }, 200);
 
     $('#datetimepicker').on('dp.show',function (ev) {
         $(this).css("background-color", "rgba(255,255,255,.8)");
@@ -88,35 +100,6 @@ $(document).on('readystatechange', function () {
 
     $('#datetimepicker').on('dp.hide',function (ev) {
         $('#dtp_container').css('display', 'none');
-    });
-
-    $('#dt_from').datetimepicker({
-        inline: true,
-        sideBySide: true,
-        //locale: window.sets.lang,
-        format:'HH:00',
-        defaultDate:  '2018-01-01 19:00',
-        //maxDate: new Date(now + (24*60*60*1000) * 7),
-        // disabledDates: [
-        //     // moment("12/25/2018"),
-        //     //new Date(2018, 11 - 1, 21),
-        //     //"2018-01-12 00:53"
-        // ]
-        //,daysOfWeekDisabled: [0, 6]
-    });
-    $('#dt_to').datetimepicker({
-        inline: true,
-        sideBySide: true,
-        //locale: window.sets.lang,
-        format:'HH:00',
-        defaultDate: '2018-01-01 23:00',
-        //maxDate: new Date(now + (24*60*60*1000) * 7),
-        // disabledDates: [
-        //     // moment("12/25/2018"),
-        //     //new Date(2018, 11 - 1, 21),
-        //     //"2018-01-12 00:53"
-        // ]
-        //,daysOfWeekDisabled: [0, 6]
     });
 
 

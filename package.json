@@ -69,6 +69,7 @@
     "i18n-iso-countries": "^3.7.8",
     "is-json": "^2.0.1",
     "jquery": "^3.3.1",
+    "jquery-textcomplete": "^1.8.4",
     "jquery-ui": "^1.12.1",
     "jquery-ui-touch-punch": "^0.2.3",
     "jquery.ui.touch": "0.0.1",
@@ -86,14 +87,18 @@
     "ol": "^4.6.5",
     "path": "^0.12.7",
     "popper.js": "^1.14.6",
+    "pricing-template": "^1.0.1",
     "sdp-jingle-json": "^3.0.3",
     "sdp-transform": "^2.4.1",
     "shortid": "^2.2.14",
     "tablesort": "^5.1.0",
     "tablesorter": "^2.31.1",
+    "textcomplete": "^0.17.1",
     "uniqid": "^5.0.3",
     "urlencode": "^1.1.0",
+    "web-push": "^3.3.3",
     "webpack-jquery-ui": "^2.0.1",
-    "webrtc-adapter": "^6.3.2"
+    "webrtc-adapter": "^6.3.2",
+    "webticker": "^3.0.0"
   }
 }

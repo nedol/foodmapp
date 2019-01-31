@@ -1,5 +1,5 @@
 export {CustomerSettings}
-import {Settings} from "../profile/settings";
+
 import {Network} from "../../network";
 
 class CustomerSettings {

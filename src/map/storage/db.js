@@ -14,7 +14,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 21;
+        this.version = 24;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -52,12 +52,11 @@ class DB {
             };
             request.onsuccess = function (e) {
                 console.log("DB open onsuccess");
-                //request.onupgradeneeded(e);
                 f(request.result);
 
             }
 
-            request.onupgradeneeded = function (event) {
+            request.onupgradeneeded = function (e) {
 
                 var db = event.target.result;
                 db.onerror = function (event) {
@@ -86,33 +85,36 @@ class DB {
                 }
 
                 try {
-                    db.deleteObjectStore(that.supplierStore);
+                    //db.deleteObjectStore(that.supplierStore);
+                    let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "uid"]});
+                    vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
+                    vSupplierStore.createIndex("dateuid", ["date","uid"], {unique: true});
+                    vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
+
                 }catch(ex){
 
                 }
-                let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "uid"]});
-                vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
-                vSupplierStore.createIndex("dateuid", ["date","uid"], {unique: true});
-                vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
 
                 try{
                     db.deleteObjectStore(that.orderStore);
+                    let vOrderStore = db.createObjectStore(that.orderStore, {keyPath: ["date", "supuid", "cusuid"]});
+                    vOrderStore.createIndex("date", "date", {unique: true});
+                    vOrderStore.createIndex("datesupuidcusuid", ["date","supuid", "cusuid"], {unique: true});
+                    vOrderStore.createIndex("datesupuid", ["date","supuid"], {unique: false});
+                    vOrderStore.createIndex("status", "status", {unique: false});
+
                 }catch(ex){
 
                 }
-                let vOrderStore = db.createObjectStore(that.orderStore, {keyPath: ["date", "supuid", "cusuid"]});
-                vOrderStore.createIndex("data", "data", {unique: false});
-                vOrderStore.createIndex("datesupuidcusuid", ["date","supuid", "cusuid"], {unique: true});
-                vOrderStore.createIndex("datesupuid", ["date","supuid"], {unique: false});
-                vOrderStore.createIndex("status", "status", {unique: false});
 
+                //db.deleteObjectStore(that.apprStore);
                 try{
-                    db.deleteObjectStore(that.approveStore);
+                    let vApprStore = db.createObjectStore(that.apprStore, {keyPath: ["date", "supuid", "cusuid", "title"]});
+                    vApprStore.createIndex("datesupcustitle", ["date", "supuid", "cusuid", "title"], {unique: true});
+                    vApprStore.createIndex("sup", ["supuid"], {unique: false});
                 }catch(ex){
 
                 }
-                let vApprStore = db.createObjectStore(that.apprStore, {keyPath: ["date", "supuid", "cusuid","title"]});
-                vApprStore.createIndex("datesupcustitle", ["date","supuid", "cusuid", "title"], {unique: true});
 
                 that.connectDB(f);
             };
@@ -171,6 +173,10 @@ class DB {
             request.onsuccess = function (ev) {
 
                 if(this.result){
+                    if(!e1start && !e1end){
+                        cb(this.result);
+                    }
+
                     let period = this.result.period.split('-');
                     if(parseInt(e1start) >= parseInt(period[0]) && parseInt(e1start) <= parseInt(period[1])
                         || parseInt(period[0]) >= parseInt(e1start) && parseInt(period[0]) <= parseInt(e1end)) {
@@ -256,13 +262,32 @@ class DB {
         };
     }
 
-    GetOrders(date, supuid,  cb){
+    GetSupOrders(date, supuid, cb){
         if(!this.DBcon)
             return;
         let tx = this.DBcon.transaction([this.orderStore], "readonly");
         let objectStore = tx.objectStore(this.orderStore);
         let idatesupuid = objectStore.index("datesupuid");
         var request = idatesupuid.getAll([date,supuid]);
+        request.onerror = function (ev) {
+            cb(-1);
+        }
+        request.onsuccess = function (ev) {
+            if(this.result){
+                cb(this.result);
+            }else{
+                cb(-1);
+            }
+        };
+    }
+
+    GetCusOrders(date, cb){
+        if(!this.DBcon)
+            return;
+        let tx = this.DBcon.transaction([this.orderStore], "readonly");
+        let objectStore = tx.objectStore(this.orderStore);
+        let idate = objectStore.index("date");
+        var request = idate.getAll(date);
         request.onerror = function (ev) {
             cb(-1);
         }
@@ -361,6 +386,20 @@ class DB {
             let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
             let index = objectStore.index("datesupcustitle");
             var request = index.get([date,supuid, cusuid, title]);
+            request.onerror = this.logerr;
+            request.onsuccess = function (ev) {
+                cb(this.result);
+            }
+        } catch (ex) {
+            console.log(ex);
+        }
+    }
+
+    GetSupApproved(supuid, cb){
+        try {
+            let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
+            let index =  objectStore.index('sup');
+            var request = index.get([supuid]);
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {
                 cb(this.result);

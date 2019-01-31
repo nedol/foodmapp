@@ -2,6 +2,7 @@
 export {Offer}
 import {OfferEditor} from './offer.editor';
 class Offer{
+
     constructor(uObj){
 
         this.stobj = uObj.offer;//db stored object
@@ -47,4 +48,5 @@ class Offer{
     OpenOfferEditor(ev) {
         ev.data.offer.editor.OpenOffer();
     }
+
 }
