@@ -340,6 +340,8 @@ class OfferOrder {
         let that = this;
         let obj = {data:{}};
         $('.menu_item').each(function (index, val) {
+            if(parseInt($(val).find('button.amount').val())===0)
+                return;
             let tab = $(val).closest('.tab-pane').attr('id');
             let of = that.offer[tab][index];
             if(parseInt($(val).find('button.amount').text())===0 && !$(val).attr('deleted')){

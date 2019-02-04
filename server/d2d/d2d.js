@@ -53,6 +53,9 @@ module.exports = class D2D {
                     case 'ratesup':
                         this.RateSupplier(q, res);
                         break;
+                    case 'setsup':
+                        this.SettingsSupplier(q, res);
+                        break;
                     case 'getcomments':
                         this.GetComments(q,res);
                         break;
@@ -68,20 +71,20 @@ module.exports = class D2D {
                     case 'approveorder':
                         this.ApproveOrder(q, res);
                         break;
+                    case 'getoffers':
+                        this.GetOffers(q, res);
+                        break;
                     case 'updateoffer':
                         this.UpdateOffer(q, res);
                         break;
                     case 'translate':
                         this.translate(q, res);
                         break;
-                    case 'getordersup':
-                        this.GetOrderSupplier(q, res);
+                    case 'getorder':
+                        this.GetOrder(q, res);
                         break;
-                    case 'getapprovedcus':
-                        this.GetApprovedCustomer(q, res);
-                        break;
-                    case 'getapprovedsup':
-                        this.GetApprovedSupplier(q, res);
+                    case 'getapproved':
+                        this.GetApproved(q, res);
                         break;
                     case 'getsuppliers':
                         this.GetSuppliers(q, res);
@@ -138,48 +141,6 @@ module.exports = class D2D {
             }
         });
     }
-
-    RegSupplier(q, res) {
-
-        let that = this;
-
-        var sql =  "SELECT sup.*"+
-            " FROM  supplier as sup"+
-            " WHERE sup.email='"+q.email+"'";
-
-        global.con_obj.query(sql, function (err, result) {
-            if (err)
-                throw err;
-
-            if (result.length > 0) {
-
-                res.writeHead(200, {
-                    'Content-Type': 'text/event-stream; charset=utf-8',
-                    'Cache-Control': 'no-cache',
-                    'Connection': 'keep-alive'
-                });
-                res.end(JSON.stringify({"msg":"msg"}));
-
-            } else {
-                let values, sql;
-                that.replaceImg_2(q.profile.avatar,function (avatar) {
-                    q.profile.avatar = avatar
-                    values = [q.uid, q.psw, JSON.stringify(q.profile), 'tariff'];
-                    sql = "INSERT INTO supplier SET  uid=?, psw=?, profile=?, tariff=?";
-                    global.con_obj.query(sql, values, function (err, result) {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        if (err) {
-                            res.end();
-                            return;
-                        }
-                        res.end(JSON.stringify(values));
-                    });
-                });
-
-            }
-        });
-    }
-
 
     Auth(q, res, req) {
         let values, sql, uid;
@@ -298,6 +259,8 @@ module.exports = class D2D {
         let ofobj = JSON.parse(offer);
         for(let tab in ofobj) {
             for (let item in ofobj[tab]) {
+                if(!ofobj[tab][item].img.src || ofobj[tab][item].img.src.includes(requrl)>0)
+                    continue;
                 const base64Data = ofobj[tab][item].img.src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
                 const hash = md5(base64Data);
                 fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
@@ -309,9 +272,10 @@ module.exports = class D2D {
                     fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
 
                     });
-                    offer = offer.replace(ofobj[tab][item].cert[c].src,'../server/images/'+hash);
+
+                    offer = offer.replace(ofobj[tab][item].cert[c].src,requrl+'/door2door/server/images/'+hash);
                 }
-                offer = offer.replace(ofobj[tab][item].img.src,'../server/images/'+hash);
+                offer = offer.replace(ofobj[tab][item].img.src,requrl+'/door2door/server/images/'+hash);
             }
             cb(offer);
         }
@@ -319,7 +283,7 @@ module.exports = class D2D {
     }
 
     replaceImg_2(src, cb) {
-        if(!src) {
+        if(!src || src.includes(requrl)>0){
             cb(src);
             return;
         }
@@ -415,28 +379,6 @@ module.exports = class D2D {
         });
     }
 
-    ApproveOrder(q,res){
-        let now = moment().format('YYYY-MM-DD h:mm:ss');
-        let values = [q.date,q.period, q.supuid, q.cusuid, q.title, JSON.stringify(q.data)];
-        let sql = "REPLACE INTO approved SET date=?, period=?, supuid=?, cusuid=?, title=?, data=?";
-        global.con_obj.query(sql, values, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
-            }
-            else if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
-                delete q.uid;
-                delete q.func;
-                delete q.proj;
-                resObj[q.cusuid].write(utils.formatSSE({func: 'approved', order: q}));
-            }
-            res.end(JSON.stringify({result: result, approved:now}));
-
-        });
-
-    }
-
     UpdateOrderStatus(q, res){
         let that = this;
         let sql =
@@ -529,8 +471,15 @@ module.exports = class D2D {
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT of.date as date, of.period as period, sup.uid as uid, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict, sup.profile as profile," +
-            " sup.rating as rating"+
-            " FROM  supplier as sup, offers as of"+
+            " sup.rating as rating, " +
+            "apprs.totals as apprs"+//общее кол-во подтверждений
+            " FROM  supplier as sup, offers as of," +
+            " (" +
+            " SELECT COUNT(*) as  totals" +
+            " FROM supplier as sup, approved as appr" +
+            " WHERE sup.uid=uid AND appr.supuid=sup.uid" +
+            " AND appr.date='" + q.date + "'" +
+            " ) AS apprs"+
             " WHERE sup.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
@@ -586,155 +535,6 @@ module.exports = class D2D {
                 res.end();
             }
 
-        });
-    }
-
-    RateSupplier(q, res, cb){
-        let sql = " SELECT sup.rating as rating"+
-            " FROM  supplier as sup"+
-            " WHERE sup.uid = '"+ q.supuid+"'";
-
-        global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
-            try {
-                let rating = {};
-                if(result[0].rating) {
-                    rating = JSON.parse(result[0].rating);
-                    rating[q.cusuid] = q.value;
-
-                }else{
-                    rating[q.cusuid]=q.value;
-                }
-
-                let sum = 0, cnt = 0;
-                for (let k in rating) {
-                    if(k==='value')
-                        continue;
-                    sum += parseFloat(rating[k]);
-                    cnt++;
-                }
-
-                rating.value = (sum/cnt).toFixed(1);
-
-                sql = " UPDATE   supplier  SET rating='" + JSON.stringify(rating) +"'"+
-                    " WHERE supplier.uid = '" + q.supuid+"'";
-                global.con_obj.query(sql, function (err, result) {
-                    if (err) {
-                        res.end(JSON.stringify({'err': err}));
-                        return;
-                    }
-                    res.end(JSON.stringify({rating: (sum/cnt).toFixed(1)}));
-                });
-            }catch(ex){
-                res.end();
-            }
-
-        });
-    }
-
-    ShareLocation(q, res, cb){
-
-        let sql = " SELECT sup.email as email" +
-            " FROM supplier as sup" +
-            " WHERE" +
-            " SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
-            " UNION" +
-            " SELECT cus.email as email" +
-            " FROM customer as cus" +
-            " WHERE " +
-            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
-
-        global.con_obj.query(sql, function (err, result) {
-            if (!res._header)
-                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
-            if(result.length>0){
-                for(let r in result){
-                    let sse = resObj[result[r].email];
-                    if(sse){
-                        sse.write(utils.formatSSE({"func":"sharelocation","email":q.supuid,"location":q.location}));
-                    }
-                }
-            }
-            if(cb) {
-                cb();
-            }else{
-                res.end(JSON.stringify({func: 'sharelocation', result: result.length}));
-            }
-        });
-    }
-
-    GetOrderSupplier(q, res) {
-
-        let sql =
-            "SELECT ord.* " +
-            " FROM orders as ord, supplier as sup" +
-            " WHERE ord.supuid=sup.uid " +
-            " AND sup.uid='" + q.uid+"' AND sup.psw='"+q.psw +"'"+
-            " AND ord.date='"+q.date+"'"+
-            " AND ord.deleted IS NULL";
-
-        global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            if (err) {
-                console.log(JSON.stringify({'err':err}));
-            }
-
-            if(result && result.length>0){
-                res.write(JSON.stringify(result));
-            }
-            res.end();
-        });
-    }
-
-    GetApprovedCustomer(q, res) {
-
-        let sql =
-            "SELECT appr.* " +
-            " FROM customer as cus, approved as appr" +
-            " WHERE cus.uid='"+q.uid +"' AND appr.cusuid=cus.uid"+
-            " AND appr.date='"+q.date+"'";
-
-        global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            if (err) {
-                console.log(JSON.stringify({'err':err}));
-            }
-
-            if(result && result.length>0){
-                res.write(JSON.stringify(result));
-            }
-            res.end();
-        });
-    }
-
-    GetApprovedSupplier(q, res) {
-
-        let sql =
-            "SELECT appr.* " +
-            " FROM supplier as sup, approved as appr" +
-            " WHERE sup.uid='"+q.uid +"' AND appr.supuid=sup.uid"+
-            " AND appr.date='"+q.date+"'";
-
-        global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            if (err) {
-                console.log(JSON.stringify({'err':err}));
-            }
-
-            if(result && result.length>0){
-                res.write(JSON.stringify(result));
-            }
-            res.end();
         });
     }
 

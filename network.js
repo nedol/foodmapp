@@ -70,6 +70,7 @@ class Network{
 
     RegSupplier(obj, cb){
         obj.proj = 'd2d';
+        obj.user = obj.set.profile.user;
         obj.func = 'regsupplier';
 
         this.postRequest(obj, function (res) {

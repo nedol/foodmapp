@@ -78,6 +78,8 @@ class Supplier{
             cb();
         });
 
+        this.GetWeekOffers();
+
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
@@ -106,78 +108,40 @@ class Supplier{
                         });
                     }
                 });
-
             }
         });
 
     }
 
-    IsAuth(cb) {
+    GetWeekOffers() {
 
+        let that = this;
         try {
-
-            window.network = new Network(host_port);
-            window.network.InitSSE(this,function () {
-
-            });
-            $('.dt_val').val(this.date);
-
-            let that =this;
 
             var data_obj ={
                 proj:"d2d",
-                func:"auth",
-                lang: window.sets.lang,
+                user: this.constructor.name.toLowerCase(),
+                func:"getoffers",
                 uid: this.uid,
+                psw: this.psw,
                 email:this.email,
                 date:this.date
             }
 
             window.network.postRequest(data_obj, function (data) {
-                if(typeof data =='string')
-                    data = JSON.parse(data);
-                if(data) {
-                    if (data.reg =='OK') {
-                        var uObj = {
-                            "email": that.email,
-                            "uid": that.uid
-                        };
-                        localStorage.setItem("admin", JSON.stringify(uObj));
+                for(let i in data.offer){
+                    window.db.IsOffer(data.offer[i].date, function (res) {
+                        if(!res){
+                            //delete data.offer[i].id;delete data.offer[i].supuid;
 
-                        window.dict = new Dict(JSON.parse(JSON.parse(data.data).dict));
-                        window.dict.set_lang(window.sets.lang, $('#main_window'));
+                            data.offer[i].location = proj.fromLonLat([data.offer[i].longitude,data.offer[i].latitude]);
+                            data.offer[i].data = JSON.parse(data.offer[i].data);
+                            data.offer[i].data.data = Object.assign(that.offer.stobj.data,data.offer[i].data.data);
+                            window.db.SetObject('offerStore',data.offer[i],function (res) {
 
-                        localStorage.setItem("lang", window.sets.lang);
-
-                        cb(data);
-
-                    }else if (data.auth){//TODO: =='OK') {
-                        localStorage.setItem("dict", JSON.stringify(data.data));
-                        if(data.data) {
-                            let dict = data.data;//JSON.parse(localStorage.getItem('dict'));//
-                            window.dict = new Dict(JSON.parse(data.data).dict);
-                            window.dict.set_lang(window.sets.lang, $('#main_window'));
-
-                            localStorage.setItem("lang", window.sets.lang);
-
-                            //class_obj.menu.menuObj = JSON.parse(data.menu);
+                            });
                         }
-
-                        //that.rtc_operator = new RTCOperator(that.uid, that.email,"browser",that.network);
-
-                        cb();
-                        that.DocReady();
-
-                    }else if(data.data){
-                        let str = data.data;
-                        let dict = JSON.parse(str).dict;
-                        window.dict = new Dict(dict);
-                        window.dict.set_lang(window.sets.lang, $('#main_window'));
-                        that.editor.menuObj = JSON.parse(data.data);
-                        that.DocReady();
-                    }else{
-                        let err = data.err;
-                    }
+                    });
                 }
             });
             
@@ -258,37 +222,37 @@ class Supplier{
 
             });
 
-            that.map.import.DownloadOrderSupplier(function () {
+            that.map.import.GetOrderSupplier(function () {
                 window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
-                    if(objs!=-1){
-                        let type = 'customer';
-                        for(let o in objs) {
-                            window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
-                                if(lat && lon) {
-                                    let loc = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
-                                    var markerFeature = new Feature({
-                                        geometry: new Point(loc),
-                                        labelPoint: new Point(loc),
-                                        //name: cursor.value.title ? cursor.value.title : "",
-                                        //tooltip: cursor.value.title ? cursor.value.title : "",
-                                        type: type,
-                                        object: objs[o]
-                                    });
-                                    var id_str = md5(window.user.date + objs[o].cusuid);
-                                    markerFeature.setId(id_str);
 
-                                    let layer = that.map.ol_map.getLayers().get(type);
-                                    if (!layer) {
-                                        layer = that.map.layers.CreateLayer(type, '1');
-                                    }
-                                    let source = layer.values_.vector;
+                    let type = 'customer';
+                    for(let o in objs) {
+                        window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
+                            if(lat && lon) {
+                                let loc = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+                                var markerFeature = new Feature({
+                                    geometry: new Point(loc),
+                                    labelPoint: new Point(loc),
+                                    //name: cursor.value.title ? cursor.value.title : "",
+                                    //tooltip: cursor.value.title ? cursor.value.title : "",
+                                    type: type,
+                                    object: objs[o]
+                                });
+                                var id_str = md5(window.user.date + objs[o].cusuid);
+                                markerFeature.setId(id_str);
 
-                                    if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date === window.user.date)
-                                        that.map.layers.AddCluster(layer, markerFeature);
+                                let layer = that.map.ol_map.getLayers().get(type);
+                                if (!layer) {
+                                    layer = that.map.layers.CreateLayer(type, '1');
                                 }
-                            });
-                        }
+                                let source = layer.values_.vector;
+
+                                if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date === window.user.date)
+                                    that.map.layers.AddCluster(layer, markerFeature);
+                            }
+                        });
                     }
+
                 });
             });
 
@@ -366,10 +330,10 @@ class Supplier{
             }
         }else {
             uObj = {
-                "date":window.user.date,
-                "period": $('.sel_period').text(),
-                "location": location,
-                "data": offer
+                date:window.user.date,
+                period: $('.sel_period').text(),
+                location: location,
+                data: offer
             };
         }
 
@@ -402,16 +366,17 @@ class Supplier{
         }
 
         let data_obj = {
-            "proj": "d2d",
-            "func": "updateoffer",
-            "uid": that.uid,
-            "psw": that.psw,
-            "categories": that.offer.editor.arCat,
-            "date": date,
-            "period": $('.sel_period').text(),
-            "location": proj.toLonLat(location),
-            "offer": urlencode.encode(JSON.stringify(data)),
-            "dict": JSON.stringify(window.dict)
+            proj: 'd2d',
+            user: window.user.constructor.name.toLowerCase(),
+            func: 'updateoffer',
+            uid: that.uid,
+            psw: that.psw,
+            categories: that.offer.editor.arCat,
+            date: date,
+            period: $('.sel_period').text(),
+            location: proj.toLonLat(location),
+            offer: urlencode.encode(JSON.stringify(data)),
+            dict: JSON.stringify(window.dict)
         };
 
         window.network.postRequest(data_obj, function (res) {
@@ -448,7 +413,7 @@ class Supplier{
         $('#my_truck').css('visibility', 'hidden');
     }
 
-    ApproveOrder(obj){
+    ApproveOrder(obj, title){
 
         let data_obj = {
             "proj": "d2d",
@@ -459,8 +424,8 @@ class Supplier{
             "period": obj.period,
             "supuid":obj.supuid,
             "cusuid":obj.cusuid,
-            "title": Object.keys(obj.data)[0],
-            "data": obj.data[Object.keys(obj.data)[0]]
+            "title": title,
+            "data": obj.data[title]
         }
 
         window.network.postRequest(data_obj, function (resp) {
@@ -481,12 +446,13 @@ class Supplier{
                location[0] = parseFloat(location[0].toFixed(6));
                location[1] = parseFloat(location[1].toFixed(6));
                 let data_obj = {
-                    "proj": "d2d",
-                    "func": "sharelocation",
-                    "uid": window.user.uid,
-                    "supuid": this.email,
-                    "date": this.date,
-                    "location": location
+                    proj: d2d,
+                    user: window.user.constructor.name.toLowerCase(),
+                    func: 'sharelocation',
+                    uid: window.user.uid,
+                    supuid: this.email,
+                    date: this.date,
+                    location: location
                 };
 
                 window.network.postRequest(data_obj, function (data) {

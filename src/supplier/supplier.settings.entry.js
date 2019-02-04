@@ -5,6 +5,7 @@ import {SupplierSettings} from "./supplier.settings";
 import {DB} from "../map/storage/db"
 
 import 'bootstrap'
+global.jQuery = require('jquery');
 
 $(document).on('readystatechange', function () {
 

@@ -25,7 +25,7 @@ require('bootstrap-select');
 let moment = require('moment');
 
 let utils = new Utils();
-
+global.jQuery = require('jquery');
 
 $(document).on('readystatechange', function () {
 

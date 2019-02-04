@@ -111,7 +111,15 @@ module.exports = {
 
             case'd2d':
                 let D2D = require('./d2d/d2d');
-                let d2d = new D2D();
+                let Supplier = require('./d2d/supplier');
+                let Customer = require('./d2d/customer');
+                let d2d = '';
+                if(q.user && q.user.toLowerCase() === 'supplier')
+                    d2d = new Supplier();
+                else if(q.user && q.user.toLowerCase() === 'customer')
+                    d2d = new Customer();
+                else
+                    d2d = new D2D();
                 d2d.dispatch(q,res,req);
                 break;
             default:

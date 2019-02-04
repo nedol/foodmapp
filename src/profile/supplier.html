@@ -6,26 +6,31 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
 <link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
+<link rel="canonical" href="http://www.bootstraptoggle.com">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css" rel="stylesheet" >
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">
 
 <!-- Libraries -->
 <script src="../../dist/host.js"></script>
 
 <script src="../../dist/supplier_profile.js"></script>
 
-
     <style>
         .scaled{
             transform: scale(1.5)
         }
         .custom-star{
-            font-size: 2.5em;
+            font-size: 2.0em;
             color: red;
         }
-       .ban_suplier{
+       .ban_supplier{
             font-size: 2.5em;
             color: red;
         }
     </style>
+<body  style="overflow: hidden">
     <div class="dropdown">
         <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
                 data-width="fit" type="button" style="background-color: #ffffff">
@@ -39,15 +44,15 @@
     </div>
     <div class="container bootstrap snippet">
         <div class="row">
-            <div class="title col-sm-2"><h1>Поставщик</h1></div>
+            <div class="title col-sm-3"><h1>Поставщик</h1></div>
             <div class="col-sm-2">
-                <input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>
+
             </div>
-            <div class="col-sm-7"></div>
+            <div class="col-sm-6"></div>
 
             <div class="col-sm-1">
                 <a href="#">
-                    <span class="ban_suplier glyphicon glyphicon-ban-circle"></span>
+                    <span class="ban_supplier glyphicon glyphicon-ban-circle" style="visibility: hidden"></span>
                 </a>
             </div>
             <div style="display: block; position:absolute; right: 10px; top:10px; font-size:xx-large">
@@ -58,16 +63,17 @@
             <div class="col-sm-12">
                 <ul class="nav nav-tabs">
                     <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Общедоступная информация</a></li>
-                    <li><a data-toggle="tab" href="#review" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
+                    <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
+                    <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
                 </ul>
 
                 <div class="tab-content">
-                    <input type="hidden" id="supid" class="form-control" name="supid">
+                    <input type="hidden" id="supuid" class="form-control" name="supuid">
                     <div class="tab-pane active" id="profile">
+                        <div style="margin: 20px"></div>
                         <div class="row">
                             <div class="col-sm-3 text-center">
                                 <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar">
-
                                 <input type="file" class="center-block file-upload" style="display: none">
                             </div>
                             <div class="col-sm-9">
@@ -90,68 +96,35 @@
                                         </div>
 
                                         <div class="col-xs-6">
+                                            <label for="inn"><h4>ИНН</h4></label>
+                                            <input type="text" id="inn" disabled class="form-control" name="inn"  placeholder="номер ИНН" title="enter your inn number if any.">
                                         </div>
                                     </div>
                                 </div>
                         </div>
                     </div><!--/tab-pane-->
-                    <div class="tab-pane" id="review">
-                        <!-- Init jquery-comments -->
-                        <script type="text/javascript">
-
-                            $(function() {
-
-    //                                $('#comments-container').comments({
-    //                                    profilePictureURL: 'https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png',
-    //                                    currentUserId: 1,
-    //                                    roundProfilePictures: true,
-    //                                    textareaRows: 1,
-    //                                    enableAttachments: true,
-    //                                    enableHashtags: true,
-    //                                    enablePinging: true,
-    //                                    getUsers: function(success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(usersArray);
-    //                                        }, 500);
-    //                                    },
-    //                                    getComments: function(success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(commentsArray);
-    //                                        }, 500);
-    //                                    },
-    //                                    postComment: function(data, success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(saveComment(data));
-    //                                        }, 500);
-    //                                    },
-    //                                    putComment: function(data, success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(saveComment(data));
-    //                                        }, 500);
-    //                                    },
-    //                                    deleteComment: function(data, success, error) {
-    //                                        setTimeout(function() {
-    //                                            success();
-    //                                        }, 500);
-    //                                    },
-    //                                    upvoteComment: function(data, success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(data);
-    //                                        }, 500);
-    //                                    },
-    //                                    uploadAttachments: function(dataArray, success, error) {
-    //                                        setTimeout(function() {
-    //                                            success(dataArray);
-    //                                        }, 500);
-    //                                    },
-    //                                });
-                            });
-                        </script>
+                    <div class="tab-pane" id="comments" style="overflow-y: auto; height: 400px">
+                        <div style="margin-top: 20px;float: right">
+                            <input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>
+                        </div>
                         <div id="comments-container"></div>
+
+
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane" id="settings">
+                        <div style="margin: 20px"></div>
+                        <div class="row">
+                            <div class="checkbox">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" class="prolong" checked data-toggle="toggle" data-size="mini" data-on="вкл" data-off="выкл">Автоматическое недельное продление предложения</label>
+                            </div>
+                        </div>
                     </div><!--/tab-pane-->
                 </div><!--/tab-content-->
             </div>
         </div><!--/col-9-->
     </div><!--/row-->
+</body>
 
+<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
 </html>

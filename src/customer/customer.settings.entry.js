@@ -4,7 +4,7 @@ import {CustomerSettings} from "./customer.settings";
 
 import 'bootstrap'
 import {DB} from "../map/storage/db"
-
+global.jQuery = require('jquery');
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {

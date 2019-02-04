@@ -113,6 +113,8 @@ class ProfileCustomer{
 
                     });
                 });
+            }else if($(tab).attr('id')==='orders'){
+                that.SaveOrderItems();
             }
         });
     }
@@ -162,9 +164,15 @@ class ProfileCustomer{
                     $(ovc).attr('id', 'ovc'+ '_' + i);
                     $(ovc).css('display','block');
                     $(ovc).addClass('menu_item');
+                    $(ovc).attr('order',item);
+                    $(ovc).find('.supuid').val(order.supuid);
+                    $(ovc).find('.item_title').text(item);
                     $(ovc).find('.item_title').attr('contenteditable', 'false');
                     $(ovc).find('.item_price').text(order.data[item].price);
-                    $(ovc).find('.item_title').text(item);
+                    $(ovc).find('.item_price').attr('contenteditable', 'false');
+                    $(ovc).find('.period_div').css('visibility', 'visible');
+                    $(ovc).find('.approved').css('visibility', 'hidden');
+                    $(ovc).find('.ordperiod').text(order.period);
                     if(item){
                         $(ovc).find('.item_title').attr('data-translate', item);
                     }
@@ -181,6 +189,23 @@ class ProfileCustomer{
 
                 }
             }
+        });
+    }
+
+    SaveOrderItems(){
+        $('.menu_item').each(function (i,ovc) {
+
+            window.parent.db.GetOrder(
+                window.parent.user.date,
+                $(ovc).find('.supuid').val(),
+                window.parent.user.uid, function (res) {
+                    if(res!==-1){
+                        res.data[$(ovc).attr('order')].qnty = parseInt($(ovc).find('.amount').text());
+                        window.parent.db.SetObject('orderStore', res,function (res) {
+
+                        })
+                    }
+                });
         });
     }
 

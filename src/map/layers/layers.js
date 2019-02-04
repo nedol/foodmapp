@@ -119,9 +119,16 @@ class Layers {
                         window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.uid,function (res) {
                             if(res!==-1) {
                                 if (feature.values_.object.date === window.user.date) {
-                                    let style = getObjectStyle(feature.values_.object);
-                                    if (style)
+
+                                    let style = getObjectStyle(feature.values_.object, res);
+                                    if (feature.values_.object.date === window.user.date) {
                                         cluster_feature.setStyle(style);
+
+                                    } else {
+                                        vectorSource.removeFeature(feature);
+                                    }
+
+
                                 }else{
                                     vectorSource.removeFeature(feature);
                                 }
@@ -129,24 +136,27 @@ class Layers {
                                 vectorSource.removeFeature(feature);
                             }
                         });
-                        if(feature.values_.object.supuid && feature.values_.object.cusuid)
-                            window.db.GetOrder(window.user.date,feature.values_.object.supuid, feature.values_.object.cusuid,function (res) {
-                                if(res!==-1) {
-                                    if (feature.values_.object.date === window.user.date) {
-                                        let style = getObjectStyle(feature.values_.object);
-                                        if (style)
-                                            cluster_feature.setStyle(style);
-                                    }else{
-                                        vectorSource.removeFeature(feature);
-                                    }
-                                }else{
-                                    vectorSource.removeFeature(feature);
-                                }
-                            });
+                        // if(feature.values_.object.supuid && feature.values_.object.cusuid) {
+                        //     window.db.GetOrder(window.user.date, feature.values_.object.supuid, feature.values_.object.cusuid, function (res) {
+                        //         if (res !== -1) {
+                        //             if (feature.values_.object.date === window.user.date) {
+                        //                 let style = getObjectStyle(feature.values_.object);
+                        //
+                        //                 if (style)
+                        //                     cluster_feature.setStyle(style);
+                        //             } else {
+                        //                 vectorSource.removeFeature(feature);
+                        //             }
+                        //         } else {
+                        //             vectorSource.removeFeature(feature);
+                        //         }
+                        //     });
+                        // }
+
                     });
                 }
 
-                function getObjectStyle(obj) {
+                function getObjectStyle(obj, appr) {
 
                     if (!obj || parseInt(obj.status) === 0)
                         return null;
@@ -158,8 +168,8 @@ class Layers {
                     scale = .3;//Map.getView().getZoom()/obj.ambit;
 
                     let opacity;
-                    if (parseInt(obj.status) === 2 && obj.category !== '12')
-                        opacity = 0.3;
+                    if ( obj.apprs<1)
+                        opacity = 0.2;
                     else
                         opacity = 1.0
 
@@ -172,12 +182,12 @@ class Layers {
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
                         anchorYUnits: 'pixel',
-                        color: [255, 255, 255, 1.0],
+                        color: [255, 255, 255, 1],
                         opacity: opacity,
-                        src: logo
+                        src: obj.profile.avatar
                     }));
                     let iconStyle;
-                    if (features.length > 1) {
+                    if (features.length > 1) {//cluster
                         iconStyle = new Style({
                             text: new Text({
                                 text: cluster_feature.values_.features.length.toString(),

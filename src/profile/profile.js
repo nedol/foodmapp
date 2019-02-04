@@ -10,6 +10,7 @@ class Profile{
     //Supplier
     OpenMyProfile(ev){
         let that = ev.data;
+
         //profile iframe
         let browser =  $('#profile_container').find('.browser');
         $('#profile_container').css('display','block');
@@ -21,7 +22,7 @@ class Profile{
             browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},
                 {
                     readOnly: true,
-                    profilePictureURL: that.profile.avatar,
+                    profilePictureURL: that.profile.profile.avatar,
                     enableEditing: false,
                     enableDeleting:false,
                     enableReplying: true,
@@ -56,6 +57,7 @@ class Profile{
                 browser.css('display', 'none');
             });
             $('.close_browser', browser.contents()).on('click touchstart', function (ev) {
+                browser[0].contentWindow.profile_sup.SaveSettings();
                 $('#profile_container').css('display','none');
             });
         });

@@ -65,14 +65,14 @@ class Import {
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
             let data_obj = {
-                "proj": "d2d",
-                "func": "getsuppliers",
-                "uid": uid,
-                "categories": cats,
-                "date": date,
-                "period":$('.sel_period').text(),
-                "areas": area,
-                "user":window.user.constructor.name
+                proj: "d2d",
+                user: window.user.constructor.name.toLowerCase(),
+                func: "getsuppliers",
+                uid: uid,
+                categories: cats,
+                date: date,
+                period:$('.sel_period').text(),
+                areas: area
             };
 
             window.network.postRequest(data_obj, function (data) {
@@ -139,22 +139,23 @@ class Import {
                 dict: JSON.parse(obj.dict),
                 rating: JSON.parse(obj.rating).value,
                 profile: obj.profile?JSON.parse(obj.profile):'',
+                apprs: obj.apprs,//общее кол-во подтверждений
                 hash: hash
             };
         }
     }
 
-
-    DownloadOrderSupplier(cb) {
+    GetOrderSupplier(cb) {
 
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
         let data_obj = {
-            "proj": "d2d",
-            "func": "getordersup",
-            "uid":window.user.uid,
-            "psw": window.user.psw,
-            "date": date
+            proj: "d2d",
+            user: window.user.constructor.name.toLowerCase(),
+            func: "getorder",
+            uid:window.user.uid,
+            psw: window.user.psw,
+            date: date
         };
 
         window.network.postRequest(data_obj, function (data) {
@@ -189,14 +190,16 @@ class Import {
         }
     }
 
-    GetApprovedCustomer(){
+    GetApprovedCustomer(supuid){
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
         let data_obj = {
-            "proj": "d2d",
-            "func": "getapprovedcus",
-            "uid": window.user.uid,
-            "date": date
+            proj: "d2d",
+            user: window.user.constructor.name.toLowerCase(),
+            func: "getapproved",
+            uid: window.user.uid,
+            supuid:supuid,
+            date: date
         };
 
         window.network.postRequest(data_obj, function (data) {
@@ -225,11 +228,12 @@ class Import {
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
         let data_obj = {
-            "proj": "d2d",
-            "func": "getapprovedsup",
-            "uid": window.user.uid,
-            "supuid":window.user.email,
-            "date": date
+            proj: "d2d",
+            user: window.user.constructor.name.toLowerCase(),
+            func: "getapproved",
+            uid: window.user.uid,
+            supuid: window.user.email,
+            date: date
         };
 
         window.network.postRequest(data_obj, function (data) {

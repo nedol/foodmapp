@@ -272,6 +272,7 @@ class Customer{
         let that = this;
 
         obj.proj = "d2d";
+        obj.user = window.user.constructor.name.toLowerCase(),
         obj.func = "updateorder";
         obj.psw = that.psw;
         obj.cusuid = that.uid;

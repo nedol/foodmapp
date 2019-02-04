@@ -12,6 +12,7 @@ module.exports = {
     //context: __dirname+'/js',
 
     entry: {
+        //'jQuery':'jquery',
         // 'supplier':['babel-polyfill',
         //     __dirname+'/src/supplier/supplier_entry.js'
         // ],

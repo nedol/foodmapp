@@ -14,7 +14,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 24;
+        this.version = 25;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -96,9 +96,9 @@ class DB {
                 }
 
                 try{
-                    db.deleteObjectStore(that.orderStore);
+                    //db.deleteObjectStore(that.orderStore);
                     let vOrderStore = db.createObjectStore(that.orderStore, {keyPath: ["date", "supuid", "cusuid"]});
-                    vOrderStore.createIndex("date", "date", {unique: true});
+                    vOrderStore.createIndex("date", "date", {unique: false});
                     vOrderStore.createIndex("datesupuidcusuid", ["date","supuid", "cusuid"], {unique: true});
                     vOrderStore.createIndex("datesupuid", ["date","supuid"], {unique: false});
                     vOrderStore.createIndex("status", "status", {unique: false});
@@ -317,6 +317,7 @@ class DB {
             }
         };
     }
+
     DeleteOrder(date, supuid, cusuid) {
 
         var request = DB.prototype.DBcon.transaction('orderStore', "readwrite").objectStore('orderStore').delete([date, supuid,cusuid]);
@@ -373,10 +374,24 @@ class DB {
         }
     }
 
+    IsOffer(key, cb){
+        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        let request = objectStore.getKey([key]);
+        request.onsuccess = (event) => {
+            cb(event.target.result);
+        };
+    }
+
     GetAllOffers(cb) {
         let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
         objectStore.getAll().onsuccess = function(event) {
+            cb(event.target.result);
+        };
+    }
 
+    GetLastOffers(cb) {
+        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        objectStore.getAll().onsuccess = function(event) {
             cb(event.target.result[event.target.result.length-1]);
         };
     }
@@ -396,6 +411,7 @@ class DB {
     }
 
     GetSupApproved(supuid, cb){
+        //TODO: проверить нужна ли дата date
         try {
             let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
             let index =  objectStore.index('sup');

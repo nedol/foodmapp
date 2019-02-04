@@ -42,7 +42,7 @@ class OfferEditor{
         $(".category[state='1']").each(function (i, cat) {
             let tab = cat.title;
             $('<li class="tab_inserted"><a cat="'+cat.id+'" data-toggle="tab" contenteditable="true"  data-translate="'+md5(tab)+'"  href="#'+tab+'"' +
-                ' style="margin:1px;color:white; background-color:black">'+cat.title+'</a>' +
+                ' style="margin:1px;">'+cat.title+'</a>' +
                 '</li>').insertBefore($('#add_tab_li'));
             $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
                 '</div>').insertBefore($('#add_tab_div'));
@@ -69,10 +69,10 @@ class OfferEditor{
         $(".content_text").dblclick(function () {
             selectText($(this));
         });
-        let str = "Предложение по доставке \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
+        let str = " \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
         $("#offer_editor").find('.modal-title').text(str);
         if(that.offer.published)
-            $("#offer_editor").find('.offer_status').text('Опубликовано:\r\n'+that.offer.published);
+            $("#offer_editor").find('.offer_status').text($('#published').text()+'\r\n'+that.offer.published);
 
 
         this.lang = window.sets.lang;
@@ -126,15 +126,16 @@ class OfferEditor{
                 if(this.offer.data[tab][i].content)
                     $(menu_item).find('.content_text').css('visibility','visible');
                 if(this.offer.data[tab][i].width)
-                    $(menu_item).find('.content_text').css('width',(this.offer.data[tab][i].width/this.offer.data[tab][i].parent.width)*100+'%');
+                    $(menu_item).find('.content_text').css('width',this.offer.data[tab][i].width);
 
-                $(menu_item).find('.content_text').css('left',this.offer.data[tab][i].position.left);
+                if(this.offer.data[tab][i].position)
+                    $(menu_item).find('.content_text').css('left',this.offer.data[tab][i].position.left);
 
                 if(this.offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img.src);
-                    $(menu_item).find('.img-fluid').css('left',!this.offer.data[tab][i].img.left?0:(this.offer.data[tab][i].img.left/this.offer.data[tab][i].parent.width)*100+'%');
-                    $(menu_item).find('.img-fluid').css('top', !this.offer.data[tab][i].img.top?0:this.offer.data[tab][i].img.top);
+                    $(menu_item).find('.img-fluid').css('left',this.offer.data[tab][i].img.left?this.offer.data[tab][i].img.left:0);
+                    $(menu_item).find('.img-fluid').css('top',this.offer.data[tab][i].img.top?this.offer.data[tab][i].img.top:0);
 
                     $(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
                 }
@@ -356,9 +357,9 @@ class OfferEditor{
                             "</td>" +
                             "<td>" +"0"+ "</td>" +
 
-                            "<td class='tablesorter-no-sort notoday' >" +
+                            "<td class='tablesorter-no-sort'>" +
                                 "<label  class=\"btn\">" +
-                                "<input type=\"checkbox\" class=\"checkbox-inline complete\">" +
+                                "<input type=\"checkbox\" disabled class=\"notoday checkbox-inline complete\">" +
                                 "<i class=\"fa fa-square-o fa-2x\"></i>" +
                                 "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                                 "</label>" +
@@ -904,7 +905,7 @@ class OfferEditor{
 
                 $.each($(miAr[i]).find('.orders').find('input:checkbox:checked'), function (i, el) {
                     window.db.GetOrder(window.user.date, window.user.uid, $(el).attr('cusuid'),function (obj) {
-                        window.user.ApproveOrder(obj);
+                        window.user.ApproveOrder(obj,$(el).attr('title'));
                     });
                 });
 
