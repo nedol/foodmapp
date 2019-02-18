@@ -19,14 +19,12 @@ var md5 = require('md5');
 var isJSON = require('is-json');
 
 import {Utils} from "../utils/utils";
-import {OrderViewer} from "../order/order.viewer";
-
 let utils = new Utils();
 
 class OfferEditor{
 
 
-    constructor(obj, date){
+    constructor(){
 
         this.changed = false;
 
@@ -34,15 +32,15 @@ class OfferEditor{
 
     }
 
-     OpenOffer() {
+    OpenOffer() {
 
         let that = this;
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
         $(".category[state='1']").each(function (i, cat) {
             let tab = cat.title;
-            $('<li class="tab_inserted"><a cat="'+cat.id+'" data-toggle="tab" contenteditable="true"  data-translate="'+md5(tab)+'"  href="#'+tab+'"' +
-                ' style="margin:1px;">'+cat.title+'</a>' +
+            $('<li class="tab_inserted"><a cat="'+cat.id+'" data-toggle="tab" data-translate="'+md5(tab)+'"  href="#'+tab+'"' +
+                ' style="color:grey;margin:1px;">'+cat.title+'</a>' +
                 '</li>').insertBefore($('#add_tab_li'));
             $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
                 '</div>').insertBefore($('#add_tab_div'));
@@ -50,6 +48,7 @@ class OfferEditor{
 
         this.offer =  window.user.offer.stobj;
         this.location = window.user.offer.stobj.location;
+        this.supuid = window.user.offer.stobj.supuid;
 
         $('.dropdown').css('visibility','visible');
         $('#order_menu_button').css('visibility','visible');
@@ -60,6 +59,11 @@ class OfferEditor{
 
         $("#offer_editor").css('display','block');
         $("#offer_editor").resizable();
+
+         $("#offer_editor").find('.avatar').on('click touchstart',function () {
+             $("#offer_editor").find('.browser').css('display', 'block');
+             $("#offer_editor").find('.modal-content').css('display','none');
+         });
 
         function selectText(el) {
             $(el).focus();
@@ -94,7 +98,8 @@ class OfferEditor{
                 $(menu_item).find(':checkbox').attr('id', 'item_cb_' + i);
                 $(menu_item).find(':checkbox').attr('pos', i);
                 $(menu_item).find(':checkbox').attr('tab', tab);
-                $('.btn').css('visibility','visible');
+
+                $(menu_item).find('.item_cb').css('visibility','visible');
 
                 if (this.offer.data[tab][i].checked == 'true') {
                     $(menu_item).find(':checkbox').prop('checked', true);
@@ -122,19 +127,20 @@ class OfferEditor{
                 $(menu_item).find('.item_title').attr('contenteditable', 'true');
 
                 $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                $(menu_item).find('.content_text').attr('data-translate',this.offer.data[tab][i].content);
-                if(this.offer.data[tab][i].content)
+                if(this.offer.data[tab][i].content_text)
+                    $(menu_item).find('.content_text').attr('data-translate',this.offer.data[tab][i].content_text.value);
+                if(this.offer.data[tab][i].content_text)
                     $(menu_item).find('.content_text').css('visibility','visible');
-                if(this.offer.data[tab][i].width)
-                    $(menu_item).find('.content_text').css('width',this.offer.data[tab][i].width);
+                if(this.offer.data[tab][i].content_text && this.offer.data[tab][i].content_text.width)
+                    $(menu_item).find('.content_text').css('width',this.offer.data[tab][i].content_text.width);
 
-                if(this.offer.data[tab][i].position)
-                    $(menu_item).find('.content_text').css('left',this.offer.data[tab][i].position.left);
+                if(this.offer.data[tab][i].content_text && this.offer.data[tab][i].content_text.left)
+                    $(menu_item).find('.content_text').css('left',this.offer.data[tab][i].content_text.left);
 
                 if(this.offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img.src);
-                    $(menu_item).find('.img-fluid').css('left',this.offer.data[tab][i].img.left?this.offer.data[tab][i].img.left:0);
+                    $(menu_item).find('.img-fluid').css('left', this.offer.data[tab][i].img.left);
                     $(menu_item).find('.img-fluid').css('top',this.offer.data[tab][i].img.top?this.offer.data[tab][i].img.top:0);
 
                     $(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
@@ -165,12 +171,13 @@ class OfferEditor{
                             delete pl[pack];
                             $(this).attr('packlist', JSON.stringify(pl));
                         }
-                        $(menu_item).find('.add_pack').css('visibility', 'hidden');
+                        //$(menu_item).find('.add_pack').css('visibility', 'hidden');
                     });
 
                     $(menu_item).find('.item_price').text(data);
-                    $(menu_item).find('.item_price').on('focusout',that, function (ev) {
+                    $(menu_item).find('.item_price').on('focusout',{that:that, mi:$(menu_item)}, function (ev) {
                         $(menu_item).find('.add_pack').css('visibility', 'hidden');
+                        that.OnClickAddPack(ev);
                     });
                 }
                 $(menu_item).find('.item_pack').attr('packlist',JSON.stringify(this.offer.data[tab][i].packlist));
@@ -269,6 +276,7 @@ class OfferEditor{
 
                 $(menu_item).find('li>a[role=packitem]').on('click',{that:that, mi:$(menu_item)}, that.OnClickPack);
 
+                $('a[href="#'+tab+'"]').css('color','blue');
             }
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
@@ -297,7 +305,7 @@ class OfferEditor{
             $.each(res, function (i, item) {
 
                let data = res[i].data;
-               let inv_period = '', inv_qnty = '', tr_disabled='',tr_style = '';
+               let inv_period = '', inv_qnty = '', tr_class='', tr_disabled='',tr_style = '';
                if(res[i].period!==that.offer.period){
                    inv_period = "style='color:red'";
                }
@@ -323,9 +331,8 @@ class OfferEditor{
                         }
 
                         let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find('.item_price').text();
-                        let inv_price="";
                         if(data[kAr[k]].price!==price){
-                            inv_price = "style='color:red'";
+                            tr_class += " inv_price";
                         }
 
                         //if published:
@@ -342,18 +349,18 @@ class OfferEditor{
                             "</td>" +
                             "<td "+ inv_qnty+">"  + data[kAr[k]].qnty + "</td>" +
                             "<td>" + data[kAr[k]].pack + "</td>" +
-                            "<td "+inv_price+">" + data[kAr[k]].price + "</td>" +
+                            "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
                             "<td>" + res[i].address + "</td>" +
                             "<td>" + parseInt(dist) + "</td>" +
                             "<td "+inv_period+">" + res[i].period + "</td>" +
                             "<td class='tablesorter-no-sort'>"+
                             (res[i].comment?"<span class='tacomment'>" + res[i].comment + "</span>":'') +
                             "</td>"+
-                            "<td>" +
-                                // "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
-                                // "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
-                                // "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
-                                // "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
+                            "<td  class='marketer'>" +
+                            //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
+                            //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
+                            //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
+                            //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
                             "</td>" +
                             "<td>" +"0"+ "</td>" +
 
@@ -366,6 +373,11 @@ class OfferEditor{
                             "</td>" +
                             "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
 
+                            if(window.user.profile.profile.type==='marketer'){
+                                $('.marketer').css('display','none');
+                                $('.approve').attr('disabled','true');
+                                $('.complete').attr('disabled','true');
+                            }
                             window.db.GetApproved(date, window.user.uid,res[i].cusuid, kAr[k],function (appr) {
                                 if(appr && appr.data.qnty===res[i].data[kAr[k]].qnty &&
                                     appr.data.price===res[i].data[kAr[k]].price) {
@@ -416,17 +428,16 @@ class OfferEditor{
                                 })
                                 //.tablesorterPager(pagerOptions);
                             },1000);
-
                     }
-
-
-
                 })
                     .catch(function (error) {
                         // ops, mom don't buy it
                         console.log(error.message);
                     });
             });
+
+            window.user.offer.viewer.InitOrders(res);
+
         });
 
         //
@@ -451,18 +462,11 @@ class OfferEditor{
 
         $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
         $("#offer_editor").find('.publish_offer_ctrl').on('click touchstart',this,function (ev) {
-            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true)['remote'],date, ev.data.location, function (obj) {
+            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true)['remote'],date, ev.data, function (obj) {
 
             });
         });
 
-        $("#offer_editor").find('.show_orders_ctrl').off('click touchstart');
-        $("#offer_editor").find('.show_orders_ctrl').on('click touchstart',this,function (ev) {
-            window.db.GetSupOrders(date,window.user.uid,function (objs) {
-                let orderViewer = new OrderViewer();
-                orderViewer.OpenOrderCustomers(objs);
-            });
-        });
 
         $('.close_browser').off('click touchstart');
         $('.close_browser').on('click touchstart', this,  that.CloseMenu);
@@ -511,6 +515,7 @@ class OfferEditor{
             }
         }
 
+        $(menu_item).find('.item_pack').addClass('dropdown-toggle');
         $(menu_item).find('.item_pack').attr('data-toggle','dropdown');
         $(menu_item).find('.pack_list').addClass('dropdown-menu');
         $(menu_item).find('.caret').css('visibility', 'visible');
@@ -521,8 +526,10 @@ class OfferEditor{
         }, that.OnClickPack);
 
         $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
-        $(menu_item).find('.item_pack').text('');
-        $(menu_item).find('.item_price').text('');
+        $(menu_item).find('.item_pack').text(pack);
+        $(menu_item).find('.item_price').text(price);
+
+        $(menu_item).find('.item_pack').dropdown("toggle");
 
     }
 
@@ -540,14 +547,9 @@ class OfferEditor{
     }
 
     OnClickImport(ev){
-        let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
-        let addr = prompt(text);
-        if(addr) {
-            $(ev.target).attr('src', addr);
-        }else{
-            $('input.file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
-            $('input.file').trigger('click');
-        }
+
+        $('input:file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
+        $('input:file').focus().trigger(ev);
 
         this.changed = true;
     }
@@ -565,12 +567,15 @@ class OfferEditor{
                     $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
                     $("#" + el.id).on('load', function (ev) {
                         if (!thumb) {
-                            let k = 200/$("#" + el.id).height();
-                            utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
-                                thumb = true;
-                                $("#" + el.id).attr('src', thmb.src);
-                            });
+                            // let k = 200/$("#" + el.id).height();
+                            // utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
+                            //     thumb = true;
+                            //     $("#" + el.id).attr('src', thmb.src);
+                            // });
+
+                            //$("#" + el.id).attr('thmb', utils.createThumb($("#" + el.id)[0]));
                         }
+
                         that.MakeDraggable(this);
                     });
                 }else if(el.func==='add_cert') {
@@ -587,7 +592,6 @@ class OfferEditor{
         });
 
     }
-
 
     OnClickAddCert(ev){
         let text = $('div[data-translate="3e68ad9b7ced9994b62721c5af7c5fbc"]').text();
@@ -629,7 +633,7 @@ class OfferEditor{
 
         ev.data.changed = true;
 
-        let tab = $('.nav-tabs').find('li.active').find('a').attr('href');
+        let tab = $('#menu_tabs').find('li.active').find('a').attr('href');
         if(!tab)
             return;
 
@@ -640,7 +644,7 @@ class OfferEditor{
         let tmplt = $('#menu_item_tmplt').clone();
         $('#menu_item_tmplt').attr('id', 'menu_item_'+ pos);
         let menu_item = $('#menu_item_'+ pos);
-        $(menu_item).attr("class",'menu_item');
+        $(menu_item).addClass('menu_item');
         $(menu_item).css('display','block');
         $(menu_item).find(':checkbox').attr('id', 'item_cb_' + pos);
         $(menu_item).find(':checkbox').attr('pos', pos);
@@ -682,6 +686,11 @@ class OfferEditor{
                 that.OnClickImport(ev);
                 $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
             }
+        });
+
+        $(menu_item).find('.item_price').on('focusout',{that:that, mi:$(menu_item)}, function (ev) {
+            $(menu_item).find('.add_pack').css('visibility', 'hidden');
+            that.OnClickAddPack(ev);
         });
 
         $(menu_item).find('.add_content').on('click touchstart',function () {
@@ -788,14 +797,14 @@ class OfferEditor{
 
         $('.item_title').trigger('click');
 
-        $('.div_tab_inserted').each(function (index, val) {
+        $('#offer_editor').find('.div_tab_inserted').each((index, val)=> {
 
             $(val).addClass('active');
             let tab = $(val).attr('id');
-            let value = $('a[href="#'+tab+'"]').text();
+            let value = $('a[href="#'+tab+'"]')[0].value;
             let cat;
             if(value) {
-                cat = $('.category[title='+value+']').attr('id');
+                cat = $('.category[title="'+value+'"]').attr('id');
                 if(!cat)
                     cat='1000';
                 that.arCat.push(parseInt(cat));
@@ -809,9 +818,9 @@ class OfferEditor{
                 return true;
             }
 
-            let checked = $(this).find('.menu_item').find(':checkbox').prop('checked');
+            let checked = $(val).find('.menu_item').find(':checkbox').prop('checked');
 
-            let miAr = $(this).find('.menu_item');
+            let miAr = $(val).find('.menu_item');
             offerObj['local'][value] = [];
             offerObj['remote'][value] = [];
 
@@ -822,7 +831,7 @@ class OfferEditor{
 
                 let title = $(miAr[i]).find('.item_title');
                 let key = $(title).attr('data-translate');
-                let text = $(miAr[i]).find('.item_title').text();
+                let text = $(miAr[i]).find('.item_title').val();
 
                 if (text.length === 0 || !text.trim())
                     continue;
@@ -844,7 +853,7 @@ class OfferEditor{
                     let cont_text = $(miAr[i]).find('.content_text');
                     let w = $(cont_text).width();
                     let h = $(cont_text).height();
-                    let pos = $(cont_text).position();
+                    let l = $(cont_text).css('left');
                     let ofs = $(cont_text).offset();
                     key = $(cont_text).attr('data-translate');
                     text = $(cont_text).text().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
@@ -859,35 +868,27 @@ class OfferEditor{
                         window.dict.dict[key][lang] = text;
                         $(cont_text).attr('data-translate',key);
                     }
-                    item.content = key;
-                    item.width = w;
-                    item.height = h;
-                    item.position = pos;
-                    item.offset = ofs;
+                    item.content_text = {value:key};
+                    item.content_text.width = w;
+                    item.content_text.height = h;
+                    item.content_text.left = l;
 
                 }else{
                     if(item.content)
                         delete item.content;
                 }
+                item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                     item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-
-                    item.img.left  = parseInt($(miAr[i]).find('.img-fluid').css('left'));
+                    let left =$(miAr[i]).find('.img-fluid').css('left');
+                    item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
                     item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
 
-                    item.img.position = $(miAr[i]).find('.img-fluid').position();
-                    item.img.offset = $(miAr[i]).find('.img-fluid').offset();
                 }else {
                     delete item.img;
                 }
 
-                item.parent = {
-                    width:$(miAr[i]).width(),
-                    height:$(miAr[i]).height(),
-                    position:$(miAr[i]).position(),
-                    offset:$(miAr[i]).offset()
-                };
 
                 item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
                 if(item.packlist) {
@@ -897,6 +898,7 @@ class OfferEditor{
                     if(!item.price)
                         continue;
                 }
+
 
                 item.cert = [];
                 $.each($(miAr[i]).find('.gallery').children(), function (i, el) {
@@ -915,7 +917,10 @@ class OfferEditor{
                     offerObj['remote'][value].push(item);
                 }
             }
-
+            if(offerObj['remote'][value].length==0)
+                delete offerObj['remote'][value];
+            if(offerObj['local'][value].length==0)
+                delete offerObj['local'][value];
         });
 
         return offerObj;
@@ -940,15 +945,17 @@ class OfferEditor{
 
         if(that.changed) {
             if ($('.menu_item').find('input:checked').length > 0 && window.user.ValidateOffer(items['remote'])) {
-                window.user.PublishOffer(items['remote'], window.user.date, ev.data.location, function (obj) {
+                window.user.PublishOffer(items['remote'], window.user.date, ev.data, function (obj) {
                     window.user.offer.stobj = obj;
                 });
             }
         }
 
-        $("#offer_editor").css('display','none');
+        window.user.profile.SaveProfile();
 
-        $("#offer_editor").find('.tab-pane').empty();
+        window.user.offer.viewer.SaveOrder();
+
+        $("#offer_editor").css('display','none');
 
         $("#offer_editor").off('hide.bs.modal');
         $('.item_title').off('click');

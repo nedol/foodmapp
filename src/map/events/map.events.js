@@ -61,45 +61,47 @@ class MapEvents{
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
                 let period = $('.sel_period').text().split(' - ');
-                if(feature.values_.features.length===1) {
-                    if(feature.values_.features[0].values_.type==='supplier') {
-                        window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.uid, function (obj) {
-                            if (obj !== -1) {
-                                if(window.user.constructor.name==='Supplier')
-                                    window.user.viewer = new OfferViewer(obj.dict);
-                                else if(window.user.constructor.name==='Customer') {
-                                    if(window.user.viewer) {
-                                        window.user.viewer.ovc.remove();
-                                        window.user.viewer = null;
+                if(feature.values_.features) {
+                    if (feature.values_.features.length === 1) {
+                        if (feature.values_.features[0].values_.type === 'supplier') {
+                            window.db.getSupplier(date, period[0], period[1], feature.values_.features[0].values_.object.uid, function (obj) {
+                                if (obj !== -1) {
+                                    if (window.user.constructor.name === 'Supplier')
+                                        window.user.viewer = new OfferViewer(obj.dict);
+                                    if (window.user.constructor.name === 'Deliver')
+                                        window.user.viewer = new OfferViewer(obj.dict);
+                                    else if (window.user.constructor.name === 'Customer') {
+                                        if (!window.user.viewer) {
+                                            window.user.viewer = new OfferOrder();
+                                        }
                                     }
-                                    window.user.viewer = new OfferOrder();
+                                    window.user.viewer.OpenOffer(obj);
                                 }
-                                window.user.viewer.OpenOffer(obj);
-                            }
+                            });
+                        } else if (feature.values_.features[0].values_.type === 'customer') {
+                            window.db.GetSupOrders(date, feature.values_.features[0].values_.object.supuid, function (objs) {
+                                let orderViewer = new OrderViewer();
+                                orderViewer.InitOrders(objs);
+                            });
+                        }
+                    } else {//cluster
+                        var coordinates = [];
+                        $.each(feature.values_.features, function (key, feature) {
+                            coordinates.push(feature.getGeometry().flatCoordinates);
                         });
-                    }else if(feature.values_.features[0].values_.type==='customer'){
-                        window.db.GetSupOrders(date,feature.values_.features[0].values_.object.supuid,function (objs) {
-                            let orderViewer = new OrderViewer();
-                            orderViewer.OpenOrderCustomers(objs);
-                        });
+
+                        var extent = Extent.boundingExtent(coordinates);
+                        var buf_extent = Extent.buffer(extent, 5);
+                        //ol.extent.applyTransform(extent, transformFn, opt_extent)
+                        that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
+
+                        that.map.ol_map.getView().animate({
+                                center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
+                            },
+                            function () {
+
+                            });
                     }
-                }else{//cluster
-                    var coordinates = [];
-                    $.each(feature.values_.features, function (key, feature) {
-                        coordinates.push(feature.getGeometry().flatCoordinates);
-                    });
-
-                    var extent = Extent.boundingExtent(coordinates);
-                    var buf_extent = Extent.buffer(extent, 5);
-                    //ol.extent.applyTransform(extent, transformFn, opt_extent)
-                    that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
-
-                    that.map.ol_map.getView().animate({
-                        center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
-                        },
-                        function () {
-
-                        });
                 }
                 return true;
             });
@@ -134,7 +136,8 @@ class MapEvents{
         this.map.ol_map.on('moveend', function (event) {
 
             if (event)
-                that.map.import.ImportData(event);
+                if(window.user.constructor.name!=='Deliver')
+                    window.user.import.ImportDataByLocation(event);
 
         });
 

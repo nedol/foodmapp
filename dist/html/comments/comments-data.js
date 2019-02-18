@@ -8,7 +8,7 @@ let commentsArray = [
    "pings": [],
    "creator": 6,
    "fullname": "Simon Powell",
-   "profile_picture_url": "../../images/user.png",
+   "profile_picture_url": "../images/user.png",
    "created_by_admin": false,
    "created_by_current_user": false,
    "upvote_count": 3,

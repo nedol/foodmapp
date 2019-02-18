@@ -41,8 +41,11 @@ module.exports = class D2D {
                     case 'confirmem':
                         this.ConfirmEmail(q, res);
                         break;
-                    case 'regsupplier':
-                        this.RegSupplier(q, res);
+                    case 'reguser':
+                        this.RegUser(q, res);
+                        break;
+                    case 'updprofile':
+                        this.UpdProfile(q, res);
                         break;
                     case 'auth':
                         this.Auth(q, res);
@@ -101,6 +104,7 @@ module.exports = class D2D {
                 }
             } catch (ex) {
                 console.log(ex);
+                res.end(JSON.stringify({err:ex}));
             }
         }
     }
@@ -110,7 +114,7 @@ module.exports = class D2D {
         let that = this;
         let sql = "SELECT user.*" +
             " FROM "+q.user.toLowerCase()+" as user" +
-            " WHERE user.email='" + q.email + "'";
+            " WHERE user.email='"+q.email+"'";
 
         global.con_obj.query(sql, function (err, result) {
             if (err)
@@ -123,7 +127,7 @@ module.exports = class D2D {
                     'Cache-Control': 'no-cache',
                     'Connection': 'keep-alive'
                 });
-                res.end(JSON.stringify({"msg":"msg"}));
+                res.end(JSON.stringify({"err":"указанный email адрес используется в системе"}));
 
             } else {
                 let values, sql, uid;
@@ -132,12 +136,69 @@ module.exports = class D2D {
 
                 res.writeHead(200, {'Content-Type': 'application/json'});
 
-                let em = new Email();
-                let html = "<a href='http://localhost:63342/door2door/dist/"+q.user.toLowerCase()+".html?uid=" + uid + "&email=" + q.email + "&lang=ru'><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+                values = [uid, psw, 'tariff',q.promo];
+                sql = "INSERT INTO "+q.user.toLowerCase()+" SET  uid=?, psw=?, tariff=? ,promo=?";
+                global.con_obj.query(sql, values, function (err, result) {
+                    if (err) {
+                        res.end(JSON.stringify({err:'Неверные данные'}));
+                        return;
+                    }
 
-                em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
-                    res.end(JSON.stringify({email: q.email}));
+                    let em = new Email();
+                    let html = "<a href=" + requrl + "/door2door/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+
+                    em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
+                        res.end(JSON.stringify({uid: uid, psw: psw, email: q.email}));
+                    });
                 });
+            }
+        });
+    }
+
+
+    RegUser(q, res) {
+
+        let that = this;
+
+        var sql =  "SELECT user.*, COUNT(em.email) as em_cnt"+
+            " FROM "+q.user.toLowerCase()+" as user, (SELECT email FROM "+q.user.toLowerCase()+" WHERE email='"+q.profile.email+"') as em"+
+            " WHERE  uid='"+q.uid+"' AND psw='"+q.psw+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (err) {
+                res.end();
+                return;
+            }
+            res.writeHead(200, {
+                'Content-Type': 'text/event-stream; charset=utf-8',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive'
+            });
+            if (result.length === 0) {
+                res.end(JSON.stringify({"err": "Аккаунт не используется в системе"}));
+
+            } else {
+                if(result[0].em_cnt>0){
+                    res.end(JSON.stringify({"err": "Email уже используется в системе"}));
+                    return;
+                }
+                let values, sql;
+                if(md5(q.profile.email)===q.uid)
+                    that.replaceImg_2(q.profile.avatar,function (avatar) {
+
+                        q.profile.avatar = avatar;
+                        values = [q.profile.email,JSON.stringify(q.profile),result[0].id];
+                        sql = "UPDATE  "+q.user.toLowerCase()+"  SET  email=?, profile=? WHERE id=?";
+                        global.con_obj.query(sql, values, function (err, res_upd) {
+
+                            if (err) {
+                                res.end(JSON.stringify({err:err}));
+                                return;
+                            }
+                            res.end(JSON.stringify({id:result[0].id,promo:result[0].promo}));
+                        });
+
+                    });
             }
         });
     }
@@ -194,44 +255,6 @@ module.exports = class D2D {
         });
     }
 
-    UpdateOffer(q, res){
-        let that = this;
-        let now = moment().format('YYYY-MM-DD h:mm:ss');
-        let sql =
-            "SELECT of.id as offer_id, sup.email as supuid, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
-            " FROM  supplier as sup, offers as of"+
-            " WHERE of.supuid=sup.uid AND sup.uid=\""+q.uid+"\" AND sup.psw=\""+q.psw +"\""+
-            " AND of.date=\""+q.date+"\" AND of.published IS NOT NULL AND of.deleted IS NULL"+
-            " ORDER BY of.id DESC";
-
-        global.con_obj.query(sql, function (err, sel) {
-            if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err: err}));
-                return;
-            }
-            let values, sql;
-            if(sel.length>0) {
-                if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
-                    let offer = urlencode.decode(q.offer);
-                    that.replaceImg(offer,function (offer) {
-                        values = [offer, q.location[1], q.location[0], sel[0].offer_id];
-                        sql = "UPDATE offers SET data='"+offer+"', latitude='"+q.location[1]+"', longitude='"+q.location[0]+"' WHERE id='"+sel[0].offer_id+"'";
-                        that.updateOfferDB(q, res, sql, values, now);
-                    });
-                }
-
-            }else {
-                let offer = urlencode.decode(q.offer);
-                that.replaceImg(offer,function (offer) {
-                    values = [q.uid,offer,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
-                    sql = 'INSERT INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
-                    that.updateOfferDB(q, res, sql, values,now);
-                });
-            }
-
-        });
-    }
 
     updateOfferDB(q, res, sql, values,now){
         let that = this;
@@ -277,13 +300,17 @@ module.exports = class D2D {
                 }
                 offer = offer.replace(ofobj[tab][item].img.src,requrl+'/door2door/server/images/'+hash);
             }
-            cb(offer);
         }
-
+        cb(offer);
     }
 
     replaceImg_2(src, cb) {
-        if(!src || src.includes(requrl)>0){
+        try {
+            if (!src || src.includes(requrl) > 0) {
+                cb(src);
+                return;
+            }
+        }catch(ex){
             cb(src);
             return;
         }
@@ -300,7 +327,7 @@ module.exports = class D2D {
         let sql = " SELECT sup.email as email" +
             " FROM supplier as sup" +
             " WHERE" +
-            " sup.email<>\'"+q.email+"\'"
+            " sup.email<>\'"+q.email+"\'"+
             " AND SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
             " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
             " UNION" +
@@ -470,7 +497,7 @@ module.exports = class D2D {
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT of.date as date, of.period as period, sup.uid as uid, of.categories as cats, " +
-            " of.latitude as lat, of.longitude as lon, of.data as data, sup.dict as dict, sup.profile as profile," +
+            " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, sup.dict as dict, sup.profile as profile," +
             " sup.rating as rating, " +
             "apprs.totals as apprs"+//общее кол-во подтверждений
             " FROM  supplier as sup, offers as of," +

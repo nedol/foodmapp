@@ -15,53 +15,55 @@ var intersection = require('array-intersection');
 
 var requrl = '';
 
+const IMG_SIZE_LIMIT = 500000;
+
 module.exports = class Supplier extends D2D{
+
 
     constructor(){
         super()
+
     }
 
-    RegSupplier(q, res) {
+
+    UpdProfile(q, res) {
 
         let that = this;
 
         var sql =  "SELECT sup.*"+
             " FROM  supplier as sup"+
-            " WHERE sup.email='"+q.email+"'";
+            " WHERE sup.uid='"+q.uid+"' AND sup.psw='"+q.psw+"'";
 
         global.con_obj.query(sql, function (err, result) {
             if (err)
                 throw err;
 
             if (result.length > 0) {
-
-                res.writeHead(200, {
-                    'Content-Type': 'text/event-stream; charset=utf-8',
-                    'Cache-Control': 'no-cache',
-                    'Connection': 'keep-alive'
-                });
-                res.end(JSON.stringify({"msg":"msg"}));
-
-            } else {
                 let values, sql;
-                that.replaceImg_2(q.profile.avatar,function (avatar) {
-                    q.profile.avatar = avatar
-                    values = [q.uid, q.psw, JSON.stringify(q.profile), 'tariff'];
-                    sql = "INSERT INTO supplier SET  uid=?, psw=?, profile=?, tariff=?";
-                    global.con_obj.query(sql, values, function (err, result) {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        if (err) {
-                            res.end();
-                            return;
-                        }
-                        res.end(JSON.stringify(values));
+                if(q.profile.avatar.length<IMG_SIZE_LIMIT && q.profile.thmb.length<IMG_SIZE_LIMIT) {
+                    that.replaceImg_2(q.profile.avatar, function (avatar) {
+                        that.replaceImg_2(q.profile.thmb, function (thmb) {
+                            q.profile.avatar = avatar;
+                            q.profile.thmb = thmb;
+                            q.profile.email = result[0].email;
+                            values = [q.uid, q.psw, JSON.stringify(q.profile), result[0].tariff];
+                            sql = "UPDATE supplier SET  uid=?, psw=?, profile=?, tariff=?";
+                            global.con_obj.query(sql, values, function (err, result) {
+                                res.writeHead(200, {'Content-Type': 'application/json'});
+                                if (err) {
+                                    res.end();
+                                    return;
+                                }
+                                res.end(JSON.stringify(values));
+                            });
+                        });
                     });
-                });
-
+                }else{
+                    res.end(JSON.stringify({"err":"Превышен размер изображения"}));
+                }
             }
         });
     }
-
 
     Auth(q, res, req) {
         let values, sql, uid;
@@ -89,13 +91,33 @@ module.exports = class Supplier extends D2D{
         });
 
     }
+    OnClickUserProfile(li){
 
+        $('#profile_container').css('display','block');
+        $('#profile_container iframe').attr('src',"../src/profile/profile.customer.html");
+        $('#profile_container iframe').off();
+        $('#profile_container iframe').on('load',function () {
+            $('#profile_container iframe')[0].contentWindow.InitProfileUser();
+
+            $('.close_browser',$('#profile_container iframe').contents()).on('touchstart click', function (ev) {
+                $('#profile_container iframe')[0].contentWindow.profile_cus.Close();
+                $('#profile_container').css('display', 'none');
+            });
+        });
+        this.MakeDraggable($( "#profile_container" ));
+        $( "#profile_container" ).resizable({});
+
+
+
+        //this.MakeDraggable($('body', $('#profile_container iframe').contents()));
+
+    }
 
     UpdateOffer(q, res){
         let that = this;
         let now = moment().format('YYYY-MM-DD h:mm:ss');
         let sql =
-            "SELECT of.id as offer_id, sup.email as supuid, DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "SELECT of.*" +
             " FROM  supplier as sup, offers as of"+
             " WHERE of.supuid=sup.uid AND sup.uid=\""+q.uid+"\" AND sup.psw=\""+q.psw +"\""+
             " AND of.date=\""+q.date+"\" AND of.published IS NOT NULL AND of.deleted IS NULL"+
@@ -107,14 +129,34 @@ module.exports = class Supplier extends D2D{
                 res.end(JSON.stringify({err: err}));
                 return;
             }
-            let values, sql;
+            let values;
             if(sel.length>0) {
                 if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
                     let offer = urlencode.decode(q.offer);
                     that.replaceImg(offer,function (offer) {
-                        values = [offer, q.location[1], q.location[0], sel[0].offer_id];
-                        sql = "UPDATE offers SET data='"+offer+"', latitude='"+q.location[1]+"', longitude='"+q.location[0]+"' WHERE id='"+sel[0].offer_id+"'";
-                        that.updateOfferDB(q, res, sql, values, now);
+                        values = [offer, q.location[1], q.location[0], q.radius, sel[0].id];
+                        let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, radius=? WHERE id=?";
+                        that.updateOfferDB(q, res, sql_upd, values, now);
+                    });
+                }
+                if(sel[0].prolong>0){
+                    let date = moment(q.date).add(sel[0].prolong, 'days').format('YYYY-MM-DD');
+
+                    let sql_ins = "REPLACE INTO offers SET ";
+                    for(let key in sel[0]){
+                        if(key==='id')
+                            continue;
+                        if(key==='date')
+                            sql_ins += key+"='"+date+"',";
+                        else
+                            sql_ins += key+"='"+sel[0][key]+"',";
+                    }
+                    sql_ins = sql_ins.replace(/,(\s+)?$/, '');
+                    global.con_obj.query(sql_ins,function (err, sel) {
+                        if (err) {
+                            res.end(JSON.stringify({err: err}));
+                            return;
+                        }
                     });
                 }
 
@@ -122,7 +164,7 @@ module.exports = class Supplier extends D2D{
                 let offer = urlencode.decode(q.offer);
                 that.replaceImg(offer,function (offer) {
                     values = [q.uid,offer,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
-                    sql = 'INSERT INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
+                    sql = 'REPLACE INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
                     that.updateOfferDB(q, res, sql, values,now);
                 });
             }
@@ -140,28 +182,30 @@ module.exports = class Supplier extends D2D{
             }else {
                 values = [q.dict, q.uid];
                 sql = "UPDATE supplier SET dict=?  WHERE uid=?";
-                global.con_obj.query(sql, values, function (err, res_1){
-                    that.BroadcastOffer(q, res, function () {
-                        if (!res._header)
-                            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-                        if (res.writable)
-                            res.end(JSON.stringify({result: result,published:now}));
+                setTimeout(function () {
+                    global.con_obj.query(sql, values, function (err, res_1){
+                        that.BroadcastOffer(q, res, function () {
+                            if (!res._header)
+                                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+                            if (res.writable)
+                                res.end(JSON.stringify({result: result,published:now}));
+                        });
                     });
-                });
+                },100);
             }
         });
     }
 
     BroadcastOffer(q, res, cb){
 
-        let sql = " SELECT sup.email as email" +
+        let sql = " SELECT sup.uid as uid" +
             " FROM supplier as sup" +
             " WHERE" +
-            " sup.email<>\'"+q.email+"\'"
+            " sup.uid<>\'"+q.uid+"\'"+
             " AND SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
             " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
             " UNION" +
-            " SELECT cus.email as email" +
+            " SELECT cus.uid as uid" +
             " FROM customer as cus" +
             " WHERE " +
             " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
@@ -176,7 +220,7 @@ module.exports = class Supplier extends D2D{
             }
             if(sel.length>0){
                 for(let r in sel){
-                    let sse = resObj[sel[r].email];
+                    let sse = resObj[sel[r].uid];
                     if(sse){
                         sse.write(utils.formatSSE({"func":"supupdate","obj":q}));
                     }
@@ -329,19 +373,18 @@ module.exports = class Supplier extends D2D{
                 res.end(JSON.stringify({'err': err}));
                 return;
             }
-            let days = q.settings.prolong?7:0;
 
             that.replaceImg_2(q.profile.avatar,function (path) {
                 q.profile.avatar = path;
-                let values = [days, JSON.stringify(q.profile)];
-                sql = " UPDATE   supplier  SET prolong=?, profile=?"+
+                let values = [JSON.stringify(q.profile)];
+                sql = " UPDATE   supplier  SET  profile=?"+
                     " WHERE supplier.uid = '" + q.uid+"'";
                 global.con_obj.query(sql, values,function (err, result) {
                     if (err) {
                         res.end(JSON.stringify({'err': err}));
                         return;
                     }
-                    res.end(JSON.stringify({prolong:q.settings.prolong}));
+                    res.end();
                 });
             });
         });
@@ -453,9 +496,9 @@ module.exports = class Supplier extends D2D{
             " FROM  supplier as sup, offers as off"+
             " WHERE sup.uid = '"+ q.uid+"' AND sup.psw = '"+q.psw+"'" +
             " AND off.supuid=sup.uid " +
-            " AND off.date<(NOW() + INTERVAL sup.prolong DAY)"+
+            " AND off.date<(NOW() + INTERVAL off.prolong DAY)"+
             " AND off.date>NOW()"+
-            " AND sup.prolong>0";
+            " AND off.prolong>0";
         global.con_obj.query(sql, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {

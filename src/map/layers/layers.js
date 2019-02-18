@@ -5,14 +5,20 @@ import srcVector from 'ol/source/vector';
 import BingMaps from 'ol/source/bingmaps';
 import TileLayer from 'ol/layer/tile';
 import OSM from 'ol/source/osm';
+import proj from 'ol/proj';
 import Cluster from 'ol/source/cluster';
-import Style from 'ol/style/style';
-import Icon from 'ol/style/icon';
-import Fill from 'ol/style/fill';
+import _ol_style_Style_ from 'ol/style/style';
+import _ol_style_Circle_ from 'ol/style/circle';
+import _ol_style_Icon_ from 'ol/style/icon';
+import _ol_style_Fill_ from 'ol/style/fill';
 import Text from 'ol/style/text';
-import Stroke from 'ol/style/stroke';
-
-
+import _ol_style_Stroke_ from 'ol/style/stroke';
+import RegularShape from 'ol/style/regularshape';
+import Draw from 'ol/interaction/draw';
+import Snap from 'ol/interaction/snap';
+import Circle from 'ol/geom/circle';
+import Collection from 'ol/collection';
+import Feature from 'ol/feature';
 import {utils} from "../../utils/utils";
 import source from 'ol/source/source';
 import Observable from 'ol/observable';
@@ -26,7 +32,7 @@ class Layers {
         let that = this;
         this.ar = [];
         this.flag = true;
-
+        that.circleLayer;
 
         try {
             //osm.setVisible(false);
@@ -51,8 +57,22 @@ class Layers {
 
             let map_strg = localStorage.getItem("map");
 
-            // if(map_strg)
-            //     SetMapVisible(map_strg);
+            if(!that.circleLayer) {
+                that.circleLayer = new layerVector({
+                    source: new srcVector(),
+                    style: new _ol_style_Style_({
+                        fill: new _ol_style_Fill_({
+                            color: 'rgba(255, 255, 255, 0.3)'
+                        }),
+                        stroke: new _ol_style_Stroke_({
+                            color: '#ff6579',
+                            width: 1
+                        })
+                    })
+                });
+            }
+            that.map.ol_map.getLayers().push(that.circleLayer);
+            that.map.ol_map.getLayers().set('radius', that.circleLayer, true);
 
             $(".category").each(function (i, el) {
                 let cat = $(el).attr("id");
@@ -98,10 +118,12 @@ class Layers {
             features: features
         });
 
+
         let clusterSource = new Cluster({
             distance: 100,//parseInt(50, 10),
             source: vectorSource
         });
+        let id_str='';
 
         let vectorLayer = new layerVector({
             map_type: false,
@@ -113,9 +135,15 @@ class Layers {
                 let period = $('.sel_period').text().split(' - ');
                 let features = cluster_feature.values_.features;
                 let rem_feat = [];
-                if (features.length > 0) {
-                    $.each(features, function (key, feature) {
-                        let id_str = feature.getId();
+                if (features && features.length > 0){
+
+                    $.each(features,  (key, feature)=> {
+                        if(feature.getId()===id_str)
+                            return;
+                        id_str = feature.getId();
+                        setTimeout(function () {
+                            id_str = '';
+                        },300);
                         window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.uid,function (res) {
                             if(res!==-1) {
                                 if (feature.values_.object.date === window.user.date) {
@@ -124,11 +152,40 @@ class Layers {
                                     if (feature.values_.object.date === window.user.date) {
                                         cluster_feature.setStyle(style);
 
+
+                                    if(window.user.constructor.name==="Customer") {
+                                        if(feature.values_.object.profile.type==='marketer')
+                                            return;
+
+                                        let source = that.circleLayer.getSource();
+
+                                        let radiusFeature='';
+                                        if(feature.values_.object.radius_feature) {
+                                            radiusFeature = feature.values_.object.radius_feature;
+                                        }else {
+                                            radiusFeature = new Feature({
+                                                geometry: new Circle(proj.fromLonLat([res.longitude, res.latitude]), res.radius)
+                                                //name: cursor.value.title ? cursor.value.title : "",
+                                                //tooltip: cursor.value.title ? cursor.value.title : "",
+                                            });
+                                            source.addFeature(radiusFeature);
+                                            feature.values_.object.radius_feature = radiusFeature;
+
+                                            let col = new Collection();
+                                            col.push(radiusFeature);
+                                            let draw = new Draw({
+                                                geometryName: 'circle',
+                                                source: source,
+                                                type: 'Circle',
+                                                features: col
+                                            });
+                                        }
+
+                                    }
+
                                     } else {
                                         vectorSource.removeFeature(feature);
                                     }
-
-
                                 }else{
                                     vectorSource.removeFeature(feature);
                                 }
@@ -136,23 +193,6 @@ class Layers {
                                 vectorSource.removeFeature(feature);
                             }
                         });
-                        // if(feature.values_.object.supuid && feature.values_.object.cusuid) {
-                        //     window.db.GetOrder(window.user.date, feature.values_.object.supuid, feature.values_.object.cusuid, function (res) {
-                        //         if (res !== -1) {
-                        //             if (feature.values_.object.date === window.user.date) {
-                        //                 let style = getObjectStyle(feature.values_.object);
-                        //
-                        //                 if (style)
-                        //                     cluster_feature.setStyle(style);
-                        //             } else {
-                        //                 vectorSource.removeFeature(feature);
-                        //             }
-                        //         } else {
-                        //             vectorSource.removeFeature(feature);
-                        //         }
-                        //     });
-                        // }
-
                     });
                 }
 
@@ -160,93 +200,122 @@ class Layers {
 
                     if (!obj || parseInt(obj.status) === 0)
                         return null;
-
+                    let source = that.circleLayer.getSource();
                     let logo = '';
                     let scale = 1;
 
                     logo = obj.logo;
-                    scale = .3;//Map.getView().getZoom()/obj.ambit;
-
+                    scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/300;
+                    if(window.user.constructor.name==='Customer'
+                        && obj.profile.type==='marketer'){
+                        if(that.map.ol_map.getView().getZoom()<16)
+                            return;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/500;
+                    }
                     let opacity;
                     if ( obj.apprs<1)
-                        opacity = 0.2;
+                        opacity = 0.9;
                     else
                         opacity = 1.0
 
-                    let icon = new Icon(/** @type {olx.style.IconOptions} */ ({
-                        //size: [50,40],
-                        //img: img ? [img.width, img.height] : undefined,
+                    var stroke = new _ol_style_Stroke_({color: 'black', width: 2});
+                    var fill = new _ol_style_Fill_({color: 'red'});
+                    let image = new RegularShape({
+                        fill: fill,
+                        stroke: stroke,
+                        points: 5,
+                        radius: 10,
+                        radius2: 4,
+                        angle: 0
+                    });
+
+                    let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
+                        //size: [100,100],
+                        //img: image,
+                        //imgSize:
                         scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [0, 0],
+                        anchor: [20, 20],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
                         anchorYUnits: 'pixel',
                         color: [255, 255, 255, 1],
                         opacity: opacity,
-                        src: obj.profile.avatar
+                        src: obj.profile.thmb?obj.profile.thmb:"./images/truck.png"
+                    }));
+                    let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
+                        //size: [100,100],
+                        //img: image,
+                        //imgSize:
+                        scale: .3, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        anchor: [20, 20],
+                        anchorOrigin: 'bottom-left',
+                        offset: [0, 0],
+                        anchorXUnits: 'pixel',
+                        anchorYUnits: 'pixel',
+                        color: [255, 255, 255, 1],
+                        opacity: opacity,
+                        src: "./images/truck.png"
                     }));
                     let iconStyle;
                     if (features.length > 1) {//cluster
-                        iconStyle = new Style({
+                        iconStyle = new _ol_style_Style_({
                             text: new Text({
                                 text: cluster_feature.values_.features.length.toString(),
                                 font: '12px serif',
                                 align: 'right',
-                                scale: 1.2,
-                                offsetX: 40,
+                                //scale: .1,
+                                offsetX: 25,
                                 offsetY: -5,
-                                fill: new Fill({
+                                fill: new _ol_style_Fill_({
                                     color: 'blue'
                                 }),
-                                stroke: new Stroke({
+                                stroke: new _ol_style_Stroke_({
                                     color: 'white',
                                     width: 2
                                 })
                             }),
-                            image: icon,
-                            zIndex: 2
+                            image: iconCluster,
+                            zIndex: 20
                         });
+
+                        source.clear();
                     } else {
 
-                        iconStyle = new Style({
+                        iconStyle = new _ol_style_Style_({
                             text: new Text({
                                 text: (obj.overlay === '' || !obj.overlay ? obj.title : ''),
                                 font: '8px serif',
                                 align: 'center',
-                                scale: 1.5,
+                                //scale: 1.5,
                                 offsetX: 15,
                                 offsetY: 0,
                                 baseline: 'top',
-                                fill: new Fill({
+                                fill: new _ol_style_Fill_({
                                     color: 'red'
                                 }),
-                                stroke: new Stroke({
+                                stroke: new _ol_style_Stroke_({
                                     color: 'white',
                                     width: 2
                                 })
                             }),
-                            image: icon,
-                            zIndex: 2
+                            image: iconItem,
+                            zIndex: 20
                         });
+                        try {
+                            if (obj.radius_feature)
+                                source.addFeature(obj.radius_feature);
+                        }catch (ex){
+
+                        }
+
                     }
 
 
-                    // setTimeout(function (feature,style) {
-                    //     style.setImage( new ol.style.Icon({
-                    //         src: ic_8,
-                    //         rotateWithView: true,
-                    //         anchor: [.5, .5],
-                    //         anchorXUnits: 'pixel', anchorYUnits: 'pixel',
-                    //         opacity: 1
-                    //     }));
-                    //     feature.setStyle(style); !!!
-                    // },100,cl_feature, iconStyle);
-
-
+                    //circle_style.image_.setScale(that.map.ol_map.getView().getZoom());
                     //TODO
-                    let shadowStyle = new Style({
-                        stroke: new Stroke({
+                    let shadowStyle = new _ol_style_Style_({
+                        stroke: new _ol_style_Stroke_({
                             color: 'rgba(0,0,0,0.5)',
                             width: 100
                         }),
@@ -269,6 +338,7 @@ class Layers {
             this.map.ol_map.getLayers().push(vectorLayer);
             this.map.ol_map.getLayers().set(cat, vectorLayer, true);
         }
+
 
         vectorLayer.setProperties({opacity: 1.0, contrast: 1.0});//setBrightness(1);
         vectorLayer.setVisible(state === '0' ? false : true);
@@ -300,11 +370,11 @@ class Layers {
                 let radius = ol.easing.easeOut(elapsedRatio) * 25 + 5;
                 let opacity = ol.easing.easeOut(1 - elapsedRatio);
 
-                let style = new Style({
-                    image: new ol.style.Circle({
+                let style = new _ol_style_Style_({
+                    image: new _ol_style_Circle_({
                         radius: radius,
                         snapToPixel: false,
-                        stroke: new Stroke({
+                        stroke: new _ol_style_Stroke_({
                             color: 'rgba(255, 0, 0, ' + opacity + ')',
                             width: 0.25 + opacity
                         })

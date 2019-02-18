@@ -6,21 +6,24 @@ var isJSON = require('is-json');
 
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
-import {Network} from "../../network";
+require('bootstrap');
 
-//import {RTCOperator} from "../rtc/rtc_operator"
+import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
+let moment = require('moment');
 import {OLMap} from '../map/map'
-
 
 import proj from 'ol/proj';
 import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
 
 import {Overlay} from "../map/overlay/overlay";
-import {SupplierMenu} from "../menu/SupplierMenu";
+
 import {Profile} from "../profile/profile";
 
+import {Import} from "../import/import";
+import {OfferEditor} from "../offer/offer.editor";
 
 let md5 = require('md5');
 
@@ -30,7 +33,6 @@ var ColorHash = require('color-hash');
 
 require('bootstrap');
 require('bootstrap-select');
-var moment = require('moment/moment');
 
 require('bootstrap/js/modal.js');
 
@@ -43,16 +45,19 @@ class Supplier{
 
         this.my_truck_ovl;
 
-        this.offer = new Offer(uObj);
+        this.offer = new Offer(this.date,uObj);
+        this.editor = new OfferEditor();//offer editor
 
         this.uid = uObj.set.uid;
         this.psw = uObj.set.psw;
         this.email = uObj.set.profile.email;
 
         this.profile = new Profile(uObj.set.profile);
+        this.profile.InitSupplierProfile();
 
         this.map = new OLMap();
-        this.menu = new SupplierMenu(this);//TODO:
+
+        this.import = new Import(this.map);
 
         this.isShare_loc = false;
 
@@ -83,7 +88,7 @@ class Supplier{
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
-        $('.open_off_editor').on('click touch', this, this.offer.OpenOfferEditor);
+        $('.open_off_editor').on('click touch', this, this.editor.OpenOffer);
         $('.open_my_profile').on('click touch', this, this.profile.OpenMyProfile);
 
         this.DateTimePickerEvents();
@@ -171,15 +176,24 @@ class Supplier{
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
                 if(layer.constructor.name==="_ol_layer_Vector_") {
-                    var features = layer.getSource().getFeatures();
-                    features.forEach((feature) => {
-                        layer.getSource().removeFeature(feature);
-                    });
+                    if(layer.getSource()) {
+                        let features = layer.getSource().getFeatures();
+                        features.forEach((feature) => {
+                            layer.getSource().removeFeature(feature);
+                        });
+                    }
                 }
             });
 
+            $('.sel_period').text('06:00 - 24:00');
+
+            if(!window.user.email)
+                return;
+
             $('#my_truck').css('visibility','visible');
 
+            let source = that.map.layers.circleLayer.getSource();
+            source.clear();
 
             if(that.my_truck_ovl) {
                 that.my_truck_ovl.RemoveOverlay();
@@ -197,17 +211,21 @@ class Supplier{
             that.offer.GetOfferDB(that.date, function (res) {
                 if(!res) {//TODO:
                     that.offer.GetOfferDB('tmplt',function (res) {
-                        that.offer.stobj = res;
-                        that.offer.stobj.date = that.date;
-                        delete that.offer.stobj.published;
+                        if(!res){
+                            that.offer.stobj = {date:that.date}
+                        }else{
+                            that.offer.stobj = res;
+                            that.offer.stobj.date = that.date;
+                            delete that.offer.stobj.published;
+                        }
                     });
 
                 }else {
                     that.offer.stobj = res;
                 }
 
-                if(that.offer.stobj.location) {
-                    that.map.MoveToLocation(that.offer.stobj.location);
+                if(that.offer.stobj && that.offer.stobj.location) {
+
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
                     let status;
@@ -216,13 +234,60 @@ class Supplier{
                     else
                         status = 'published';
                     $(my_truck_2).addClass(status);
-                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj.location);
-                    $('#my_truck').css('visibility', 'hidden');
+                    if(that.profile.profile.type==='marketer')
+                        $(my_truck_2).attr('src',that.profile.profile.avatar);
+                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
+                    $('#my_truck').on('click touchstart', (ev)=> {
+                        if(that.offer.stobj.location)
+                            that.map.MoveToLocation(that.offer.stobj.location);
+                    });
+
+
+                    setTimeout(()=>{
+                        that.map.MoveToLocation(that.offer.stobj.location);
+                    },300);
+
                 }
+
+                $('#map').on('drop',function (ev) {
+                    ev.preventDefault();
+
+                    let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
+                    let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
+                    window.user.offer.stobj.location = coor;
+                    if(!that.my_truck_ovl) {
+                        let my_truck_2 = $('#my_truck').clone()[0];
+                        $(my_truck_2).attr('id', 'my_truck_2');
+                        if(that.profile.profile.type==='marketer')
+                            $(my_truck_2).attr('src',that.profile.profile.avatar);
+                        let status;
+                        if (!that.offer.stobj.published)
+                            status = 'unpublished';
+                        else
+                            status = 'published';
+                        $(my_truck_2).addClass(status);
+                        that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
+                        //$('#my_truck').css('visibility', 'hidden');
+                    }
+
+                    that.my_truck_ovl.overlay.values_.position = coor;
+                    that.my_truck_ovl.overlay.changed();
+                    if(that.my_truck_ovl.modify) {
+                        that.my_truck_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
+                        that.my_truck_ovl.modify.changed();
+                    }
+
+                    window.db.GetOffer(window.user.date,function (of) {
+                        of.location = coor;
+                        window.db.SetObject('offerStore',of,res=>{
+
+                        });
+                    })
+                });
 
             });
 
-            that.map.import.GetOrderSupplier(function () {
+            that.import.GetOrderSupplier(function () {
                 window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
 
                     let type = 'customer';
@@ -256,7 +321,7 @@ class Supplier{
                 });
             });
 
-            that.map.import.GetApprovedSupplier(function (res) {
+            that.import.GetApprovedSupplier(function (res) {
 
             });
         });
@@ -269,22 +334,6 @@ class Supplier{
             ev.preventDefault();
         });
 
-        $('#map').on('drop',function (ev) {
-            ev.preventDefault();
-            if(that.my_truck_ovl) {
-                that.my_truck_ovl.RemoveOverlay();
-                that.my_truck_ovl = '';
-            }
-            let pixel = [ev.originalEvent.clientX,ev.originalEvent.clientY];
-            let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-            that.offer.stobj.location = coor;
-
-            $('#my_truck').css('visibility','visible');
-            let my_truck_2 = $('#my_truck').clone()[0];
-            $(my_truck_2).attr('id','my_truck_2');
-            that.my_truck_ovl  = new Overlay(that.map,my_truck_2,coor);
-            $('#my_truck').css('visibility','hidden');
-        });
     }
 
     OnClickTimeRange(ev){
@@ -317,12 +366,16 @@ class Supplier{
         if (uObj) {
             for (let tab in offer) {
                 for (let i in offer[tab]) {
-                    if (!this.offer.stobj.data[tab])
-                        uObj.data[tab] = {};
-                    if (this.offer.stobj.data[tab][i] && !offer[tab][i].img_left)
-                        offer[tab][i].img_left = this.offer.stobj.data[tab][i].img_left;
-                    if (this.offer.stobj.data[tab][i] && !offer[tab][i].img_top)
-                        offer[tab][i].img_top = this.offer.stobj.data[tab][i].img_top;
+                    if (!uObj.data[tab]) {
+                        uObj.data[tab] = offer[tab];
+                    }
+                    if(!uObj.data[tab][i]){
+                        uObj.data[tab].push({img:{}});
+                    }
+                    if (offer[tab] && offer[tab][i] && offer[tab][i].img && offer[tab][i].img.left)
+                        uObj.data[tab][i].img.left = offer[tab][i].img.left;
+                    if (offer[tab] && offer[tab][i] && offer[tab][i].img && offer[tab][i].img.top)
+                        uObj.data[tab][i].img.top = offer[tab][i].img.top;
                 }
                 uObj.data[tab] = offer[tab];
                 uObj.period = $('.sel_period').text();
@@ -337,9 +390,6 @@ class Supplier{
             };
         }
 
-        this.offer.SetOfferDB(uObj,dict);
-        //offer template store
-        uObj.date = 'tmplt';
         this.offer.SetOfferDB(uObj,dict);
     }
 
@@ -357,7 +407,7 @@ class Supplier{
     }
 
 
-    PublishOffer(data, date, location, cb){
+    PublishOffer(menu, date, data, cb){
 
         let that = this;
         if(!this.offer.stobj.location || location.length===0){
@@ -374,8 +424,9 @@ class Supplier{
             categories: that.offer.editor.arCat,
             date: date,
             period: $('.sel_period').text(),
-            location: proj.toLonLat(location),
-            offer: urlencode.encode(JSON.stringify(data)),
+            location: proj.toLonLat(data.offer.location),
+            radius: data.offer.radius,
+            offer: urlencode.encode(JSON.stringify(menu)),
             dict: JSON.stringify(window.dict)
         };
 
@@ -414,18 +465,19 @@ class Supplier{
     }
 
     ApproveOrder(obj, title){
-
+        return;
         let data_obj = {
-            "proj": "d2d",
-            "func": "approveorder",
-            "uid": window.user.uid,
-            "psw": window.user.psw,
-            "date":obj.date,
-            "period": obj.period,
-            "supuid":obj.supuid,
-            "cusuid":obj.cusuid,
-            "title": title,
-            "data": obj.data[title]
+            proj: 'd2d',
+            func: 'approveorder',
+            uid: window.user.uid,
+            psw: window.user.psw,
+            user: window.user.constructor.name,
+            date:obj.date,
+            period: obj.period,
+            supuid:obj.supuid,
+            cusuid:obj.cusuid,
+            title: title,
+            data: obj.data[title]
         }
 
         window.network.postRequest(data_obj, function (resp) {
@@ -465,8 +517,6 @@ class Supplier{
         }
     }
 
-
-
     OnMessage(data){
         if(data.func ==='ordered'){//TODO:
             window.db.SetObject('orderStore',data.order,(res)=>{
@@ -499,6 +549,7 @@ class Supplier{
                 }
             });
         }
+
     }
 
 }

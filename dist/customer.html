@@ -310,7 +310,6 @@
             /*width: 50px;*/
         }
 
-
         #categories{
             position: fixed;
             top:0px;
@@ -324,15 +323,14 @@
     </style>
 
     <div id="category_container">
-        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px;
-        right: 50%; left:50%"/>
+        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px; right: 50%; left:50%"/>
     </div>
 
     <div align="center" id="categories">
-        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../dist/images/ic_0.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="food" id="0" title="Food" src="../dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
         <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
         <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
-        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../dist/images/ic_30.png" state="0"  data-translate="3fb5a1fd02693fe2959220f291b05f19" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="pizza" id="30" title="Pizza" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
         <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
         <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
         <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../dist/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
@@ -356,355 +354,353 @@
 </div>
 
 <div id="offer_order" class="order_container"
-     style="display:none;   position: fixed;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483645; margin: auto;
-       width:85%;  height: 85%; left: 0; right:0; top: 0;bottom: 0;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-    <iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
-
-    <style>
-        .order-header{
-            padding:9px 15px;
-            border-bottom:1px solid #5e5e5e;
-            background-color: #0e0e0e;
-            -webkit-border-top-left-radius: 5px;
-            -webkit-border-top-right-radius: 5px;
-            -moz-border-radius-topleft: 5px;
-            -moz-border-radius-topright: 5px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        .order-body{
-            position:sticky;
-            overflow: auto;
-            padding:9px 15px;
-            border-bottom:1px solid black;
-            border-top:1px solid black;
-            border-right:1px solid black;
-            border-left:1px solid black;
-            color: #ffffff;
-            background-color: black ;
-            -webkit-border-top-left-radius: 0px;
-            -webkit-border-top-right-radius: 0px;
-            -moz-border-radius-topleft: 0px;
-            -moz-border-radius-topright: 0px;
-            border-top-left-radius: 0px;
-            border-top-right-radius: 0px;
-        }
-        .order-footer {
-            padding: 9px 15px;
-            border-bottom: 1px solid black;
-            border-top: 0px;
-            color: #5e5e5e;
-            background-color: black;
-            -webkit-border-top-left-radius: 5px;
-            -webkit-border-top-right-radius: 5px;
-            -moz-border-radius-topleft: 5px;
-            -moz-border-radius-topright: 5px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
-        .comment{
-            position: absolute;
-            bottom:0px;
-            left: 0px;
-            text-align:left;
-            width: 100%;
-            font-family:'Segoe Script';
-            font-size: large;
-            color: #ff6d6b;
-            font-family:'Segoe Script';
-            font-size: large;
-            border-color: #0f192a
-        }
-        textarea:focus {
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .div_tab_inserted{
-            height:500px;
-            overflow-y:scroll;
-            width:100%;
-        }
-        .tab-content::-webkit-scrollbar {
-            width: 0 !important;
-        }
-        li {
-            float: left;
-        }
-
-        li a, .dropbtn {
-            display: inline-block;
-            color: white;
-            text-align: center;
-            padding: 14px 16px;
-            text-decoration: none;
-        }
-
-        li a:hover, .dropdown:hover .dropbtn {
-            background-color: red;
-        }
-
-        li.dropdown {
-            display: inline-block;
-        }
-
-        .dropdown-content {
-            display: none;
-            position: absolute;
-            background-color: #f9f9f9;
-            min-width: 160px;
-            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-            z-index: 1;
-        }
-
-        .dropdown-content a {
-            color: black;
-            padding: 12px 16px;
-            text-decoration: none;
-            display: block;
-            text-align: left;
-        }
-
-        .dropdown-content a:hover {background-color: #f1f1f1}
-
-        .dropdown:hover .dropdown-content {
-            display: block;
-        }
-        textarea{
-            background-color: #0e0e0e;
-        }
-        [href=".tacollapse"]{
-            color: whitesmoke;
-            font-size: 30px;
-        }
-        .custom-star {
-            font-size: 1.0em;
-            color: red;
-        }
-    </style>
-    <div class="order order-header" style="position: relative;color:white;width: 100%;">
-        <div class="row" style="display: inline-block; width:95%; margin: 0 auto;">
-
-            <div class="col-sm-3 col-xs-3">
-                <div style="height: 50px; width: 50px;">
-                    <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
-                        style="max-width:100%;max-height:100%;">
-                </div>
-
-                <div class="sup_container" style="position: absolute;top:0px;left: 70px">
-                    <!-- botstrap-rating doesn't work here-->
-                    <!--<input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>-->
-                    <div class="name" style="display:none">name</div>
-                    <div class="email">supplier@d2d.com</div>
-                </div>
-            </div>
-
-            <div class="col-sm-6 col-xs-6">
-                <div data-translate="884d9804999fc47a3c2694e49ad2536a" style="text-align: center; color:white">Адрес доставки</div>
-
-                <div>
-                <textarea name="address" class="address form-control" rows="1" contenteditable="true"
-                    data-translate placeholder="Введите адрес доставки"
-                    style="text-align: center; background-color:black;color: #c4e3f3;border-color: #2b2b2b"></textarea>
-                </div>
-            </div>
-
-            <div class="col-sm-3 col-xs-3">
-                <div class="order_div" style="white-space: pre; text-align: center">Order for</div>
-            </div>
-        </div>
-        <div style="display: inline-block; position:absolute; font-size:xx-large; right: 10px; padding-left: 20px;">
-            <span class="close_browser glyphicon glyphicon-remove-sign" title="Опубликовать и закрыть"></span>
-        </div>
-        <div class="ord_status" style="position: absolute;right: 0;bottom: 0; color:grey;font-size: x-small;"></div>
+        style="display:none;   position: absolute;
+        overflow-x: hidden; overflow-y: hidden; z-index:2147483645; margin: auto;
+        width:85%;  height: 85%; left: 0; right:0; top: 0;bottom: 0;
+        border: solid 0px lightslategrey;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div style="display: inline-block; position:absolute; font-size:xx-large; right: 10px; padding-left: 20px;">
+        <span class="close_browser glyphicon glyphicon-remove-sign" title="Опубликовать и закрыть"></span>
     </div>
-    <div class="order order-body">
-        <div style="float: right; padding: 20px 0px 0px; color:gray">
-            <h5 style="display: inline;margin-right:40px;">Расфасовка:</h5>
-            <h5 style="display: inline;margin-right:40px" >Цена:</h5>
-            <h5  style="display: inline;margin-right:40px">Количество:</h5>
-            <h5  style="display: inline;">Подтверждено:</h5>
-        </div>
+    <div>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#order" data-translate="">Заказ</a></li>
+            <li><a data-toggle="tab" href="#profile" data-translate="">Поставщик</a></li>
+        </ul>
         <div class="tab-content">
-            <ul class="nav nav-tabs menu_tabs">
-                <li class="add_tab_li" title="add tab" style="display: none;">
-                    <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
-                </li>
-            </ul>
-            <div class="tab-content">
-                <div class="tab-pane fade add_tab_div" style="border: none"></div>
-            </div>
-        </div>
-    </div>
-    <div class="order order-footer">
-        <!--<span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>-->
-        <textarea  class="input collapse in tacollapse comment" rows="5" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
-    </div>
+            <div class="tab-pane active" id="order" style="width: 97%;  margin: 0 auto;">
+                <style>
+                    .order-header{
+                        padding:9px 15px;
+                        border-bottom:1px solid #5e5e5e;
+                        background-color: #0e0e0e;
+                         -webkit-border-top-left-radius: 5px;
+                         -webkit-border-top-right-radius: 5px;
+                         -moz-border-radius-topleft: 5px;
+                         -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                        font-family: Arial, Helvetica, sans-serif;
+                    }
+                    .order-body{
+                        position:sticky;
+                        overflow: auto;
+                        padding:9px 15px;
+                        border-bottom:1px solid black;
+                        border-top:1px solid black;
+                        border-right:1px solid black;
+                        border-left:1px solid black;
+                        color: #ffffff;
+                        background-color: black ;
+                         -webkit-border-top-left-radius: 0px;
+                         -webkit-border-top-right-radius: 0px;
+                         -moz-border-radius-topleft: 0px;
+                         -moz-border-radius-topright: 0px;
+                        border-top-left-radius: 0px;
+                        border-top-right-radius: 0px;
+                    }
+                    .order-footer {
+                        padding: 9px 15px;
+                        border-bottom: 1px solid black;
+                        border-top: 0px;
+                        color: #5e5e5e;
+                        background-color: black;
+                         -webkit-border-top-left-radius: 5px;
+                         -webkit-border-top-right-radius: 5px;
+                         -moz-border-radius-topleft: 5px;
+                         -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                    }
+                    .comment{
+                        /*position: absolute;*/
+                        bottom:0px;
+                        left: 0px;
+                        text-align:left;
+                        width: 100%;
+                        font-family:'Segoe Script';
+                        font-size: large;
+                        color: #ff6d6b;
+                        border-color: #0f192a
+                    }
+                    textarea:focus {
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .div_tab_inserted{
+                        height:500px;
+                        overflow-y:scroll;
+                        width:100%;
+                    }
+                    .tab-content::-webkit-scrollbar {
+                        width: 0 !important;
+                    }
+                    li {
+                        float: left;
+                    }
 
+                    li a, .dropbtn {
+                        display: inline-block;
+                        color: white;
+                        text-align: center;
+                        padding: 14px 16px;
+                        text-decoration: none;
+                    }
 
+                    li a:hover, .dropdown:hover .dropbtn {
+                        background-color: red;
+                    }
 
-</div>
+                    li.dropdown {
+                        display: inline-block;
+                    }
 
+                    .dropdown-content {
+                        display: none;
+                        position: absolute;
+                        background-color: #f9f9f9;
+                        min-width: 160px;
+                        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                        z-index: 1;
+                    }
 
-<div  id="menu_item_tmplt"   style="background-color: #262626;">
-    <style>
-        .label{
-            text-align: center;
-            white-space: nowrap;
-        }
-        .ctrl{
-            font-family: "arial";
-            font-size: x-large;
-            padding: 10px;
-        }
-        .menu_item{
-            position: relative;
-            color:white;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            margin-bottom: 5px;
-            width: 100%;
+                    .dropdown-content a {
+                        color: black;
+                        padding: 12px 16px;
+                        text-decoration: none;
+                        display: block;
+                        text-align: left;
+                    }
 
-        }
-        #menu_item_tmplt {
-            display: none;
-        }
-        .item_title:focus{
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .item_title{
-            font-family:'Courier New';
-            font-size: x-large;
-            word-wrap: break-word;
-        }
+                    .dropdown-content a:hover {background-color: #f1f1f1}
 
-        .content_text{
-            font-family:'Segoe Script';
-            font-size: medium;
-            /*height: 240px;*/
-            /*width:100%;*/
-            border-width: 0px;
-            /*overflow:auto;*/
-            /*user-select: none;*/
-            /*-webkit-appearance: textarea;*/
-            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-            box-sizing: border-box;         /* IE 8+ */
-        }
-        .image_div{
-            position: absolute;
-            padding:15px;
-            right:0px;
-            bottom:0;
-        }
-        .item_price{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .item_pack{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .qnty{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:18px;
-        }
-        [contentEditable=true]:empty:not(:focus):before{
-            content:attr(placeholder);
-            color:gray;
-        }
+                    .dropdown:hover .dropdown-content {
+                        display: block;
+                    }
+                    textarea{
+                        background-color: #0e0e0e;
+                    }
+                    [href=".tacollapse"]{
+                        color: whitesmoke;
+                        font-size: 30px;
+                    }
+                    .custom-star {
+                        font-size: 1.0em;
+                        color: red;
+                    }
+                </style>
+                <div class="order order-header" style="position: relative;color:white;width: 100%;">
+                    <div class="row" style="display: inline-block; width:95%; margin: 0 auto;">
 
-    </style>
-    <div class="supuid" style="display: none"></div>
-    <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
-        <div  style="display:inline-block;float: left">
-            <div class="item_title" data-translate contentEditable="false" placeholder="название" data-toggle="collapse"></div>
-        </div>
-        <div style="display:inline-block;float: right">
+                        <div class="col-sm-3 col-xs-3">
+                            <div style="height: 50px; width: 50px;">
+                                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
+                                    style="max-width:100%;max-height:100%;">
+                            </div>
 
-            <div class="pack_container" style="display:inline-block;background-color:#1d2124;margin-right:30px;visibility: hidden;">
-                <div class="dropdown">
-                    <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+                            <div class="sup_container" style="position: absolute;top:0px;left: 70px">
+                                <!-- botstrap-rating doesn't work here-->
+                                <!--<input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>-->
+                                <div class="rating_container"></div>
+                                <div class="name" style="display:none">name</div>
+                                <div class="email">supplier@d2d.com</div>
+                            </div>
+                        </div>
 
-                    <div class="item_pack input dropdown-toggle" data-toggle="dropdown"  placeholder="     гр."
-                         style="display:inline-block;font-weight:normal;font-size:24px;white-space: nowrap;">
+                        <div class="col-sm-6 col-xs-6">
+                            <div>
+                                <textarea name="address" class="address form-control" rows="1" contenteditable="true"
+                                     placeholder="Введите адрес доставки"
+                                    style="text-align: center; background-color:black;color: #c4e3f3;border-color: #2b2b2b"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-3 col-xs-3">
+                        </div>
                     </div>
-                    <span class="caret" style="display:inline-block;"></span>
+                    <div class="ord_status" style="position: absolute;right: 0;bottom: 0; color:grey;font-size: x-small;"></div>
                 </div>
-            </div>
-
-            <div class="input item_price"  contentEditable="true" placeholder="руб"
-                 style="display:inline-block;margin-right:30px;background-color:#1d2124;font-weight:normal;font-size:24px;white-space: nowrap;">
-
-            </div>
-
-            <div class="dropdown" style="display:inline-block;padding:10px;background-color:#1d2124;margin-right: 30px;">
-                <div class="row">
-                    <span class="reduce ctrl scaled"
-                        onclick="
-                        if(parseInt($(this).siblings('.btn').text())>0){
-                            $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())-1);
-                            if(parseInt($(this).siblings('.btn').text())===0)
-                                $(this).closest('.menu_item').attr('deleted', true);
+                <div class="order order-body">
+                    <div style="float: right; padding: 20px 0px 0px; color:gray">
+                        <h5 style="display: inline;margin-right:40px;">Расфасовка:</h5>
+                        <h5 style="display: inline;margin-right:40px" >Цена:</h5>
+                        <h5  style="display: inline;margin-right:40px">Количество:</h5>
+                        <h5  style="display: inline;">Подтверждено:</h5>
+                    </div>
+                    <div class="tab-content">
+                        <ul class="nav nav-tabs menu_tabs">
+                            <li class="add_tab_li" title="add tab" style="display: none;">
+                                <span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>
+                            </li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane fade add_tab_div" style="border: none"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="order order-footer">
+                    <!--<span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>-->
+                    <textarea  class="input collapse in tacollapse comment" rows="2" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
+                </div>
+                <div  id="menu_item_tmplt"   style="display:none;background-color: #262626;">
+                    <style>
+                        .label{
+                            text-align: center;
+                            white-space: nowrap;
                         }
-                    ">-</span>
-                    <button class="amount btn btn-sm btn-primary" type="button"
-                        style=" font-size: large">0
-                    </button>
-                    <span class="increase ctrl scaled" onclick="
-                        $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())+1);
+                        .ctrl{
+                            font-family: "arial";
+                            font-size: x-large;
+                            padding: 10px;
+                        }
+                        .menu_item{
+                            position: relative;
+                            color:white;
+                            border-radius: 5px;
+                            border: 1px solid #343434;
+                            margin-bottom: 5px;
+                            width: 100%;
 
-                    ">+</span>
+                        }
+                        #menu_item_tmplt {
+                            display: none;
+                        }
+                        .item_title:focus{
+                            outline: none !important;
+                            border-color: #719ECE;
+                            box-shadow: 0 0 10px #719ECE;
+                        }
+                        .item_title{
+                            font-family:'Courier New';
+                            font-size: x-large;
+                            word-wrap: break-word;
+                        }
+
+                        .content_text{
+                            font-family:'Segoe Script';
+                            font-size: medium;
+                            /*height: 240px;*/
+                            /*width:100%;*/
+                            border-width: 0px;
+                            /*overflow:auto;*/
+                            /*user-select: none;*/
+                            /*-webkit-appearance: textarea;*/
+                             -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                             -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                            box-sizing: border-box;         /* IE 8+ */
+                        }
+                        .image_div{
+                            position: absolute;
+                            padding:15px;
+                            right:0px;
+                            bottom:0;
+                        }
+                        .item_price{
+                            color: #0088bb;
+                            position: relative;
+                            font-weight:normal;
+                            font-size:24px;
+                            word-wrap:normal
+                        }
+                        .item_pack{
+                            color: #0088bb;
+                            position: relative;
+                            font-weight:normal;
+                            font-size:24px;
+                            word-wrap:normal
+                        }
+                        .qnty{
+                            color: #0088bb;
+                            position: relative;
+                            font-weight:normal;
+                            font-size:18px;
+                        }
+                        [contentEditable=true]:empty:not(:focus):before{
+                            content:attr(placeholder);
+                            color:gray;
+                        }
+
+                    </style>
+                    <div class="supuid" style="display: none"></div>
+                    <div class="row" style="background-color: #262626; margin-right:5px; margin-left: 5px">
+                        <div  style="display:inline-block;float: left">
+                            <div class="item_title" data-translate contentEditable="false" placeholder="название" data-toggle="collapse"></div>
+                        </div>
+                        <div style="display:inline-block;float: right">
+                            <div class="pack_container" style="display:inline-block;background-color:#1d2124;margin-right:30px;visibility: hidden;">
+                                <div class="dropdown">
+                                    <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+
+                                    <div class="item_pack input dropdown-toggle" data-toggle="dropdown"  placeholder="     гр."
+                                         style="display:inline-block;font-weight:normal;font-size:24px;white-space: nowrap;">
+                                    </div>
+                                    <span class="caret" style="display:inline-block;"></span>
+                                </div>
+                            </div>
+
+                            <div class="input item_price"  contentEditable="true" placeholder="руб"
+                                 style="display:inline-block;margin-right:30px;background-color:#1d2124;font-weight:normal;font-size:24px;white-space: nowrap;">
+
+                            </div>
+
+                            <div class="dropdown" style="display:inline-block;padding:10px;background-color:#1d2124;margin-right: 30px;">
+                                <div class="row">
+                                <span class="reduce ctrl scaled"
+                                      onclick="
+                                    if(parseInt($(this).siblings('.btn').text())>0){
+                                        $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())-1);
+                                        if(parseInt($(this).siblings('.btn').text())===0)
+                                            $(this).closest('.menu_item').attr('deleted', true);
+                                    }
+                                ">-</span>
+                                    <button class="amount input btn btn-sm btn-primary" type="button"
+                                            style=" font-size: large">0
+                                    </button>
+                                    <span class="increase ctrl scaled" onclick="
+                                    $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())+1);
+
+                                ">+</span>
+                                </div>
+                                </div>
+                                <div class="period_div" style="visibility: hidden;display:inline-block;width:80px;vertical-align: middle;">
+                                    <div class="ordperiod" style="font-size: .75em;white-space: nowrap;">Время доставки</div>
+                                    <div style="text-align: center">
+                                        <span class="fa fa-handshake-o approved" style="font-size: 20px;"></span>
+                                    </div>
+                                </div>
+                        </div>
+                    </div>
+                    <div class="item_content collapse">
+                        <div>
+                            <div  class="input content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+                        </div>
+                        <div>
+                            <img class="input img-fluid" draggable="false" src="" style="z-index: 1;">
+                        </div>
+                        <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
+                    </div>
                 </div>
             </div>
-            <div class="period_div" style="visibility: hidden;display:inline-block;width:80px;vertical-align: middle;">
-                <div class="ordperiod" style="font-size: .75em;white-space: nowrap;">Время доставки</div>
-                <div style="text-align: center">
-                    <span class="fa fa-handshake-o approved" style="font-size: 20px;"></span>
+            <div class="tab-pane" id="profile">
+                <div class="browser_container" id="profile_container"
+                     style="display:block;
+                     overflow: visible; z-index:2147483646;
+                     position: absolute;
+                     height: auto;
+                     max-height: 80% !important;
+                     min-height: 50% !important;
+                     width:80%; left: 10%;
+                     border: solid 0px lightslategrey;
+                     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
                 </div>
             </div>
         </div>
     </div>
-    <div class="item_content collapse">
-        <div>
-            <div  class="input content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
-        </div>
-        <div>
-            <img class="input img-fluid w3-image" draggable="false"  src="" style="z-index: 1;">
-        </div>
-        <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
-    </div>
 </div>
 
-<div class="browser_container" id="profile_container"
-     style="display:none;
-        overflow: visible; z-index:2147483646;
-        position: fixed;
-        height: auto;
-        max-height: 80% !important;
-        min-height: 50% !important;
-       width:80%; left: 10%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
-</div>
-
+<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
 <span id="locText" style="font-family: serif">Lat Lon</span>
 
 <img id="search_but"  src="../dist/images/ic_map_search.png" title="Search">
@@ -723,7 +719,6 @@
 
 <data class="tariff" id="price_editable" value="true"></data>
 
-<Customer />
 
 </body>
 </html>

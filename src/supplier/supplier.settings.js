@@ -16,6 +16,7 @@ class SupplierSettings {
             let form = $('.form');
             ev.data.OnSubmit(form);
         });
+        // $('.avatar').attr('src',location.origin+'/door2door/dist/images/avatar_2x.png');
     }
 
     Open() {
@@ -30,21 +31,28 @@ class SupplierSettings {
         let that = this;
 
         var data_post ={
-            proj:$(form).find('#proj').val(),
+            proj:'d2d',
             user:"Supplier",
-            func:$(form).find('#func').val(),
+            func:'confirmem',
+            type:'marketer',
             avatar:$(form).find('.avatar').attr('src'),
             lang: $('html').attr('lang'),
             email:$(form).find('#email').val(),
             name:$(form).find('#name').val(),
             address:$(form).find('#address').val(),
-            mobile:$(form).find('#mobile').val()
+            mobile:$(form).find('#mobile').val(),
+            promo:$(form).find('#promo').val()
         }
 
         this.network.postRequest(data_post, function (obj) {
-            delete data_post.proj; delete data_post.func;
+            if(obj.err){
+                alert(obj.err);
+                return;
+            }
+            delete data_post.proj; delete data_post.func; delete data_post.email;
             that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
-                alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
+                alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                window.location.replace("../profile.supplier.html?lang="+data_post.lang);
             });
         });
     }

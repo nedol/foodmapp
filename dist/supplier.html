@@ -15,9 +15,10 @@
 <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
+<!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
 <link rel="stylesheet" href="../lib/style.css">
 <link rel="stylesheet" href="../node_modules/tablesorter/dist/css/theme.default.min.css">
+
 
 <script src="../lib/load-image/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
@@ -65,6 +66,18 @@
         border-radius: 5px;
         background-color: rgba(213, 19, 18, 0.7);
         z-index:2;
+    }
+    #dtp_container {
+        display: none;
+        position: absolute;
+        margin: auto;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 250px;
+        height: 250px;
+        z-index: 11;
     }
 
     #locText{
@@ -127,6 +140,7 @@
 
     #my_truck{
         display: block;
+        visibility: hidden;
         position: absolute;
         right: 10px;
         top: 10%;
@@ -229,15 +243,15 @@
 
 <div id="main_window" class="container">
     <div class="row">
-        <div class="form-group scaled" style="position:absolute;width:250px;right:50px;z-index: 10;">
+        <div class="col-xm-4 col-sm-4"></div>
+        <div class="form-group  col-xm-8 col-sm-8" style="position:absolute;width:280px;right:0px;z-index: 10;">
             <div class='input-group date'   style="width:auto" >
-                <input type='text'  class="form-control dt_val"
-                       value="Day of Delivery"/>
+                <input type='text'  class="form-control dt_val" value="Day of Delivery"/>
                 <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
+                    <span class="glyphicon glyphicon-calendar"></span>
                 </span>
 
-                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
+                <button class="sel_period btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
                         data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
@@ -257,47 +271,11 @@
         </div>
     </div>
 
-    <div id="dtp_container"
-         style="
-            display: none;
-             position: absolute;
-             margin: auto;
-             top: 0;
-             right: 0;
-             bottom: 0;
-             left: 0;
-             width: 200px;
-             height: 200px;
-             z-index: 11;">
+    <div id="dtp_container">
         <div id="datetimepicker" style="display: inline-block"></div>
     </div>
 
 </div>
-
-<div class="menu_container">
-    <button  class="toggle_menu btn btn-default btn-lg" data-width="fit" type="button">
-        <span class="glyphicon glyphicon-option-vertical"></span>
-    </button>
-
-    <div class="sup_menu"
-         style="
-         display: block;
-         position: fixed;
-         top:0px; left: 0px;
-         width:10%; height: 100%;
-         padding-left: 5px;
-         color: white;
-         background-color: rgb(3,0,0);
-         white-space: nowrap;
-         z-index:20;">
-        <div class="list-group">
-            <a href="#" class="open_off_editor list-group-item" style="border: hidden;color: white;background-color: black">Редактор предложений</a>
-            <a href="#" class="open_my_profile list-group-item" style="border: hidden;color: white;background-color: black">Профиль</a>
-
-        </div>
-    </div>
-</div>
-
 
 
 <div id="category_include" style="display:none">
@@ -332,10 +310,10 @@
     </div>
 
     <div align="center" id="categories">
-        <input type="image" class="category" cat="pizza" id="0" title="Pizza" src="../dist/images/ic_0.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="food" id="0" title="Food" src="../dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
         <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
         <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
-        <input type="image" class="category" cat="cheese" id="30" title="Cheese" src="../dist/images/ic_30.png" state="0"  data-translate="3fb5a1fd02693fe2959220f291b05f19" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="pizza" id="30" title="Pizza" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
         <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
         <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
         <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../dist/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
@@ -358,423 +336,441 @@
 
 </div>
 
-<div class="browser_container" id="profile_container"
-     style="display:none;
-        overflow: visible; z-index:2147483646;
-        position: fixed;
-        height: auto;
-        max-height: 90% !important;
-        min-height: 70% !important;
-       width:80%; left: 10%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
-</div>
-
-<div id="offer_editor" style="display: none; position: fixed;
-     color:black;  background-color: #f0f0f0;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:75%;  height: auto; left: 15%; top: 5%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+<div id="offer_editor" style="
+    display: none; position: absolute;
+    color:black;  background-color: #f0f0f0;
+    overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+    width:84%;  left: 0; right:0;top:5%;bottom:5%;
+    border: solid 0px lightslategrey;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div style="display: inline-block; position:absolute; top:0;right: 10px; padding-left: 20px;color: white">
+        <span class="close_browser glyphicon glyphicon-remove-sign"></span>
+    </div>
     <div>
-        <div class="modal-content">
-            <style>
-                .modal-header{
-                    position: relative;
-                    width: 100%;
-                    padding:9px 15px;
-                    border-bottom:1px solid #737373;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                    font-family: Arial, Helvetica, sans-serif;
-                }
-                .modal-body{
-                    padding:9px 15px;
-                    border-bottom:1px solid #262626;
-                    border-top:1px solid black;
-                    border-right:1px solid black;
-                    border-left:1px solid black;
-                    -webkit-border-top-left-radius: 0px;
-                    -webkit-border-top-right-radius: 0px;
-                    -moz-border-radius-topleft: 0px;
-                    -moz-border-radius-topright: 0px;
-                    border-top-left-radius: 0px;
-                    border-top-right-radius: 0px;
-                }
-                .modal-footer {
-                    padding: 9px 15px;
-                    border-bottom: 1px solid black;
-                    border-top: 0px;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-                .tab_inserted{
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
+            <li><a data-toggle="tab" href="#profile" data-translate="">Мой профиль</a></li>
+        </ul>
 
-                }
-                .comment{
-                    display:none;
-                    text-align:left;
-                    width: 100%;
-                    color: #ff3504;
-                    font-family:'Segoe Script';
-                    font-size: large;
-                    width: 100%;
-                }
-                textarea:focus {
-                    outline: none !important;
-                    border-color: #719ECE;
-                    box-shadow: 0 0 10px #719ECE;
-                }
-                .div_tab_inserted{
-                    height:500px;
-                    overflow-y:scroll;
-                    width:100%;
-                }
-                .tab-content::-webkit-scrollbar {
-                    width: 0 !important;
-                }
-                li {
-                    float: left;
-                }
+        <div class="tab-content">
+            <div class="tab-pane active" id="editor">
+                <style>
+                    .modal-content{
+                        position: absolute;
+                        height: 90%;
+                        width: 98%;
+                        left: 1%;
+                        margin: auto;
+                    }
+                    .modal-header{
+                        display: none;
+                        position: relative;
+                        width: 100%;
+                        padding:9px 15px;
+                        border-bottom:1px solid #737373;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                        font-family: Arial, Helvetica, sans-serif;
+                    }
+                    .modal-body{
+                        position: relative;
+                        height:100%;
+                        width: 100%;
+                        margin: auto;
+                        border-width: 0px;
+                        padding:9px 15px;
+                        border-bottom:1px solid #262626;
+                        border-top:1px solid black;
+                        border-right:1px solid black;
+                        border-left:1px solid black;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                        -webkit-border-bottom-left-radius: 5px;
+                        -webkit-border-bottom-right-radius: 5px;
+                        -moz-border-radius-bottomleft: 5px;
+                        -moz-border-radius-bottomright: 5px;
+                        border-bottom-left-radius: 5px;
+                        border-bottom-right-radius: 5px;
+                    }
+                    .modal-footer {
+                        height: 50px;
+                        padding: 9px 10px;
+                        border-bottom: 0px solid black;
+                        border-top: 0px;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                    }
+                    .tab_inserted{
 
-                li a {
-                    display: inline-block;
-                    text-align: center;
-                    padding: 14px 16px;
-                    text-decoration: none;
-                }
+                    }
 
-                li a:hover, .dropdown:hover .dropbtn {
+                    textarea:focus {
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .tab-content{
+                        /*height: 90%;*/
+                    }
 
-                }
+                    .tab-content::-webkit-scrollbar {
+                        width: 0 !important;
 
-                .dropdown {
-                    display: inline-block;
-                }
+                    }
+                    li {
+                        float: left;
+                    }
 
-                li.dropdown {
-                    display: inline-block;
-                }
+                    li a {
+                        display: inline-block;
+                        text-align: center;
+                        padding: 14px 16px;
+                        text-decoration: none;
+                    }
 
-                .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    min-width: 160px;
-                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                    z-index: 1;
-                }
+                    li a:hover, .dropdown:hover .dropbtn {
 
-                .dropdown-content a {
-                    padding: 12px 16px;
-                    text-decoration: none;
-                    display: block;
-                    text-align: left;
-                }
+                    }
 
-                .dropdown-content a:hover {
-                    background-color: #d51312
-                }
+                    .dropdown {
+                        display: inline-block;
+                    }
 
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-                .close_browser {
-                    color: #1d2124;
-                    font-size: xx-large;
-                    opacity: 1;
-                }
-                .close_browser:hover {
-                    color: #d51312;
-                    opacity: 1;
-                }
-                .offer_status{
-                    font-size: x-small;
-                }
+                    li.dropdown {
+                        display: inline-block;
+                    }
 
+                    .dropdown-content {
+                        display: none;
+                        position: absolute;
+                        min-width: 160px;
+                        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                        z-index: 1;
+                    }
 
-            </style>
-            <div class="modal-header">
-                <div class="row">
-                    <div class="col-sm-1 col-xs-1 dropdown">
-                        <button id="order_menu_button" class="btn btn-default btn-sm dropdown-toggle"
-                                data-toggle="dropdown" data-width="fit" type="button">
-                            <span class="glyphicon glyphicon-option-vertical"></span>
-                        </button>
-                        <ul id="menu_list" class="dropdown-menu order_menu_options">
-                            <li class="show_orders_ctrl" data-width="fit"><a href="#"
-                               data-translate="54a228ac1da8df4602aa2052461c1349">Показать заказы</a></li>
-                        </ul>
-                    </div>
-                    <div  class="col-sm-2 col-xs-2">
+                    .dropdown-content a {
+                        padding: 12px 16px;
+                        text-decoration: none;
+                        display: block;
+                        text-align: left;
+                    }
+
+                    .dropdown-content a:hover {
+                        background-color: #d51312
+                    }
+
+                    .dropdown:hover .dropdown-content {
+                        display: block;
+                    }
+                    .close_browser {
+                        color: #1d2124;
+                        font-size: xx-large;
+                        opacity: 1;
+                    }
+                    .close_browser:hover {
+                        color: #d51312;
+                        opacity: 1;
+                    }
+                    .offer_status{
+                        font-size: x-small;
+                    }
+                    .display_none{
+                        display: none;
+                    }
+                    .inv_price{
+                        color:red
+                    }
+                </style>
+                <div class="modal-content">
+                    <div class="modal-header">
                         <div class="modal-title" style="text-align: center;"></div>
+                        <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div style="float: right; padding: 10px 0px 0px; margin-right: 15px">
+                            <h5 style="color:gray;display: inline;margin-right:40px;">Расфасовка:</h5>
+                            <h5 style="color:gray;display: inline;margin-right:40px" >Цена:</h5>
+                            <h5 style="color:gray;display: inline;" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Заказы:</h5>
+                        </div>
+
+                        <ul class="nav nav-tabs" id="menu_tabs">
+                            <li id="add_tab_li" title="add tab" style="display: none;">
+                                <span id="add_tab" class="add_tab" href="#add_tab"
+                                    style="visibility: hidden;">
+                                </span>
+                            </li>
+                        </ul>
+                        <div class="tab-content" style="position:relative;height: 95%;overflow-y: scroll">
+                            <!--div_tab_inserted-->
+                            <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
+
+                            <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 2px"></span>
+
+                        </div>
                     </div>
 
-                    <div class="col-sm-7 col-xs-7"></div>
+                    <div class="modal-footer">
 
-                    <div class="col-xs-1"></div>
-                </div>
-                <div style="display: inline-block; position:absolute; top:0;right: 10px; padding-left: 20px;color: white">
-                    <span class="close_browser glyphicon glyphicon-remove-sign"></span>
-                </div>
-                <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
-
-            </div>
-            <div  class="modal-body">
-                <div style="float: right; padding: 20px 0px 0px; margin-right: 3%">
-                    <h5 style="color:gray;display: inline;margin-right:40px;">Расфасовка:</h5>
-                    <h5 style="color:gray;display: inline;margin-right:40px" >Цена:</h5>
-                    <h5 style="color:gray;display: inline;" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Заказы:</h5>
-                </div>
-                <div class="tab-content">
-                    <ul class="nav nav-tabs" id="menu_tabs">
-                        <li id="add_tab_li" title="add tab" style="display: none;">
-                            <span id="add_tab" class="add_tab" href="#add_tab"
-                              style="visibility: hidden;"></span>
-                        </li>
-                    </ul>
-                    <div class="tab-content" id="tab_content">
-                        <!--div_tab_inserted-->
-                        <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
                     </div>
                 </div>
-            </div>
-            <div class="modal-footer">
-                 <textarea  class="comment"></textarea>
-                <!--<img id="add_item" title="add item" src="./images/ic_plus.png"  style="display: none; opacity: .5;background-color: aliceblue">-->
-                <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 2px"></span>
+                <div style="display:none;position:absolute; height:50px;bottom:0;left:5px;width: 15em">
+                    <span>Автоматически публиковать</span>
+                    <select class="sel_prolong"  size="1" style="">
+                        <option value="0"></option>
+                        <option value="1">на следующий день</option>
+                        <option value="7" selected>на следующую неделю</option>
+                    </select>
+                </div>
+                <style>
+                    th {
+                        text-align: center;
+                        color: #c4e3f3;
+                        font-size: 20px
+                    }
+                    #menu_item_tmplt{
+                        display: none;
+                    }
+                    .menu_item{
+                        position: relative;
+                        border-radius: 5px;
+                        border: 0px solid #343434;
+                        padding-left: 5px;
+                        margin: 5px;
+                        width: 98.7%;
+                        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+                    }
+                    .item_cb{
 
+                        width: 4%;
+                    }
+                    .item_title:focus{
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .item_title{
+                        display: inline-block;
+                        font-family:'Courier New';
+                        font-size: x-large;
+                        /*height: 240px;*/
+                        /*width:100%;*/
+                        border-width: 0px;
+                        /*overflow:auto;*/
+                        /*user-select: none;*/
+                        -webkit-appearance: textarea;
+                        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                        box-sizing: border-box;         /* IE 8+ */
+                    }
+                    li.active a{
+                        color:blue;
+                        background-color:grey;
+                    }
+                    .item_pack{
+                        display: inline-block;
+                        color: #0088bb;
+                        font-weight:normal;
+                        font-size:24px;
+                        white-space: nowrap;
+                    }
+                    .item_price{
+                        color: #0088bb;
+                        font-weight:normal;
+                        font-size:24px;
+                        white-space: nowrap;
+                    }
+                    .order_ctrl{
+                        width: 7%;
+                        position: relative;
+                        color: #80afbb;
+                        font-weight:normal;
+                        font-size:30px;
+                    }
+                    .item_content{
+                        /*position:relative;*/
+                        /*height: 280px;*/
+                        /*padding: 5px;*/
+
+                    }
+                    .content_text{
+                        font-family:'Segoe Script';
+                        font-size: medium;
+                        /*height: 240px;*/
+                        /*width:100%;*/
+                        border-width: 0px;
+                        /*overflow:auto;*/
+                        /*user-select: none;*/
+                        -webkit-appearance: textarea;
+                        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                        box-sizing: border-box;         /* IE 8+ */
+                    }
+                    .image_div{
+                        position: absolute;
+                        padding:15px;
+                        right:0px;
+                        bottom:0;
+                    }
+
+                    .orders{
+                        visibility: hidden;
+                        margin-top: 15px;
+                    }
+                    .gallery{
+                        position: absolute;
+                    }
+                    .cert{
+                        z-index: 50;
+                        padding: 5px;
+                    }
+                    .notoday{
+                        display:none;!important;
+                    }
+                    [contentEditable=true]:empty:not(:focus):before{
+                        content:attr(placeholder);
+                        color:gray;
+                    }
+
+                </style>
+
+                <div  id="menu_item_tmplt">
+                    <div class="row menu_item_row">
+                        <div style="display: inline-block">
+                            <label  class="item_cb btn" title="Опубликовать" style="margin-right:20px;visibility:hidden">
+                                <input type="checkbox" class="checkbox-inline" style="display: none">
+                                <i class="fa fa-square-o fa-2x"></i>
+                                <i class="fa fa-check-square-o fa-2x"></i>
+                            </label>
+                            <input type="text" class="item_title input input-sm" contentEditable="true" placeholder="название" data-toggle="collapse">
+                        </div>
+                        <div style="float: right">
+                            <div class="pack_container" style="display: inline-block;margin-right:30px">
+                                <div class="dropdown">
+                                    <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
+                                        <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
+                                    </ul>
+                                    <div  class="item_pack input" contenteditable="true"  placeholder="....."></div>
+                                    <span class="caret" style="display: inline-block; visibility: hidden"></span>
+                                    <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="display:none;visibility:hidden; float: right"></span>
+                                </div>
+
+                            </div>
+                            <div style="display: inline-block;margin-right:30px">
+                                <div class="input item_price"  contenteditable="true" placeholder="руб"></div>
+                            </div>
+                            <div style="display: inline-block;margin-right:5px">
+                                <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
+                                <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
+                            </div>
+                        </div>
+                        <div class="collapse item_content">
+                            <div>
+                                <div  class="input content_text" rows="5" cols="5" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contentEditable="true">&nbsp;</div>
+                            </div>
+
+                            <div>
+                                <img class="input img-fluid" width="100px" src="" >
+                            </div>
+                            <div class="toolbar"  style="display:none; position:relative;width:20%;float: right;">
+                                <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
+                                <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                                <span class="glyphicon glyphicon-modal-window add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                            </div>
+                            <div class="gallery" style="position: relative;float: left"></div>
+                        </div>
+                    </div>
+
+                    <div  class="collapse orders">
+                        <table class="table tablesorter">
+                            <thead style="color:gray;background-color: #f3f3f3">
+                            <tr>
+                                <th>
+                                    <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                </th>
+                                <th class="marketer">
+                                    <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                                </th>
+                                <th class="marketer">
+                                    <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody style="background-color: #e6e6e6"></tbody>
+                        </table>
+                    </div>
+
+                </div>
+
+                <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
+                <data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
+                <data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
+                <data class="alerts" id="show_orders" data-translate="54a228ac1da8df4602aa2052461c1349" style="display: none">Show Orders</data>
+                <data class="alerts" id="offer_delivery" data-translate="2dd63ed2ec0b1a276c6a24eed9ddf874" style="display: none">Предложение по доставке</data>
+                <data class="alerts" id="published" data-translate="44ec8d4ee84b681847b88ee0c5b3b790" style="display: none">Опубликовано</data>
+                <data class="tariff" id="items_limit" value="5" style="display: none"></data>
+            </div><!--/tab-pane-->
+            <div class="tab-pane" id="profile">
+                <div class="browser_container" id="profile_container"
+                     style="
+                     position: absolute;
+                    overflow: visible; z-index:2147483646;
+                    height: 80%; left:1%;
+                    /*max-height: 90% !important;*/
+                    /*min-height: 70% !important;*/
+                   width:98%;
+                   border: solid 0px lightslategrey;
+                   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+
+                    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%;height:100%"></iframe>
+                </div>
             </div>
+
         </div>
     </div>
+    <input type="file" class="file" multiple style="display: none"/>
 
-    <style>
-        th {
-            text-align: center;
-            color: #c4e3f3;
-            font-size: 20px
-        }
-        #menu_item_tmplt{
-            display: none;
-        }
-        .menu_item{
-            position: relative;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            padding: 5px;
-            margin-bottom: 5px;
-            width: 100%;
-            padding: 10px;
-        }
-        .item_cb{
-            font-size: medium;
-            width: 4%;
-        }
-        .item_title:focus{
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .item_title{
-            display: inline-block;
-            font-family:'Courier New';
-            font-size: x-large;
-            /*height: 240px;*/
-            /*width:100%;*/
-            border-width: 0px;
-            /*overflow:auto;*/
-            /*user-select: none;*/
-            -webkit-appearance: textarea;
-            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-            box-sizing: border-box;         /* IE 8+ */
-        }
-        li.active a{
-            color:blue;
-            background-color:grey;
-        }
-        .item_pack{
-            display: inline-block;
-            color: #0088bb;
-            font-weight:normal;
-            font-size:24px;
-            white-space: nowrap;
-        }
-        .item_price{
-            color: #0088bb;
-            font-weight:normal;
-            font-size:24px;
-            white-space: nowrap;
-        }
-        .order_ctrl{
-            width: 7%;
-            position: relative;
-            color: #80afbb;
-            font-weight:normal;
-            font-size:30px;
-        }
-        .item_content{
-            /*position:relative;*/
-            /*height: 280px;*/
-            /*padding: 5px;*/
 
-        }
-        .content_text{
-            font-family:'Segoe Script';
-            font-size: medium;
-            /*height: 240px;*/
-            /*width:100%;*/
-            border-width: 0px;
-            /*overflow:auto;*/
-            /*user-select: none;*/
-            /*-webkit-appearance: textarea;*/
-            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-            box-sizing: border-box;         /* IE 8+ */
-        }
-        .image_div{
-            position: absolute;
-            padding:15px;
-            right:0px;
-            bottom:0;
-        }
-
-        .orders{
-            visibility: hidden;
-            margin-top: 15px;
-        }
-        .gallery{
-            position: absolute;
-        }
-        .cert{
-            z-index: 50;
-            padding: 5px;
-        }
-        .notoday{
-            display:none;!important;
-        }
-        [contentEditable=true]:empty:not(:focus):before{
-            content:attr(placeholder);
-            color:gray;
-        }
-
-    </style>
-    <div  id="menu_item_tmplt">
-        <div class="row">
-            <div style="display: inline-block">
-                <label  class="item_cb btn" title="Опубликовать" style="margin-right:20px;visibility:hidden">
-                    <input type="checkbox" class="checkbox-inline" style="display: none">
-                    <i class="fa fa-square-o fa-2x"></i>
-                    <i class="fa fa-check-square-o fa-2x"></i>
-                </label>
-                <div class="input item_title" rows="2" contentEditable="true"  data-toggle="collapse"></div>
-           </div>
-            <div style="float: right">
-               <div class="pack_container" style="display: inline-block;margin-right:30px">
-
-                   <div class="dropdown">
-                       <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
-                           <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
-                       </ul>
-                       <div  class="item_pack input" contenteditable="true"  placeholder="....."></div>
-                       <span class="caret" style="display: inline-block; visibility: hidden"></span>
-                       <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="visibility:hidden; float: right"></span>
-                   </div>
-
-                </div>
-                <div style="display: inline-block;margin-right:30px">
-                    <div class="input item_price"  contenteditable="true" placeholder="руб"></div>
-                </div>
-                <div style="display: inline-block;margin-right:30px">
-                    <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
-                    <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
-                </div>
-            </div>
-            <div class="collapse item_content">
-                <div>
-                    <div  class="input content_text" rows="10" cols="10" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contentEditable="true">&nbsp;</div>
-                </div>
-
-                <div>
-                    <img class="input img-fluid w3-image"  src="" >
-                </div>
-                <div class="toolbar"  style="display:none; position:relative;width:20%;float: right;">
-                    <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
-                    <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
-                    <span class="glyphicon glyphicon-modal-window add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
-                </div>
-                <div class="gallery" style="position: relative;float: left"></div>
-            </div>
-        </div>
-
-        <div  class="collapse orders">
-            <table class="table tablesorter">
-            <thead style="color:gray;background-color: #f3f3f3">
-                <tr>
-                    <th>
-                        <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                    </th>
-                    <th>
-                        <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
-                    </th>
-                </tr>
-            </thead>
-                <tbody style="background-color: #e6e6e6"></tbody>
-            </table>
-        </div>
-
-    </div>
-
-    <input type="file" class="file" multiple style="display: none;"/>
-
-    <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
-    <data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
-    <data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
-    <data class="alerts" id="show_orders" data-translate="54a228ac1da8df4602aa2052461c1349" style="display: none">Show Orders</data>
-    <data class="alerts" id="offer_delivery" data-translate="2dd63ed2ec0b1a276c6a24eed9ddf874">Предложение по доставке</data>
-    <data class="alerts" id="published" data-translate="44ec8d4ee84b681847b88ee0c5b3b790">Опубликовано</data>
-    <data class="tariff" id="items_limit" value="5"></data>
 </div>
 
 <div id="offer_viewer" class="order_container"
-     style="display:none;   position: fixed;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       style="display:none;   position: fixed;
+       overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
        width:70%;  height: auto; left: 20%; top: 5%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
@@ -811,103 +807,14 @@
 
 </div>
 
-<style>
-    h4, h5{
-        color: whitesmoke;
-    }
-</style>
-<div id="order_viewer" style="display:none;   position: fixed;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:60%;  height: 50%; left: 20%; top: 20%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div>
-        <div class="modal-content">
-            <div class="modal-header" style="position: relative;width: 100%;">
-                <!--div class="dropdown" style="display: inline-block">
-                    <button class="btn btn-default btn-sm order_menu_button dropdown-toggle" data-toggle="dropdown"
-                            data-width="fit" type="button">
-                        <span class="glyphicon glyphicon-option-vertical"></span>
-                    </button>
-                    <ul class="dropdown-menu order_menu_options menu_list">
-                        <li class="publish_offer" data-width="fit">
-                            <a href="#" data-translate="23d285609698e41e54306c4189c90569">Supplier</a>
-                        </li>
-                    </ul>
-                </div-->
 
-                <h4 class="modal-title"  style="display: inline-block" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Type</h4>
-                <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                <h4 class="modal-menu-number"  style="display: none">Order</h4>
-
-                <div style="display: inline-block; position:absolute; right: 10px;  color:white">
-                    <span class="close_browser glyphicon glyphicon-remove-sign"></span>
-                </div>
-            </div>
-
-            <div class="modal-body table-responsive">
-                <table class="table tablesorter">
-                    <thead>
-                        <tr>
-                            <th>
-                                <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
-                            </th>
-                            <th>
-                                <span class="glyphicon glyphicon-apple"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                            </th>
-                            <th>
-                                <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
-                            </th>
-                            <th>
-                                <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody> </tbody>
-                </table>
-            </div>
-
-            <div class="modal-footer">
-                 <textarea  class="comment"
-                    style="display:none; text-align:left; width: 100%; color: red; font-family:'Segoe Script'; font-size: large;">
-                 </textarea>
-            </div>
-        </div>
-    </div>
-
-</div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
 
 <div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
 
-<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;
-    visibility: visible" align="center"/>
+<!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
+    <!--visibility: visible" align="center"/>-->
 
 <style>
     .unpublished{

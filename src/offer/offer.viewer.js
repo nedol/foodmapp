@@ -74,7 +74,7 @@ class OfferViewer {
 
         $(".category[state='1']").each(function (i, cat) {
             let tab = cat.title;
-            if(!tab || that.offer[tab].length===0)
+            if(!that.offer[tab] || that.offer[tab].length===0)
                 return;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +

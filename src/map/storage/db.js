@@ -14,7 +14,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 25;
+        this.version = 26;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -87,7 +87,7 @@ class DB {
                 try {
                     //db.deleteObjectStore(that.supplierStore);
                     let vSupplierStore = db.createObjectStore(that.supplierStore, {keyPath: ["date", "uid"]});
-                    vSupplierStore.createIndex("datehash", ["date","hash"], {unique: true});
+                    vSupplierStore.createIndex("date", ["date"], {unique: false});
                     vSupplierStore.createIndex("dateuid", ["date","uid"], {unique: true});
                     vSupplierStore.createIndex("datelatlon",["date","latitude","longitude"],{unique: true});
 
@@ -131,10 +131,12 @@ class DB {
         var request = objectStore.put(obj);
         request.onerror = function (err) {
             console.log(err);
-            f(false);
+            if(f)
+                f(false);
         };
         request.onsuccess = function () {
-            f(true);
+            if(f)
+                f(true);
         }
     }
 
@@ -244,7 +246,13 @@ class DB {
 
     }
 
-
+    GetAllSuppliers(date,cb) {
+        let objectStore = this.DBcon.transaction('supplierStore', "readonly").objectStore('supplierStore');
+        let ind = objectStore.index("date");
+        ind.getAll([date]).onsuccess = function(event) {
+            cb(event.target.result);
+        };
+    }
 
     GetDictValue(hash, cb){
         let tx = this.DBcon.transaction([this.dictStore], "readonly");
@@ -261,6 +269,7 @@ class DB {
             }
         };
     }
+
 
     GetSupOrders(date, supuid, cb){
         if(!this.DBcon)

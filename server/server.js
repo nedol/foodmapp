@@ -27,13 +27,9 @@ global.con_obj;
 
 let bing_api_token
 
-
-
 String.prototype.replaceAll = function(search, replace){
     return this.split(search).join(replace);
 }
-
-
 
 module.exports = {
 
@@ -112,10 +108,13 @@ module.exports = {
             case'd2d':
                 let D2D = require('./d2d/d2d');
                 let Supplier = require('./d2d/supplier');
+                let Deliver = require('./d2d/deliver');
                 let Customer = require('./d2d/customer');
                 let d2d = '';
                 if(q.user && q.user.toLowerCase() === 'supplier')
                     d2d = new Supplier();
+                else if(q.user && q.user.toLowerCase() === 'deliver')
+                    d2d = new Deliver();
                 else if(q.user && q.user.toLowerCase() === 'customer')
                     d2d = new Customer();
                 else

@@ -4,6 +4,7 @@ export {OLMap};
 import map from 'ol/map';
 import View from 'ol/view';
 import TileLayer from 'ol/layer/tile';
+import Cluster from 'ol/source/cluster';
 import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
@@ -20,9 +21,9 @@ import {Layers} from './layers/layers';
 import {Events} from './events/events';
 
 import {Feature} from "./events/feature.events";
-import {Import} from "./import/import";
+
 import {Marker} from "./marker/marker";
-import {Menu} from "../menu/menu";
+
 
 
 class OLMap {
@@ -76,8 +77,6 @@ class OLMap {
         this.categories = new Categories(this);
         this.layers = new Layers(this);
         this.feature = new Feature(this);
-        this.import = new Import(this);
-
 
     }
 
@@ -100,7 +99,7 @@ class OLMap {
 
         setTimeout(function () {
 
-            // let time = new Date().getTime();
+            let time = new Date().getTime();
             // let cl = localStorage.getItem('cur_loc');
             // cl = JSON.parse(cl);
             // if (cl != null && cl.time < 1503824276869) {
@@ -110,7 +109,7 @@ class OLMap {
 
             if (!localStorage.getItem("cur_loc")) {
 
-                let coor = proj.fromLonLat([parseFloat('-0.128105'), parseFloat('51.507340')])
+                let coor = proj.fromLonLat([parseFloat('37.460546'), parseFloat('55.669308')])
 
                 localStorage.setItem("cur_loc", "{\"lon\":" + coor[0] + "," +
                     "\"lat\":" + coor[1] + ", \"time\":" + time + "}");
@@ -147,9 +146,13 @@ class OLMap {
         window.db.GetRangeSupplier(window.user.date, period[0], period[1],
             parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
             for(let f in features) {
-                for(let c in features[f].values_.categories) {
+                let c = 0;
+                $.each(features[f].values_.object.data, function (i,item) {
+                    let cat = $(".category[title="+i+"]").attr('id');//features[f].values_.categories[c++];
 
-                    let cat = features[f].values_.categories[c];
+                    if(!item[0])
+                        return;
+
                     let layer = that.ol_map.getLayers().get(cat);
                     if (!layer) {
                         layer = that.layers.CreateLayer(cat, '1');
@@ -158,10 +161,20 @@ class OLMap {
                     let source = layer.values_.vector;
 
                     if(features[f].values_.object.uid===window.user.uid)
-                        continue;
-                    if (!source.getFeatureById(features[f].getId()) && features[f].values_.object.date===window.user.date)
-                        that.layers.AddCluster(layer, features[f]);
-                }
+                        return;
+                    if (!source.getFeatureById(features[f].getId()) &&
+                        features[f].values_.object.date===window.user.date) {
+                        //that.layers.AddCluster(layer, features[f]);
+                        source.addFeature(features[f]);
+
+                        let clusterSource = new Cluster({
+                            distance: 100,//parseInt(50, 10),
+                            source: source
+                        });
+
+                        layer.setSource(clusterSource);
+                    }
+                });
             }
         });
     }
@@ -177,10 +190,24 @@ class OLMap {
         });
     }
 
-    MoveToLocation(location){
+    FlyToLocation(location){
         let that = this;
         this.animate.flyTo(location, function () {
             //Marker.overlay.setPosition(data.data[data.data.length-1]);
+        });
+    }
+    MoveToLocation(location) {
+        let that = this;
+        that.ol_map.getView().animate({
+            center: location,
+            zoom: that.zoom_param ? that.zoom_param : 15,
+            duration: window.sets.animate_duration * 2,
+
+        }, function () {
+            //$("#marker").trigger("change:cur_pos", [window.sets.coords.cur, "Event"]);
+            let latlon = proj.toLonLat(location);
+            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
+            $("#zoom_but").text(that.zoom_param ? that.zoom_param : 15);
         });
     }
 

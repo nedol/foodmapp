@@ -1,13 +1,14 @@
 'use strict'
 export {Offer}
 import {OfferEditor} from './offer.editor';
+import {OrderViewer} from "../order/order.viewer";
 class Offer{
 
-    constructor(uObj){
+    constructor(date,uObj){
 
         this.stobj = uObj.offer;//db stored object
-        this.editor = new OfferEditor();//offer editor
-        this.viewer;
+        this.viewer = new OrderViewer();
+
     }
 
     GetOfferDB(date, cb){
@@ -22,10 +23,11 @@ class Offer{
         });
     }
 
-    SetOfferDB(obj, dict) {
+    SetOfferDB(obj, dict,cb) {
         this.stobj.data = obj.data;
         window.db.SetObject('offerStore',obj,function (res) {
-
+            obj.date = 'tmplt';
+            window.db.SetObject('offerStore',obj);
         });
         if(dict){
             for(let i in dict){
@@ -45,8 +47,6 @@ class Offer{
     }
 
 
-    OpenOfferEditor(ev) {
-        ev.data.offer.editor.OpenOffer();
-    }
+
 
 }

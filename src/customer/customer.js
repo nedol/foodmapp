@@ -30,6 +30,8 @@ var ColorHash = require('color-hash');
 import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {Profile} from "../profile/profile";
+import {Import} from "../import/import";
+
 var moment = require('moment/moment');
 
 window.TriggerEvent = function (el, ev) {
@@ -50,6 +52,8 @@ class Customer{
         this.email = '';//!!! no need to registrate
         this.profile = new Profile(uObj.profile);
         this.map = new OLMap();
+
+        this.import = new Import(this.map);
 
     }
 
@@ -176,10 +180,17 @@ class Customer{
 
             $(this).data("DateTimePicker").toggle();
 
+            let source = that.map.layers.circleLayer.getSource();
+            source.clear();
+            source.changed();
+
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
                 if(layer.constructor.name==="_ol_layer_Vector_") {
-                    layer.getSource().refresh();
+                    if(layer.getSource()) {
+                        layer.getSource().clear();
+                        layer.getSource().changed();
+                    }
                 }
             });
             window.db.GetOffer(that.date ,function (res) {
@@ -191,7 +202,7 @@ class Customer{
                     });
                 }
             });
-            that.map.import.GetApprovedCustomer(function () {
+            that.import.GetApprovedCustomer(function () {
 
             });
         });
@@ -293,7 +304,7 @@ class Customer{
     OnClickUserProfile(li){
 
         $('#profile_container').css('display','block');
-        $('#profile_container iframe').attr('src',"../src/profile/customer.html");
+        $('#profile_container iframe').attr('src',"../src/profile/profile.customer.html");
         $('#profile_container iframe').off();
         $('#profile_container iframe').on('load',function () {
             $('#profile_container iframe')[0].contentWindow.InitProfileUser();

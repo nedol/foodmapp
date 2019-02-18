@@ -18,7 +18,7 @@ class Network{
     }
 
     InitSSE(user, cb){
-        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&uid='+user.uid
+        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&uid='+user.uid+'&user='+user.constructor.name
             //,{withCredentials: true}
         );
         this.eventSource.onerror = function(e) {
@@ -38,7 +38,7 @@ class Network{
         this.eventSource.onmessage = function (e) {
             console.log(e.data);
             window.user.OnMessage(JSON.parse(e.data));
-
+            return Promise.resolve("Dummy response to keep the console quiet");
         };
         this.eventSource.addEventListener('sse', (e) => {
             console.log(e.data);
@@ -68,13 +68,17 @@ class Network{
 
     }
 
-    RegSupplier(obj, cb){
-        obj.proj = 'd2d';
-        obj.user = obj.set.profile.user;
-        obj.func = 'regsupplier';
+    RegUser(obj, cb){
+        let post_obj = {};
+        post_obj.proj = 'd2d';
+        post_obj.uid = obj.uid;
+        post_obj.psw = obj.psw;
+        post_obj.user = obj.profile.user;
+        post_obj.func = 'reguser';
+        post_obj.profile = obj.profile;
 
-        this.postRequest(obj, function (res) {
-            cb();
+        this.postRequest(post_obj, function (res) {
+            cb(res);
         });
     }
 

@@ -1,13 +1,14 @@
 'use strict'
-import {DB} from "../map/storage/db"
 
-var { Textcomplete, Textarea } = require('textcomplete');
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
 require('bootstrap');
 
-global.jQuery = require('jquery');
+// global.jQuery = require('jquery');
+
+import {Utils} from "../utils/utils";
+let utils = new Utils();
 
 window.InitProfileSupplier = function (obj, settings) {
 
@@ -27,6 +28,18 @@ window.InitProfileSupplier = function (obj, settings) {
 
                 reader.onload = function (e) {
                     $('.avatar').attr('src', e.target.result);
+                    $('.avatar').on('load',function (ev) {
+                        ev.preventDefault();
+                        let k = 50/$(this).height();
+                        utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
+                            $('.avatar').attr('thmb', thmb.src);
+                        });
+                    });
+                    // $('.avatar').on('load',function (ev) {
+                    //     let thmb = utils.createThumb_1($('.avatar')[0]);
+                    //     $('.avatar').attr('thmb',thmb);
+                    // })
+
                     $('.avatar').siblings('input:file').attr('changed', true);
                 }
                 reader.readAsDataURL(input.files[0]);
@@ -167,25 +180,39 @@ class ProfileSupplier{
         $('.rating').attr('data-readonly', 'true');
     }
 
-    SaveProfile(form){
+    SaveProfile(uid, psw){
         let that = this;
+        let data_post='';
+        let k = 50/ $('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
 
-        var data_post ={
-            proj:$(form).find('#proj').val(),
-            user:"Supplier",
-            func:$(form).find('#func').val(),
-            avatar:$(form).find('.avatar').attr('src'),
-            lang: $('html').attr('lang'),
-            email:$(form).find('#email').val(),
-            name:$(form).find('#name').val(),
-            address:$(form).find('#address').val(),
-            mobile:$(form).find('#mobile').val()
-        }
+            data_post ={
+                proj:'d2d',
+                user:window.parent.user.constructor.name,
+                func:'updprofile',
+                uid: uid,
+                psw: psw,
+                profile: {
+                    type:window.parent.user.profile.profile.type,
+                    email: $('#email').val(),
+                    avatar: $('.avatar').attr('src'),
+                    thmb: thmb.src,
+                    lang: $('html').attr('lang'),
+                    name: $('#name').val(),
+                    address: $('#address').val(),
+                    mobile: $('#mobile').val(),
+                    place: $('#place').val(),
+                }
+            }
 
-        window.parent.network.postRequest(data_post, function (obj) {
-            delete data_post.proj; delete data_post.func;
-            that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
+            window.parent.network.postRequest(data_post, function (res) {
 
+                window.parent.db.GetSettings(function (obj) {
+                    obj[0].profile = data_post.profile;
+                    window.parent.db.SetObject('setStore',obj[0], function (res) {
+
+                    });
+                });
             });
         });
     }

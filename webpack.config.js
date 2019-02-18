@@ -12,17 +12,14 @@ module.exports = {
     //context: __dirname+'/js',
 
     entry: {
-        //'jQuery':'jquery',
-        // 'supplier':['babel-polyfill',
-        //     __dirname+'/src/supplier/supplier_entry.js'
-        // ],
-        // 'user':['babel-polyfill',
-        //     __dirname+'/src/user/user_entry.js'
-        // ]
+        'jQuery':'jquery',
         'supplier': __dirname+'/src/supplier/supplier.entry.js'
+        ,'deliver': __dirname+'/src/deliver/deliver.entry.js'
         ,'customer': __dirname+'/src/customer/customer.entry.js'
         ,'supplier_profile':__dirname+'/src/profile/profile.supplier.js'
         ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
+        ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.entry.js'
+        ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.entry.js'
 
 
     },

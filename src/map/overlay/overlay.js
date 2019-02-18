@@ -5,22 +5,43 @@ import {Utils} from "../../utils/utils";
 //import {User} from "../menu/user";
 import _ol_Overlay_  from "ol/overlay";
 import proj from 'ol/proj';
+import Collection from 'ol/collection';
+
+import Feature from 'ol/feature';
+import layerVector from 'ol/layer/vector';
+import srcVector from 'ol/source/vector';
+import _ol_style_Style_ from 'ol/style/style';
+import _ol_style_Circle_ from 'ol/style/circle';
+import _ol_style_Icon_ from 'ol/style/icon';
+import _ol_style_Fill_ from 'ol/style/fill';
+import Text from 'ol/style/text';
+import _ol_style_Stroke_ from 'ol/style/stroke';
+import interaction_ from 'ol/interaction';
+import Modify from 'ol/interaction/modify';
+import Draw from 'ol/interaction/draw';
+import Snap from 'ol/interaction/snap';
+import Circle from 'ol/geom/circle';
 
 let utils = new Utils();
 
 class Overlay {
 
-    constructor(map, element, coor) {
+    constructor(map, element, offer) {
 
         this.map = map;
         let that = this;
+        this.draw;
+        this.modify;
+        this.snap; // global so we can remove them later
 
         this.overlay = new _ol_Overlay_({
             element: element,
-            position: coor,
+            position: offer.location,
             positioning: 'center-center',
             offset:[-20,-20]
         });
+        if(window.user.profile.profile.type==='deliver')
+            this.CreateCircle(offer);
 
         element.ovl = this.overlay;
 
@@ -36,8 +57,6 @@ class Overlay {
                 y = center[1] < coor[1] ? y : -y;
             }catch(ex){
             }
-
-
         });
 
         this.map.ol_map.addOverlay(this.overlay);
@@ -52,7 +71,7 @@ class Overlay {
         // }, 5);
 
         $(element).on('click touchstart', window.user, function (ev) {
-            window.user.offer.editor.OpenOffer();
+            window.user.editor.OpenOffer();
         });
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {
@@ -106,7 +125,59 @@ class Overlay {
             $(element).trigger("map:pointerdrag", [event]);
         });
 
+
     };
+
+    CreateCircle(offer) {
+        let that = this;
+        let layer = window.user.map.layers.circleLayer;
+        var source = layer.getSource();
+
+        var radiusFeature = new Feature({
+            geometry: new Circle(offer.location,offer.radius?offer.radius:1000)
+            //name: cursor.value.title ? cursor.value.title : "",
+            //tooltip: cursor.value.title ? cursor.value.title : "",
+        });
+
+        radiusFeature.setId('radius_feature');
+        source.addFeature(radiusFeature);
+
+        let col = new Collection();
+        col.push(radiusFeature);
+        that.draw = new Draw({
+            geometryName:'circle',
+            source: source,
+            type: 'Circle',
+            features:col
+        });
+
+        //that.map.ol_map.addInteraction(that.draw);
+        that.snap = new Snap({source: source});
+        that.map.ol_map.addInteraction(that.snap);
+
+        that.modify = new Modify({source: source});
+
+        that.map.ol_map.addInteraction(that.modify);
+
+        that.draw.addEventListener('drawstart', function (ev) {
+
+        });
+        that.draw.addEventListener('drawend', function (ev) {
+           // that.map.ol_map.removeInteraction(that.draw);
+            that.overlay.values_.position = ev.target.sketchCoords_[0];
+        });
+        that.modify.addEventListener('modifyend', function (ev) {
+            let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
+            window.db.GetOffer(window.user.date,function (of) {
+                if(of) {
+                    of.radius = radius;
+                    window.db.SetObject('offerStore', of, res => {
+                        window.user.offer.stobj.radius = radius;
+                    });
+                }
+            })
+        });
+    }
 
     DownloadOverlay(url, obj) {
 
@@ -342,4 +413,5 @@ class Overlay {
         let that = this;
         that.map.ol_map.removeOverlay(that.overlay);
     }
+
 }

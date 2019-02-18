@@ -7,22 +7,23 @@ class Profile{
     constructor(profile){
         this.profile = !profile?{}:profile;
     }
-    //Supplier
-    OpenMyProfile(ev){
-        let that = ev.data;
 
+    //Supplier
+    InitSupplierProfile(){
+        let that = this;
         //profile iframe
         let browser =  $('#profile_container').find('.browser');
         $('#profile_container').css('display','block');
         browser.draggable();
-        browser.attr('src', '../src/profile/supplier.html');
+        browser.attr('src', './profile.supplier.html');
 
         browser.off();
         browser.on('load', function () {
-            browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},
+
+            browser[0].contentWindow.InitProfileSupplier({supuid:window.user.uid,user:window.user.constructor.name},
                 {
                     readOnly: true,
-                    profilePictureURL: that.profile.profile.avatar,
+                    profilePictureURL: that.profile.avatar,
                     enableEditing: false,
                     enableDeleting:false,
                     enableReplying: true,
@@ -41,10 +42,15 @@ class Profile{
 
             if(that.profile) {
                 $('input',browser.contents()).removeAttr('disabled');
-                $('#name', browser.contents()).val(that.profile.profile.name);
-                $('#email', browser.contents()).val(that.profile.profile.email);
-                $('#mobile', browser.contents()).val(that.profile.profile.mobile);
-                $('#address', browser.contents()).val(that.profile.profile.address);
+                $('#email', browser.contents()).attr('disabled', true);
+                if(!that.profile.email){
+                    $('#email', browser.contents()).attr('placeholder','Не подтвержден. Проверьте почту');
+                }else{
+                    $('#email', browser.contents()).val(that.profile.email);
+                }
+                $('#name', browser.contents()).val(that.profile.name);
+                $('#mobile', browser.contents()).val(that.profile.mobile);
+                $('#address', browser.contents()).val(that.profile.address);
 
                 setTimeout(function () {
                     browser[0].contentWindow.profile_sup.InitRating();
@@ -69,12 +75,12 @@ class Profile{
         let browser = ovc.find('.browser');
         let avatar = ovc.find('.avatar').attr('src');
         browser.draggable();
-        browser.attr('src', '../src/profile/supplier.html');
+        browser.attr('src', './profile.supplier.html');
         browser.on('load', function () {
             browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},
                 {   //comments settings
-                    readOnly: (that.appr.cusuid===window.user.uid)?false:true,
-                    profilePictureURL: that.profile.avatar?that.profile.avatar:avatar,
+                    readOnly: (that.appr && that.appr.cusuid===window.user.uid)?false:true,
+                    profilePictureURL: that.profile.thmb?that.profile.thmb:that.profile.avatar,
                     enableEditing: false,
                     enableDeleting:false,
                     enableReplying: false,
@@ -98,7 +104,7 @@ class Profile{
                 $('#address', browser.contents()).val(that.profile.address);
 
                 browser[0].contentWindow.profile_sup.InitRating();
-                if(that.appr.cusuid!==window.user.uid)
+                if(that.appr && that.appr.cusuid!==window.user.uid)
                     browser[0].contentWindow.profile_sup.SetRatingReadonly();
                 browser[0].contentWindow.profile_sup.SetRating(rating);
 
@@ -114,5 +120,10 @@ class Profile{
                 ovc.remove();
             });
         });
+    }
+
+    SaveProfile(){
+        let browser =  $('#profile_container').find('.browser');
+        browser[0].contentWindow.profile_sup.SaveProfile(window.user.uid, window.user.psw);
     }
 }

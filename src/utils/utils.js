@@ -76,18 +76,27 @@ class Utils{
         return deferred.promise();
     }
 
-    createThumb(base, w, h, callback) {
+    createThumb(el){
+        var thmbImg = loadImage.scale(
+            $(el)[0], // img or canvas element
+            {maxWidth: 50}
+        );
+        return thmbImg.src;
+    }
+
+    createThumb_1(base, w, h, callback) {
         var c = document.createElement("canvas"),    // create a canvas
             ctx = c.getContext("2d"),                // get context
             img = new Image();                       // final image
             img.crossOrigin="anonymous";
         c.width = w;                                 // set size = thumb
         c.height = h;
-        ctx.drawImage(base, 0, 0, w, h);            // draw in frame
+        ctx.drawImage(base, 0, 0, w, h);             // draw in frame
         img.onload = function() {                    // handle async loading
+
             callback(this);                // provide image to callback
         };
-        img.src = c.toDataURL();                     // convert canvas to URL
+        img.src = c.toDataURL();             // convert canvas to URL
     }
 
     isIntersec(from, from_1, to, to_1) {
