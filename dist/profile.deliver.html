@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="ru">
+<!--https://bootsnipp.com/snippets/4Mm5R-->
+<meta charset="utf-8">
+<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" type="text/css" href="../lib/jquery-comments-master/css/jquery-comments.css">
+<link rel="canonical" href="http://www.bootstraptoggle.com">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css" rel="stylesheet" >
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet">
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css" rel="stylesheet">
+<!--<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">-->
+
+<!-- Libraries -->
+<script src="../lib/load-image/load-image.all.min.js"></script>
+<script src="host.js"></script>
+<script src="deliver_profile.js"></script>
+
+    <style>
+        .scaled{
+            transform: scale(1.5)
+        }
+        .custom-star{
+            font-size: 2.0em;
+            color: red;
+        }
+       .ban_supplier{
+            font-size: 2.5em;
+            color: red;
+        }
+    </style>
+<body  style="overflow: hidden">
+    <div class="container bootstrap snippet">
+        <div class="row">
+            <div class="col-sm-1">
+                <a href="#">
+                    <span class="ban_supplier glyphicon glyphicon-ban-circle" style="visibility: hidden"></span>
+                </a>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Общедоступная информация</a></li>
+                    <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
+                    <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
+                </ul>
+
+                <div class="tab-content">
+                    <input type="hidden" id="supuid" class="form-control" name="supuid">
+                    <div class="tab-pane active" id="profile">
+                        <div style="margin: 20px"></div>
+                        <div class="row">
+                            <div class="col-sm-3 text-center">
+                                <img src="" class="avatar img-circle img-thumbnail" alt="avatar">
+                                <input type="file" class="center-block file-upload" style="display: none">
+                            </div>
+                            <div class="col-sm-9">
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="name"><h4>Имя</h4></label>
+                                            <input type="text"  disabled  id="name" class="form-control" name="name"  placeholder="last name" title="enter your last name if any.">
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label for="email"><h4>Email</h4></label>
+                                            <input type="email" disabled id="email" class="form-control" name="email"  placeholder="введите адрес" title="введите адрес" data-toggle="tooltip">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="mobile"><h4>Телефон</h4></label>
+                                            <input type="phone" id="mobile" disabled class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
+                                        </div>
+                                    <div class="col-xs-6">
+                                        <label for="worktime"><h4>Часы работы</h4></label>
+                                        <input  id="worktime" type="text" class="sel_period form-control dropdown-toggle"  data-toggle="dropdown" data-width="fit"
+                                                placeholder="08:00 - 20:00" value="08:00 - 20:00" title="часы работы">
+
+                                        <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                                            <li href="#">06:00 - 08:00</li>
+                                            <li href="#">08:00 - 10:00</li>
+                                            <li href="#">10:00 - 12:00</li>
+                                            <li href="#">12:00 - 14:00</li>
+                                            <li href="#">14:00 - 16:00</li>
+                                            <li href="#">16:00 - 18:00</li>
+                                            <li href="#">18:00 - 20:00</li>
+                                            <li href="#">20:00 - 22:00</li>
+                                            <li href="#">22:00 - 24:00</li>
+                                        </ol>
+                                    </div>
+                                    <div class="col-xs-6">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane" id="comments" style="overflow-y: auto; height: 400px">
+                        <div style="position: absolute;right: 0;top:0px;">
+                            <input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star">
+                        </div>
+                        <div id="comments-container" style="overflow-y: hidden"></div>
+
+
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane" id="settings">
+                        <div style="margin: 20px"></div>
+                        <div class="row">
+                            <div class="form-group">
+
+                                <div class="col-xs-6">
+                                    <label for="prolong"><h4>Автоматическое продление</h4></label>
+                                    <input type="text" id="prolong" disabled class="form-control" name="prolong"  placeholder="продление" title="продление">
+                                </div>
+                                <div class="col-xs-6">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/tab-pane-->
+                </div><!--/tab-content-->
+            </div>
+        </div><!--/col-9-->
+    </div><!--/row-->
+</body>
+
+<!--<script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>-->
+</html>

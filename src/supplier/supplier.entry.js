@@ -1,7 +1,7 @@
 'use strict'
 
 
-// global.jQuery = require('jquery');
+global.jQuery = require('jquery');
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
@@ -71,7 +71,7 @@ $(document).on('readystatechange', function () {
                 uObj['set'] = set[res];
                 window.network = new Network(host_port);
 
-                if( !set[res]['profile'].email) {
+                if(!set[res]['profile'].email) {
 
                     if (utils.getParameterByName('email') &&
                         utils.getParameterByName('uid') &&
@@ -107,6 +107,7 @@ $(document).on('readystatechange', function () {
 
                     }else {
                         if(md5(uObj['set']['profile'].email)!==uObj['set'].uid) {
+                            window.db.DeleteObject('setStore',uObj['set'].uid);
                             return;
                         }
 

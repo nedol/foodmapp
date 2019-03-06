@@ -6,7 +6,7 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
     <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2019 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Delivery Customer</title>
+    <title>Customer</title>
 </head>
 
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -18,7 +18,7 @@
 
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="customer.js"></script>
-
+<script src="../lib/jquery.ui.touch-punch.min.js"></script>
 <style>
     html, body{
         padding: 0px;
@@ -253,7 +253,7 @@
 <div id="main_window" class="container">
 
     <div>
-        <div class="date_ctrl form-group scaled">
+        <div class="date_ctrl form-group">
             <div class='input-group date' style="width:auto" >
                 <input type='text' class="form-control dt_val"/>
                 <span class="input-group-addon">
@@ -283,7 +283,7 @@
         <div id="datetimepicker" style="display: inline-block"></div>
     </div>
 
-    <div class="row" style="position:fixed;bottom:0%;width: 80%;left: 10%">
+    <div class="row" style="display:none;position:fixed;bottom:0%;width: 80%;left: 10%">
         <div class="col-xs-12">
             <div class="panel-group">
                 <div class="panel panel-default"  align="center">
@@ -495,7 +495,7 @@
 
                         <div class="col-sm-3 col-xs-3">
                             <div style="height: 50px; width: 50px;">
-                                <img src="http://ssl.gstatic.com/accounts/ui/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
+                                <img src="./images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
                                     style="max-width:100%;max-height:100%;">
                             </div>
 
@@ -578,17 +578,12 @@
                         }
 
                         .content_text{
+                            overflow-y: scroll;
                             font-family:'Segoe Script';
                             font-size: medium;
-                            /*height: 240px;*/
-                            /*width:100%;*/
-                            border-width: 0px;
+                            margin-left: 20px;
                             /*overflow:auto;*/
                             /*user-select: none;*/
-                            /*-webkit-appearance: textarea;*/
-                             -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                             -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                            box-sizing: border-box;         /* IE 8+ */
                         }
                         .image_div{
                             position: absolute;
@@ -672,11 +667,13 @@
                         </div>
                     </div>
                     <div class="item_content collapse">
-                        <div>
-                            <div  class="input content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
-                        </div>
-                        <div>
-                            <img class="input img-fluid" draggable="false" src="" style="z-index: 1;">
+                        <div class="row">
+                            <div class="col-sm-10 col-xs-10">
+                                <div  class="input content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contenteditable="true"></div>
+                            </div>
+                            <div class="col-sm-2 col-xs-2">
+                                <img class="input img-fluid center-block" draggable="false" src="" style="z-index: 1;">
+                            </div>
                         </div>
                         <div class="gallery" style="position: absolute;left: 0;bottom: 0"></div>
                     </div>
@@ -698,6 +695,19 @@
             </div>
         </div>
     </div>
+</div>
+
+<div class="browser_container" id="my_profile_container"
+     style="display:none;
+         overflow: visible; z-index:2147483646;
+         position: absolute;
+         height: auto;
+         max-height: 80% !important;
+         min-height: 50% !important;
+         width:80%; left: 10%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
 
 <!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->

@@ -10,6 +10,7 @@ import interaction from 'ol/interaction';
 import control from 'ol/control';
 
 import Point from 'ol/geom/point';
+import Feature from 'ol/feature';
 import proj from 'ol/proj';
 
 import {Geo} from './location/geolocation';
@@ -20,7 +21,7 @@ import {DB} from './storage/db';
 import {Layers} from './layers/layers';
 import {Events} from './events/events';
 
-import {Feature} from "./events/feature.events";
+// import {Feature} from "./events/feature.events";
 
 import {Marker} from "./marker/marker";
 
@@ -140,43 +141,67 @@ class OLMap {
     }
 
 
-    GetObjectsFromStorage(cats, area) {
+    GetObjectsFromStorage(area) {
         let that = this;
         let period = $('.sel_period').text().split(' - ');
-        window.db.GetRangeSupplier(window.user.date, period[0], period[1],
-            parseFloat(area[0]),  parseFloat(area[2]),  parseFloat(area[1]),  parseFloat(area[3]), function (features) {
-            for(let f in features) {
+        function setFeatures(objs) {
+            for (let o in objs) {
+                var markerFeature = new Feature({
+                    geometry: new Point(proj.fromLonLat([objs[o].longitude, objs[o].latitude])),
+                    labelPoint: new Point(proj.fromLonLat([objs[o].longitude,objs[o].latitude])),
+                    //name: cursor.value.title ? cursor.value.title : "",
+                    //tooltip: cursor.value.title ? cursor.value.title : "",
+                    categories: JSON.parse(objs[o].categories),
+                    type:'supplier',
+                    object: objs[o]
+                });
+                markerFeature.setId(objs[o].uid);
+
                 let c = 0;
-                $.each(features[f].values_.object.data, function (i,item) {
-                    let cat = $(".category[title="+i+"]").attr('id');//features[f].values_.categories[c++];
+                for(let tab in objs[o].data) {
 
-                    if(!item[0])
-                        return;
+                    let cat = $(".category[title=" +tab + "][state=1]").attr('id');//features[f].values_.categories[c++];
 
-                    let layer = that.ol_map.getLayers().get(cat);
+                    if (!cat || !objs[o].profile)
+                        continue;
+
+                    let layer = that.ol_map.getLayers().get(cat + "_" + objs[o].profile.type);
                     if (!layer) {
-                        layer = that.layers.CreateLayer(cat, '1');
+                        layer = that.layers.CreateLayer(cat + "_" + objs[o].profile.type, '1');
                     }
 
                     let source = layer.values_.vector;
 
-                    if(features[f].values_.object.uid===window.user.uid)
-                        return;
-                    if (!source.getFeatureById(features[f].getId()) &&
-                        features[f].values_.object.date===window.user.date) {
-                        //that.layers.AddCluster(layer, features[f]);
-                        source.addFeature(features[f]);
+                    if (objs[o].uid === window.user.uid)
+                        continue;
+                    if (!source.getFeatureById(markerFeature.getId())) {
 
-                        let clusterSource = new Cluster({
-                            distance: 100,//parseInt(50, 10),
-                            source: source
-                        });
+                        source.addFeature(markerFeature);
 
-                        layer.setSource(clusterSource);
+                        if (objs[o].profile.type === 'marketer') {
+                            objs[o].img = "./images/ic_" + cat + ".png";
+                            let clusterSource = new Cluster({
+                                distance: 50,
+                                source: source
+                            });
+
+                            layer.setSource(clusterSource);
+                        }
                     }
-                });
+                }
+
             }
-        });
+        }
+        if(area) {
+            window.db.GetRangeSupplier(window.user.date,
+                parseFloat(area[0]), parseFloat(area[2]), parseFloat(area[1]), parseFloat(area[3]), function (features) {
+                   setFeatures(features);
+                });
+        }else {
+            window.db.GetAllSuppliers(window.user.date,function (features) {
+                setFeatures(features);
+            })
+        }
     }
 
     SetMarkersArExt(cat, jsAr) {
@@ -184,7 +209,7 @@ class OLMap {
         var obj = jsAr.shift();
         window.db.SetObject('supplierStore',obj, function (cat) {
             if (jsAr.length === 0)
-                this.GetObjectsFromStorage(cat);
+                this.GetObjectsFromStorage();
             else
                 this.SetMarkersArExt(cat, jsAr);
         });

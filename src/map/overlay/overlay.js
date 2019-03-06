@@ -168,10 +168,10 @@ class Overlay {
         });
         that.modify.addEventListener('modifyend', function (ev) {
             let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
-            window.db.GetOffer(window.user.date,function (of) {
-                if(of) {
-                    of.radius = radius;
-                    window.db.SetObject('offerStore', of, res => {
+            window.db.GetOffer(new Date(window.user.date),function (of) {
+                if(of[0]) {
+                    of[0].radius = radius;
+                    window.db.SetObject('offerStore', of[0], res => {
                         window.user.offer.stobj.radius = radius;
                     });
                 }

@@ -23,7 +23,7 @@ require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
 
-//global.jQuery = require('jquery');
+global.jQuery = require('jquery');
 
 const shortid = require('shortid');
 var md5 = require('md5');

@@ -46,15 +46,15 @@ module.exports = class Supplier extends D2D{
                             q.profile.avatar = avatar;
                             q.profile.thmb = thmb;
                             q.profile.email = result[0].email;
-                            values = [q.uid, q.psw, JSON.stringify(q.profile), result[0].tariff];
-                            sql = "UPDATE supplier SET  uid=?, psw=?, profile=?, tariff=?";
+                            values = [JSON.stringify(q.profile), result[0].tariff,q.uid, q.psw];
+                            sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
                             global.con_obj.query(sql, values, function (err, result) {
                                 res.writeHead(200, {'Content-Type': 'application/json'});
                                 if (err) {
                                     res.end();
                                     return;
                                 }
-                                res.end(JSON.stringify(values));
+                                res.end(JSON.stringify({profile:q.profile}));
                             });
                         });
                     });
@@ -91,6 +91,7 @@ module.exports = class Supplier extends D2D{
         });
 
     }
+
     OnClickUserProfile(li){
 
         $('#profile_container').css('display','block');
@@ -117,9 +118,9 @@ module.exports = class Supplier extends D2D{
         let that = this;
         let now = moment().format('YYYY-MM-DD h:mm:ss');
         let sql =
-            "SELECT of.*" +
-            " FROM  supplier as sup, offers as of"+
-            " WHERE of.supuid=sup.uid AND sup.uid=\""+q.uid+"\" AND sup.psw=\""+q.psw +"\""+
+            "SELECT of.*, sup.uid as supuid, deluid.uid as deliver" +
+            " FROM  supplier as sup, offers as of, (SELECT del.uid FROM deliver as del WHERE LOCATE('"+q.uid+"',del.suppliers)>0) as deluid "+
+            " WHERE of.supuid=sup.uid AND sup.uid=\""+q.uid+"\" AND sup.psw=\""+q.psw +"\"" +
             " AND of.date=\""+q.date+"\" AND of.published IS NOT NULL AND of.deleted IS NULL"+
             " ORDER BY of.id DESC";
 
@@ -137,6 +138,10 @@ module.exports = class Supplier extends D2D{
                         values = [offer, q.location[1], q.location[0], q.radius, sel[0].id];
                         let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, radius=? WHERE id=?";
                         that.updateOfferDB(q, res, sql_upd, values, now);
+                        if(sel[0].deliver) {
+                            //copy offer to deliver's offer
+                            //that.updateOfferDeliver(q, res, sel[0].deliver,offer);
+                        }
                     });
                 }
                 if(sel[0].prolong>0){
@@ -169,6 +174,50 @@ module.exports = class Supplier extends D2D{
                 });
             }
 
+        });
+    }
+
+    updateOfferDeliver(q, res, deliver, offer){
+
+        let sql =
+            "SELECT of.*" +
+            " FROM  deliver as del, offers as of"+
+            " WHERE del.uid=of.supuid AND del.uid=\""+deliver+"\""+
+            " AND of.date=\""+q.date+"\"";
+
+        global.con_obj.query(sql, function (err, sel) {
+            if (err) {
+                res.write(JSON.stringify({err: err}));
+                return;
+            }
+            if(sel[0] && sel[0].data){
+                let del_obj = JSON.parse(sel[0].data);
+                let sup_obj = JSON.parse(offer);
+                for(let tab in sup_obj){
+                    for(let of in sup_obj[tab]) {
+                        if(!del_obj[tab] || !del_obj[tab][of])
+                            continue;
+                        if (sup_obj[tab][of].title === del_obj[tab][of].title) {
+                            let pl = sup_obj[tab][of].packlist;
+                            for (let k in pl) {
+                                let price = parseInt(pl[k]);
+                                let t = pl[k].replace(price, '');
+                                price = parseInt(pl[k]) * 1.2;//markup
+                                pl[k] = price + t;
+                            }
+                            del_obj[tab][of].packlist = pl;
+                            let values = [JSON.stringify(del_obj), sel[0].id];
+                            sql = "UPDATE offers SET data=? WHERE id=?";
+                            global.con_obj.query(sql, values, function (err, sel) {
+                                if (err) {
+                                    res.write(JSON.stringify({err: err}));
+                                    return;
+                                }
+                            });
+                        }
+                    }
+                }
+            }
         });
     }
 
@@ -376,8 +425,8 @@ module.exports = class Supplier extends D2D{
 
             that.replaceImg_2(q.profile.avatar,function (path) {
                 q.profile.avatar = path;
-                let values = [JSON.stringify(q.profile)];
-                sql = " UPDATE   supplier  SET  profile=?"+
+                let values = [JSON.stringify(q.profile), q.settings.prolong];
+                sql = " UPDATE   supplier  SET  profile=?, prolong=?"+
                     " WHERE supplier.uid = '" + q.uid+"'";
                 global.con_obj.query(sql, values,function (err, result) {
                     if (err) {
@@ -439,14 +488,14 @@ module.exports = class Supplier extends D2D{
         //     " AND DAY(appr.date)=DAY(NOW()))";
 
          let sql=
-             " SELECT ord.*, sup.dict " +
-             " FROM orders as ord, supplier as sup" +
-             " WHERE ord.supuid=sup.uid  " +
+             " SELECT ord.*, cus.profile as profile, sup.dict " +
+             " FROM orders as ord, supplier as sup, customer as cus" +
+             " WHERE ord.supuid=sup.uid  AND ord.cusuid=cus.uid" +
              " AND sup.uid='" + q.uid+"'"+
              " AND sup.psw='"+q.psw +"'"+
              " AND ord.date='"+q.date+"'" +
              " UNION" +
-             " SELECT ord.*,NULL " +
+             " SELECT ord.*,NULL,NULL " +
              " FROM  orders as ord,  approved as appr  " +
              " WHERE  " +
              " ord.date='"+q.date+"'" +

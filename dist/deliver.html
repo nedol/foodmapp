@@ -23,7 +23,7 @@
 <script src="../lib/load-image/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="deliver.js"></script>
-
+<script src="../lib/jquery.ui.touch-punch.min.js"></script>
 <style>
 
     html, body{
@@ -243,29 +243,13 @@
 
 <div id="main_window" class="container">
     <div class="row">
-        <div class="col-xm-4 col-sm-4 col-md-4"></div>
-        <div class="form-group  col-xm-8 col-sm-8 col-md-8" style="position:absolute;width:280px;right:0px;z-index: 10;">
+        <div class="col-xm-10 col-sm-10 col-md-10"></div>
+        <div class="form-group  col-xm-2 col-sm-2 col-md-2" style="position:absolute;width:180px;right:0px;z-index: 10;">
             <div class='input-group date'   style="width:auto" >
                 <input type='text'  class="form-control dt_val" data-width="fit" value="Day of Delivery"/>
                 <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                 </span>
-
-                <button class="sel_period btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
-                        data-width="fit" style="display:inline-block;float:right">
-                    <span class="caret"></span>
-                </button>
-                <ol id="period_list" class="dropdown-menu period_list" role="menu">
-                    <li href="#">06:00 - 08:00</li>
-                    <li href="#">08:00 - 10:00</li>
-                    <li href="#">10:00 - 12:00</li>
-                    <li href="#">12:00 - 14:00</li>
-                    <li href="#">14:00 - 16:00</li>
-                    <li href="#">16:00 - 18:00</li>
-                    <li href="#">18:00 - 20:00</li>
-                    <li href="#">20:00 - 22:00</li>
-                    <li href="#">22:00 - 24:00</li>
-                </ol>
 
             </div>
         </div>
@@ -349,7 +333,7 @@
     <div>
         <ul class="nav nav-tabs">
             <li class="active"><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
-            <li><a data-toggle="tab" href="#profile" data-translate="">Мой профиль</a></li>
+            <li><a data-toggle="tab" href="#profile" data-translate="">Профиль</a></li>
         </ul>
 
         <div class="tab-content">
@@ -492,6 +476,20 @@
                     .inv_price{
                         color:red
                     }
+                    .content_text{
+
+                        font-family:'Segoe Script';
+                        font-size: medium;
+                        margin-left: 20px;
+                        height: 200px;
+                        width:100%;
+                        /*overflow:auto;*/
+                        /*user-select: none;*/
+                        -webkit-appearance: textarea;
+                        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                        box-sizing: border-box;         /* IE 8+ */
+                    }
                 </style>
                 <div class="modal-content">
                     <div class="modal-header">
@@ -500,9 +498,11 @@
                     </div>
                     <div class="modal-body">
                         <div style="float: right; padding: 10px 0px 0px; margin-right: 15px">
-                            <h5 style="color:gray;display: inline;margin-right:40px;">Расфасовка:</h5>
-                            <h5 style="color:gray;display: inline;margin-right:40px" >Цена:</h5>
-                            <h5 style="color:gray;display: inline;" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Заказы:</h5>
+                            <h5 style="color:gray;display: inline-block;margin-right:30px">Расфасовка:</h5>
+                            <h5 style="color:gray;display: inline-block;margin-right:30px" >Цена:</h5>
+                            <h5 class="markup_header" style="color:gray;display: none;margin-right:30px" >Наценка:</h5>
+                            <h5 class="total_header" style="color:gray;display: none;margin-right:30px" >Сумма:</h5>
+                            <h5 class="orders_header" style="color:gray;display: none;margin-right:30px" >Заказ:</h5>
                         </div>
 
                         <ul class="nav nav-tabs" id="menu_tabs">
@@ -525,14 +525,7 @@
 
                     </div>
                 </div>
-                <div style="display:none;position:absolute; height:50px;bottom:0;left:5px;width: 15em">
-                    <span>Автоматически публиковать</span>
-                    <select class="sel_prolong"  size="1" style="">
-                        <option value="0"></option>
-                        <option value="1">на следующий день</option>
-                        <option value="7" selected>на следующую неделю</option>
-                    </select>
-                </div>
+
                 <style>
                     th {
                         text-align: center;
@@ -585,11 +578,16 @@
                         font-size:24px;
                         white-space: nowrap;
                     }
-                    .item_price{
+                    .input{
+                        border-width: 0;
                         color: #0088bb;
                         font-weight:normal;
                         font-size:24px;
                         white-space: nowrap;
+                    }
+                    .item_price,.item_pack,.item_markup{
+                        width: 100%;
+                        text-align: center;
                     }
                     .order_ctrl{
                         width: 7%;
@@ -605,17 +603,12 @@
 
                     }
                     .content_text{
+                        overflow-y: scroll;
                         font-family:'Segoe Script';
                         font-size: medium;
-                        /*height: 240px;*/
-                        /*width:100%;*/
-                        border-width: 0px;
+                        margin-left: 20px;
                         /*overflow:auto;*/
                         /*user-select: none;*/
-                        -webkit-appearance: textarea;
-                        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                        box-sizing: border-box;         /* IE 8+ */
                     }
                     .image_div{
                         position: absolute;
@@ -655,33 +648,41 @@
                             </label>
                             <input type="text" class="item_title input input-sm" contentEditable="true" placeholder="название" data-toggle="collapse">
                         </div>
-                        <div style="float: right">
-                            <div class="pack_container" style="display: inline-block;margin-right:30px">
-                                <div class="dropdown">
-                                    <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
-                                        <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
-                                    </ul>
-                                    <div  class="item_pack input" contenteditable="true"  placeholder="....."></div>
-                                    <span class="caret" style="display: inline-block; visibility: hidden"></span>
-                                    <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="display:none;visibility:hidden; float: right"></span>
+                        <div style="display: inline-block;width:22%;float: right;margin-right: 10px">
+                            <div class="row">
+                                <div class="pack_container col-sm-3 col-xs-3">
+                                    <div class="dropdown">
+                                        <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
+                                            <!--<li><a role="packitem" style="color: red">добавить</a></li>-->
+                                        </ul>
+                                        <div class="input item_pack" contentEditable="true"></div>
+                                        <span class="caret" style="display: inline; visibility: hidden"></span>
+                                    </div>
                                 </div>
-
-                            </div>
-                            <div style="display: inline-block;margin-right:30px">
-                                <div class="input item_price"  contenteditable="true" placeholder="руб"></div>
-                            </div>
-                            <div style="display: inline-block;margin-right:5px">
-                                <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
-                                <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
+                                <div class="price_div col-sm-3 col-xs-3">
+                                    <input class="input item_price" contentEditable="false" placeholder="руб">
+                                </div>
+                                <div class="markup_div col-sm-3 col-xs-3" style="display: none">
+                                    <input class="input item_markup"  contentEditable="true" placeholder="руб">
+                                </div>
+                                <div class="total_div col-sm-3 col-xs-3" style="display: none">
+                                    <input class="input item_total"  contentEditable="true" placeholder="руб">
+                                </div>
+                                <div class="orders_div col-sm-3 col-xs-3" style="display: none">
+                                    <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
+                                    <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
+                                </div>
                             </div>
                         </div>
                         <div class="collapse item_content">
-                            <div>
-                                <div  class="input content_text" rows="5" cols="5" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d" data-translate contentEditable="true">&nbsp;</div>
-                            </div>
-
-                            <div>
-                                <img class="input img-fluid" width="100px" src="" >
+                            <div class="row">
+                                <div class="form-group col-sm-10 col-xs-10">
+                                    <textarea class="content_text form-control"  rows="8" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contentEditable="true">
+                                    </textarea>
+                                </div>
+                                <div class="col-sm-2 col-xs-2">
+                                    <img class="input img-fluid center-block" width="100px" src="" >
+                                </div>
                             </div>
                             <div class="toolbar"  style="display:none; position:relative;width:20%;float: right;">
                                 <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
@@ -696,6 +697,9 @@
                         <table class="table tablesorter">
                             <thead style="color:gray;background-color: #f3f3f3">
                             <tr>
+                                <th>
+                                    <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                                </th>
                                 <th>
                                     <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
                                 </th>
@@ -902,43 +906,6 @@
     </div>
 </div>
 
-
-<div id="offer_viewer" class="order_container"
-     style="display:none;   position: absolute;
-     overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:70%;  height: 90%; left: 20%; top: 5%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div>
-        <div class="modal-content">
-            <div class="modal-header" style="position: relative;width: 100%;">
-                <div class="row">
-                    <div class="col-sm-6 col-xs-6">
-                        <h4 class="modal-title"  style="display: inline-block">Order for</h4>
-                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
-                    </div>
-                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; top:0;right: 5px;color: white">
-                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div class="tab-content dropup">
-                    <ul class="nav nav-tabs menu_tabs">
-                        <li class="offer_add_tab_li" title="add tab">
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade offer_add_tab_div" style="border: none"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    <data class="alerts choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
-</div>
 
 <span id="locText" style="font-family: serif">Lat Lon</span>
 

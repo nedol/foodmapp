@@ -22,10 +22,10 @@ require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
 
-let moment = require('moment');
+//let moment = require('moment');
 
 let utils = new Utils();
-//global.jQuery = require('jquery');
+global.jQuery = require('jquery');
 
 $(document).on('readystatechange', function () {
 
@@ -49,68 +49,69 @@ $(document).on('readystatechange', function () {
 
     $('.date_ctrl').draggable();
 
-    let now = new Date();
 
-    var today = new Date();
-    var week = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
+    (function initDP() {
 
-    $('#datetimepicker').datetimepicker({
-        inline: true,
-        sideBySide: true,
-        locale: window.sets.lang,
-        format: 'DD.MM.YYYY',
-        defaultDate: today,
-        //minDate:today,//TODO: uncomment for production
-        maxDate: week,
-        //daysOfWeekDisabled: [0, 6],
-        disabledDates: [
-            //moment("12/25/2018"),
-            //new Date(2018, 11 - 1, 21),
-            "2019-02-01"
-        ]
-    });
+        var today = new Date();
+        var week = new Date(today.getTime() + (7 * 24 * 60 * 60 * 1000));
 
-    let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-    $('.dt_val').val(date);
+        $('#datetimepicker').datetimepicker({
+            inline: true,
+            sideBySide: true,
+            locale: window.sets.lang,
+            format: 'DD.MM.YYYY',
+            defaultDate: today,
+            //minDate:today,//TODO: uncomment for production
+            maxDate: week,
+            //daysOfWeekDisabled: [0, 6],
+            disabledDates: [
+                //moment("12/25/2018"),
+                //new Date(2018, 11 - 1, 21),
+                "2019-02-01"
+            ]
+        });
+        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        $('.dt_val').val(date);
 
-    let dt_w = $('#dtp_container').css('width');
-    let dt_h = $('#dtp_container').css('height');
-    let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
-
-    //$('#datetimepicker').hide();
-
-    $(window).on( "resize", function( event ) {
         let dt_w = $('#dtp_container').css('width');
         let dt_h = $('#dtp_container').css('height');
-        scale = window.innerWidth > window.innerHeight?(window.innerHeight)/parseFloat(dt_h):(window.innerWidth)/parseFloat(dt_w);
-        $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
-    });
+        let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
 
-    setTimeout(function () {
-        $('#datetimepicker').trigger("dp.change");
+        $(window).on("resize", function (event) {
+            let dt_w = $('#dtp_container').css('width');
+            let dt_h = $('#dtp_container').css('height');
+            scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
+            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+        });
+
         $('#datetimepicker').data("DateTimePicker").toggle();
-    }, 200);
 
-    $('#datetimepicker').on('dp.show',function (ev) {
-        $(this).css("background-color", "rgba(255,255,255,.8)");
-        $('#dtp_container').css('display', 'block');
+        $('#datetimepicker').on('dp.show', function (ev) {
+            $(this).css("background-color", "rgba(255,255,255,.8)");
+            $('#dtp_container').css('display', 'block');
 
-        $('#dtp_container').css('transform', 'scale('+(scale-1)+','+(scale-1)+')');
-    });
+            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+        });
 
-    $('#datetimepicker').on('dp.hide',function (ev) {
-        $('#dtp_container').css('display', 'none');
-    });
+        $('#datetimepicker').on('dp.hide', function (ev) {
+            $('#dtp_container').css('display', 'none');
+        })
+
+        $('.glyphicon-calendar').on('click', function (ev) {
+            $('#datetimepicker').data("DateTimePicker").toggle();
+        });
+
+        setTimeout(function () {
+            $('#datetimepicker').trigger("dp.change");
+            $('#datetimepicker').data("DateTimePicker").toggle();
+        }, 200);
+    })();
 
 
     // $(window).on( "orientationchange", function( event ) {
     //     let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
     //     $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
     // });
-
-    $('.glyphicon-calendar').on('click',function (ev) {
-        $('#datetimepicker').data("DateTimePicker").toggle();
-    });
 
     window.network = new Network(host_port);
 
@@ -148,6 +149,7 @@ $(document).on('readystatechange', function () {
 
         });
     });
+
 });
 
 

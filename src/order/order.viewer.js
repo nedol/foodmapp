@@ -11,7 +11,7 @@ require('bootstrap/js/tab.js');
 import proj from 'ol/proj';
 const langs = require("../dict/languages");
 
-var moment = require('moment');
+// var moment = require('moment');
 
 var md5 = require('md5');
 var isJSON = require('is-json');
@@ -194,12 +194,16 @@ class OrderViewer {
 
     SaveOrder(ev) {
         let orders = this.orders;
-        $('.approve:checked').each(function (i,item) {
-            if(!orders[i])
-                return;
-            let obj = orders[i];
-            window.user.ApproveOrder(obj, $(item).attr('title'));
-        })
+        try {
+            $('.approve:checked').each(function (i, item) {
+                if (!orders[i])
+                    return;
+                let obj = orders[i];
+                window.user.ApproveOrder(obj, $(item).attr('title'));
+            })
+        }catch(ex){
+            console.error();
+        }
     }
 }
 

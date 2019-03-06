@@ -42,8 +42,7 @@ class Import {
                     });
                 }
 
-                if (window.db)
-                    that.map.GetObjectsFromStorage(cats, area);
+                that.map.GetObjectsFromStorage(area);
 
             } catch (ex) {
                 console.log(ex);
@@ -62,7 +61,7 @@ class Import {
     LoadSupplierData(uid, cats, area, cb ) {
         let that =  this;
         try{
-            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+            let date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
             let data_obj = {
                 proj: "d2d",
@@ -71,7 +70,6 @@ class Import {
                 uid: uid,
                 categories: cats,
                 date: date,
-                period:$('.sel_period').text(),
                 areas: area
             };
 
@@ -99,6 +97,7 @@ class Import {
                         if(obj.uid ===window.user.uid && obj.date===window.user.date){
 
                             if(!Object.keys(window.user.offer.stobj.data)[0] && obj) {
+
                                 window.db.SetObject('dictStore',obj.dict, function (res) {
 
                                 });
@@ -112,6 +111,7 @@ class Import {
 
                             continue;
                         }
+
                         window.db.SetObject('supplierStore',obj, function (success) {
 
                         });
@@ -126,10 +126,10 @@ class Import {
         }
 
         function formatObject(obj) {
-            let hash = md5(JSON.stringify({longitude:obj.lon, latitude:obj.lat}));
+
             return {
                 uid: obj.uid,
-                date: obj.date,
+                date: new Date(obj.date),
                 period: obj.period,
                 categories: obj.cats,
                 longitude: obj.lon,
@@ -140,8 +140,8 @@ class Import {
                 dict: obj.dict?JSON.parse(obj.dict):{},
                 rating: obj.rating?JSON.parse(obj.rating).value:'',
                 profile: obj.profile?JSON.parse(obj.profile):'',
-                apprs: obj.apprs,//общее кол-во подтверждений
-                hash: hash
+                apprs: obj.apprs//общее кол-во подтверждений
+
             };
         }
     }
@@ -172,6 +172,9 @@ class Import {
                         let obj = res[i];
                         if(!obj)
                             continue;
+                        obj.date = new Date(obj.date);
+                        obj.date.setHours(3);
+                        obj.dict = obj.dict?JSON.parse(obj.dict):obj.dict;
                         obj.logo =  "../dist/images/user.png";
                         if(obj.data)
                             obj.data = JSON.parse(obj.data);
@@ -212,6 +215,8 @@ class Import {
                 if (res) {
                     for(let i in res) {
                         res[i].data = JSON.parse(res[i].data);
+                        res[i].date = new Date(res[i].date);
+                        res[i].date.setHours(3);
                         window.db.SetObject('approvedStore',res[i],function (res) {
 
                         });

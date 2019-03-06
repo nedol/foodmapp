@@ -1,7 +1,3 @@
-
-
-var moment = require('moment');
-
 export {DB};
 import {utils} from '../../utils/utils';
 import Point from 'ol/geom/point';
@@ -14,7 +10,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 26;
+        this.version = 30;
 
         if (!window.indexedDB) {
             console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -71,13 +67,15 @@ class DB {
                 }
 
                 try {
+                    //db.deleteObjectStore(that.offerStore);
                     let vOfferStore = db.createObjectStore(that.offerStore, {keyPath: ["date"]});
-                    vOfferStore.createIndex("date", "date", {unique: false});
+                    vOfferStore.createIndex("date", "date", {unique: true});
                 }catch(ex){
 
                 }
 
                 try {
+                    //db.deleteObjectStore(that.dictStore);
                     let vDictStore = db.createObjectStore(that.dictStore, {keyPath: ["hash"]});
                     vDictStore.createIndex("hash", "hash", {unique: true});
                 }catch(ex){
@@ -107,8 +105,8 @@ class DB {
 
                 }
 
-                //db.deleteObjectStore(that.apprStore);
                 try{
+                    //db.deleteObjectStore(that.apprStore);
                     let vApprStore = db.createObjectStore(that.apprStore, {keyPath: ["date", "supuid", "cusuid", "title"]});
                     vApprStore.createIndex("datesupcustitle", ["date", "supuid", "cusuid", "title"], {unique: true});
                     vApprStore.createIndex("sup", ["supuid"], {unique: false});
@@ -126,7 +124,6 @@ class DB {
 
     //unified storage function
     SetObject(storeName, obj, f) {
-
         var objectStore = this.DBcon.transaction([storeName], "readwrite").objectStore(storeName);
         var request = objectStore.put(obj);
         request.onerror = function (err) {
@@ -163,39 +160,84 @@ class DB {
             };
     }
 
-    getSupplier( date, e1start, e1end, uid, cb) {
+    GetSupplierFeature( date,uid, cb) {
 
-        if (!uid || !date)
+        if(!this.DBcon)
             return;
-        try {
-            let objectStore = this.DBcon.transaction(this.supplierStore, "readonly").objectStore(this.supplierStore);
-            let idateuid = objectStore.index("dateuid");
-            var request = idateuid.get([date,uid]);
-            request.onerror = this.logerr;
-            request.onsuccess = function (ev) {
 
-                if(this.result){
-                    if(!e1start && !e1end){
-                        cb(this.result);
-                    }
+        var tx = this.DBcon.transaction([this.supplierStore], "readonly");
+        var objectStore = tx.objectStore(this.supplierStore);
+        let idateuid = objectStore.index("dateuid");
+        var lowerBound = [date, uid];
+        var upperBound = [date, uid];
+        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
 
-                    let period = this.result.period.split('-');
-                    if(parseInt(e1start) >= parseInt(period[0]) && parseInt(e1start) <= parseInt(period[1])
-                        || parseInt(period[0]) >= parseInt(e1start) && parseInt(period[0]) <= parseInt(e1end)) {
-                        cb(this.result);
-                    }else{
-                       cb(-1);
-                    }
-                }else{
-                    cb(-1);
+        var features = [];
+
+        idateuid.openCursor(boundKeyRange).onsuccess = function (event) {
+
+            var cursor = event.target.result;
+            if (cursor) {
+                //
+                // if(cursor.value.date!==date1)
+                //     cursor.continue();
+
+                //let period = cursor.value.period.split('-');
+
+                var markerFeature = new Feature({
+                    geometry: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
+                    labelPoint: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
+                    //name: cursor.value.title ? cursor.value.title : "",
+                    //tooltip: cursor.value.title ? cursor.value.title : "",
+                    categories: JSON.parse(cursor.value.categories),
+                    type:'supplier',
+                    object: cursor.value
+                });
+
+                markerFeature.setId(cursor.value.uid);
+                features.push(markerFeature);
+
+                try {
+                    cursor.continue();
+                }catch (ex){
+                    console.log();
                 }
             }
-        } catch (ex) {
-            console.log(ex);
+        };
+
+        tx.oncomplete = function () {
+            cb(features);
         }
     }
 
-    GetRangeSupplier(date, e1start, e1end, lat_0, lon_0, lat_1, lon_1, f) {
+    GetSupplier( date,uid, cb) {
+
+        if(!this.DBcon)
+            return;
+
+        var tx = this.DBcon.transaction([this.supplierStore], "readonly");
+        var objectStore = tx.objectStore(this.supplierStore);
+        let idateuid = objectStore.index("dateuid");
+        var lowerBound = [date, uid];
+        var upperBound = [date, uid];
+        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
+
+        var features = [];
+
+        idateuid.openCursor(boundKeyRange).onsuccess = function (event) {
+
+            var cursor = event.target.result;
+            if (cursor) {
+                try {
+                    cb(cursor.value);
+                }catch (ex){
+                    console.log();
+                }
+            }
+        };
+    }
+
+    GetRangeSupplier(date, lat_0, lon_0, lat_1, lon_1, f) {
 
         if(!this.DBcon)
             return;
@@ -205,7 +247,7 @@ class DB {
         var ilatlon = objectStore.index("datelatlon");
         var lowerBound = [date,lat_0,lon_0];
         var upperBound = [date,lat_1,lon_1];
-        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound);
+        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
 
         var features = [];
 
@@ -213,30 +255,12 @@ class DB {
 
             var cursor = event.target.result;
             if (cursor) {
-
-                if(cursor.value.date!==date)
-                    cursor.continue();
-
-                let period = cursor.value.period.split('-');
-
-                if(parseInt(e1start) >= parseInt(period[0]) && parseInt(e1start) <= parseInt(period[1])
-                    || parseInt(period[0]) >= parseInt(e1start) && parseInt(period[0]) <= parseInt(e1end)) {
-
-                    var markerFeature = new Feature({
-                        geometry: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
-                        labelPoint: new Point(proj.fromLonLat([cursor.value.longitude, cursor.value.latitude])),
-                        //name: cursor.value.title ? cursor.value.title : "",
-                        //tooltip: cursor.value.title ? cursor.value.title : "",
-                        categories: JSON.parse(cursor.value.categories),
-                        type:'supplier',
-                        object: cursor.value
-                    });
-
-                    markerFeature.setId(cursor.value.hash);
-                    features.push(markerFeature);
-                }
-
+                features.push(cursor.value);
+            }
+            try {
                 cursor.continue();
+            }catch (ex){
+                console.log();
             }
         };
 
@@ -356,6 +380,20 @@ class DB {
         }
     }
 
+    DeleteObject(store, uid, cb) {
+
+        var request = DB.prototype.DBcon.transaction(store, "readwrite").objectStore(store).delete([uid]);
+        request.onerror = function (ev) {
+            console.log(ev);
+        };
+        request.onsuccess = function () {
+            console.log("File delete from DB:");
+            if(cb)
+                cb();
+        }
+
+    }
+
     GetSettings(cb) {
         try {
             let objectStore = this.DBcon.transaction('setStore', "readonly").objectStore('setStore');
@@ -371,15 +409,36 @@ class DB {
 
     GetOffer(date,  cb) {
         try {
-            let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
-            let index = objectStore.index("date");
-            var request = index.get(date);
-            request.onerror = this.logerr;
-            request.onsuccess = function (ev) {
-                cb(this.result);
+
+            var tx = this.DBcon.transaction([this.offerStore], "readonly");
+            var objectStore = tx.objectStore(this.offerStore);
+            var idate = objectStore.index("date");
+            var lowerBound = new Date(date);
+            lowerBound.setHours(lowerBound.getHours() - 1);
+            var upperBound = new Date(date);
+            upperBound.setHours(upperBound.getHours()+1);
+            let boundKeyRange = IDBKeyRange.bound(lowerBound, upperBound,false);
+
+            var ar = [];
+
+            idate.openCursor(boundKeyRange).onsuccess = function (event) {
+
+                var cursor = event.target.result;
+                if (cursor) {
+                    ar.push(cursor.value);
+                }
+                try {
+                    cursor.continue();
+                } catch (ex) {
+                    console.log();
+                }
+            };
+
+            tx.oncomplete = function () {
+               cb(ar);
             }
         } catch (ex) {
-            console.log(ex);
+
         }
     }
 
@@ -398,7 +457,7 @@ class DB {
         };
     }
 
-    GetLastOffers(cb) {
+    GetLastOffer(cb) {
         let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
         objectStore.getAll().onsuccess = function(event) {
             cb(event.target.result[event.target.result.length-1]);

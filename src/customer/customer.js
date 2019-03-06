@@ -11,7 +11,7 @@ require('bootstrap');
 
 require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
 
-import {OfferEditor} from '../offer/offer.editor';
+import {OfferEditor} from '../supplier/offer.editor';
 import {Dict} from '../dict/dict.js';
 import {Network} from "../../network";
 
@@ -45,7 +45,7 @@ class Customer{
 
     constructor(uObj) {
 
-        this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
         this.uid = uObj.uid;
         this.psw = uObj.psw;
@@ -104,14 +104,14 @@ class Customer{
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
-        window.db.GetOffer(this.date,function (res) {
-            if(res){
-                $('.sel_period').text(res.period);
-            }else{
-                let time = $($('.period_list li')[0]).text();
-                $('.sel_period').text(time);
-            }
-        });
+        // window.db.GetOffer(this.date,function (res) {
+        //     if(res){
+        //         $('.sel_period').text(res.period);
+        //     }else{
+        //         let time = $($('.period_list li')[0]).text();
+        //         $('.sel_period').text(time);
+        //     }
+        // });
         this.DateTimePickerEvents();
     }
 
@@ -172,11 +172,12 @@ class Customer{
 
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
-            that.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+            that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-            $('.dt_val').val(that.date);
+            $('.dt_val').val($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
             $('.sel_period').find('option').css('visibility','visible');
+            $('.sel_period').text('06:00 - 24:00');
 
             $(this).data("DateTimePicker").toggle();
 
@@ -193,18 +194,20 @@ class Customer{
                     }
                 }
             });
-            window.db.GetOffer(that.date ,function (res) {
-                if(res){
-                    $('.sel_period').text(res.period);
-                }else{
-                    window.db.SetObject('offerStore',{date:that.date,period:$('.sel_period').text()},function (res) {
-
-                    });
-                }
-            });
+            // window.db.GetOffer(that.date ,function (res) {
+            //     if(res){
+            //         $('.sel_period').text(res.period);
+            //     }else{
+            //         window.db.SetObject('offerStore',{date:that.date,period:$('.sel_period').text()},function (res) {
+            //
+            //         });
+            //     }
+            // });
             that.import.GetApprovedCustomer(function () {
 
             });
+
+            that.map.GetObjectsFromStorage();
         });
     }
 
@@ -232,10 +235,7 @@ class Customer{
     }
 
     UpdateOrderLocal(obj){
-        if(Object.keys(obj.data).length===0) {
-
-            return;
-        }
+        obj.date = new Date(obj.date);
         window.db.SetObject('orderStore',obj,(res)=>{
 
         });
@@ -303,23 +303,23 @@ class Customer{
 
     OnClickUserProfile(li){
 
-        $('#profile_container').css('display','block');
-        $('#profile_container iframe').attr('src',"../src/profile/profile.customer.html");
-        $('#profile_container iframe').off();
-        $('#profile_container iframe').on('load',function () {
-            $('#profile_container iframe')[0].contentWindow.InitProfileUser();
+        $('#my_profile_container').css('display','block');
+        $('#my_profile_container iframe').attr('src',"./profile.customer.html");
+        $('#my_profile_container iframe').off();
+        $('#my_profile_container iframe').on('load',function () {
+            $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
 
-            $('.close_browser',$('#profile_container iframe').contents()).on('touchstart click', function (ev) {
-                $('#profile_container iframe')[0].contentWindow.profile_cus.Close();
-                $('#profile_container').css('display', 'none');
+            $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
+                $('#my_profile_container iframe')[0].contentWindow.profile_cus.Close();
+                $('#my_profile_container').css('display', 'none');
             });
         });
-        this.MakeDraggable($( "#profile_container" ));
-        $( "#profile_container" ).resizable({});
+        this.MakeDraggable($( "#my_profile_container" ));
+        $( "#my_profile_container" ).resizable({});
 
 
 
-        //this.MakeDraggable($('body', $('#profile_container iframe').contents()));
+        //this.MakeDraggable($('body', $('#my_profile_container iframe').contents()));
 
     }
 

@@ -92,13 +92,15 @@ class Categories {
         $(el).css('opacity', $(el).attr('state') === '1' ? 1 : 0.3);
 
         let layers = that.map.ol_map.getLayers().values_;
-        let id = parseInt($(el).attr('id'));
+        let id = $(el).attr('id');
 
-        if (layers[id])
-            layers[id].setVisible(($(el).attr('state') === '0' ? false : true));
+        for(let l in layers) {
+            if(parseInt(l) ===parseInt(id))
+                layers[l].setVisible(($(el).attr('state') === '0' ? false : true));
+        }
 
         let cats = $(".category").toArray();
-        cats = jQuery.map(cats, function (el) {
+        cats = $.map(cats, function (el) {
             return {id: $(el).attr('id'), state: $(el).attr('state')};
         });
         localStorage.setItem("state_category", JSON.stringify(cats));

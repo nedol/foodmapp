@@ -38,7 +38,7 @@ class Network{
         this.eventSource.onmessage = function (e) {
             console.log(e.data);
             window.user.OnMessage(JSON.parse(e.data));
-            return Promise.resolve("Dummy response to keep the console quiet");
+            //return Promise.resolve("Dummy response to keep the console quiet");
         };
         this.eventSource.addEventListener('sse', (e) => {
             console.log(e.data);

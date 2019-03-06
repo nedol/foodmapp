@@ -90,7 +90,7 @@ class Geo {
             });
 
 
-            // geolocation.on('change:position', function() {
+            geolocation.on('change:position', function() {
             //     var coords = geolocation.getPosition();
             //
             //     var time = new Date().getTime();
@@ -101,7 +101,7 @@ class Geo {
             //     }
             //
             //     return;
-            // });
+            });
 
             geolocation.on('change:speed', function () {
                 var speed = geolocation.getSpeed();
@@ -129,14 +129,23 @@ class Geo {
 
         var latlon = proj.toLonLat(window.sets.coords.gps);
 
-        // ReverseGeocoding(latlon, 15, function (res) {
-        //     var adr = res;
-        // });
+        localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
+            "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
+
+        //TODO: поиск текущего места
+        // let cur_loc = JSON.parse(localStorage.getItem("cur_loc"));
+        // if(!cur_loc.address) {
+        //     latlon = [latlon[1], latlon[0]];
+        //     this.SearchPlace(latlon, 16, function (res) {
+        //
+        //         cur_loc.address = res;
+        //         localStorage.setItem("cur_loc", JSON.stringify(cur_loc));
+        //     });
+        // }
 
         if (window.sets.loc_mode) {
             this.SetCurPosition(that,window.sets.coords.gps);
-            localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
-                "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
+
             if(window.user.SendLocation)
                 window.user.SendLocation(window.sets.coords.gps);
         }

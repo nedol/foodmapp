@@ -1,5 +1,8 @@
 'use strict'
 
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
@@ -10,14 +13,21 @@ require('bootstrap');
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-window.InitProfileSupplier = function (obj, settings) {
+window.InitProfileSupplier = function (user, settings) {
 
-    window.profile_sup = new ProfileSupplier(window.parent.db);
-    window.profile_sup.InitComments(obj, settings);
+    window.profile_sup = new ProfileSupplier();
+    window.profile_sup.InitComments(user, settings);
     window.profile_sup.InitRateSupplier();
     window.profile_sup.InitSettingsSupplier();
 
-    if(obj.user==='Supplier') {
+    if(user.constructor.name==='Supplier') {
+        if(!user.profile.profile.avatar) {
+            utils.LoadImage("./images/avatar_2x.png", function (src) {
+                $('.avatar').attr('src', src);
+            });
+        }else{
+            $('.avatar').attr('src', user.profile.profile.avatar);
+        }
         $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
         $('img.avatar').on('click',function (ev) {
             $(this).siblings('.file-upload').trigger('click');
@@ -50,6 +60,22 @@ window.InitProfileSupplier = function (obj, settings) {
         $(".file-upload").on('change', function () {
             readURL(this);
         });
+
+        $( "#period_list" ).selectable({
+            stop: function() {
+                let result;
+                $( ".ui-selected", this ).each(function(i) {
+                    let index = $( "#period_list li" ).index( this );
+                    if(i===0)
+                        result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    if($( ".ui-selected").length===i+1)
+                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                });
+                $('.sel_period').val(result);
+                $( ".sel_period ").dropdown("toggle");
+
+            }
+        });
     }
 }
 
@@ -57,7 +83,9 @@ window.InitProfileSupplier = function (obj, settings) {
 
 class ProfileSupplier{
     constructor(){
-
+        $('#prolong').on('changed', function (ev) {
+            
+        })
     }
 
     InitComments(obj, settings){
@@ -168,8 +196,9 @@ class ProfileSupplier{
 
     InitSettingsSupplier(){
         window.parent.db.GetSettings(function (obj) {
-            if(obj[0].settings)
-                $('#settings').find(':input.prolong').bootstrapToggle(obj[0].settings.prolong?'on':'off')
+            if(obj[0].settings) {
+                $('input#prolong').val(obj[0].settings.prolong);
+            }
         });
     }
 
@@ -199,7 +228,7 @@ class ProfileSupplier{
                     thmb: thmb.src,
                     lang: $('html').attr('lang'),
                     name: $('#name').val(),
-                    address: $('#address').val(),
+                    worktime: $('#worktime').val(),
                     mobile: $('#mobile').val(),
                     place: $('#place').val(),
                 }
@@ -208,7 +237,7 @@ class ProfileSupplier{
             window.parent.network.postRequest(data_post, function (res) {
 
                 window.parent.db.GetSettings(function (obj) {
-                    obj[0].profile = data_post.profile;
+                    obj[0].profile = res.profile;
                     window.parent.db.SetObject('setStore',obj[0], function (res) {
 
                     });
@@ -220,13 +249,12 @@ class ProfileSupplier{
 
     SaveSettings(){
         let settings = {};
-        $('#settings').find(':input').each(function (i,item) {
-            settings[$(item).attr('class')] = $(item).prop('checked');
+        $('#settings').find('select').each(function (i,item) {
+            settings[$(item).attr('id')] = $(item).closest('div').find('.sel_prolong').val();
         });
 
         window.parent.db.GetSettings(function (obj) {
             obj[0].settings = settings;
-            obj[0].profile.avatar = $('#profile').find('.avatar').attr('src');
             window.parent.db.SetObject('setStore',obj[0],function (res) {
                 window.parent.user.profile.profile =  obj[0].profile;
             });

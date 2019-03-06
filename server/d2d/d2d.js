@@ -183,22 +183,21 @@ module.exports = class D2D {
                     return;
                 }
                 let values, sql;
-                if(md5(q.profile.email)===q.uid)
-                    that.replaceImg_2(q.profile.avatar,function (avatar) {
-
+                if(md5(q.profile.email)===q.uid) {
+                    that.replaceImg_2(q.profile.avatar, function (avatar) {
                         q.profile.avatar = avatar;
-                        values = [q.profile.email,JSON.stringify(q.profile),result[0].id];
-                        sql = "UPDATE  "+q.user.toLowerCase()+"  SET  email=?, profile=? WHERE id=?";
+                        values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
+                        sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
                         global.con_obj.query(sql, values, function (err, res_upd) {
 
                             if (err) {
-                                res.end(JSON.stringify({err:err}));
+                                res.end(JSON.stringify({err: err}));
                                 return;
                             }
-                            res.end(JSON.stringify({id:result[0].id,promo:result[0].promo}));
+                            res.end(JSON.stringify({id: result[0].id, promo: result[0].promo}));
                         });
-
                     });
+                }
             }
         });
     }
@@ -496,21 +495,21 @@ module.exports = class D2D {
     GetSuppliers(q, res){
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT of.date as date, of.period as period, sup.uid as uid, of.categories as cats, " +
+        let sql = " SELECT  DATE_FORMAT(of.date, \"%Y-%m-%d\") as date, sup.uid as uid, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, sup.dict as dict, sup.profile as profile," +
             " sup.rating as rating, " +
-            "apprs.totals as apprs"+//общее кол-во подтверждений
+            " apprs.totals as apprs"+//общее кол-во подтверждений
             " FROM  supplier as sup, offers as of," +
             " (" +
             " SELECT COUNT(*) as  totals" +
             " FROM supplier as sup, approved as appr" +
             " WHERE sup.uid=uid AND appr.supuid=sup.uid" +
-            " AND appr.date='" + q.date + "'" +
+            " AND appr.date=DATE_FORMAT(\""+q.date+"\", \"%Y-%m-%d\")"+
             " ) AS apprs"+
             " WHERE sup.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date=\""+q.date+"\" AND of.published IS NOT NULL AND of.deleted IS NULL";
+            " AND of.date=DATE_FORMAT(\""+q.date+"\", \"%Y-%m-%d\") AND of.published IS NOT NULL AND of.deleted IS NULL";
 
         global.con_obj.query(sql, function (err, result) {
             res.writeHead(200, {'Content-Type': 'application/json'});

@@ -155,7 +155,7 @@ class ProfileCustomer{
                 for(let item in order.data) {
                     let ovc = $(window.parent.menu_item_tmplt).clone();
 
-                    window.parent.db.getSupplier(window.parent.user.date, '', '', order.supuid,function (res) {
+                    window.parent.db.getSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
                         if(res!=-1) {
                             let dict = new Dict(res.dict.dict);
                             dict.set_lang(window.parent.sets.lang, ovc[0]);

@@ -18,6 +18,11 @@ $.fn.setCursorPosition = function(pos) {
     return this;
 };
 
+Date.prototype.addDays = function(days) {
+    this.setDate(this.getDate() + parseInt(days));
+    return this;
+};
+
 class Utils{
 
     getParameterByName(name, url) {

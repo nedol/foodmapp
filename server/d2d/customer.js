@@ -80,9 +80,9 @@ module.exports = class Customer extends D2D{
         let now = moment().format('YYYY-MM-DD h:mm:ss');
         let sql =
             "SELECT ord.*"+ //, tar.options as tariff"+ // cus.email as cusuid,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
-            " FROM  supplier as sup, customer as cus, orders as ord" +
+            " FROM  customer as cus, orders as ord" +
             //", tariff as tar"+
-            " WHERE sup.uid=ord.supuid  AND ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
+            " WHERE ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
             " AND cus.psw=\""+q.psw+"\"" +
             //" AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
             " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
@@ -154,6 +154,74 @@ module.exports = class Customer extends D2D{
                     global.resObj[q.cusuid].write(utils.formatSSE({func:'updateorderstatus',order:sel[0]}));
                 }
             });
+        });
+    }
+
+
+    GetSuppliers(q, res){
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+        let sql = " SELECT " +
+            " DATE_FORMAT(of.date,'%Y-%m-%d') as date, of.categories as cats, " +
+            " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+            " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
+            " apprs.totals as apprs"+//общее кол-во подтверждений
+            " FROM  supplier as sup, offers as of," +
+            " (" +
+            " SELECT COUNT(*) as  totals" +
+            " FROM supplier as sup, approved as appr" +
+            " WHERE appr.supuid=sup.uid" +
+            " AND appr.date=\""+q.date.split('T')[0]+"\"" +
+            " ) AS apprs"+
+            " WHERE sup.uid = of.supuid"+
+            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
+            " AND of.date=\""+q.date.split('T')[0]+"\" AND of.published IS NOT NULL AND of.deleted IS NULL " +
+            " UNION" +
+            " SELECT of.date as date, of.categories as cats, " +
+            " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+            " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
+            " apprs.totals as apprs"+//общее кол-во подтверждений" +
+            " FROM  deliver as del, offers as of," +
+            " (" +
+            " SELECT COUNT(*) as  totals" +
+            " FROM deliver as del, approved as appr" +
+            " WHERE appr.supuid=del.uid" +
+            " AND appr.date=\""+q.date.split('T')[0]+"\"" +
+            " ) AS apprs"+
+            " WHERE del.uid = of.supuid"+
+            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
+            " AND of.date=\""+q.date.split('T')[0]+"\" AND of.published IS NOT NULL AND of.deleted IS NULL";
+
+        global.con_obj.query(sql, function (err, result) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if (err) {
+                res.end(JSON.stringify({'err':err}));
+                return;
+            }
+            let now = moment().format('YYYY-MM-DD');
+            sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
+
+            global.con_obj.query(sql, function (err, result) {
+                if (err) {
+                    console.log(JSON.stringify({'err':err}));
+                }
+            });
+
+            if(result.length>0) {
+                for(let i in result) {
+                    let cats = JSON.parse(result[i].cats);
+                    if (intersection(cats, q.categories).length > 0) {
+
+                    }else{
+                        delete result[i];
+                    }
+                }
+                res.write(urlencode.encode(JSON.stringify(result)));
+            }
+
+            res.end();
         });
     }
 

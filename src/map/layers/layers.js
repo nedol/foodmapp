@@ -74,11 +74,6 @@ class Layers {
             that.map.ol_map.getLayers().push(that.circleLayer);
             that.map.ol_map.getLayers().set('radius', that.circleLayer, true);
 
-            $(".category").each(function (i, el) {
-                let cat = $(el).attr("id");
-                let state = $(el).attr("state");
-                that.CreateLayer(cat, state);
-            });
 
         } catch (ex) {
             console.log("InitLayers");
@@ -133,9 +128,9 @@ class Layers {
             style: function (cluster_feature, atr) {
 
                 let period = $('.sel_period').text().split(' - ');
-                let features = cluster_feature.values_.features;
+                let features = cluster_feature.values_.features?cluster_feature.values_.features:[cluster_feature];
                 let rem_feat = [];
-                if (features && features.length > 0){
+                if (cluster_feature.values_ || (features && features.length > 0)){
 
                     $.each(features,  (key, feature)=> {
                         if(feature.getId()===id_str)
@@ -144,14 +139,17 @@ class Layers {
                         setTimeout(function () {
                             id_str = '';
                         },300);
-                        window.db.getSupplier(window.user.date,period[0],period[1],feature.values_.object.uid,function (res) {
-                            if(res!==-1) {
-                                if (feature.values_.object.date === window.user.date) {
+                        window.db.GetSupplierFeature(new Date(window.user.date),feature.values_.object.uid,function (res) {
+                            if(res[0]!==-1) {
+                                if (feature.values_.object.date.valueOf() === new Date(window.user.date).valueOf()) {
 
-                                    let style = getObjectStyle(feature.values_.object, res);
-                                    if (feature.values_.object.date === window.user.date) {
-                                        cluster_feature.setStyle(style);
+                                    if(window.user.constructor.name==="Supplier"){
+                                        if(feature.values_.object.profile.type==='marketer')
+                                            return;
+                                    }
 
+                                    let style = getObjectStyle(feature.values_.object, res[0].values_.object);
+                                    cluster_feature.setStyle(style);
 
                                     if(window.user.constructor.name==="Customer") {
                                         if(feature.values_.object.profile.type==='marketer')
@@ -164,11 +162,11 @@ class Layers {
                                             radiusFeature = feature.values_.object.radius_feature;
                                         }else {
                                             radiusFeature = new Feature({
-                                                geometry: new Circle(proj.fromLonLat([res.longitude, res.latitude]), res.radius)
+                                                geometry: new Circle(proj.fromLonLat([res[0].values_.object.longitude, res[0].values_.object.latitude]), res[0].values_.object.radius)
                                                 //name: cursor.value.title ? cursor.value.title : "",
                                                 //tooltip: cursor.value.title ? cursor.value.title : "",
                                             });
-                                            source.addFeature(radiusFeature);
+
                                             feature.values_.object.radius_feature = radiusFeature;
 
                                             let col = new Collection();
@@ -179,13 +177,11 @@ class Layers {
                                                 type: 'Circle',
                                                 features: col
                                             });
+                                            source.addFeature(radiusFeature);
                                         }
 
                                     }
 
-                                    } else {
-                                        vectorSource.removeFeature(feature);
-                                    }
                                 }else{
                                     vectorSource.removeFeature(feature);
                                 }
@@ -195,59 +191,52 @@ class Layers {
                         });
                     });
                 }
+                else if(cluster_feature.values_){
+                    ;
+                }
 
                 function getObjectStyle(obj, appr) {
 
                     if (!obj || parseInt(obj.status) === 0)
                         return null;
                     let source = that.circleLayer.getSource();
-                    let logo = '';
+                    let ic_clust = "./images/truck.png";
                     let scale = 1;
 
-                    logo = obj.logo;
+                    let logo = obj.logo;
                     scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/300;
-                    if(window.user.constructor.name==='Customer'
-                        && obj.profile.type==='marketer'){
-                        if(that.map.ol_map.getView().getZoom()<16)
-                            return;
+                    if(obj.profile.type==='marketer'){
+                        // if(that.map.ol_map.getView().getZoom()<15)
+                        //     return;
+                        ic_clust = obj.img;
                         scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/500;
                     }
                     let opacity;
                     if ( obj.apprs<1)
                         opacity = 0.9;
                     else
-                        opacity = 1.0
+                        opacity = 1.0;
 
-                    var stroke = new _ol_style_Stroke_({color: 'black', width: 2});
-                    var fill = new _ol_style_Fill_({color: 'red'});
-                    let image = new RegularShape({
-                        fill: fill,
-                        stroke: stroke,
-                        points: 5,
-                        radius: 10,
-                        radius2: 4,
-                        angle: 0
-                    });
 
                     let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
                         //size: [100,100],
                         //img: image,
                         //imgSize:
-                        scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [20, 20],
+                        scale: obj.profile.thmb?scale:scale*.5, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        anchor: obj.profile.thmb?[20, 20]:[40, 40],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
                         anchorYUnits: 'pixel',
                         color: [255, 255, 255, 1],
                         opacity: opacity,
-                        src: obj.profile.thmb?obj.profile.thmb:"./images/truck.png"
+                        src: obj.profile.thmb?obj.profile.thmb: "./images/user.png"
                     }));
                     let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
                         //size: [100,100],
                         //img: image,
                         //imgSize:
-                        scale: .3, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        scale: .2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
                         anchor: [20, 20],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
@@ -255,7 +244,7 @@ class Layers {
                         anchorYUnits: 'pixel',
                         color: [255, 255, 255, 1],
                         opacity: opacity,
-                        src: "./images/truck.png"
+                        src: ic_clust
                     }));
                     let iconStyle;
                     if (features.length > 1) {//cluster
@@ -279,7 +268,7 @@ class Layers {
                             zIndex: 20
                         });
 
-                        source.clear();
+                        //source.clear();
                     } else {
 
                         iconStyle = new _ol_style_Style_({
