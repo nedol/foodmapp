@@ -105,7 +105,7 @@ class OfferOrder {
         //this.ovc.find('.custom-star').val(obj.rating);
 
         $('.email').text(obj.profile.email);
-        $('.name').css('display','block').text(obj.profile.name);
+        $('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
         window.db.GetSupApproved(obj.uid, function (res) {
             that.appr = res;
         });
@@ -145,19 +145,17 @@ class OfferOrder {
                 return;
             if($('[href="#'+tab+'"]').length===0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore(that.ovc.find('.add_tab_li'));
+                    '</li>').insertBefore(that.ovc.find('#add_tab_li'));
                 $('<div id="'+tab+'" class="tab-pane fade div_tab_inserted dropdown" style="border: none">' +
-                    '</div>').insertBefore(that.ovc.find('.add_tab_div'));
+                    '</div>').insertBefore(that.ovc.find('#add_tab_div'));
             }
 
             for (let i in that.offer[tab]) {
 
-                let markup = 1;
-
                 let menu_item  = $('#menu_item_tmplt').clone();
-                $('menu_item').attr('id', tab + '_' + i);
+                $(menu_item).attr('id', tab + '_' + i);
 
-                $(menu_item).attr("class", 'menu_item');
+                $(menu_item).attr('class','menu_item');
                 $(menu_item).css('display', 'block');
 
                 $(menu_item).find('.item_title').attr('contenteditable', 'false');
@@ -181,45 +179,29 @@ class OfferOrder {
                     $(menu_item).find('.content_text').attr('data-translate',that.offer[tab][i].content_text.value);
                 if(that.offer[tab][i].content_text)
                     $(menu_item).find('.content_text').css('visibility','visible');
-                if(that.offer[tab][i].content_text && that.offer[tab][i].content_text.width)
-                    $(menu_item).find('.content_text').css('width',that.offer[tab][i].content_text.width);
-
-                if(that.offer[tab][i].content_text && that.offer[tab][i].content_text.left)
-                    $(menu_item).find('.content_text').css('left',that.offer[tab][i].content_text.left);
 
                 if(that.offer[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', that.offer[tab][i].img.src);
-                    $(menu_item).find('.img-fluid').css('left',!that.offer[tab][i].img.left?0:(that.offer[tab][i].img.left/that.offer[tab][i].width)*100+'%');
-                    $(menu_item).find('.img-fluid').css('top', !that.offer[tab][i].img.top?0:that.offer[tab][i].img.top);
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
-
-                $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:that.offer[tab][i]},function(ev){
-                    that.changed = true;
-                    let pl = ev.data.off.packlist;
-                    $(menu_item).find('.item_pack').text($(ev.target).text());
-                    $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
-                });
 
                 let setPrice = function (packlist, mi) {
                     if(mi) menu_item = mi;
                     $(menu_item).find('.pack_list').empty();
                     let pl = packlist;
+                    let ml = that.offer[tab][i].markuplist;
                     $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
                     for (let p in pl) {
-                        markup = that.offer[tab][i].markup ? that.offer[tab][i].markup : '0';
                         if (!i)
                             continue;
-                        let data;
-                        if (markup.includes('%')) {
-                            markup = (parseInt(markup) / 100 + 1);
-                            data = (parseInt(pl[p]) * markup).toFixed(0);
-                        } else {
-                            markup = parseInt(markup);
-                            data = (parseInt(pl[p]) + markup);
-                        }
+                        let ml_val;
+                        if(!ml || !ml[p])
+                            ml_val = 0;
+                        else
+                            ml_val= parseInt(ml[p]);
+                        let data = parseInt(pl[p])+ml_val;
 
                         $(menu_item).find('.item_price').attr('base', pl[p]);
                         pl[p] = data;
@@ -236,28 +218,41 @@ class OfferOrder {
                     }
                 }
 
-                if(false) {
+                if(that.offer[tab][i].owner) {
                     $(menu_item).find('.item_title').attr('owner', that.offer[tab][i].owner);
                     window.db.GetSupplier(new Date(window.user.date),that.offer[tab][i].owner,function (offer) {
-                        setPrice(offer.data[tab][i].packlist,menu_item);
+                        let title = that.offer[tab][i].title;
+                        let incl = _.find(offer.data[tab],{title:title});
+                        setPrice(incl.packlist,menu_item);
+
+                        $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:incl},function(ev){
+                            that.changed = true;
+                            let pl = incl.packlist;
+                            $(menu_item).find('.item_pack').text($(ev.target).text());
+                            $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
+                        });
 
                         $(menu_item).find('.content_text').attr('contenteditable', 'false');
-                        if(offer.data[tab][i].content_text)
-                            $(menu_item).find('.content_text').attr('data-translate', offer.data[tab][i].content_text.value);
-                        if(offer.data[tab][i].content_text)
+                        if(incl.content_text)
+                            $(menu_item).find('.content_text').attr('data-translate', incl.content_text.value);
+                        if(incl.content_text)
                             $(menu_item).find('.content_text').css('visibility','visible');
-                        if(offer.data[tab][i].content_text && offer.data[tab][i].content_text.width)
-                            $(menu_item).find('.content_text').css('width',offer.data[tab][i].content_text.width);
 
-                        if(offer.data[tab][i].content_text && offer.data[tab][i].content_text.left)
-                            $(menu_item).find('.content_text').css('left',offer.data[tab][i].content_text.left);
-
-                        if(offer.data[tab][i].img) {
+                        if(incl.img) {
                             $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                            $(menu_item).find('.img-fluid').attr('src', offer.data[tab][i].img.src);
-                            $(menu_item).find('.img-fluid').css('left',!offer.data[tab][i].img.left?0:(offer.data[tab][i].img.left/offer.data[tab][i].width)*100+'%');
-                            $(menu_item).find('.img-fluid').css('top', !offer.data[tab][i].img.top?0:offer.data[tab][i].img.top);
+                            $(menu_item).find('.img-fluid').attr('src', incl.img.src);
+                            $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
+                            $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
                         }
+
+                        $.each(incl.cert, function (ind, data) {
+                            let img = new Image();
+                            img.src = data.src;
+                            //$(img).offset(data.pos); TODO:
+                            img.height = '100';
+                            $(menu_item).find('.gallery').append(img);
+                            $(img).on('click', that.onClickCert);
+                        });
 
                         that.ovc.find('#' + tab).append(menu_item);
                         that.dict.dict = Object.assign(offer.dict.dict,that.dict.dict);
@@ -269,28 +264,37 @@ class OfferOrder {
                     that.ovc.find('#' + tab).append(menu_item);
                 }
 
-
-                $(menu_item).find('.gallery').attr('id', 'gallery_' + tab + '_' + i);
-
-                $.each(that.offer[tab][i].cert, function (i, data) {
-                    let img = new Image();
-                    img.src = data.src;
-                    //$(img).offset(data.pos); TODO:
-                    img.height = '50';
-                    $(menu_item).find('.gallery').append(img);
-                    $(img).on('click', that.onClickCert);
+                $(menu_item).find('li>a[role=packitem]').on('click', {that: that, off:that.offer[tab][i]},function(ev){
+                    that.changed = true;
+                    let pl = ev.data.off.packlist;
+                    $(menu_item).find('.item_pack').text($(ev.target).text());
+                    $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
                 });
 
-                //$(tmplt).insertAfter('#offer_order');
+                $(menu_item).find('.item_content').on('shown.bs.collapse', function (e) {
+                    $(this).find('.content').off();
+                    $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
+                        $(this).height(0).height(this.scrollHeight);
+                    }).find( 'textarea' ).change();
+                });
 
-                if ($(menu_item).find('.item_content').css('display') == 'block'
+                for(let c in that.offer[tab][i].cert) {
+                    let img = new Image();
+                    img.src = that.offer[tab][i].cert[c].src;
+                    //$(img).offset(data.pos); TODO:
+                    img.height = '100';
+                    $(menu_item).find('.gallery').append(img);
+                    $(img).on('click', that.onClickCert);
+                }
+
+                if ($(menu_item).find('.item_content').css('display') === 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
                     && $(menu_item).find('.content_text').text()===""){
                     $(menu_item).find('.item_content').slideToggle("fast");
                 }
-
             }
         });
+
 
         this.RedrawOrder(obj);
 
@@ -339,29 +343,13 @@ class OfferOrder {
         ev.preventDefault();
         ev.stopPropagation();
         if(!$(this).attr('height'))
-            $(this).attr('height','50');
+            $(this).attr('height','100');
         else {
             $(this).removeAttr('height');
         }
         return false;
     };
 
-    MakeDraggable(el){
-        $(el).draggable({
-            start: function () {
-                console.log("drag start");
-            },
-            drag: function () {
-                return false;//$(el).attr('drag', true);
-            },
-            stop: function () {
-                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
-                // $(el).css('right', rel_x + '%');
-                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
-                // $(el).css('bottom', rel_y + '%');
-            }
-        });
-    }
 
     RedrawOrder(obj){
         let that = this;

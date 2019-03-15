@@ -227,7 +227,7 @@ class Deliver{
 
             that.map.GetObjectsFromStorage();
 
-            that.GetOffersDeliver();
+            //that.GetOffersDeliver();
 
             window.db.GetOffer(that.date, function (off) {
                 if(!off[0]) {
@@ -236,18 +236,26 @@ class Deliver{
                             that.offer.stobj = {date:that.date}
                         }else{
                             that.offer.stobj = res;
+                            if(_.isString(res.profile)) {
+                                that.offer.stobj.profile = JSON.parse(res.profile);
+                            }
                             that.offer.stobj.date = that.date;
                             delete that.offer.stobj.published;
                         }
                     });
                 }else{
                     that.offer.stobj = off[0];
+                    if(_.isString( off[0].profile)) {
+                        that.offer.stobj.profile = JSON.parse( off[0].profile);
+                    }
                 }
 
                 if(that.offer.stobj && that.offer.stobj.location) {
 
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
+                    if(window.user.profile.profile.thmb)
+                        $(my_truck_2).attr('src',window.user.profile.profile.thmb);
                     let status;
                     if (!that.offer.stobj.published)
                         status = 'unpublished';
@@ -276,6 +284,8 @@ class Deliver{
                     if(!that.my_truck_ovl) {
                         let my_truck_2 = $('#my_truck').clone()[0];
                         $(my_truck_2).attr('id', 'my_truck_2');
+                        if(window.user.profile.profile.thmb)
+                            $(my_truck_2).attr('src',window.user.profile.profile.thmb);
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';
@@ -375,49 +385,51 @@ class Deliver{
         })
     }
 
-    UpdateOfferLocal(tab, offer, location, dict){
+    UpdateOfferLocal(offer0,offer, dict){
 
-        let uObj = Object.assign(this.offer.stobj);
-        uObj.date = window.user.date;
-        uObj.supuid = window.user.uid;
-        uObj.data={};
-        if (uObj) {
-            for (let tab in offer) {
-                for (let i in offer[tab]) {
-                    if (!uObj.data[tab]) {
-                        uObj.data[tab] = offer[tab];
-                    }
-                    if(!uObj.data[tab][i]){
-                        uObj.data[tab].push({img:{}});
-                    }
-                    if(offer[tab][i].img) {
-                        if (offer[tab] && offer[tab][i] && offer[tab][i].img.left)
-                            uObj.data[tab][i].img.left = offer[tab][i].img.left;
-                        if (offer[tab] && offer[tab][i] && offer[tab][i].img.top)
-                            uObj.data[tab][i].img.top = offer[tab][i].img.top;
-                    }
-                }
-                uObj.data[tab] = offer[tab];
-                uObj.period = $('.sel_period').text();
-                this.offer.stobj.data[tab] = offer[tab];
-            }
-        }else {
-            uObj = {
-                date:window.user.date,
-                period: $('.sel_period').text(),
-                location: location,
-                data: offer
-            };
+        if(!offer0) {
+            offer0 = {};
+            offer0.date = window.user.date;
+            offer0.supuid = window.user.uid;
+            offer0.data = {};
         }
+
+        for (let tab in offer) {
+            for (let i in offer[tab]) {
+                if (!offer0.data[tab]) {
+                    offer0.data[tab] = offer[tab];
+                }
+                if(!offer0.data[tab][i]){
+                    offer0.data[tab].push({img:{}});
+                }
+                if(offer[tab][i].img) {
+                    if (offer[tab] && offer[tab][i] && offer[tab][i].img.left)
+                        offer0.data[tab][i].img.left = offer[tab][i].img.left;
+                    if (offer[tab] && offer[tab][i] && offer[tab][i].img.top)
+                        offer0.data[tab][i].img.top = offer[tab][i].img.top;
+                }
+            }
+            offer0.data[tab] = offer[tab];
+            offer0.location = this.offer.stobj.location;
+            offer0.period = $('.sel_period').text();
+            this.offer.stobj.data[tab] = offer0.data[tab];
+        }
+
+        // uObj = {
+        //     date:window.user.date,
+        //     period: $('.sel_period').text(),
+        //     location: location,
+        //     data: offer
+
         try {
-            this.offer.SetOfferDB(uObj, dict);
+            this.offer.SetOfferDB(offer0, dict);
         }catch(ex){
 
         }
 
     }
 
-    UpdateDeliverOfferLocal(tab, offer, location, dict){
+    UpdateDeliverOfferLocal(offer0, offer, location, dict){
 
         let uObj = Object.assign(this.offer.stobj);
         uObj.date = window.user.date;
@@ -425,9 +437,13 @@ class Deliver{
         uObj.data={};
         if (uObj) {
             for (let tab in offer) {
+                if (!uObj.data[tab]) {
+                    uObj.data[tab] = offer[tab];
+                }
                 for (let i in offer[tab]) {
-                    if (!uObj.data[tab]) {
-                        uObj.data[tab] = offer[tab];
+                    if(_.isEmpty(offer[tab][i].markuplist)) {
+                        offer[tab].splice(i,1);
+                        continue;
                     }
                     if(!uObj.data[tab][i]){
                         uObj.data[tab].push({img:{}});

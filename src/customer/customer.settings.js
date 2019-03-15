@@ -69,9 +69,10 @@ class CustomerSettings {
         let that = this;
 
         var data_post ={
-            proj:$(form).find('#proj').val(),
+            proj:"d2d",
             user:"Customer",
-            func:$(form).find('#func').val(),
+            func:"confirmem",
+            host:location.origin,
             avatar:$(form).find('.avatar').attr('src'),
             lang: $('html').attr('lang'),
             email:$(form).find('#email').val(),

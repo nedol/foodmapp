@@ -20,12 +20,9 @@ import {Network} from "../../network";
 import {OLMap} from '../map/map';
 import proj from 'ol/proj';
 
-
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
-
-
 
 import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
@@ -50,6 +47,8 @@ class Customer{
         this.uid = uObj.uid;
         this.psw = uObj.psw;
         this.email = '';//!!! no need to registrate
+        if(uObj['profile'] && uObj['profile'].email)
+            this.email = uObj['profile'].email;
         this.profile = new Profile(uObj.profile);
         this.map = new OLMap();
 
@@ -310,8 +309,8 @@ class Customer{
             $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
 
             $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
-                $('#my_profile_container iframe')[0].contentWindow.profile_cus.Close();
-                $('#my_profile_container').css('display', 'none');
+                if($('#my_profile_container iframe')[0].contentWindow.profile_cus.Close())
+                    $('#my_profile_container').css('display', 'none');
             });
         });
         this.MakeDraggable($( "#my_profile_container" ));

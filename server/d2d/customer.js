@@ -13,8 +13,9 @@ var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 var intersection = require('array-intersection');
 
-
 var requrl = '';
+
+const IMG_SIZE_LIMIT = 500000;
 
 module.exports = class Customer extends D2D{
 
@@ -22,54 +23,142 @@ module.exports = class Customer extends D2D{
         super()
     }
 
-    Auth(q, res, req) {
-        let values, sql, uid;
-        let psw = shortid.generate();
-        if(q.user==='Customer'){
-            uid = md5(new Date())
-            values = [uid, psw,'tariff'];
-            sql = "REPLACE INTO customer SET  uid=?, psw=?, tariff=?";
-        }else if(q.user==='Supplier'){
-            uid = md5(q.email);
-            values = [uid, psw, q.email,'tariff'];
-            sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
-        }
-        global.con_obj.query(sql, values, function (err, result) {
+
+
+    ConfirmEmail(q, res) {
+        let that = this;
+
+        let sql = "SELECT user.*" +
+            " FROM " + q.user.toLowerCase() + " as user" +
+            " WHERE user.uid='" + q.uid + "'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (err)
+                throw err;
             res.writeHead(200, {'Content-Type': 'application/json'});
-            try{
-                if (err) {
-                    res.end(JSON.stringify({err: err}));
-                }else{
-                    res.end(JSON.stringify({uid: uid,psw:psw}));
+            if (result.length > 0) {
+                if(!result.email &&  q.profile.email &&  q.host){
+                    let em = new Email();
+                    let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + q.uid + "&email=" + q.profile.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+
+                    em.SendMail("nedol.infodesk@gmail.com", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
+
+                    });
                 }
-            }catch(ex) {
-                res.end(JSON.stringify({err: ex}));
+                delete q.profile.email;
+                that.updProfile(q, res);
+            } else {
+                let values, sql, uid;
+                let psw = shortid.generate();
+
+                sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid='"+q.uid+"', psw='"+psw+"',profile='"+JSON.stringify({email:q.profile.email})+"'";
+                global.con_obj.query(sql, function (err, result) {
+                    if (err) {
+                        throw err;
+                    }
+
+                    if(q.email &&  q.host){
+                        let em = new Email();
+                        let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+
+                        em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
+                            res.write(JSON.stringify({uid: uid, psw: psw, email: q.email}));
+                        });
+                    }
+                    res.end(JSON.stringify({uid: uid, psw: psw}));
+                });
             }
         });
 
     }
 
-    select_query(q, res) {
+    updProfile(q, res) {
 
-        let sql = "SELECT DATE_FORMAT(o.date,'%Y-%m-%d') as date, o.data as order_data, o.reserved as reserved" +
-            " FROM  orders as o, objects as obj" +
-            " WHERE DATE_FORMAT(o.date,'%Y-%m-%d')='" + q.date + "' AND obj.latitude=" + q.lat + " AND obj.longitude=" + q.lon +
-            " AND o.obj_id = obj.id" +
-            " ORDER BY o.date DESC LIMIT 1";
+        let that = this;
 
-        //console.log(sql);
-        let obj_this = this;
+        var sql =  "SELECT cus.*"+
+            " FROM  customer as cus"+
+            " WHERE cus.uid='"+q.uid+"' AND cus.psw='"+q.psw+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (err)
+                throw err;
+
+            if (result.length > 0) {
+                let values, sql;
+                if(q.profile.avatar && q.profile.avatar.length<IMG_SIZE_LIMIT &&
+                    q.profile.thmb && q.profile.thmb.length<IMG_SIZE_LIMIT) {
+                    that.replaceImg_2(q.profile.avatar, function (avatar) {
+                        that.replaceImg_2(q.profile.thmb, function (thmb) {
+                            q.profile.avatar = avatar;
+                            q.profile.thmb = thmb;
+                            if(result[0].email)
+                                q.profile.email = result[0].email;
+                            values = [JSON.stringify(q.profile), q.uid, q.psw];
+                            sql = "UPDATE customer SET   profile=? WHERE uid=? AND psw=?";
+                            setTimeout(function () {
+                                global.con_obj.query(sql, values, function (err, result) {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    if (!res._header)
+                                        res.writeHead(200, {'Content-Type': 'application/json'});
+                                    res.end(JSON.stringify({profile: q.profile}));
+                                });
+                            },100);
+                        });
+                    });
+                }else{
+                    res.end(JSON.stringify({"err":"Превышен размер изображения"}));
+                }
+            }
+        });
+    }
+
+
+    RegUser(q, res) {
+
+        let that = this;
+
+        var sql =  "SELECT user.*, COUNT(em.email) as em_cnt"+
+            " FROM "+q.user.toLowerCase()+" as user, (SELECT email FROM "+q.user.toLowerCase()+" WHERE email='"+q.profile.email+"') as em"+
+            " WHERE  uid='"+q.uid+"' AND psw='"+q.psw+"'";
+
+
         global.con_obj.query(sql, function (err, result) {
             if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err: err}));
+                throw err;
             }
-            if(result && result[0]) {
-                obj_this.handleMysqlResult(q, res, result);
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
-            }else{
-                //res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({"offer":'undefined'}))
+            if (result.length === 0) {
+                res.end(JSON.stringify({"err": "Аккаунт не используется в системе"}));
+                return;
+            } else {
+                if(result[0].em_cnt>0){
+                    res.end(JSON.stringify({"err": "Email уже используется в системе"}));
+                    return;
+                }
+                let values, sql;
+                if(result[0].profile)
+                    if(JSON.parse(result[0].profile).email===q.profile.email) {
+                        that.replaceImg_2(q.profile.avatar, function (avatar) {
+                            that.replaceImg_2(q.profile.thmb, function (thmb) {
+                                q.profile.avatar = avatar;
+                                q.profile.thmb = thmb;
+                                values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
+                                sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
+                                global.con_obj.query(sql, values, function (err, res_upd) {
+
+                                    if (err) {
+                                        res.end(JSON.stringify({err: err}));
+                                        return;
+                                    }
+                                    res.end(JSON.stringify({id: result[0].id}));
+                                });
+                            });
+                        });
+                    }
             }
         });
     }
@@ -89,11 +178,10 @@ module.exports = class Customer extends D2D{
             " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             let values, sql;
             if(sel.length>0) {
                 values = [JSON.stringify(q.data), q.comment, q.period, q.address, now, sel[0].id];
@@ -131,6 +219,9 @@ module.exports = class Customer extends D2D{
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
+            if (err) {
+                throw err;
+            }
             res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
                 res.end(JSON.stringify({err: err}));
@@ -144,9 +235,9 @@ module.exports = class Customer extends D2D{
             }
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
-                    res.end(JSON.stringify({err: err}));
-                    return;
+                    throw err;
                 }
+
                 res.end(JSON.stringify({result: result}));
 
                 if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
@@ -171,12 +262,12 @@ module.exports = class Customer extends D2D{
             " SELECT COUNT(*) as  totals" +
             " FROM supplier as sup, approved as appr" +
             " WHERE appr.supuid=sup.uid" +
-            " AND appr.date=\""+q.date.split('T')[0]+"\"" +
+            " AND appr.date='"+q.date.split('T')[0]+"'" +
             " ) AS apprs"+
             " WHERE sup.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date=\""+q.date.split('T')[0]+"\" AND of.published IS NOT NULL AND of.deleted IS NULL " +
+            " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL " +
             " UNION" +
             " SELECT of.date as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
@@ -187,21 +278,20 @@ module.exports = class Customer extends D2D{
             " SELECT COUNT(*) as  totals" +
             " FROM deliver as del, approved as appr" +
             " WHERE appr.supuid=del.uid" +
-            " AND appr.date=\""+q.date.split('T')[0]+"\"" +
+            " AND appr.date='"+q.date.split('T')[0]+"'" +
             " ) AS apprs"+
             " WHERE del.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date=\""+q.date.split('T')[0]+"\" AND of.published IS NOT NULL AND of.deleted IS NULL";
+            " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err':err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             let now = moment().format('YYYY-MM-DD');
-            sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
+            sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date='"+now+"' WHERE uid='"+q.uid+"'";
 
             global.con_obj.query(sql, function (err, result) {
                 if (err) {
@@ -231,11 +321,10 @@ module.exports = class Customer extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             try {
                 let rating = JSON.parse(result[0].rating);
                 res.end(JSON.stringify({rating: rating.value}));
@@ -253,11 +342,10 @@ module.exports = class Customer extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             try {
                 let rating = {};
                 if(result[0].rating) {
@@ -282,8 +370,7 @@ module.exports = class Customer extends D2D{
                     " WHERE supplier.uid = '" + q.supuid+"'";
                 global.con_obj.query(sql, function (err, result) {
                     if (err) {
-                        res.end(JSON.stringify({'err': err}));
-                        return;
+                        throw err;
                     }
                     res.end(JSON.stringify({rating: (sum/cnt).toFixed(1)}));
                 });
@@ -309,12 +396,12 @@ module.exports = class Customer extends D2D{
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, result) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
+
             if(result.length>0){
                 for(let r in result){
                     let sse = resObj[result[r].email];
@@ -340,10 +427,10 @@ module.exports = class Customer extends D2D{
             " AND appr.date='"+q.date+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             if(result && result.length>0){
                 res.write(JSON.stringify(result));

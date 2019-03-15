@@ -36,7 +36,7 @@ module.exports = class Deliver extends D2D{
         global.con_obj.query(sql, function (err, result) {
             if (err)
                 throw err;
-
+            res.writeHead(200, {'Content-Type': 'application/json'});
             if (result.length > 0) {
                 let values, sql;
                 if(q.profile.avatar.length<IMG_SIZE_LIMIT && q.profile.thmb.length<IMG_SIZE_LIMIT) {
@@ -48,17 +48,17 @@ module.exports = class Deliver extends D2D{
                             values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
                             sql = "UPDATE deliver SET  profile=?, tariff=? WHERE  uid=? AND psw=?";
                             global.con_obj.query(sql, values, function (err, result) {
-                                res.writeHead(200, {'Content-Type': 'application/json'});
                                 if (err) {
-                                    res.end();
-                                    return;
+                                    throw err;
                                 }
-                                res.end(JSON.stringify(values));
+
+                                res.end(JSON.stringify({values:values}));
                             });
                         });
                     });
                 }else{
                     res.end(JSON.stringify({"err":"Превышен размер изображения"}));
+                    return;
                 }
             }
         });
@@ -92,15 +92,13 @@ module.exports = class Deliver extends D2D{
         let sql =
             "SELECT of.*, del.suppliers as suppliers" +
             " FROM  deliver as del, offers as of"+
-            " WHERE of.supuid=del.uid AND del.uid=\""+q.uid+"\" AND del.psw=\""+q.psw +"\""+
-            " AND of.date=DATE_FORMAT(\""+q.date+"\",'%Y-%m-%d') AND of.published IS NOT NULL AND of.deleted IS NULL"+
+            " WHERE of.supuid=del.uid AND del.uid='"+q.uid+"' AND del.psw='"+q.psw +"'"+
+            " AND of.date=DATE_FORMAT('"+q.date+"','%Y-%m-%d') AND of.published IS NOT NULL AND of.deleted IS NULL"+
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
             if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
             let values;
             if(sel.length>0) {
@@ -128,8 +126,7 @@ module.exports = class Deliver extends D2D{
                     sql_ins = sql_ins.replace(/,(\s+)?$/, '');
                     global.con_obj.query(sql_ins,function (err, sel) {
                         if (err) {
-                            res.end(JSON.stringify({err: err}));
-                            return;
+                            throw err;
                         }
                     });
                 }
@@ -137,9 +134,13 @@ module.exports = class Deliver extends D2D{
             }else {
                 let offer = urlencode.decode(q.offer);
                 that.replaceImg(offer,function (offer) {
-                    values = [offer,q.uid,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
-                    sql = 'INSERT INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
-                    that.updateOfferDB(q, res, sel[0], sql, values,now);
+                    values = [offer,q.uid,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date];
+                    sql = 'REPLACE INTO offers SET data=?, supuid=?,categories=?, longitude=?, latitude=?, date=?';
+                    try {
+                        that.updateOfferDB(q, res, sel[0], sql, values, now);
+                    }catch(ex){
+
+                    }
                 });
             }
 
@@ -149,29 +150,32 @@ module.exports = class Deliver extends D2D{
     updateOfferDB(q, res, sel, sql, values,now){
         let that = this;
         global.con_obj.query(sql, values, function (err, result) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({err: err}));
-            }else {
-                let of_obj = JSON.parse(values[0]);
-                let owners = sel[0].suppliers?JSON.parse(sel[0].suppliers):'';
-                for(let ar in of_obj) {
-                    owners = _.union(owners,_.map(of_obj[ar], 'owner'));
+            let of_obj = JSON.parse(values[0]);
+            let owners;
+            if(sel) {
+                owners = sel.suppliers ? JSON.parse(sel.suppliers) : '';
+                for (let ar in of_obj) {
+                    owners = _.union(owners, _.map(of_obj[ar], 'owner'));
                 }
-                values = [q.dict, JSON.stringify(owners),q.uid];
-                sql = "UPDATE deliver SET dict=?, suppliers=?  WHERE uid=?";
-                setTimeout(function () {
-                    global.con_obj.query(sql, values, function (err, res_1){
-                        that.BroadcastOffer(q, res, function () {
-                            if (!res._header)
-                                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-                            if (res.writable)
-                                res.end(JSON.stringify({result: result,published:now}));
-                        });
-                    });
-                },100);
             }
+            values = [q.dict, JSON.stringify(owners),q.uid];
+            sql = "UPDATE deliver SET dict=?, suppliers=?  WHERE uid=?";
+            setTimeout(function () {
+                global.con_obj.query(sql, values, function (err, res_1){
+                    that.BroadcastOffer(q, res, function () {
+                        if (!res._header)
+                            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+                        if (res.writable)
+                            res.end(JSON.stringify({result: result,published:now}));
+                    });
+                });
+            },100);
+
         });
     }
 
@@ -191,12 +195,12 @@ module.exports = class Deliver extends D2D{
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, sel) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
+
             if(sel.length>0){
                 for(let r in sel){
                     let sse = resObj[sel[r].uid];
@@ -222,17 +226,16 @@ module.exports = class Deliver extends D2D{
             " FROM  supplier as sup, customer as cus, orders as ord" +
             //", tariff as tar"+
             " WHERE sup.uid=ord.supuid  AND ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
-            " AND cus.psw=\""+q.psw+"\"" +
-            //" AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
-            " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
+            " AND cus.psw='"+q.psw+"'" +
+            //" AND cus.tariff=tar.id AND tar.applicant='c'" +
+            " AND cus.uid=ord.cusuid AND ord.date='"+q.date+"'" +
             " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             let values, sql;
             if(sel.length>0) {
                 values = [JSON.stringify(q.data), q.comment, q.period, q.address, now, sel[0].id];
@@ -264,12 +267,11 @@ module.exports = class Deliver extends D2D{
         let values = [q.date.split('T')[0],q.period, q.supuid, q.cusuid, q.title, JSON.stringify(q.data)];
         let sql = "REPLACE INTO approved SET date=?, period=?, supuid=?, cusuid=?, title=?, data=?";
         global.con_obj.query(sql, values, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
-            else if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+            if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
                 delete q.uid;
                 delete q.func;
                 delete q.proj;
@@ -287,16 +289,15 @@ module.exports = class Deliver extends D2D{
             "SELECT ord.*,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
             " WHERE sup.email=\'"+q.supuid+"\' AND sup.uid=\'"+q.uid+"\'" +
-            " AND of.sup_uid=sup.uid AND cus.email=ord.cusuid AND ord.cusuid=\""+q.cusuid+"\" AND ord.date=\""+q.date+"\"" +
+            " AND of.sup_uid=sup.uid AND cus.email=ord.cusuid AND ord.cusuid='"+q.cusuid+"' AND ord.date='"+q.date+"'" +
             " AND ord.date=\'"+q.date.split('T')[0]+"\'"+
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             let values, sql;
             if(sel.length>0) {
                 values = [ q.status, sel[0].id];
@@ -324,11 +325,11 @@ module.exports = class Deliver extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             try {
                 let rating = JSON.parse(result[0].rating);
                 res.end(JSON.stringify({rating: rating.value}));
@@ -347,11 +348,10 @@ module.exports = class Deliver extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"' AND sup.psw = '"+q.psw+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             that.replaceImg_2(q.profile.avatar,function (path) {
                 q.profile.avatar = path;
@@ -360,8 +360,7 @@ module.exports = class Deliver extends D2D{
                     " WHERE supplier.uid = '" + q.uid+"'";
                 global.con_obj.query(sql, values,function (err, result) {
                     if (err) {
-                        res.end(JSON.stringify({'err': err}));
-                        return;
+                        throw err;
                     }
                     res.end();
                 });
@@ -384,12 +383,12 @@ module.exports = class Deliver extends D2D{
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, result) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
+
             if(result.length>0){
                 for(let r in result){
                     let sse = resObj[result[r].email];
@@ -435,10 +434,10 @@ module.exports = class Deliver extends D2D{
 
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             if(result && result.length>0){
                 res.write(JSON.stringify(result));
@@ -456,10 +455,10 @@ module.exports = class Deliver extends D2D{
             " AND appr.date='"+q.date+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             if(result && result.length>0){
                 res.write(JSON.stringify(result));
@@ -482,11 +481,10 @@ module.exports = class Deliver extends D2D{
             " AND off.supuid=del.uid" +
             " AND off.date>='"+ q.date.split('T')[0]+"'";
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({offer:result}));
         });
     }

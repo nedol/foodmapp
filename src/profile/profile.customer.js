@@ -5,6 +5,8 @@ require('webpack-jquery-ui/draggable');
 require('jquery-ui-touch-punch');
 import {Dict} from '../dict/dict.js';
 
+import {Utils} from "../utils/utils";
+let utils = new Utils();
 
 window.InitProfileUser = function (obj, avatar) {
 
@@ -73,6 +75,8 @@ class ProfileCustomer{
             if(data[0] && data[0].profile) {
                 that.uid = data[0].uid;
                 that.psw = data[0].psw;
+                that.profile = data[0].profile;
+
                 for (let i in data[0].profile) {
                     if (i === 'avatar') {
                         $('.avatar').attr('src', data[0].profile[i]);
@@ -88,7 +92,7 @@ class ProfileCustomer{
 
     Close() {
         let items = this.GetProfileItems();
-        this.OnSubmit();
+        return this.OnSubmit();
     }
 
     GetProfileItems(){
@@ -108,10 +112,10 @@ class ProfileCustomer{
                         }
                         profile[inp.id] = $(inp).val();
                     });
-                    data[0]['profile'] = profile;
-                    window.parent.db.SetObject('setStore', data[0], function (res) {
-
-                    });
+                    // data[0]['profile'] = profile;
+                    // window.parent.db.SetObject('setStore', data[0], function (res) {
+                    //
+                    // });
                 });
             }else if($(tab).attr('id')==='orders'){
                 that.SaveOrderItems();
@@ -121,29 +125,73 @@ class ProfileCustomer{
 
     OnSubmit(){
         let that = this;
-        let form = $('.tab-content');
-        var data_post ={
-            proj:$(form).find('#proj').val(),
-            user:"Customer",
-            func:$(form).find('#func').val(),
-            avatar:$(form).find('.avatar').attr('src'),
-            lang: $('html').attr('lang'),
-            email:$(form).find('#email').val(),
-            name:$(form).find('#name').val(),
-            address:$(form).find('#address').val(),
-            mobile:$(form).find('#mobile').val()
-        }
 
-        window.parent.network.postRequest(data_post, function (res) {
-            delete data_post.proj; delete data_post.func;
-            window.parent.db.GetSettings(function (obj) {
-                obj[0].profile = data_post;
-                window.parent.db.SetObject('setStore',obj[0], function (res) {
-                    alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
+        let k = 50/ $('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+
+            let form = $('.tab-content');
+            let data_post = {
+                proj: $(form).find('#proj').val(),
+                host: location.origin,
+                user: "Customer",
+                func: "confirmem",
+                uid: window.parent.user.uid,
+                psw: window.parent.user.psw,
+                profile: {
+                    user:'customer',
+                    email: $('#email').val(),
+                    avatar: $('.avatar').attr('src'),
+                    thmb: thmb.src,
+                    lang: $('html').attr('lang'),
+                    name: $('#name').val(),
+                    mobile: $('#mobile').val(),
+                    address: $('#address').val()
+                }
+            }
+
+            try {
+                window.parent.network.postRequest(data_post, function (res) {
+
+                    delete data_post.proj;
+                    delete data_post.func;
+                    delete data_post.uid;
+                    delete data_post.host;
+                    if (!res.err) {
+                        window.parent.db.GetSettings(function (obj) {
+                            if (!obj[0])
+                                obj[0] = {};
+                            else {
+                                if ((!obj[0].profile || !obj[0].profile.email) && data_post.profile.email) {
+
+                                    delete data_post.profile.email;
+                                    alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
+                                }
+                            }
+
+                            if (res.psw)
+                                obj[0].psw = res.psw;
+                            obj[0].profile = data_post.profile;
+
+                            window.parent.db.SetObject('setStore', obj[0], function (res) {
+
+                            });
+
+                            return true;
+                        });
+                    } else {
+                        alert(res.err);
+                    }
+
                 });
-            });
+            }
+            catch
+                (ex) {
 
+            }
         });
+
+
+        return true;
     }
 
     InitUserOrders(){

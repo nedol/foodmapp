@@ -23,9 +23,9 @@ class Network{
         );
         this.eventSource.onerror = function(e) {
             if (this.readyState == EventSource.CONNECTING) {
-                //console.log("Соединение порвалось, пересоединяемся...");
+                console.log("Соединение порвалось, пересоединяемся...");
             } else {
-                //console.log("Ошибка, состояние: " + this.readyState);
+                console.log("Ошибка, состояние: " + this.readyState);
             }
         };
         this.eventSource.onopen = function(e) {
@@ -57,7 +57,7 @@ class Network{
         let post_par = JSON.stringify(par);
 
         axios.post(this.host, post_par
-            , { crossdomain: true }
+            , { crossDomain: true}
         )
             .then(function (response) {
                 cb(response.data);

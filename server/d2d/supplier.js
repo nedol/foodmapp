@@ -39,23 +39,25 @@ module.exports = class Supplier extends D2D{
                 throw err;
 
             if (result.length > 0) {
-                let values, sql;
-                if(q.profile.avatar.length<IMG_SIZE_LIMIT && q.profile.thmb.length<IMG_SIZE_LIMIT) {
+                let profile,values, sql;
+                if(q.profile.avatar && q.profile.avatar.length<IMG_SIZE_LIMIT &&
+                    q.profile.thmb && q.profile.thmb.length<IMG_SIZE_LIMIT) {
                     that.replaceImg_2(q.profile.avatar, function (avatar) {
                         that.replaceImg_2(q.profile.thmb, function (thmb) {
                             q.profile.avatar = avatar;
                             q.profile.thmb = thmb;
                             q.profile.email = result[0].email;
-                            values = [JSON.stringify(q.profile), result[0].tariff,q.uid, q.psw];
+                            values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
                             sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
-                            global.con_obj.query(sql, values, function (err, result) {
-                                res.writeHead(200, {'Content-Type': 'application/json'});
-                                if (err) {
-                                    res.end();
-                                    return;
-                                }
-                                res.end(JSON.stringify({profile:q.profile}));
-                            });
+                            setTimeout(function () {
+                                global.con_obj.query(sql, values, function (err, result) {
+                                    if (err) {
+                                        throw err;
+                                    }
+                                    res.writeHead(200, {'Content-Type': 'application/json'});
+                                    res.end(JSON.stringify({profile: q.profile}));
+                                });
+                            },100);
                         });
                     });
                 }else{
@@ -126,9 +128,7 @@ module.exports = class Supplier extends D2D{
 
         global.con_obj.query(sql, function (err, sel) {
             if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
             let values;
             if(sel.length>0) {
@@ -168,8 +168,8 @@ module.exports = class Supplier extends D2D{
             }else {
                 let offer = urlencode.decode(q.offer);
                 that.replaceImg(offer,function (offer) {
-                    values = [q.uid,offer,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date, q.period];
-                    sql = 'REPLACE INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?, period=?';
+                    values = [q.uid,offer,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date];
+                    sql = 'REPLACE INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?';
                     that.updateOfferDB(q, res, sql, values,now);
                 });
             }
@@ -187,8 +187,7 @@ module.exports = class Supplier extends D2D{
 
         global.con_obj.query(sql, function (err, sel) {
             if (err) {
-                res.write(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
             if(sel[0] && sel[0].data){
                 let del_obj = JSON.parse(sel[0].data);
@@ -224,24 +223,25 @@ module.exports = class Supplier extends D2D{
     updateOfferDB(q, res, sql, values,now){
         let that = this;
         global.con_obj.query(sql, values, function (err, result) {
-            if (!res._header)
-                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-            }else {
-                values = [q.dict, q.uid];
-                sql = "UPDATE supplier SET dict=?  WHERE uid=?";
-                setTimeout(function () {
-                    global.con_obj.query(sql, values, function (err, res_1){
-                        that.BroadcastOffer(q, res, function () {
-                            if (!res._header)
-                                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-                            if (res.writable)
-                                res.end(JSON.stringify({result: result,published:now}));
-                        });
-                    });
-                },100);
+                throw err;
             }
+
+            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+
+            values = [q.dict, q.uid];
+            sql = "UPDATE supplier SET dict=?  WHERE uid=?";
+            setTimeout(function () {
+                global.con_obj.query(sql, values, function (err, res_1){
+                    that.BroadcastOffer(q, res, function () {
+                        if (!res._header)
+                            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+                        if (res.writable)
+                            res.end(JSON.stringify({result: result,published:now}));
+                    });
+                });
+            },100);
+
         });
     }
 
@@ -251,22 +251,42 @@ module.exports = class Supplier extends D2D{
             " FROM supplier as sup" +
             " WHERE" +
             " sup.uid<>\'"+q.uid+"\'"+
-            " AND SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',',1)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',',1 -1)) + 1)," +
+            "       ',', '')<"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',',2)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',',2 -1)) + 1)," +
+            "       ',', '')>"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',', 3)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',', 3 -1)) + 1)," +
+            "       ',', '')<"+q.location[0]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',', 4)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',', 4 -1)) + 1)," +
+            "       ',', '')>"+q.location[0]+
             " UNION" +
             " SELECT cus.uid as uid" +
             " FROM customer as cus" +
             " WHERE " +
-            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
+            " REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',',1)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',',1 -1)) + 1)," +
+            "       ',', '')<"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',',2)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',',2 -1)) + 1)," +
+            "       ',', '')>"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',', 3)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',', 3 -1)) + 1)," +
+            "       ',', '')<"+q.location[0]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',', 4)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',', 4 -1)) + 1)," +
+            "       ',', '')>"+q.location[0];
 
         global.con_obj.query(sql, function (err, sel) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
+
             if(sel.length>0){
                 for(let r in sel){
                     let sse = resObj[sel[r].uid];
@@ -298,11 +318,11 @@ module.exports = class Supplier extends D2D{
             " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             let values, sql;
             if(sel.length>0) {
                 values = [JSON.stringify(q.data), q.comment, q.period, q.address, now, sel[0].id];
@@ -334,12 +354,12 @@ module.exports = class Supplier extends D2D{
         let values = [q.date,q.period, q.supuid, q.cusuid, q.title, JSON.stringify(q.data)];
         let sql = "REPLACE INTO approved SET date=?, period=?, supuid=?, cusuid=?, title=?, data=?";
         global.con_obj.query(sql, values, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
-            else if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
+            if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
                 delete q.uid;
                 delete q.func;
                 delete q.proj;
@@ -348,7 +368,6 @@ module.exports = class Supplier extends D2D{
             res.end(JSON.stringify({result: result, approved:now}));
 
         });
-
     }
 
     UpdateOrderStatus(q, res){
@@ -362,11 +381,11 @@ module.exports = class Supplier extends D2D{
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             let values, sql;
             if(sel.length>0) {
                 values = [ q.status, sel[0].id];
@@ -375,8 +394,7 @@ module.exports = class Supplier extends D2D{
             }
             global.con_obj.query(sql, values, function (err, result) {
                 if (err) {
-                    res.end(JSON.stringify({err: err}));
-                    return;
+                    throw err;
                 }
                 res.end(JSON.stringify({result: result}));
 
@@ -394,11 +412,11 @@ module.exports = class Supplier extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             try {
                 let rating = JSON.parse(result[0].rating);
                 res.end(JSON.stringify({rating: rating.value}));
@@ -417,11 +435,10 @@ module.exports = class Supplier extends D2D{
             " WHERE sup.uid = '"+ q.supuid+"' AND sup.psw = '"+q.psw+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             that.replaceImg_2(q.profile.avatar,function (path) {
                 q.profile.avatar = path;
@@ -454,12 +471,12 @@ module.exports = class Supplier extends D2D{
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, result) {
+            if (err) {
+                throw err;
+            }
             if (!res._header)
                 res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-            if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
-            }
+
             if(result.length>0){
                 for(let r in result){
                     let sse = resObj[result[r].email];
@@ -504,10 +521,10 @@ module.exports = class Supplier extends D2D{
 
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
 
             if(result && result.length>0){
                 res.write(JSON.stringify(result));
@@ -526,10 +543,11 @@ module.exports = class Supplier extends D2D{
             " AND appr.date='"+q.date+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
 
             if(result && result.length>0){
                 res.write(JSON.stringify(result));
@@ -545,15 +563,15 @@ module.exports = class Supplier extends D2D{
             " FROM  supplier as sup, offers as off"+
             " WHERE sup.uid = '"+ q.uid+"' AND sup.psw = '"+q.psw+"'" +
             " AND off.supuid=sup.uid " +
-            " AND off.date<(NOW() + INTERVAL off.prolong DAY)"+
+            " AND off.date<(NOW() + INTERVAL sup.prolong DAY)"+
             " AND off.date>NOW()"+
-            " AND off.prolong>0";
+            " AND sup.prolong>0";
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             res.end(JSON.stringify({offer:result}));
         });
     }

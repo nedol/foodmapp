@@ -10,7 +10,7 @@ require('jquery-ui-touch-punch');
 require('dialog-polyfill');
 
 require("../../global");
-var _ = require('lodash');
+
 
 import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
@@ -27,7 +27,7 @@ require('bootstrap-select');
 //global.jQuery = require('jquery');
 
 const shortid = require('shortid');
-var md5 = require('md5');
+
 
 let utils = new Utils();
 window.sets.lang = utils.getParameterByName('lang');
@@ -61,6 +61,7 @@ $(document).on('readystatechange', function () {
     window.db = new DB('Supplier', function () {
         let uid = utils.getParameterByName('uid');
         window.db.GetSettings(function (set) {
+            var _ = require('lodash');
             let res = _.findKey(set, function(k) {
                 return k.uid === uid;
             });
@@ -71,7 +72,7 @@ $(document).on('readystatechange', function () {
                 uObj['set'] = set[res];
                 window.network = new Network(host_port);
 
-                if(!set[res]['profile'].email) {
+                if(set[res]['profile'] && !set[res]['profile'].email) {
 
                     if (utils.getParameterByName('email') &&
                         utils.getParameterByName('uid') &&
@@ -82,13 +83,12 @@ $(document).on('readystatechange', function () {
                                 alert(res.err);
                                 return;
                             }
-                            try {
-                                uObj.set.profile.promo = JSON.parse(reg.promo);
-
-                            }catch(ex) {
-
-                            }
-
+                            // try {
+                            //     uObj.set.profile.promo = JSON.parse(reg.promo);
+                            //
+                            // }catch(ex) {
+                            //
+                            // }
                             uObj.set.id = reg.id;
                             window.db.SetObject('setStore', uObj.set, function (res) {
                                 window.user = new Supplier(uObj);
@@ -96,7 +96,6 @@ $(document).on('readystatechange', function () {
                                 });
                             });
                         });
-
 
                     }else{
                         window.user = new Supplier(uObj);
@@ -106,6 +105,7 @@ $(document).on('readystatechange', function () {
 
 
                     }else {
+                        var md5 = require('md5');
                         if(md5(uObj['set']['profile'].email)!==uObj['set'].uid) {
                             window.db.DeleteObject('setStore',uObj['set'].uid);
                             return;
@@ -118,7 +118,11 @@ $(document).on('readystatechange', function () {
                 }
 
             } else {
-                window.location.replace("http://localhost:63342/door2door/dist/settings.supplier.html");
+                if(window.location.hostname==='localhost')
+                    window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
+
+                else if(window.location.hostname==='nedol')
+                    window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
             }
 
         });

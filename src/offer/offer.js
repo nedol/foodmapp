@@ -49,8 +49,8 @@ class Offer{
         this.stobj.data = obj.data;
         window.db.GetOffer(obj.date, function (set) {
             let tabs = Object.keys(obj.data);
-            if(set && set.data)
-                tabs = _.assign(Object.keys(obj.data),Object.keys(set.data));
+            if(set[0] && set[0].data)
+                tabs = _.assign(Object.keys(obj.data),Object.keys(set[0].data));
             let filter,unchecked;
             for(let t in tabs) {
                 let tab = tabs[t];
@@ -59,10 +59,10 @@ class Offer{
                         return objValue.concat(srcValue);
                     }
                 }
-                if(set && set.data) {
+                if(set[0] && set[0].data) {
                     unchecked = _.filter(obj.data[tab], {'checked': 'false'});
-                    set.data[tab] = _.differenceBy( set.data[tab],unchecked,'supuid');
-                    obj.data[tab] = _.unionBy(obj.data[tab],set.data[tab],  'title');//,new customizer(set.data[tab], obj.data[tab]));
+                    set[0].data[tab] = _.differenceBy( set[0].data[tab],unchecked,'supuid');
+                    obj.data[tab] = _.unionBy(obj.data[tab],set[0].data[tab],  'title');//,new customizer(set.data[tab], obj.data[tab]));
                     obj.data[tab] = _.filter(obj.data[tab], {'checked': 'true'});
 
                 }

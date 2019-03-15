@@ -52,6 +52,7 @@ class OfferEditor{
 
         $('.dropdown').css('visibility','visible');
         $('#order_menu_button').css('visibility','visible');
+
         $('#add_tab_li').css('visibility','visible');
         $('#add_item').css('visibility','visible');
 
@@ -60,19 +61,22 @@ class OfferEditor{
         $("#offer_editor").css('display','block');
         $("#offer_editor").resizable();
 
+
          $("#offer_editor").find('.avatar').on('click touchstart',function () {
              $("#offer_editor").find('.browser').css('display', 'block');
              $("#offer_editor").find('.modal-content').css('display','none');
          });
+
+        if(screen.width<1000) {
+            $("#offer_editor").css('zoom', 0.5);
+            $("#offer_editor").css('-moz-transform', 0.5);
+        }
 
         function selectText(el) {
             $(el).focus();
             document.execCommand('selectAll', false, null);
         }
 
-        $(".content_text").dblclick(function () {
-            selectText($(this));
-        });
         let str = " \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
         $("#offer_editor").find('.modal-title').text(str);
         if(that.offer.published)
@@ -140,9 +144,6 @@ class OfferEditor{
                 if(this.offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').attr('src', this.offer.data[tab][i].img.src);
-                    // $(menu_item).find('.img-fluid').css('left', this.offer.data[tab][i].img.left);
-                    // $(menu_item).find('.img-fluid').css('top',this.offer.data[tab][i].img.top?this.offer.data[tab][i].img.top:0);
-
                     //$(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
                 }
 
@@ -213,7 +214,7 @@ class OfferEditor{
                     let img = new Image();
                     img.src = data.src;
                     //$(img).offset(data.pos);TODO:
-                    img.height = '50';
+                    img.height = '100';
                     $(menu_item).find('.gallery').append(img);
                     $(img).on('click', that.onClickCert);
                     that.MakeDraggable(img);
@@ -229,20 +230,18 @@ class OfferEditor{
                     $(menu_item).find('.item_content').slideToggle("fast");
                 }
 
-                //$(menu_item).find('.content_text').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
+                $(menu_item).find('input:file').on('change', this, that.OnImportImage);
 
 
                 $(menu_item).find('.add_picture').attr('id', 'ap_' + tab + '_' + i);
                 $(menu_item).find('.add_picture').on('click',this,function (ev) {
                     let menu_item = $(this).closest('.menu_item');
-                    let vis = $(menu_item).find('.img-fluid').css('visibility');
-                    if (vis === 'visible'){
-                        $(menu_item).find('.img-fluid').css('visibility','hidden');
-                    }else {
-                        ev.target = $(menu_item).find('.img-fluid')[0];
-                        that.OnClickImport(ev);
-                        $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
-                    }
+                    //let vis = $(menu_item).find('.img-fluid').css('visibility');
+                    ev.target = $(menu_item).find('.img-fluid')[0];
+                    ev.mi = menu_item;
+                    that.OnClickImport(ev);
+                    $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
+
                 });
 
                 $(menu_item).find('.add_content').on('click touchstart',menu_item,function (ev) {
@@ -263,6 +262,7 @@ class OfferEditor{
                 $(menu_item).find('.add_cert').on('click',this,function (ev) {
                     let menu_item = $(this).closest('.menu_item');
                     ev.target = $(menu_item).find('.gallery')[0];
+                    ev.mi = menu_item;
                     that.OnClickAddCert(ev);
                     $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
                 });
@@ -279,6 +279,11 @@ class OfferEditor{
 
                 $('a[href="#'+tab+'"]').css('color','blue');
             }
+
+            $('#' + tab).sortable({
+                placeholder: "ui-state-highlight"
+            });
+            $('#' + tab).disableSelection();
 
             $('[href="#'+tab+'"]').on('show.bs.tab',function (ev) {
                 if(ev.relatedTarget) {
@@ -445,16 +450,18 @@ class OfferEditor{
         this.lang = window.sets.lang;
         window.dict.set_lang(window.sets.lang,$("#offer_editor"));
 
-        //$('.content_text').resizable();
+        $('.item_content').on('shown.bs.collapse', function (e) {
+            $(this).find('.content').off();
+            $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
+                $(this).height(0).height(this.scrollHeight);
+            }).find( 'textarea' ).change();
+        });
 
-        let evnts = $._data($('#add_tab').get(0), "events");
 
-        evnts = $._data($('#add_item').get(0), "events");
-        if(!evnts || !evnts['click']) {
-            $('#add_item').on('click', this, this.AddOfferItem);
-        }
+        $("#offer_editor").find('#add_item').off();
+        $("#offer_editor").find('#add_item').on('click', this, this.AddOfferItem);
 
-        $('input:file').on('change', this, that.OnImportImage);
+
 
         $('.input').click(function (ev) {
             that.changed = true;
@@ -472,7 +479,7 @@ class OfferEditor{
         $('.close_browser').off('click touchstart');
         $('.close_browser').on('click touchstart', this,  that.CloseMenu);
 
-        that.MakeDraggable($("#offer_editor"));
+        $("#offer_editor").draggable();
 
     }
 
@@ -480,8 +487,9 @@ class OfferEditor{
         ev.preventDefault();
         ev.stopPropagation();
         if(!$(this).attr('height'))
-            $(this).attr('height','50');
+            $(this).attr('height','100');
         else {
+            //$(this).attr('height','600');
             $(this).removeAttr('height');
         }
         return false;
@@ -548,17 +556,18 @@ class OfferEditor{
     }
 
     OnClickImport(ev){
-
-        $('input:file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
-        $('input:file').focus().trigger(ev);
+        let menu_item = ev.mi;
+        $(menu_item).find('input:file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
+        $(menu_item).find('input:file').focus();
+        $(menu_item).find('input:file').trigger(ev);
 
         this.changed = true;
     }
 
     OnImportImage(ev){
         let that = ev.data;
-        let  files = $("input[type='file']")[0].files;
-        let el = JSON.parse($(ev.target).attr('func_el'));
+        let  files = $(this)[0].files;
+        let el = JSON.parse($(this).attr('func_el'));
         utils.HandleFileSelect(ev, files, function (data, smt) {
             if(data) {
                 if(el.func==='load_img') {
@@ -583,7 +592,9 @@ class OfferEditor{
                     let img  = new Image();//'<img src="'+data+'" height="50" >';
                     img.class = 'cert';
                     img.src = data;
-                    img.height = '50';
+                    img.height = '100';
+                    img.id = md5(data);
+
                     $("#" + el.id).append(img);
                     $(img).on('click',that.onClickCert);
                     that.MakeDraggable(img);
@@ -595,9 +606,9 @@ class OfferEditor{
     }
 
     OnClickAddCert(ev){
-
-        $('input.file').attr('func_el', JSON.stringify({func:'add_cert',id:$(ev.target).attr('id')}));
-        $('input.file').trigger('click');
+        let menu_item = ev.mi;
+        $(menu_item).find('input.file').attr('func_el', JSON.stringify({func:'add_cert',id:$(ev.target).attr('id')}));
+        $(menu_item).find('input.file').trigger('click');
 
         this.changed = true;
     }
@@ -611,10 +622,13 @@ class OfferEditor{
                 //$(el).attr('drag', true);
             },
             stop: function (ev) {
+                console.log("drag stop");
                 // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
                 // $(el).css('right', rel_x + '%');
                 // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
                 // $(el).css('bottom', rel_y + '%');
+                $(ev.target).remove();
+
             }
         });
     }
@@ -640,7 +654,7 @@ class OfferEditor{
         let tmplt = $('#menu_item_tmplt').clone();
         $('#menu_item_tmplt').attr('id', 'menu_item_'+ pos);
         let menu_item = $('#menu_item_'+ pos);
-        $(menu_item).addClass('menu_item');
+        $(menu_item).attr('class','menu_item');
         $(menu_item).css('display','block');
         $(menu_item).find(':checkbox').attr('id', 'item_cb_' + pos);
         $(menu_item).find(':checkbox').attr('pos', pos);
@@ -672,16 +686,18 @@ class OfferEditor{
         $(menu_item).find('.item_pack').on('focusin', that,(ev)=> {
             $(menu_item).find('.add_pack').css('visibility', 'visible');
         });
+
+        $(menu_item).find('input:file').on('change', this, that.OnImportImage);
+
         $(menu_item).find('.add_picture').on('click touchstart',menu_item,function (ev) {
             let menu_item = $(ev.data);
             let vis = $(menu_item).find('.img-fluid').css('visibility');
-            if (vis === 'visible'){
-                $(menu_item).find('.img-fluid').css('visibility','hidden');
-            }else {
-                ev.target = $(menu_item).find('.img-fluid')[0];
-                that.OnClickImport(ev);
-                $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
-            }
+
+            ev.target = $(menu_item).find('.img-fluid')[0];
+            ev.mi = menu_item;
+            that.OnClickImport(ev);
+            $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
+
         });
 
         $(menu_item).find('.item_price').on('focusout',{that:that, mi:$(menu_item)}, function (ev) {
@@ -824,8 +840,9 @@ class OfferEditor{
                 let key = $(title).attr('data-translate');
                 let text = $(miAr[i]).find('.item_title').val();
 
-                if (text.length === 0 || !text.trim())
+                if (text.length === 0 || !text.trim()) {
                     continue;
+                }
                 if(!window.dict.dict[key]) {
                     window.dict.dict[key] = {};
                 }
@@ -904,7 +921,8 @@ class OfferEditor{
                 cat = $('.category[title="'+value+'"]').attr('id');
                 if(!cat)
                     cat='1000';
-                that.arCat.push(parseInt(cat));
+                if(!_.includes(that.arCat,parseInt(cat)))
+                    that.arCat.push(parseInt(cat));
 
                 offerObj['local'][value].push(item);
 
@@ -929,7 +947,7 @@ class OfferEditor{
         // if(active) {
         //     items = this.getTabItems(active, lang);
         // }
-        window.user.UpdateOfferLocal(active, items['local'], this.location, window.dict.dict);
+        window.user.UpdateOfferLocal(this.offer,items['local'], this.location, window.dict.dict);
         return items;
     }
 

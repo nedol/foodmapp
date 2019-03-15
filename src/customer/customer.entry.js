@@ -48,7 +48,7 @@ $(document).on('readystatechange', function () {
     window.sets.lang = utils.getParameterByName('lang');
 
     $('.date_ctrl').draggable();
-
+    let date;
 
     (function initDP() {
 
@@ -70,7 +70,7 @@ $(document).on('readystatechange', function () {
                 "2019-02-01"
             ]
         });
-        let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+        date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         $('.dt_val').val(date);
 
         let dt_w = $('#dtp_container').css('width');
@@ -117,36 +117,53 @@ $(document).on('readystatechange', function () {
 
     let uObj = {};
     window.db = new DB('Customer', function () {
-        window.db.GetSettings(function (res) {
-            if(res.length===0){
-                let data_obj ={
-                    proj:"d2d",
-                    func:"auth",
-                    user: "Customer",
-                    email:'',
-                    lang: window.sets.lang,
-                    date:date
-                }
-                window.network.postRequest(data_obj, function (data) {
-                    if (data.uid) {
-                        uObj.uid = data.uid;
-                        uObj.psw = data.psw;
-                        window.db.SetObject('setStore', uObj, function (res) {
-                            window.user = new Customer(uObj);
-                            window.user.IsAuth_test(function (data) {//TODO:
+        let uid = utils.getParameterByName('uid');
+        window.db.GetSettings(function (set) {
+            var _ = require('lodash');
+            let res = _.findKey(set, function(k) {
+                return k.uid === uid;
+            });
+            res=0;
+            if (set[res]) {
+                uObj = set[res];
+                if (set[res]['profile'] && !set[res]['profile'].email &&
+                    utils.getParameterByName('email')) {
+                    if (utils.getParameterByName('uid') &&
+                        uid === uObj.uid) {
+                        uObj['profile'].email = utils.getParameterByName('email');
+                        window.network.RegUser(uObj, function (reg) {
+                            if (!reg || reg.err) {
+                                alert(res.err);
+                                return;
+                            }
 
+                            window.db.SetObject('setStore', uObj, function (res) {
+                                window.user = new Customer(uObj);
+                                window.user.IsAuth_test(function (data) {//TODO:
+                                });
                             });
                         });
-                    }
-                });
-            }else{
-                uObj = res[0];
-                window.user = new Customer(uObj);
-                window.user.IsAuth_test(function (data) {//TODO:
+                    }else{
+                        window.user = new Customer(uObj);
+                        window.user.IsAuth_test(function (data) {//TODO:
 
+                        });
+                    }
+                }else {
+                    window.user = new Customer(uObj);
+                    window.user.IsAuth_test(function (data) {//TODO:
+
+                    });
+                }
+            }else {
+                let md5 = require('md5');
+                uObj = {uid:md5(new Date())};
+                window.db.SetObject('setStore', uObj, function (res) {
+                    window.user = new Customer(uObj);
+                    window.user.IsAuth_test(function (data) {//TODO:
+                    });
                 });
             }
-
         });
     });
 

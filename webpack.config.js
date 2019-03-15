@@ -20,9 +20,7 @@ module.exports = {
         ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
         ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
         ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.entry.js'
-        ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.entry.js'
-
-
+        ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
     },
     output: {
         path: path.resolve(__dirname, 'dist'),

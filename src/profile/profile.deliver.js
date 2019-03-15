@@ -192,6 +192,7 @@ class ProfileDeliver{
         let that = this;
         let data_post='';
         let k = 50/ $('.avatar').height();
+        if(!$('.avatar').attr('src').includes('https://'))
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
 
             data_post ={
@@ -202,6 +203,7 @@ class ProfileDeliver{
                 psw: psw,
                 profile: {
                     type:window.parent.user.profile.profile.type,
+                    host:location.origin,
                     email: $('#email').val(),
                     avatar: $('.avatar').attr('src'),
                     thmb: thmb.src,
@@ -214,13 +216,14 @@ class ProfileDeliver{
             }
 
             window.parent.network.postRequest(data_post, function (res) {
+                if(res.values) {
+                    window.parent.db.GetSettings(function (obj) {
+                        obj[0].profile = data_post.profile;
+                        window.parent.db.SetObject('setStore', obj[0], function (res) {
 
-                window.parent.db.GetSettings(function (obj) {
-                    obj[0].profile = data_post.profile;
-                    window.parent.db.SetObject('setStore',obj[0], function (res) {
-
+                        });
                     });
-                });
+                }
             });
         });
     }

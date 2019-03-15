@@ -35,17 +35,40 @@ class OfferViewer {
         this.location = [];
 
         this.period = $('.sel_period').text();
-        this.ovc = $("#offer_editor");
+
+
+
+    }
+
+
+    OpenOffer(offer) {
+        let that = this;
+
+        this.ovc = $("#offer_editor").clone();
+        this.ovc.attr('id','ovc');
+        this.ovc.insertBefore("#offer_editor");
         this.ovc.css('display','block');
+        /*transform: scale(0.5) ;*/
+
+        if(screen.width<1000) {
+            this.ovc.css('zoom', 0.5);
+            this.ovc.css('-moz-transform', 0.5);
+        }
+
         this.ovc.draggable();
+        this.ovc.resizable();
 
         this.ovc.find('.modal-title').text("Delivery for ");
         this.ovc.find('.modal-title').attr('data-translate', md5('Delivery for'));
         this.ovc.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
 
+        this.ovc.find('.packing_header').css('display','inline-block');
+        this.ovc.find('.price_header').css('display','inline-block');
         this.ovc.find('.markup_header').css('display','inline-block');
         this.ovc.find('.total_header').css('display','inline-block');
         this.ovc.find('.orders_header').css('display','none');
+        this.ovc.find('.packing_div').css('display','inline-block');
+        this.ovc.find('.price_div').css('display','inline-block');
         this.ovc.find('.markup_div').css('display','inline-block');
         this.ovc.find('.total_div').css('display','inline-block');
         this.ovc.find('.orders_div').css('display','none');
@@ -54,13 +77,8 @@ class OfferViewer {
         window.sysdict.set_lang(window.sets.lang,$("#menu_item_tmplt"));
         window.sysdict.set_lang(window.sets.lang,$(this.ovc));
 
-    }
-
-
-    OpenOffer(offer) {
-        let that = this;
         this.uid = offer.uid;
-        this.offer = offer.data;
+        this.offer = offer;
         window.supplier = new Supplier();
         window.supplier.profile = new Profile(offer.profile);
         window.supplier.profile.InitSupplierProfile();
@@ -75,7 +93,7 @@ class OfferViewer {
 
         $(".category[state='1']").each(function (i, cat) {
             let tab = cat.title;
-            if (!that.offer[tab] || that.offer[tab].length === 0)
+            if (!offer.data[tab] || offer.data[tab].length === 0)
                 return;
             if ($('[href="#' + tab + '"]').length === 0) {
                 $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="' + md5(tab) + '"  href="#' + tab + '">' + tab + '</a>' +
@@ -107,24 +125,6 @@ class OfferViewer {
 
                 $(menu_item).find('.item_cb').css('visibility', 'visible');
 
-                let t = tab;
-                window.db.GetOffer(new Date(window.supplier.date), function (ar) {
-                   if(ar[0] && ar[0].data[t] &&
-                       ar[0].data[t][i] &&
-                       ar[0].data[t][i].title=== $(menu_item).find('.item_title').attr('data-translate')){
-
-                       if(ar[0].data[t][i].markuplist) {
-                           $(menu_item).find(':checkbox').prop('checked', true);
-                           $(menu_item).find('.item_markup').attr('markuplist', JSON.stringify(ar[0].data[t][i].markuplist));
-                           $(menu_item).find('.item_markup').val(ar[0].data[t][i].markuplist[$(menu_item).find('.item_pack').text()]);
-                           $(menu_item).find('.item_total').val(parseInt($(menu_item).find('.item_price').val()) + parseInt($(menu_item).find('.item_markup').val()));
-                       }else{
-                           $(menu_item).find('.item_markup').attr('markuplist', JSON.stringify({}));
-                       }
-                   }
-
-                });
-
                 $(menu_item).find(':checkbox').on('change', this, function (ev) {
                     ev.data.changed = true;
                 });
@@ -134,6 +134,23 @@ class OfferViewer {
                 if (offer.data[tab][i].title) {
                     $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
                 }
+
+                let t = tab;
+                window.db.GetOffer(new Date(window.supplier.date), function (ar) {
+                    let title = $(menu_item).find('.item_title').attr('data-translate');
+                    if(ar[0] && ar[0].data[t]){
+                        let incl = _.find(ar[0].data[t],{title:title,owner:offer.data[tab][i].supuid});
+                        if(incl && incl.markuplist) {
+                            $(menu_item).find(':checkbox').prop('checked', true);
+                            $(menu_item).find('.item_markup').attr('markuplist', JSON.stringify(incl.markuplist));
+                            $(menu_item).find('.item_markup').val(incl.markuplist[$(menu_item).find('.item_pack').text()]);
+                            $(menu_item).find('.item_total').val(parseInt($(menu_item).find('.item_price').val()) + parseInt($(menu_item).find('.item_markup').val()));
+                        }else{
+                            $(menu_item).find('.item_markup').attr('markuplist', JSON.stringify({}));
+                        }
+                    }
+
+                });
 
                 $(menu_item).find('.item_markup').attr('markuplist','{}');
 
@@ -219,7 +236,7 @@ class OfferViewer {
                     let img = new Image();
                     img.src = data.src;
                     //$(img).offset(data.pos);TODO:
-                    img.height = '50';
+                    img.height = '100';
                     $(menu_item).find('.gallery').append(img);
                     $(img).on('click', that.onClickCert);
                 });
@@ -295,6 +312,13 @@ class OfferViewer {
             });
         }
 
+        $('.item_content').on('shown.bs.collapse', function (e) {
+            $(this).find('.content').off();
+            $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
+                $(this).height(0).height(this.scrollHeight);
+            }).find( 'textarea' ).change();
+        });
+
         $($('.tab_inserted a')[0]).tab('show');
 
         if(new Date(window.supplier.date).getDate()=== new Date().getDate()){
@@ -311,6 +335,18 @@ class OfferViewer {
         $('.close_browser').on('click touchstart', this,  that.CloseMenu);
 
     }
+
+    onClickCert(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        if(!$(this).attr('height'))
+            $(this).attr('height','100');
+        else {
+            //$(this).attr('height','600');
+            $(this).removeAttr('height');
+        }
+        return false;
+    };
 
     OnClickPack(ev){
         let menu_item = ev.data.mi;
@@ -373,22 +409,7 @@ class OfferViewer {
         //if(ev.data.changed)
         let items = that.SaveOffer(ev,window.sets.lang);
 
-        $("#offer_editor").css('display','none');
-
-        $("#offer_editor").off('hide.bs.modal');
-        $('.item_title').off('click');
-        //$('#add_item').off('click',this.AddOfferItem);
-        //$('.modal-body').find('.add_tab').off('click', this.AddTab);
-        $('.div_tab_inserted').remove();
-
-        //$('.sp_dlg').off('changed.bs.select');
-        $("#offer_editor").find('.toolbar').css('display', 'none');
-        $('input:file').off('change');
-
-
-        $('.menu_item').remove();
-        $('.tab_inserted').remove();
-
+        that.ovc.remove();
     }
 
     GetOfferItems(lang){
@@ -398,7 +419,7 @@ class OfferViewer {
 
         $('.item_title').trigger('click');
 
-        $('#offer_editor').find('.div_tab_inserted').each((index, val)=> {
+        $(that.ovc).find('.div_tab_inserted').each((index, val)=> {
 
             $(val).addClass('active');
             let tab = $(val).attr('id');
@@ -425,6 +446,7 @@ class OfferViewer {
             for (let i = 0; i < miAr.length; i++) {
 
                 let item = {};
+                item.checked = that.offer.data[tab][i].checked;//from offer
                 let checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
 
                 let title = $(miAr[i]).find('.item_title');
@@ -475,7 +497,7 @@ class OfferViewer {
                     if(item.content)
                         delete item.content;
                 }
-                item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
+                item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$(that.ovc).width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                     item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
@@ -526,10 +548,8 @@ class OfferViewer {
         let ind = $("li.tab_inserted.active").val();
         let active = $($("li.active").find('a')[ind]).text();
         let items  = this.GetOfferItems(lang,ind);
-        // if(active) {
-        //     items = this.getTabItems(active, lang);
-        // }
-        window.user.UpdateDeliverOfferLocal(active, items['local'], this.location, window.dict.dict);
+
+        window.user.UpdateDeliverOfferLocal(this.offer, items['local'], window.dict.dict);
         return items;
     }
 }

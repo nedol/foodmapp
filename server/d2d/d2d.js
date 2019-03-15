@@ -4,6 +4,7 @@ let moment = require('moment');
 
 let utils = require('../utils');
 let fs = require('fs');
+let os = require('os');
 var md5 = require('md5');
 const shortid = require('shortid');
 var isJSON = require('is-json');
@@ -14,6 +15,8 @@ var intersection = require('array-intersection');
 global.resObj = {};
 
 var requrl = '';
+
+
 
 module.exports = class D2D {
 
@@ -116,19 +119,19 @@ module.exports = class D2D {
             " FROM "+q.user.toLowerCase()+" as user" +
             " WHERE user.email='"+q.email+"'";
 
+// res.writeHead(200, {'Content-Type': 'application/json'});
+// res.end(JSON.stringify(sql));
+// return;
+
         global.con_obj.query(sql, function (err, result) {
             if (err)
                 throw err;
 
             if (result.length > 0) {
 
-                res.writeHead(200, {
-                    'Content-Type': 'text/event-stream; charset=utf-8',
-                    'Cache-Control': 'no-cache',
-                    'Connection': 'keep-alive'
-                });
-                res.end(JSON.stringify({"err":"указанный email адрес используется в системе"}));
-
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({"err": "указанный email адрес используется в системе"}));
+                return;
             } else {
                 let values, sql, uid;
                 let psw = shortid.generate();
@@ -136,22 +139,23 @@ module.exports = class D2D {
 
                 res.writeHead(200, {'Content-Type': 'application/json'});
 
-                values = [uid, psw, 'tariff',q.promo];
-                sql = "INSERT INTO "+q.user.toLowerCase()+" SET  uid=?, psw=?, tariff=? ,promo=?";
+                values = [uid, psw, 'tariff', q.promo];
+                sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?, tariff=? ,promo=?";
                 global.con_obj.query(sql, values, function (err, result) {
                     if (err) {
-                        res.end(JSON.stringify({err:'Неверные данные'}));
+                        res.end(JSON.stringify({err: 'Неверные данные'}));
                         return;
                     }
 
                     let em = new Email();
-                    let html = "<a href=" + requrl + "/door2door/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+                    let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
 
                     em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
-                        res.end(JSON.stringify({uid: uid, psw: psw, email: q.email}));
+                        res.end(JSON.stringify({result: result, uid: uid, psw: psw, email: q.email}));
                     });
                 });
             }
+
         });
     }
 
@@ -164,19 +168,16 @@ module.exports = class D2D {
             " FROM "+q.user.toLowerCase()+" as user, (SELECT email FROM "+q.user.toLowerCase()+" WHERE email='"+q.profile.email+"') as em"+
             " WHERE  uid='"+q.uid+"' AND psw='"+q.psw+"'";
 
+
         global.con_obj.query(sql, function (err, result) {
             if (err) {
-                res.end();
-                return;
+                throw err;
             }
-            res.writeHead(200, {
-                'Content-Type': 'text/event-stream; charset=utf-8',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive'
-            });
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             if (result.length === 0) {
                 res.end(JSON.stringify({"err": "Аккаунт не используется в системе"}));
-
+                return;
             } else {
                 if(result[0].em_cnt>0){
                     res.end(JSON.stringify({"err": "Email уже используется в системе"}));
@@ -194,7 +195,7 @@ module.exports = class D2D {
                                 res.end(JSON.stringify({err: err}));
                                 return;
                             }
-                            res.end(JSON.stringify({id: result[0].id, promo: result[0].promo}));
+                            res.end(JSON.stringify({id: result[0].id}));
                         });
                     });
                 }
@@ -215,6 +216,9 @@ module.exports = class D2D {
             sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
         }
         global.con_obj.query(sql, values, function (err, result) {
+            if (err) {
+                throw err;
+            }
             res.writeHead(200, {'Content-Type': 'application/json'});
             try{
                 if (err) {
@@ -229,51 +233,24 @@ module.exports = class D2D {
 
     }
 
-    select_query(q, res) {
-
-        let sql = "SELECT DATE_FORMAT(o.date,'%Y-%m-%d') as date, o.data as order_data, o.reserved as reserved" +
-            " FROM  orders as o, objects as obj" +
-            " WHERE DATE_FORMAT(o.date,'%Y-%m-%d')='" + q.date + "' AND obj.latitude=" + q.lat + " AND obj.longitude=" + q.lon +
-            " AND o.obj_id = obj.id" +
-            " ORDER BY o.date DESC LIMIT 1";
-
-        //console.log(sql);
-        let obj_this = this;
-        global.con_obj.query(sql, function (err, result) {
-            if (err) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err: err}));
-            }
-            if(result && result[0]) {
-                obj_this.handleMysqlResult(q, res, result);
-
-            }else{
-                //res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({"offer":'undefined'}))
-            }
-        });
-    }
-
 
     updateOfferDB(q, res, sql, values,now){
         let that = this;
         global.con_obj.query(sql, values, function (err, result) {
-            if (!res._header)
-                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-            }else {
-                values = [q.dict, q.uid];
-                sql = "UPDATE supplier SET dict=?  WHERE uid=?";
-                global.con_obj.query(sql, values, function (err, res_1){
-                    that.BroadcastOffer(q, res, function () {
-                        if (!res._header)
-                            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
-                        if (res.writable)
-                            res.end(JSON.stringify({result: result,published:now}));
-                    });
-                });
+                throw err;
             }
+
+            values = [q.dict, q.uid];
+            sql = "UPDATE supplier SET dict=?  WHERE uid=?";
+            global.con_obj.query(sql, values, function (err, res_1){
+                that.BroadcastOffer(q, res, function () {
+                    if (!res._header)
+                        res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+                    if (res.writable)
+                        res.end(JSON.stringify({result: result,published:now}));
+                });
+            });
         });
     }
 
@@ -295,9 +272,9 @@ module.exports = class D2D {
 
                     });
 
-                    offer = offer.replace(ofobj[tab][item].cert[c].src,requrl+'/door2door/server/images/'+hash);
+                    offer = offer.replace(ofobj[tab][item].cert[c].src,requrl+'/d2d/server/images/'+hash);
                 }
-                offer = offer.replace(ofobj[tab][item].img.src,requrl+'/door2door/server/images/'+hash);
+                offer = offer.replace(ofobj[tab][item].img.src,requrl+'/d2d/server/images/'+hash);
             }
         }
         cb(offer);
@@ -305,7 +282,7 @@ module.exports = class D2D {
 
     replaceImg_2(src, cb) {
         try {
-            if (!src || src.includes(requrl) > 0) {
+            if (!src || src.includes('http')) {
                 cb(src);
                 return;
             }
@@ -313,11 +290,12 @@ module.exports = class D2D {
             cb(src);
             return;
         }
+
         const base64Data = src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
         const hash = md5(base64Data);
-
+        let hn  = os.hostname();
         fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
-            cb(requrl+'/door2door/server/images/'+hash);
+            cb(requrl+'/d2d/server/images/'+hash);
         });
     }
 
@@ -337,12 +315,10 @@ module.exports = class D2D {
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
 
         global.con_obj.query(sql, function (err, sel) {
-            if (!res._header)
-                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
             if(sel.length>0){
                 for(let r in sel){
                     let sse = resObj[sel[r].email];
@@ -374,11 +350,11 @@ module.exports = class D2D {
             " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             let values, sql;
             if(sel.length>0) {
                 values = [JSON.stringify(q.data), q.comment, q.period, q.address, now, sel[0].id];
@@ -416,11 +392,11 @@ module.exports = class D2D {
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({err: err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             let values, sql;
             if(sel.length>0) {
                 values = [ q.status, sel[0].id];
@@ -449,7 +425,9 @@ module.exports = class D2D {
             " WHERE obj.latitude=" + admin.lat + " AND obj.longitude=" + admin.lon;
 
         global.con_obj.query(sql_select, function (err, result) {
-
+            if (err) {
+                throw err;
+            }
             if (result.length > 0) {
 
 
@@ -512,11 +490,10 @@ module.exports = class D2D {
             " AND of.date=DATE_FORMAT(\""+q.date+"\", \"%Y-%m-%d\") AND of.published IS NOT NULL AND of.deleted IS NULL";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err':err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
             let now = moment().format('YYYY-MM-DD');
             sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date=\""+now+"\" WHERE uid=\""+q.uid+"\"";
 
@@ -548,11 +525,11 @@ module.exports = class D2D {
             " WHERE sup.uid = '"+ q.supuid+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                res.end(JSON.stringify({'err': err}));
-                return;
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             try {
                 let rating = JSON.parse(result[0].rating);
                 res.end(JSON.stringify({rating: rating.value}));
@@ -571,11 +548,11 @@ module.exports = class D2D {
             " WHERE supuid='"+q.supuid +"'";
 
         global.con_obj.query(sql, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
             if (err) {
-                console.log(JSON.stringify({'err':err}));
-                res.end(JSON.stringify({'err':err}));
+                throw err;
             }
+            res.writeHead(200, {'Content-Type': 'application/json'});
+
             let array = [];
             for(let d in result) {
                 array.push(JSON.parse(result[d].data));
@@ -592,10 +569,10 @@ module.exports = class D2D {
             let values = [q.supuid, JSON.stringify(q.data)];
             let sql = "REPLACE INTO comm SET supuid=?, data=?";
             global.con_obj.query(sql, values, function (err, result) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
                 if (err) {
-                    console.log(JSON.stringify({'err':err}));
+                    throw err;
                 }
+                res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end();
             });
         });

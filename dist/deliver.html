@@ -6,7 +6,7 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
     <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>Deliver</title>
+    <title>ДоТуДо Доставка</title>
 </head>
 
 <meta charset="utf-8">
@@ -27,7 +27,7 @@
 <style>
 
     html, body{
-        padding: 0px;
+        padding: 2px;
         margin: 0px;
         height: 100%;
         width: 100%;
@@ -36,6 +36,7 @@
     .scaled{
         transform: scale(1.5)
     }
+
     #marker {
         display:block;
         position:absolute;
@@ -48,11 +49,11 @@
         filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
     }
     .map{
+        position: fixed;
         padding: 0px;
         margin: 0px;
         height: 100%;
         width: 100%;
-        position: fixed;
         z-index: 0;
     }
 
@@ -294,15 +295,15 @@
 
     <div align="center" id="categories">
         <input type="image" class="category" cat="food" id="0" title="Food" src="../dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
-        <input type="image" class="category" cat="fruits" id="10" title="Fruits & Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="veges" id="10" title="Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
         <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
-        <input type="image" class="category" cat="pizza" id="30" title="Pizza" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
         <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
         <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
-        <input type="image" class="category" cat="mushrooms" id="60" title="Mushrooms" src="../dist/images/ic_60.png" state="0"  data-translate="54a790c38eed762e354f16fb664c53de" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../dist/images/ic_70.png" state="1"  data-translate="25090ca7ae49ae5e0826233de9b89a30" />
-        <input type="image" class="category" cat="chicken" id="80" title="Chicken" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="liver" id="90" title="Liver" src="../dist/images/ic_90.png" state="0"  data-translate="822ce45977e6e321b1a6b2efa72df99f" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="../dist/images/ic_60.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../dist/images/ic_70.png" state="1"  data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
+        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
+        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="../dist/images/ic_90.png" state="0"  data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
         <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
         <input type="image" class="category" cat="bread" id="110" title="Bread" src="../dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
         <input type="image" class="category" cat="bio" id="120" title="Bio" src="../dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
@@ -323,8 +324,8 @@
 <div id="offer_editor" style="
     display: none; position: absolute;
     color:black;  background-color: #f0f0f0;
-    overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-    width:84%;  left: 0; right:0;top:5%;bottom:5%;
+    overflow-x: hidden; overflow-y: hidden; z-index:1000; margin: auto;
+    width:95%;  left: 0; right:0;top:5%;bottom:5%;
     border: solid 0px lightslategrey;
     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <div style="display: inline-block; position:absolute; top:0;right: 10px; padding-left: 20px;color: white">
@@ -337,13 +338,13 @@
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane active" id="editor">
+            <div class="tab-pane active" id="editor" style="width:97%;  margin: 0 auto;">
                 <style>
                     .modal-content{
                         position: absolute;
-                        height: 90%;
-                        width: 98%;
-                        left: 1%;
+                        height: 92%;
+                        width: 99%;
+                        left: .5%;
                         margin: auto;
                     }
                     .modal-header{
@@ -395,6 +396,9 @@
                         -moz-border-radius-topright: 5px;
                         border-top-left-radius: 5px;
                         border-top-right-radius: 5px;
+                    }
+                    .input{
+                        background-color: transparent;
                     }
                     .tab_inserted{
 
@@ -497,12 +501,12 @@
                         <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
                     </div>
                     <div class="modal-body">
-                        <div style="float: right; padding: 10px 0px 0px; margin-right: 15px">
-                            <h5 style="color:gray;display: inline-block;margin-right:30px">Расфасовка:</h5>
-                            <h5 style="color:gray;display: inline-block;margin-right:30px" >Цена:</h5>
-                            <h5 class="markup_header" style="color:gray;display: none;margin-right:30px" >Наценка:</h5>
-                            <h5 class="total_header" style="color:gray;display: none;margin-right:30px" >Сумма:</h5>
-                            <h5 class="orders_header" style="color:gray;display: none;margin-right:30px" >Заказ:</h5>
+                        <div class="row" style="float: right; width: 35%;word-wrap: break-word; text-align:center; margin-right: 10px;color:gray">
+                            <h5 class="packing_header col-sm-3 col-xs-3" style="color:gray;display: none;">Расфасовка:</h5>
+                            <h5 class="price_header col-sm-3 col-xs-3" style="color:gray;display: none;" >Закупка:</h5>
+                            <h5 class="markup_header col-sm-3 col-xs-3" style="color:gray;display: none;" >Наценка:</h5>
+                            <h5 class="total_header col-sm-3 col-xs-3" style="color:gray;display: none;" >Продажа:</h5>
+                            <h5 class="orders_header col-sm-3 col-xs-3" style="color:gray;display: none;" >Заказ:</h5>
                         </div>
 
                         <ul class="nav nav-tabs" id="menu_tabs">
@@ -540,8 +544,8 @@
                         border-radius: 5px;
                         border: 0px solid #343434;
                         padding-left: 5px;
-                        margin: 5px;
-                        width: 98.7%;
+                        margin: 2px;
+                        width: 99%;
                         box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
                     }
                     .item_cb{
@@ -554,11 +558,11 @@
                         box-shadow: 0 0 10px #719ECE;
                     }
                     .item_title{
-                        display: inline-block;
+
                         font-family:'Courier New';
                         font-size: x-large;
                         /*height: 240px;*/
-                        /*width:100%;*/
+                        width:80%;
                         border-width: 0px;
                         /*overflow:auto;*/
                         /*user-select: none;*/
@@ -585,7 +589,7 @@
                         font-size:24px;
                         white-space: nowrap;
                     }
-                    .item_price,.item_pack,.item_markup{
+                    .item_price,.item_pack,.item_markup,.item_total{
                         width: 100%;
                         text-align: center;
                     }
@@ -602,14 +606,7 @@
                         /*padding: 5px;*/
 
                     }
-                    .content_text{
-                        overflow-y: scroll;
-                        font-family:'Segoe Script';
-                        font-size: medium;
-                        margin-left: 20px;
-                        /*overflow:auto;*/
-                        /*user-select: none;*/
-                    }
+
                     .image_div{
                         position: absolute;
                         padding:15px;
@@ -639,8 +636,8 @@
                 </style>
 
                 <div  id="menu_item_tmplt">
-                    <div class="row menu_item_row">
-                        <div style="display: inline-block">
+                    <div class="row">
+                        <div class="packing_div" style="display: inline-block;width:60%;">
                             <label  class="item_cb btn" title="Опубликовать" style="margin-right:20px;visibility:hidden">
                                 <input type="checkbox" class="checkbox-inline" style="display: none">
                                 <i class="fa fa-square-o fa-2x"></i>
@@ -648,7 +645,7 @@
                             </label>
                             <input type="text" class="item_title input input-sm" contentEditable="true" placeholder="название" data-toggle="collapse">
                         </div>
-                        <div style="display: inline-block;width:22%;float: right;margin-right: 10px">
+                        <div style="display: inline-block;width:35%;float: right;margin-right: 10px; text-align:center;">
                             <div class="row">
                                 <div class="pack_container col-sm-3 col-xs-3">
                                     <div class="dropdown">
@@ -659,7 +656,7 @@
                                         <span class="caret" style="display: inline; visibility: hidden"></span>
                                     </div>
                                 </div>
-                                <div class="price_div col-sm-3 col-xs-3">
+                                <div class="price_div col-sm-3 col-xs-3"  style="display: none">
                                     <input class="input item_price" contentEditable="false" placeholder="руб">
                                 </div>
                                 <div class="markup_div col-sm-3 col-xs-3" style="display: none">
@@ -674,22 +671,25 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="collapse item_content">
+                        <div class="item_content collapse">
                             <div class="row">
                                 <div class="form-group col-sm-10 col-xs-10">
-                                    <textarea class="content_text form-control"  rows="8" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contentEditable="true">
-                                    </textarea>
+                                    <div class="content">
+                                        <textarea class="content_text form-control" rows="5" placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contentEditable="true">
+                                        </textarea>
+                                    </div>
+                                    <div class="gallery" style="position: relative;float: left"></div>
                                 </div>
                                 <div class="col-sm-2 col-xs-2">
-                                    <img class="input img-fluid center-block" width="100px" src="" >
+                                    <img class="input img-fluid center-block" style="width:90%;margin-right: 50px" src="" >
                                 </div>
                             </div>
-                            <div class="toolbar"  style="display:none; position:relative;width:20%;float: right;">
+                            <div class="toolbar"   style="display:none; position:relative;width:20%; margin-left: auto; margin-right: auto;">
                                 <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
                                 <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
                                 <span class="glyphicon glyphicon-modal-window add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
                             </div>
-                            <div class="gallery" style="position: relative;float: left"></div>
+
                         </div>
                     </div>
 
@@ -776,59 +776,59 @@
        width:80%;    left: 0%;  right:0; height: 80%; top: 50px;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <style>
-        .modal-content{
-            position: absolute;
-            height: 100%;
-            width: 100%
-        }
-        .modal-header{
-            position: relative;
-            width: 100%;
-            padding:9px 15px;
-            border-bottom:1px solid #737373;
-            -webkit-border-top-left-radius: 5px;
-            -webkit-border-top-right-radius: 5px;
-            -moz-border-radius-topleft: 5px;
-            -moz-border-radius-topright: 5px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        .modal-body{
-            height: 100%;
-            width: 100%;
-            padding:9px 15px;
-            border-bottom:1px solid #262626;
-            border-top:1px solid black;
-            border-right:1px solid black;
-            border-left:1px solid black;
-            -webkit-border-top-left-radius: 5px;
-            -webkit-border-top-right-radius: 5px;
-            -moz-border-radius-topleft: 5px;
-            -moz-border-radius-topright: 5px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-            -webkit-border-bottom-left-radius: 5px;
-            -webkit-border-bottom-right-radius: 5px;
-            -moz-border-radius-bottomleft: 5px;
-            -moz-border-radius-bottomright: 5px;
-            border-bottom-left-radius: 5px;
-            border-bottom-right-radius: 5px;
-        }
-        .modal-footer {
-            padding: 9px 10px;
-            border-bottom: 0px solid black;
-            border-top: 0px;
-            -webkit-border-top-left-radius: 5px;
-            -webkit-border-top-right-radius: 5px;
-            -moz-border-radius-topleft: 5px;
-            -moz-border-radius-topright: 5px;
-            border-top-left-radius: 5px;
-            border-top-right-radius: 5px;
-        }
+    <!--<style>-->
+        <!--.modal-content{-->
+            <!--position: absolute;-->
+            <!--height: 90%;-->
+            <!--width: 98%-->
+        <!--}-->
+        <!--.modal-header{-->
+            <!--position: relative;-->
+            <!--width: 100%;-->
+            <!--padding:9px 15px;-->
+            <!--border-bottom:1px solid #737373;-->
+            <!-- -webkit-border-top-left-radius: 5px;-->
+            <!-- -webkit-border-top-right-radius: 5px;-->
+            <!-- -moz-border-radius-topleft: 5px;-->
+            <!-- -moz-border-radius-topright: 5px;-->
+            <!--border-top-left-radius: 5px;-->
+            <!--border-top-right-radius: 5px;-->
+            <!--font-family: Arial, Helvetica, sans-serif;-->
+        <!--}-->
+        <!--.modal-body{-->
+            <!--height: 100%;-->
+            <!--width: 100%;-->
+            <!--padding:9px 15px;-->
+            <!--border-bottom:1px solid #262626;-->
+            <!--border-top:1px solid black;-->
+            <!--border-right:1px solid black;-->
+            <!--border-left:1px solid black;-->
+            <!-- -webkit-border-top-left-radius: 5px;-->
+            <!-- -webkit-border-top-right-radius: 5px;-->
+            <!-- -moz-border-radius-topleft: 5px;-->
+            <!-- -moz-border-radius-topright: 5px;-->
+            <!--border-top-left-radius: 5px;-->
+            <!--border-top-right-radius: 5px;-->
+            <!-- -webkit-border-bottom-left-radius: 5px;-->
+            <!-- -webkit-border-bottom-right-radius: 5px;-->
+            <!-- -moz-border-radius-bottomleft: 5px;-->
+            <!-- -moz-border-radius-bottomright: 5px;-->
+            <!--border-bottom-left-radius: 5px;-->
+            <!--border-bottom-right-radius: 5px;-->
+        <!--}-->
+        <!--.modal-footer {-->
+            <!--padding: 9px 10px;-->
+            <!--border-bottom: 0px solid black;-->
+            <!--border-top: 0px;-->
+            <!-- -webkit-border-top-left-radius: 5px;-->
+            <!-- -webkit-border-top-right-radius: 5px;-->
+            <!-- -moz-border-radius-topleft: 5px;-->
+            <!-- -moz-border-radius-topright: 5px;-->
+            <!--border-top-left-radius: 5px;-->
+            <!--border-top-right-radius: 5px;-->
+        <!--}-->
 
-    </style>
+    <!--</style>-->
     <div class="modal-content" style="position: absolute;top:0px;height:100%;width: 100%;">
         <div style="display: inline-block; z-index:11; position:absolute; right: 10px;  color:grey">
             <span class="close_browser glyphicon glyphicon-remove-sign"></span>

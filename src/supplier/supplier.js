@@ -25,7 +25,7 @@ import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferEditor} from "./offer.editor";
 
-let md5 = require('md5');
+
 
 var urlencode = require('urlencode');
 
@@ -113,15 +113,15 @@ class Supplier{
             }
 
             window.network.postRequest(data_obj, function (data) {
-                for(let i in data.offer){
+                for(let i in data){
                     window.db.IsOffer(data.offer[i].date, function (res) {
                         if(!res){
                             //delete data.offer[i].id;delete data.offer[i].supuid;
 
-                            data.offer[i].location = proj.fromLonLat([data.offer[i].longitude,data.offer[i].latitude]);
-                            data.offer[i].data = JSON.parse(data.offer[i].data);
-                            data.offer[i].data.data = Object.assign(that.offer.stobj.data,data.offer[i].data.data);
-                            window.db.SetObject('offerStore',data.offer[i],function (res) {
+                            data[i].location = proj.fromLonLat([data[i].longitude,data[i].latitude]);
+                            data[i].data = JSON.parse(data.offer[i].data);
+                            data[i].data.data = Object.assign(that.offer.stobj.data,data[i].data.data);
+                            window.db.SetObject('offerStore',data[i],function (res) {
 
                             });
                         }
@@ -262,6 +262,7 @@ class Supplier{
             });
 
             that.import.GetOrderSupplier(function () {
+                var md5 = require('md5');
                 window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
 
                     let type = 'customer';
@@ -310,7 +311,7 @@ class Supplier{
 
     }
 
-    UpdateOfferLocal(tab, offer, location, dict){
+    UpdateOfferLocal(offer0,offer, location, dict){
 
         let uObj = Object.assign(this.offer.stobj);
         uObj.data={};
@@ -386,8 +387,8 @@ class Supplier{
             let data = res;
             if(data.err){
                 console.log(data.err.code);
-            }else if(data.result.affectedRows===1){
-                window.db.GetOffer(window.user.date, function (obj) {
+            }else if(data.result.affectedRows>0){
+                window.db.GetOffer(new Date(window.user.date), function (obj) {
                     obj[0].published = res.published;
                     window.db.SetObject('offerStore',obj[0],function (res) {
                         if(res)

@@ -10,7 +10,7 @@ require('jquery-ui-touch-punch');
 require('dialog-polyfill');
 
 require("../../global");
-var _ = require('lodash');
+
 
 import {Utils} from "../utils/utils";
 import {Deliver} from '../deliver/deliver'
@@ -60,6 +60,7 @@ $(document).on('readystatechange', function () {
     window.db = new DB('Deliver', function () {
         let uid = utils.getParameterByName('uid');
         window.db.GetSettings(function (set) {
+            var _ = require('lodash');
             let res = _.findKey(set, function(k) {
                 return k.uid === uid;
             });
@@ -115,7 +116,11 @@ $(document).on('readystatechange', function () {
                 }
 
             } else {
-                window.location.replace("http://localhost:63342/door2door/dist/settings.deliver.html");
+                if(window.location.hostname==='localhost')
+                    window.location.replace("http://localhost:63342/d2d/dist/settings.deliver.html");
+
+                else if(window.location.hostname==='nedol')
+                    window.location.replace("https://nedol.ru/d2d/dist/settings.deliver.html");
             }
 
         });

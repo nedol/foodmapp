@@ -20,9 +20,9 @@ window.InitProfileSupplier = function (user, settings) {
     window.profile_sup.InitRateSupplier();
     window.profile_sup.InitSettingsSupplier();
 
-    if(user.constructor.name==='Supplier') {
+    if(user==='Supplier') {
         if(!user.profile.profile.avatar) {
-            utils.LoadImage("./images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('.avatar').attr('src', src);
             });
         }else{
@@ -40,7 +40,7 @@ window.InitProfileSupplier = function (user, settings) {
                     $('.avatar').attr('src', e.target.result);
                     $('.avatar').on('load',function (ev) {
                         ev.preventDefault();
-                        let k = 50/$(this).height();
+                        let k = 70/$(this).height();
                         utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
                             $('.avatar').attr('thmb', thmb.src);
                         });
@@ -77,6 +77,9 @@ window.InitProfileSupplier = function (user, settings) {
             }
         });
     }
+    else if(user.user==='Customer'){
+        $('input').prop( "disabled", true );
+    }
 }
 
 
@@ -91,6 +94,7 @@ class ProfileSupplier{
     InitComments(obj, settings){
 
         $('img.avatar').attr('src', settings.profilePictureURL);
+        settings.profilePictureURL = window.parent.user.profile.profile.avatar;
         $('#comments-container').comments(Object.assign(settings,{
             getComments: function(success, error) {
                 let par = {
@@ -246,6 +250,40 @@ class ProfileSupplier{
         });
     }
 
+    SaveProfile_new(uid, psw){
+        let that = this;
+        let data_post ={
+            proj:'d2d',
+            user:window.parent.user.constructor.name,
+            func:'updprofile',
+            uid: uid,
+            psw: psw,
+            profile: {
+                type:window.parent.user.profile.profile.type,
+                email: $('#email').val(),
+                host:location.origin,
+                avatar: $('.avatar').attr('src'),
+                thmb: $('.avatar').attr('thmb'),
+                lang: $('html').attr('lang'),
+                name: $('#name').val(),
+                worktime: $('#worktime').val(),
+                mobile: $('#mobile').val(),
+                place: $('#place').val(),
+            }
+        }
+
+        window.parent.network.postRequest(data_post, function (res) {
+
+            window.parent.db.GetSettings(function (obj) {
+                obj[0].profile = data_post.profile;
+                window.parent.db.SetObject('setStore',obj[0], function (res) {
+                    console.log('updprofile succeed');
+                    //$('#my_truck_2',$(window.parent).contents()).attr('src',data_post.profile.thmb);
+                });
+            });
+        });
+
+    }
 
     SaveSettings(){
         let settings = {};

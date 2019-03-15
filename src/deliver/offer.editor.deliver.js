@@ -15,7 +15,7 @@ const langs = require("../dict/languages");
 
 // var moment = require('moment');
 
-var md5 = require('md5');
+
 
 
 import {Utils} from "../utils/utils";
@@ -39,6 +39,7 @@ class OfferEditorDeliver{
         window.db.GetOffer(date,(of)=> {
             this.fillEditor(of);
             window.db.GetAllSuppliers(date,(ar)=> {
+                var _ = require('lodash');
                 supAr = ar;
                 let union = _.unionBy(offAr,supAr,'supuid');
             });
@@ -52,7 +53,7 @@ class OfferEditorDeliver{
     }
 
     fillEditor(ar) {
-
+        var md5 = require('md5');
         let that = this;
 
         $(".category[state='1']").each(function (i, cat) {
@@ -76,12 +77,17 @@ class OfferEditorDeliver{
         this.ovc .css('display','block');
         this.ovc .resizable();
 
+        this.ovc.find('.packing_header').css('display','inline-block');
         this.ovc.find('.markup_header').css('display','none');
+        this.ovc.find('.price_header').css('display','inline-block');
         this.ovc.find('.total_header').css('display','inline-block');
         this.ovc.find('.orders_header').css('display','inline-block');
+        this.ovc.find('.packing_div').css('display','inline-block');
+        this.ovc.find('.price_div').css('display','inline-block');
         this.ovc.find('.markup_div').css('display','none');
         this.ovc.find('.total_div').css('display','inline-block');
-        this.ovc.find('.orders_div').css('display','none');
+        this.ovc.find('.orders_div').css('display','inline-block');
+
 
         this.ovc.find('.avatar').on('click touchstart',function () {
              $("#offer_editor").find('.browser').css('display', 'block');
@@ -109,10 +115,11 @@ class OfferEditorDeliver{
         $('#add_item').css('display', 'block');
         $('#add_tab_li').css('display','block');
 
-        let markup ="0%";
+        let markup ="0";
 
         for(let of in ar) {
             let offer = ar[of];
+            that.offer = offer;
             if(offer)
             for (let tab in offer.data) {
                 if (!tab)
@@ -127,6 +134,19 @@ class OfferEditorDeliver{
                     }else{
                         $(menu_item).attr("owner", offer.data[tab][i].owner);
                     }
+                    let t = tab;
+                    window.db.GetSupplier(new Date(window.user.date), $(menu_item).attr("owner"), function (sup) {
+                        $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
+                        var base = _.find(sup.data[t], { title:offer.data[tab][i].title });
+                        let pack = $(menu_item).find('.item_pack').text();
+                        $(menu_item).find('.item_total').val(parseInt(base.packlist[pack])+parseInt(offer.data[tab][i].markuplist[pack]));
+                        $(menu_item).find('.item_price').val(parseInt(base.packlist[pack]));
+                        window.dict.dict = Object.assign(sup.dict.dict, window.dict.dict);
+                        this.lang = window.sets.lang;
+                        window.dict.set_lang(window.sets.lang,$(menu_item));
+
+                    });
+
                     $(menu_item).attr('id', tab +'_'+ of +'_' + i);
                     $(menu_item).attr("class", 'menu_item');
 
@@ -169,9 +189,6 @@ class OfferEditorDeliver{
                     if (offer.data[tab][i].title) {
                         $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
                     }
-                    if(offer.data[tab][i].markup)
-                        markup = offer.data[tab][i].markup;
-                    $(menu_item).find('.item_price').attr('contenteditable', isEditable);
 
                     $(menu_item).find('.item_content').attr('id', 'content_' + tab +'_'+of+ '_' + i);
                     $(menu_item).find('.item_title').attr('data-target', '#content_' + tab +'_'+of+ '_' + i);
@@ -182,40 +199,23 @@ class OfferEditorDeliver{
                         $(menu_item).find('.content_text').attr('data-translate', offer.data[tab][i].content_text.value);
                     if (offer.data[tab][i].content_text)
                         $(menu_item).find('.content_text').css('visibility', 'visible');
-                    // if (offer.data[tab][i].content_text && offer.data[tab][i].content_text.width)
-                    //     $(menu_item).find('.content_text').css('width', offer.data[tab][i].content_text.width);
-                    //
-                    // if (offer.data[tab][i].content_text && offer.data[tab][i].content_text.left)
-                    //     $(menu_item).find('.content_text').css('left', offer.data[tab][i].content_text.left);
 
                     if (offer.data[tab][i].img) {
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
                         $(menu_item).find('.img-fluid').attr('src', offer.data[tab][i].img.src);
-                        // $(menu_item).find('.img-fluid').css('left', offer.data[tab][i].img.left);
-                        // $(menu_item).find('.img-fluid').css('top', offer.data[tab][i].img.top ? offer.data[tab][i].img.top : 0);
-                        //
-                        // $(menu_item).find('.img-fluid').draggable({
-                        //     containment: '#content_' + tab + '_' + i,
-                        //     scroll: false
-                        // });
                     }
 
                     $(menu_item).find('.img-fluid').attr('id', 'img_' + tab +'_'+of+ '_' + i);
                     $(menu_item).find('.pack_list').empty();
-                    let pl = offer.data[tab][i].packlist;
-                    $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
+                    let pl = offer.data[tab][i].markuplist;
+                    $(menu_item).find('.item_pack').attr('markuplist', JSON.stringify(pl));
                     for (let p in pl) {
                         if (!p)
                             continue;
                         let data = parseInt(pl[p]);
                         $(menu_item).find('.item_price').attr('base',data);
-                        if(offer.data[tab][i].markup.includes('%')) {
-                            markup = parseInt(offer.data[tab][i].markup)/100+1;
-                            data = (data * markup).toFixed(0);
-                        }else{
-                            markup = parseInt(offer.data[tab][i].markup);
-                            data = (parseInt(data) + markup).toFixed(0);
-                        }
+
+
                         pl[p] = data;
                         $(menu_item).find('.dropdown').css('visibility', 'visible');
                         $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + p + "</a></li>");
@@ -225,6 +225,7 @@ class OfferEditorDeliver{
                         $(menu_item).find('.item_pack').attr('data-toggle', 'dropdown');
                         //$(menu_item).find('.item_pack').addClass('dropdown-toggle');
                         $(menu_item).find('.item_pack').attr('pack', i);
+
 
                         $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
                             let that = ev.data;
@@ -238,40 +239,8 @@ class OfferEditorDeliver{
                             //$(menu_item).find('.add_pack').css('visibility', 'hidden');
                         });
 
-                        $(menu_item).find('.item_price').val(data);
-                        $(menu_item).find('.item_price').on('focusout', {that: that, mi: $(menu_item)}, function (ev) {
-                            $(menu_item).find('.add_pack').css('visibility', 'hidden');
-                            let packlist = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
-                            let pack = $(menu_item).find('.item_pack').text();
-                            let price = parseInt($(ev.target).val());
-                            packlist[pack] = price;
-                            $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(packlist));
-
-                        });
-
-                        $(menu_item).find('.item_markup').val(offer.data[tab][i].markup);
-                        $(menu_item).find('.item_markup').on('focusout',that,(ev)=>{
-                            if($(ev.target).val().includes('%')) {
-                                let markup = parseInt($(ev.target).val()) / 100 + 1;
-                                let price = $(ev.target).closest('.row').find('.item_price').attr('base');
-                                $(ev.target).closest('.row').find('.item_price').val(Math.ceil(price * markup));
-                            }else{
-                                let markup = parseInt($(ev.target).val());
-                                let price = parseInt($(ev.target).closest('.row').find('.item_price').attr('base'));
-                                $(ev.target).closest('.row').find('.item_price').val(price + markup);
-                            }
-                        });
                     }
 
-
-                    $(menu_item).find('.item_pack').on('focusin', that, (ev) => {
-                        $(menu_item).find('.add_pack').css('visibility', 'visible');
-                        //$(this).focus();
-                    });
-                    $(menu_item).find('.item_price').on('focusin', that, (ev) => {
-                        $(menu_item).find('.add_pack').css('visibility', 'visible');
-                        //$(this).focus();
-                    });
 
                     $(menu_item).find('.gallery').attr('id', 'gallery_' + tab +'_'+of+ '_' + i);
 
@@ -279,7 +248,7 @@ class OfferEditorDeliver{
                         let img = new Image();
                         img.src = data.src;
                         //$(img).offset(data.pos);TODO:
-                        img.height = '50';
+                        img.height = '100';
                         $(menu_item).find('.gallery').append(img);
                         $(img).on('click', that.onClickCert);
                         that.MakeDraggable(img);
@@ -296,11 +265,6 @@ class OfferEditorDeliver{
                         && $(menu_item).find('.content_text').text() === "") {
                         $(menu_item).find('.item_content').slideToggle("fast");
                     }
-
-                    // $(menu_item).find('.content_text').draggable({
-                    //     containment: '#content_' + tab + '_' + i,
-                    //     scroll: false
-                    // });
 
                     $(menu_item).find('.add_picture').attr('id', 'ap_'  + tab +'_'+of+ '_' + i);
                     $(menu_item).find('.add_picture').on('click', this, function (ev) {
@@ -353,6 +317,11 @@ class OfferEditorDeliver{
                     $('a[href="#' + tab + '"]').css('color', 'blue');
                 }
 
+                $('#' + tab).sortable({
+                    placeholder: "ui-state-highlight"
+                });
+                $('#' + tab).disableSelection();
+
                 $('[href="#' + tab + '"]').on('show.bs.tab', function (ev) {
                     if (ev.relatedTarget) {
                         //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
@@ -375,6 +344,13 @@ class OfferEditorDeliver{
             }
 
         }//for offer array
+
+        $('.item_content').on('shown.bs.collapse', function (e) {
+            $(this).find('.content').off();
+            $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
+                $(this).height(0).height(this.scrollHeight);
+            }).find( 'textarea' ).change();
+        });
 
         window.db.GetSupOrders(window.user.date, window.user.uid, function (res) {
 
@@ -676,7 +652,7 @@ class OfferEditorDeliver{
     }
 
     AddOfferItem(ev){
-
+        var md5 = require('md5');
         let that = ev.data;
 
         // if($('.menu_item').length>=parseInt($('#items_limit').val())) {
@@ -843,6 +819,7 @@ class OfferEditorDeliver{
     }
 
     GetOfferItems(lang){
+        var md5 = require('md5');
         let that = this;
         let offerObj = {local:{}, remote:{}};
         that.arCat = [];
@@ -941,11 +918,9 @@ class OfferEditorDeliver{
                     delete item.img;
                 }
 
-                item.markup = $(miAr[i]).find('.item_markup').val();
-
-                item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
-                if(item.packlist)
-                    item.packlist = JSON.parse(item.packlist);
+                item.markuplist = $(miAr[i]).find('.item_pack').attr('markuplist');
+                if(item.markuplist)
+                    item.markuplist = JSON.parse(item.markuplist);
 
                 item.price = parseInt($(miAr[i]).find('.item_price').attr('base'));
                 if(!item.price)
@@ -985,10 +960,8 @@ class OfferEditorDeliver{
         let ind = $("li.tab_inserted.active").val();
         let active = $($("li.active").find('a')[ind]).text();
         let items  = this.GetOfferItems(lang,ind);
-        // if(active) {
-        //     items = this.getTabItems(active, lang);
-        // }
-        window.user.UpdateOfferLocal(active, items['local'], this.location, window.dict.dict);
+
+        window.user.UpdateOfferLocal(this.offer, items['local'], window.dict.dict);
         return items;
     }
 

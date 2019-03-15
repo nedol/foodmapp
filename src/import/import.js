@@ -91,7 +91,7 @@ class Import {
                     cb(true);
                     for (let i in res) {
                         let obj = res[i];
-                        if(!obj)
+                        if(!obj || !obj.profile)
                             continue;
                         obj = formatObject(obj);
                         if(obj.uid ===window.user.uid && obj.date===window.user.date){

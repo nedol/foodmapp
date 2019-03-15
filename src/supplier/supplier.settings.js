@@ -35,6 +35,7 @@ class SupplierSettings {
             user:"Supplier",
             func:'confirmem',
             type:'marketer',
+            host:location.origin,
             avatar:$(form).find('.avatar').attr('src'),
             lang: $('html').attr('lang'),
             email:$(form).find('#email').val(),
@@ -49,10 +50,18 @@ class SupplierSettings {
                 alert(obj.err);
                 return;
             }
-            delete data_post.proj; delete data_post.func; delete data_post.email;
+            delete data_post.proj;
+            delete data_post.func;
+            delete data_post.email;
+            delete data_post.host;
+
             that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
                 alert('На указанный email-адрес была выслана ссылка для входа в программу');
-                window.location.replace("../profile.supplier.html?lang="+data_post.lang);
+                if(window.location.hostname==='localhost')
+                    window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html?uid"+obj.uid);
+
+                else if(window.location.hostname==='nedol')
+                    window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html?uid"+obj.uid);
             });
         });
     }

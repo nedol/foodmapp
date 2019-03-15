@@ -51,12 +51,18 @@ class Profile{
                 $('#mobile', browser.contents()).val(that.profile.mobile);
                 $('#address', browser.contents()).val(that.profile.address);
                 $('#place', browser.contents()).val(that.profile.place);
+                $('img.avatar', browser.contents()).attr('src',that.profile.avatar);
+                $('img.avatar', browser.contents()).attr('thmb',that.profile.thmb);
+                if(window.user.constructor.name==='Deliver'){
+                    $('a[href=\'#settings\']',browser.contents()).css('display','none');
+                }
 
                 setTimeout(function () {
                     browser[0].contentWindow.profile_sup.InitRating();
                     browser[0].contentWindow.profile_sup.SetRatingReadonly();
                 },500);
             }
+
             $('.title h1', browser.contents()).text('Мой профиль');
             $('.odr_ctrl', browser.contents()).on('click', function (ev) {
                 $(that.ovc).find('.order').css('display', 'block');
@@ -154,7 +160,9 @@ class Profile{
                     hideRepliesText: 'Скрыть'});
 
             if(that.profile) {
-                $('input',browser.contents()).removeAttr('disabled');
+                $('input',browser.contents()).prop('readonly', true);
+                $('input',browser.contents()).attr('placeholder', '');
+                $('input',browser.contents()).attr('title', '');
                 $('#name', browser.contents()).val(that.profile.name);
                 $('#email', browser.contents()).val(that.profile.email);
                 $('#mobile', browser.contents()).val(that.profile.mobile);
@@ -167,6 +175,8 @@ class Profile{
                 browser[0].contentWindow.profile_sup.SetRating(rating);
 
             }
+            if(!window.user.profile.profile.type)
+                $('a[href=\"#settings\"]', browser.contents()).parent('li').css('display','none');
 
             $('.odr_ctrl', browser.contents()).on('click', function (ev) {
                 $(that.ovc).find('.order').css('display', 'block');

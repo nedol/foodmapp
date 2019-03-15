@@ -3,9 +3,44 @@
 export {DeliverSettings}
 
 require('jquery-ui')
+import {DB} from "../map/storage/db"
+
+import 'bootstrap'
 import {Network} from "../../network";
 
+$(document).on('readystatechange', function () {
 
+    if (!window.EventSource) {
+        alert('В этом браузере нет поддержки EventSource.');
+        return;
+    }
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+    // parent
+
+    window.db = new DB('Deliver', function () {
+        window.ds = new DeliverSettings(window.db);
+    });
+
+    var readURL = function(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.avatar').attr('src', e.target.result);
+                $('.avatar').siblings('input:file').attr('changed',true);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+    $(".file-upload").on('change', function(){
+        readURL(this);
+    });
+});
 
 class DeliverSettings {
     constructor(db){
@@ -34,7 +69,8 @@ class DeliverSettings {
             user:"Deliver",
             func:'confirmem',
             type:'deliver',
-            avatar:$(form).find('.avatar').attr('src'),
+            host:location.origin,
+            //avatar:$(form).find('.avatar').attr('src'),
             lang: $('html').attr('lang'),
             email:$(form).find('#email').val(),
             name:$(form).find('#name').val(),
@@ -44,8 +80,8 @@ class DeliverSettings {
         }
 
         this.network.postRequest(data_post, function (obj) {
-            if(obj.err){
-                alert(obj.err);
+            if(obj.err || obj.code){
+                alert(obj.err+obj.code);
                 return;
             }
             delete data_post.proj; delete data_post.func; delete data_post.email;

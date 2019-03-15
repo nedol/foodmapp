@@ -41,6 +41,16 @@ class Utils{
         return local.toJSON().slice(0, 10);
     }
 
+    isJSON(str) {
+        try {
+            var obj = JSON.parse(str);
+            if (obj && typeof obj === 'object' && obj !== null) {
+                return true;
+            }
+        } catch (err) {}
+        return false;
+    }
+
     QueryMethod(protocol,options, postData, res, cb) {
         let http_;
         if(protocol==='http')
@@ -202,8 +212,8 @@ class Utils{
             {
                 orientation:true,
                 canvas:true,
-                maxWidth: 600,
-                maxHeight: 300
+                maxWidth: 1000,
+                maxHeight: 600
             }// Options
         );
 
