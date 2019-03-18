@@ -141,23 +141,24 @@ class Profile{
         browser.off('load');
         browser.on('load', function () {
             browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},
-                {   //comments settings
-                    readOnly: (that.appr && that.appr.cusuid===window.user.uid)?false:true,
-                    profilePictureURL: that.profile.thmb?that.profile.thmb:that.profile.avatar,
-                    enableEditing: false,
-                    enableDeleting:false,
-                    enableReplying: false,
-                    textareaPlaceholderText: 'Оставить комментарий',
-                    newestText: 'Новые',
-                    oldestText: 'Старые',
-                    popularText: 'Популярные',
-                    sendText: 'Послать',
-                    replyText: 'Ответить',
-                    editText: 'Изменить',
-                    editedText: 'Измененный',
-                    youText: 'Я',
-                    saveText: 'Сохранить',
-                    hideRepliesText: 'Скрыть'});
+            {   //comments settings
+                readOnly: (that.appr && that.appr.cusuid===window.user.uid)?false:true,
+                profilePictureURL: that.profile.thmb?that.profile.thmb:that.profile.avatar,
+                enableEditing: true,
+                enableDeleting:false,
+                enableReplying: false,
+                textareaPlaceholderText: 'Оставить комментарий',
+                newestText: 'Новые',
+                oldestText: 'Старые',
+                popularText: 'Популярные',
+                sendText: 'Послать',
+                replyText: 'Ответить',
+                editText: 'Изменить',
+                editedText: 'Измененный',
+                youText: 'Я',
+                saveText: 'Сохранить',
+                hideRepliesText: 'Скрыть'
+            });
 
             if(that.profile) {
                 $('input',browser.contents()).prop('readonly', true);

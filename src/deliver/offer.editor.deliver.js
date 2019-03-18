@@ -128,11 +128,11 @@ class OfferEditorDeliver{
                 for (let i in offer.data[tab]) {
                     let menu_item = $('#menu_item_tmplt').clone();
 
-                    if(offer.supuid!==window.user.uid) {
+                    if(offer.data[tab][i].owner){
+                        $(menu_item).attr("owner", offer.data[tab][i].owner);
+                    }else{
                         offer.data[tab][i].supuid = offer.supuid;
                         $(menu_item).attr("owner", offer.supuid);
-                    }else{
-                        $(menu_item).attr("owner", offer.data[tab][i].owner);
                     }
                     let t = tab;
                     window.db.GetSupplier(new Date(window.user.date), $(menu_item).attr("owner"), function (sup) {
@@ -352,7 +352,45 @@ class OfferEditorDeliver{
             }).find( 'textarea' ).change();
         });
 
-        window.db.GetSupOrders(window.user.date, window.user.uid, function (res) {
+        that.HandleOrders(window.user.date);
+        //
+        this.lang = window.sets.lang;
+        window.dict.set_lang(window.sets.lang,$("#offer_editor"));
+
+        //$('.content_text').resizable();
+
+        let evnts = $._data($('#add_tab').get(0), "events");
+
+        evnts = $._data($('#add_item').get(0), "events");
+        if(!evnts || !evnts['click']) {
+            $('#add_item').on('click', this, this.AddOfferItem);
+        }
+
+        $('input:file').on('change', this, that.OnImportImage);
+
+        $('.input').click(function (ev) {
+            that.changed = true;
+            $(this).focus();
+        });
+
+        $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
+        $("#offer_editor").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
+            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true)['remote'],date, ev.data, function (obj) {
+
+            });
+        });
+
+
+        $('.close_browser').off('click touchstart');
+        $('.close_browser').on('click touchstart', this,  that.CloseMenu);
+
+        that.MakeDraggable($("#offer_editor"));
+
+    }
+
+    HandleOrders(date){
+        let that = this;
+        window.db.GetSupOrders(date, window.user.uid, function (res) {
 
             for(let i in res){
                 let data = res[i].data;
@@ -378,7 +416,7 @@ class OfferEditorDeliver{
                         $(mi).find('.order_amnt').text(data[kAr[k]].qnty);
                         let inv_qnty = '', tr_style = '', tr_disabled = '', del='';
                         if (data[kAr[k]].status === 'deleted') {//deleted
-                        '<span class="glyphicon glyphicon-remove">'
+                            '<span class="glyphicon glyphicon-remove">'
                             inv_qnty = "title='deleted' style='color:red'";
                             tr_style = "color:red";
                             tr_disabled = "disabled";
@@ -468,39 +506,6 @@ class OfferEditorDeliver{
             //window.user.offer.viewer.InitOrders(res);
 
         });
-        //
-        this.lang = window.sets.lang;
-        window.dict.set_lang(window.sets.lang,$("#offer_editor"));
-
-        //$('.content_text').resizable();
-
-        let evnts = $._data($('#add_tab').get(0), "events");
-
-        evnts = $._data($('#add_item').get(0), "events");
-        if(!evnts || !evnts['click']) {
-            $('#add_item').on('click', this, this.AddOfferItem);
-        }
-
-        $('input:file').on('change', this, that.OnImportImage);
-
-        $('.input').click(function (ev) {
-            that.changed = true;
-            $(this).focus();
-        });
-
-        $("#offer_editor").find('.publish_offer_ctrl').off('click touchstart');
-        $("#offer_editor").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
-            window.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang,true)['remote'],date, ev.data, function (obj) {
-
-            });
-        });
-
-
-        $('.close_browser').off('click touchstart');
-        $('.close_browser').on('click touchstart', this,  that.CloseMenu);
-
-        that.MakeDraggable($("#offer_editor"));
-
     }
 
     onClickCert(ev) {
@@ -857,7 +862,8 @@ class OfferEditorDeliver{
 
                 let item = {};
                 item.checked = JSON.stringify($(miAr[i]).find(':checkbox').prop('checked'));
-
+                if(item.checked==='false')
+                    continue;
                 let title = $(miAr[i]).find('.item_title');
                 let key = $(title).attr('data-translate');
                 let text = $(miAr[i]).find('.item_title').val();
@@ -1020,7 +1026,18 @@ class OfferEditorDeliver{
         });
     }
 
+    OnMessage(data){//TODO:
+        if(data.func ==='ordered'){
+            $('tbody').empty();
+            this.HandleOrders(data.order.date);
 
+        }
+        if(data.func ==='sharelocation'){
+            let loc = data.location;
+
+        }
+
+    }
 
 }
 

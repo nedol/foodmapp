@@ -20,7 +20,7 @@ window.InitProfileSupplier = function (user, settings) {
     window.profile_sup.InitRateSupplier();
     window.profile_sup.InitSettingsSupplier();
 
-    if(user==='Supplier') {
+    if(user.constructor.name==='Supplier') {
         if(!user.profile.profile.avatar) {
             utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('.avatar').attr('src', src);
@@ -76,9 +76,11 @@ window.InitProfileSupplier = function (user, settings) {
 
             }
         });
+
+        $('input').prop( "readonly", false );
     }
     else if(user.user==='Customer'){
-        $('input').prop( "disabled", true );
+        $('input').prop( "readonly", true );
     }
 }
 
@@ -86,8 +88,15 @@ window.InitProfileSupplier = function (user, settings) {
 
 class ProfileSupplier{
     constructor(){
-        $('#prolong').on('changed', function (ev) {
+        $('#prolong').on('input', function (ev) {
             
+        });
+        this.changed = false;
+        $('input').change(()=> {
+            this.changed = true;
+        });
+        $('.dropdown').on('hide.bs.dropdown',()=> {
+            this.changed = true;
         })
     }
 
@@ -215,6 +224,8 @@ class ProfileSupplier{
 
     SaveProfile(uid, psw){
         let that = this;
+        if(!this.changed)
+            return;
         let data_post='';
         let k = 50/ $('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
@@ -241,8 +252,10 @@ class ProfileSupplier{
             window.parent.network.postRequest(data_post, function (res) {
 
                 window.parent.db.GetSettings(function (obj) {
-                    obj[0].profile = res.profile;
-                    window.parent.db.SetObject('setStore',obj[0], function (res) {
+                    let _ = require('lodash');
+                    let set = _.find(obj, {uid:window.parent.user.uid});
+                    set.profile = data_post.profile;
+                    window.parent.db.SetObject('setStore',set, function (res) {
 
                     });
                 });
@@ -286,25 +299,32 @@ class ProfileSupplier{
     }
 
     SaveSettings(){
+        if(!this.changed)
+            return;
+        this.changed = false;
+
         let settings = {};
         $('#settings').find('select').each(function (i,item) {
             settings[$(item).attr('id')] = $(item).closest('div').find('.sel_prolong').val();
         });
 
         window.parent.db.GetSettings(function (obj) {
-            obj[0].settings = settings;
-            window.parent.db.SetObject('setStore',obj[0],function (res) {
-                window.parent.user.profile.profile =  obj[0].profile;
+            let _ = require('lodash');
+            let set = _.find(obj, {uid:window.parent.user.uid});
+            set.settings = settings;
+            window.parent.db.SetObject('setStore',set,function (res) {
+                window.parent.user.profile.profile =  set.profile;
             });
             let data_obj ={
                 proj:"d2d",
                 user: window.parent.user.constructor.name.toLowerCase(),
                 func:"setsup",
                 psw: window.parent.user.psw,
-                uid: window.parent.user.uid
+                uid: window.parent.user.uid,
+                profile:set.profile
             }
             data_obj['settings'] = settings;
-            data_obj['profile'] = obj[0].profile;
+            data_obj['profile'] = set.profile;
             window.parent.network.postRequest(data_obj, function (data) {
 
             });

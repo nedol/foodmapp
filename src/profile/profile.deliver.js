@@ -77,7 +77,7 @@ class ProfileDeliver{
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'getcomments',
-                    supuid:obj.supuid
+                    supuid:obj.uid
                 }
                 window.parent.network.postRequest(par, function (data) {
                     usersArray = [

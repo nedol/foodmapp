@@ -109,12 +109,20 @@
                         <div class="row">
                             <div class="form-group">
 
-                                <div class="col-xs-6">
-                                    <label for="prolong"><h4>Автоматическое продление</h4></label>
-                                    <input type="text" id="prolong" disabled class="form-control" name="prolong"  placeholder="продление" title="продление">
-                                </div>
-                                <div class="col-xs-6">
+                                <div class="row">
+                                    <div class="form-group dropdown">
+                                        <div class="col-xs-6">
+                                            <label for="prolong"><h4>Продление предложения</h4></label>
+                                            <select id="prolong" disabled class="sel_prolong"  size="1" style="">
+                                                <option value="0"></option>
+                                                <option value="1"  selected>на следующий день</option>
+                                                <option value="7">на следующую неделю</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-xs-6">
 
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>

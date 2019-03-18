@@ -1,2 +1,2 @@
-let host_port ='http://localhost:3000';//'https://nedol.ru/server';//
+let host_port ='https://nedol.ru/server';//'http://localhost:3000';//
 

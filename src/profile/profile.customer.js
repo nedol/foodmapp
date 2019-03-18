@@ -190,7 +190,6 @@ class ProfileCustomer{
             }
         });
 
-
         return true;
     }
 
@@ -203,7 +202,7 @@ class ProfileCustomer{
                 for(let item in order.data) {
                     let ovc = $(window.parent.menu_item_tmplt).clone();
 
-                    window.parent.db.getSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
+                    window.parent.db.GetSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
                         if(res!=-1) {
                             let dict = new Dict(res.dict.dict);
                             dict.set_lang(window.parent.sets.lang, ovc[0]);
@@ -213,7 +212,7 @@ class ProfileCustomer{
                     $(ovc).css('display','block');
                     $(ovc).addClass('menu_item');
                     $(ovc).attr('order',item);
-                    $(ovc).find('.supuid').val(order.supuid);
+                    $(ovc).attr('supuid',order.supuid);
                     $(ovc).find('.item_title').text(item);
                     $(ovc).find('.item_title').attr('contenteditable', 'false');
                     $(ovc).find('.item_price').text(order.data[item].price);
@@ -245,7 +244,7 @@ class ProfileCustomer{
 
             window.parent.db.GetOrder(
                 window.parent.user.date,
-                $(ovc).find('.supuid').val(),
+                $(ovc).attr('supuid'),
                 window.parent.user.uid, function (res) {
                     if(res!==-1){
                         res.data[$(ovc).attr('order')].qnty = parseInt($(ovc).find('.amount').text());

@@ -459,6 +459,18 @@ class OfferOrder {
 
         return true;
     }
+
+    OnMessage(data){//TODO:
+        if(data.func ==='approved'){
+            this.RedrawOrder({uid:data.order.supuid});
+
+        }
+        if(data.func ==='sharelocation'){
+            let loc = data.location;
+
+        }
+
+    }
 }
 
 

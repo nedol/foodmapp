@@ -51,7 +51,7 @@ class Offer{
             let tabs = Object.keys(obj.data);
             if(set[0] && set[0].data)
                 tabs = _.assign(Object.keys(obj.data),Object.keys(set[0].data));
-            let filter,unchecked;
+            let unchecked;
             for(let t in tabs) {
                 let tab = tabs[t];
                 let customizer = function (objValue, srcValue) {

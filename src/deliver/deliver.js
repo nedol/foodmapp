@@ -409,17 +409,13 @@ class Deliver{
                         offer0.data[tab][i].img.top = offer[tab][i].img.top;
                 }
             }
-            offer0.data[tab] = offer[tab];
-            offer0.location = this.offer.stobj.location;
-            offer0.period = $('.sel_period').text();
-            this.offer.stobj.data[tab] = offer0.data[tab];
+
         }
 
-        // uObj = {
-        //     date:window.user.date,
-        //     period: $('.sel_period').text(),
-        //     location: location,
-        //     data: offer
+        offer0.data = offer;
+        offer0.location = this.offer.stobj.location;
+        offer0.period = $('.sel_period').text();
+        this.offer.stobj.data = offer0.data;
 
         try {
             this.offer.SetOfferDB(offer0, dict);
@@ -431,46 +427,23 @@ class Deliver{
 
     UpdateDeliverOfferLocal(offer0, offer, location, dict){
 
-        let uObj = Object.assign(this.offer.stobj);
-        uObj.date = window.user.date;
-        uObj.supuid = window.user.uid;
-        uObj.data={};
-        if (uObj) {
-            for (let tab in offer) {
-                if (!uObj.data[tab]) {
-                    uObj.data[tab] = offer[tab];
-                }
-                for (let i in offer[tab]) {
-                    if(_.isEmpty(offer[tab][i].markuplist)) {
-                        offer[tab].splice(i,1);
-                        continue;
-                    }
-                    if(!uObj.data[tab][i]){
-                        uObj.data[tab].push({img:{}});
-                    }
-                    if(offer[tab][i].img) {
-                        if (offer[tab] && offer[tab][i] && offer[tab][i].img.left)
-                            uObj.data[tab][i].img.left = offer[tab][i].img.left;
-                        if (offer[tab] && offer[tab][i] && offer[tab][i].img.top)
-                            uObj.data[tab][i].img.top = offer[tab][i].img.top;
-                    }
-                    //offer[tab][i].checked = 'false';
-                }
-                uObj.data[tab] = offer[tab];
-                uObj.period = $('.sel_period').text();
-                this.offer.stobj.data[tab] = offer[tab];
-            }
-        }else {
-            uObj = {
-                date:window.user.date,
-                period: $('.sel_period').text(),
-                location: location,
-                data: offer
-            };
+        for(let tab in this.offer.stobj.data){
+            if(this.offer.stobj.data[tab][0])
+            this.offer.stobj.data[tab] = _.filter(this.offer.stobj.data[tab], function (o) {
+                return o.owner !== offer0.uid;
+            });
         }
-
-        this.offer.AddOfferDB(uObj,dict);
-
+        for(let tab in offer){
+            if(!this.offer.stobj.data) {
+                this.offer.stobj.data = {};
+            }
+            if(!this.offer.stobj.data[tab])
+                this.offer.stobj.data[tab] = [];
+            this.offer.stobj.data[tab] = _.concat(this.offer.stobj.data[tab],offer[tab]);
+        }
+        this.offer.stobj.date = new Date(window.user.date);
+        this.offer.stobj.supuid = window.user.uid;
+        this.offer.SetOfferDB(this.offer.stobj,dict);
     }
 
     ValidateOffer(data){
@@ -630,6 +603,8 @@ class Deliver{
                 }
             });
         }
+
+        this.editor.OnMessage(data);
 
     }
 

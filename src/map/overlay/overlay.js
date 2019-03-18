@@ -34,6 +34,7 @@ class Overlay {
         this.modify;
         this.snap; // global so we can remove them later
 
+
         this.overlay = new _ol_Overlay_({
             element: element,
             position: offer.location,

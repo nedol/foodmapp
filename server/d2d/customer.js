@@ -197,9 +197,7 @@ module.exports = class Customer extends D2D{
                 }
 
                 if(global.resObj[q.supuid] && global.resObj[q.supuid].connection.writable) {
-                    delete q.uid;
-                    delete q.func;
-                    delete q.proj;
+                    delete q.uid; delete q.func; delete q.proj;
                     resObj[q.supuid].write(utils.formatSSE({func: 'ordered', order: q}));
                 }
                 res.end(JSON.stringify({result: result, published:now}));

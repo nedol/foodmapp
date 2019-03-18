@@ -272,10 +272,8 @@ module.exports = class Deliver extends D2D{
             }
             res.writeHead(200, {'Content-Type': 'application/json'});
             if(global.resObj[q.cusuid] && global.resObj[q.cusuid].connection.writable) {
-                delete q.uid;
-                delete q.func;
-                delete q.proj;
-                resObj[q.cusuid].write(utils.formatSSE({func: 'approved', order: q}));
+                delete q.uid; delete q.func;delete q.proj;delete q.psw;
+                global.resObj[q.cusuid].write(utils.formatSSE({func: 'approved', order: q}));
             }
             res.end(JSON.stringify({result: result, approved:now}));
 

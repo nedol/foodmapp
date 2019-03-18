@@ -61,27 +61,27 @@
                                 <div class="form-group">
                                     <div class="col-xs-6">
                                         <label for="name"><h4>Имя</h4></label>
-                                        <input type="text"  disabled  id="name" class="form-control" name="name"  placeholder="last name" title="enter your last name if any.">
+                                        <input type="text"  readonly="true"  id="name" class="form-control" name="name"  placeholder="last name" title="enter your last name if any.">
                                     </div>
 
                                     <div class="col-xs-6">
                                         <label for="email"><h4>Email</h4></label>
-                                        <input type="email" disabled id="email" class="form-control" name="email"  placeholder="введите адрес" title="введите адрес" data-toggle="tooltip">
+                                        <input type="email"  readonly="true"  id="email" class="form-control" name="email"  placeholder="введите адрес" title="введите адрес" data-toggle="tooltip">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <div class="col-xs-6">
                                         <label for="mobile"><h4>Телефон</h4></label>
-                                        <input type="phone" id="mobile" disabled class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
+                                        <input type="phone" id="mobile"  readonly="true"  class="form-control" name="mobile"  placeholder="enter mobile number" title="enter your mobile number if any.">
                                     </div>
                                     <div class="col-xs-6">
-                                        <label for="place"><h4>Торговая точка</h4></label>
-                                        <input type="text" required class="form-control"  id="place"  placeholder="ФудСити, пав.А, 01-234" title="как вас найти?">
+                                        <label for="place"><h4>Адрес торговой точки</h4></label>
+                                        <input type="text" required   readonly="true"  class="form-control"  id="place"  placeholder="ФудСити, пав.А, 01-234" title="как вас найти?">
                                     </div>
                                 </div>
                                 <div class="form-group">
-                                    <div class="col-xs-6">
+                                    <div class="dropdown col-xs-6">
                                         <label for="worktime"><h4>Часы работы</h4></label>
                                         <input  id="worktime" type="text" class="sel_period form-control dropdown-toggle"  data-toggle="dropdown" data-width="fit"
                                                 placeholder="08:00 - 20:00" value="08:00 - 20:00" title="часы работы">

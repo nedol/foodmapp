@@ -207,7 +207,7 @@ class Supplier{
                         status = 'published';
                     $(my_truck_2).addClass(status);
                     if(that.profile.profile.type==='marketer')
-                        $(my_truck_2).attr('src',that.profile.profile.avatar);
+                        $(my_truck_2).attr('src',that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar);
                     that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
                     $('#my_truck').on('click touchstart', (ev)=> {
                         if(that.offer.stobj.location)
@@ -231,7 +231,7 @@ class Supplier{
                         let my_truck_2 = $('#my_truck').clone()[0];
                         $(my_truck_2).attr('id', 'my_truck_2');
                         if(that.profile.profile.type==='marketer')
-                            $(my_truck_2).attr('src',that.profile.profile.avatar);
+                            $(my_truck_2).attr('src',that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar);
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';

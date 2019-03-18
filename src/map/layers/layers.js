@@ -206,8 +206,7 @@ class Layers {
                     let logo = obj.logo;
                     scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/300;
                     if(obj.profile.type==='marketer'){
-                        // if(that.map.ol_map.getView().getZoom()<15)
-                        //     return;
+
                         ic_clust = obj.img;
                         scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/500;
                     }
@@ -219,7 +218,7 @@ class Layers {
 
 
                     let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
-                        //size: [100,100],
+                        // size: [50,50],
                         //img: image,
                         //imgSize:
                         scale: obj.profile.thmb?scale:scale*.5, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
@@ -270,6 +269,9 @@ class Layers {
 
                         //source.clear();
                     } else {
+
+                        if(that.map.ol_map.getView().getZoom()<15)
+                            return;
 
                         iconStyle = new _ol_style_Style_({
                             text: new Text({

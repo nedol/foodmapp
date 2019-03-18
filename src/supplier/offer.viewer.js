@@ -510,6 +510,7 @@ class OfferViewer {
                 }
 
                 item.markuplist = $(miAr[i]).find('.item_markup').attr('markuplist');
+
                 if(item.markuplist) {
                     item.markuplist = JSON.parse(item.markuplist);
                 }else{
@@ -518,7 +519,8 @@ class OfferViewer {
                         continue;
                 }
 
-
+                if(_.isEmpty(item.markuplist))
+                    continue;
                 item.cert = [];
                 $.each($(miAr[i]).find('.gallery').children(), function (i, el) {
                     item.cert.push({src:el.src,pos:$(el).position()});
@@ -551,6 +553,19 @@ class OfferViewer {
 
         window.user.UpdateDeliverOfferLocal(this.offer, items['local'], window.dict.dict);
         return items;
+    }
+
+    OnMessage(data){//TODO:
+        if(data.func ==='ordered'){
+            data.order.date = new Date(data.order.date.split('T')[0]);
+
+
+        }
+        if(data.func ==='sharelocation'){
+            let loc = data.location;
+
+        }
+
     }
 }
 

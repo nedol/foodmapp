@@ -117,7 +117,7 @@ module.exports = class D2D {
         let that = this;
         let sql = "SELECT user.*" +
             " FROM "+q.user.toLowerCase()+" as user" +
-            " WHERE user.email='"+q.email+"'";
+            " WHERE user.email='"+q.profile.email+"'";
 
 // res.writeHead(200, {'Content-Type': 'application/json'});
 // res.end(JSON.stringify(sql));
@@ -135,23 +135,28 @@ module.exports = class D2D {
             } else {
                 let values, sql, uid;
                 let psw = shortid.generate();
-                uid = md5(q.email);
+                uid = md5(q.profile.email);
 
                 res.writeHead(200, {'Content-Type': 'application/json'});
+                that.replaceImg_2(q.profile.avatar, function (avatar) {
+                    that.replaceImg_2(q.profile.thmb, function (thmb) {
+                        q.profile.avatar = avatar;
+                        q.profile.thmb = thmb;
+                        values = [uid, psw, 'tariff', q.promo, JSON.stringify(q.profile)];
+                        sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?, tariff=? ,promo=?, profile=?";
+                        global.con_obj.query(sql, values, function (err, result) {
+                            if (err) {
+                                res.end(JSON.stringify({err: 'Неверные данные'}));
+                                return;
+                            }
 
-                values = [uid, psw, 'tariff', q.promo];
-                sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?, tariff=? ,promo=?";
-                global.con_obj.query(sql, values, function (err, result) {
-                    if (err) {
-                        res.end(JSON.stringify({err: 'Неверные данные'}));
-                        return;
-                    }
+                            let em = new Email();
+                            let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.profile.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
 
-                    let em = new Email();
-                    let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
-
-                    em.SendMail("nedol.infodesk@gmail.com", q.email, "Подтверждение регистрации пользователя", html, function (result) {
-                        res.end(JSON.stringify({result: result, uid: uid, psw: psw, email: q.email}));
+                            em.SendMail("nedol.infodesk@gmail.com", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
+                                res.end(JSON.stringify({result: result, uid: uid, psw: psw, email: q.profile.email}));
+                            });
+                        });
                     });
                 });
             }
@@ -186,16 +191,19 @@ module.exports = class D2D {
                 let values, sql;
                 if(md5(q.profile.email)===q.uid) {
                     that.replaceImg_2(q.profile.avatar, function (avatar) {
-                        q.profile.avatar = avatar;
-                        values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
-                        sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
-                        global.con_obj.query(sql, values, function (err, res_upd) {
+                        that.replaceImg_2(q.profile.thmb, function (thmb) {
+                            q.profile.avatar = avatar;
+                            q.profile.thmb = thmb;
+                            values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
+                            sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
+                            global.con_obj.query(sql, values, function (err, res_upd) {
 
-                            if (err) {
-                                res.end(JSON.stringify({err: err}));
-                                return;
-                            }
-                            res.end(JSON.stringify({id: result[0].id}));
+                                if (err) {
+                                    res.end(JSON.stringify({err: err}));
+                                    return;
+                                }
+                                res.end(JSON.stringify({id: result[0].id}));
+                            });
                         });
                     });
                 }
@@ -301,27 +309,49 @@ module.exports = class D2D {
 
     BroadcastOffer(q, res, cb){
 
-        let sql = " SELECT sup.email as email" +
+        let sql = " SELECT sup.uid as uid" +
             " FROM supplier as sup" +
             " WHERE" +
-            " sup.email<>\'"+q.email+"\'"+
-            " AND SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
+            " sup.uid<>'"+q.uid+"'"+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',',1)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',',1 -1)) + 1)," +
+            "       ',', '')<"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',',2)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',',2 -1)) + 1)," +
+            "       ',', '')>"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',', 3)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',', 3 -1)) + 1)," +
+            "       ',', '')<"+q.location[0]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(sup.region,',', 4)," +
+            "       LENGTH(SUBSTRING_INDEX(sup.region,',', 4 -1)) + 1)," +
+            "       ',', '')>"+q.location[0]+
             " UNION" +
-            " SELECT cus.email as email" +
+            " SELECT cus.uid as uid" +
             " FROM customer as cus" +
             " WHERE " +
-            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
+            " REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',',1)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',',1 -1)) + 1)," +
+            "       ',', '')<"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',',2)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',',2 -1)) + 1)," +
+            "       ',', '')>"+q.location[1]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',', 3)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',', 3 -1)) + 1)," +
+            "       ',', '')<"+q.location[0]+
+            " AND REPLACE(SUBSTRING(SUBSTRING_INDEX(cus.region,',', 4)," +
+            "       LENGTH(SUBSTRING_INDEX(cus.region,',', 4 -1)) + 1)," +
+            "       ',', '')>"+q.location[0];
 
         global.con_obj.query(sql, function (err, sel) {
             if (err) {
                 throw err;
             }
-            res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+            if (!res._header)
+                res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
+
             if(sel.length>0){
                 for(let r in sel){
-                    let sse = resObj[sel[r].email];
+                    let sse = resObj[sel[r].uid];
                     if(sse){
                         sse.write(utils.formatSSE({"func":"supupdate","obj":q}));
                     }

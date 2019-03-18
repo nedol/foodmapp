@@ -343,13 +343,16 @@ class Customer{
     }
 
     OnMessage(data){
+        let that = this;
         if(data.func ==='approved'){
+            data.order.date = new Date(data.order.date.split('T')[0]);
             window.db.GetOrder(data.order.date, data.order.supuid,data.order.cusuid, function (ord) {
+                if(ord===-1)
+                    return;
                 ord.data[data.order.title].approved = data.order.data.approved;
-                window.db.SetObject('orderStore', ord, function (res) {
-                    if(window.user.viewer){
-                        //window.user.viewer.RedrawOrder(ord)
-                    }
+                window.db.SetObject('orderStore', ord, (res)=> {
+                    if(that.viewer)
+                        that.viewer.OnMessage(data);
                 });
             });
         }
@@ -411,6 +414,8 @@ class Customer{
                 });
             });
         }
+
+
     }
 
 

@@ -72,11 +72,15 @@ $(document).on('readystatechange', function () {
                 uObj['set'] = set[res];
                 window.network = new Network(host_port);
 
+                // window.db.DeleteObject('setStore',uObj['set'].uid);
+                // return;
+
                 if(set[res]['profile'] && !set[res]['profile'].email) {
 
                     if (utils.getParameterByName('email') &&
                         utils.getParameterByName('uid') &&
                         utils.getParameterByName('uid') === uObj['set'].uid) {
+                            uObj['set']['profile'].user = 'Supplier';
                             uObj['set']['profile'].email = utils.getParameterByName('email');
                         window.network.RegUser(uObj['set'], function (reg) {
                             if (!reg ||reg.err) {
@@ -106,7 +110,7 @@ $(document).on('readystatechange', function () {
 
                     }else {
                         var md5 = require('md5');
-                        if(md5(uObj['set']['profile'].email)!==uObj['set'].uid) {
+                        if(!uObj['set']['profile'].email || md5(uObj['set']['profile'].email)!==uObj['set'].uid) {
                             window.db.DeleteObject('setStore',uObj['set'].uid);
                             return;
                         }
