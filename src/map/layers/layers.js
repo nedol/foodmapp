@@ -14,16 +14,12 @@ import _ol_style_Fill_ from 'ol/style/fill';
 import Text from 'ol/style/text';
 import _ol_style_Stroke_ from 'ol/style/stroke';
 import RegularShape from 'ol/style/regularshape';
-import Draw from 'ol/interaction/draw';
-import Snap from 'ol/interaction/snap';
-import Circle from 'ol/geom/circle';
-import Collection from 'ol/collection';
-import Feature from 'ol/feature';
-import {utils} from "../../utils/utils";
+
+import {Utils} from "../../utils/utils";
 import source from 'ol/source/source';
 import Observable from 'ol/observable';
 
-import {Overlay} from "../overlay/overlay";
+import {UtilsMap} from "../../utils/utils.map.js";
 
 
 class Layers {
@@ -32,7 +28,9 @@ class Layers {
         let that = this;
         this.ar = [];
         this.flag = true;
-        that.circleLayer;
+        this.path  = './../..';
+        if(location.origin.includes('localhost'))
+            this.path = 'https://nedol.ru'
 
         try {
             //osm.setVisible(false);
@@ -55,17 +53,15 @@ class Layers {
             map.ol_map.getLayers().push(bingMapsRoad, true);
             map.ol_map.getLayers().set("Bing", bingMapsRoad, true);
 
-            let map_strg = localStorage.getItem("map");
-
             if(!that.circleLayer) {
                 that.circleLayer = new layerVector({
                     source: new srcVector(),
                     style: new _ol_style_Style_({
                         fill: new _ol_style_Fill_({
-                            color: 'rgba(255, 255, 255, 0.3)'
+                            color: 'rgba(255, 255, 255, 0.1)'
                         }),
                         stroke: new _ol_style_Stroke_({
-                            color: '#ff6579',
+                            color: 'rgba(255, 0, 0, 0.5)',
                             width: 1
                         })
                     })
@@ -73,6 +69,27 @@ class Layers {
             }
             that.map.ol_map.getLayers().push(that.circleLayer);
             that.map.ol_map.getLayers().set('radius', that.circleLayer, true);
+
+            that.map.ol_map.on('moveend', function (event) {
+                let source = that.circleLayer.getSource();
+                let features = source.getFeatures();
+                let utils = new UtilsMap();
+                for(let f in features){
+                    let radius = features[f].values_.geometry.getRadius();
+                    let center = features[f].values_.geometry.getCenter();
+                    let map_center = that.map.ol_map.getView().getCenter();
+                    let dist = //utils.getCoordsDistance( that.map.ol_map,center,event.coordinate);
+                    utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
+                    if(dist*1800<=radius && features[f].values_.obj.uid){
+                        $('#deliver_but').css('display','block');
+                        $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar)
+                        $('#deliver_but').attr('supuid',features[f].values_.obj.uid);
+
+                    }else{
+                        $('#deliver_but').css('display','none');
+                    }
+                }
+            });
 
 
         } catch (ex) {
@@ -139,56 +156,20 @@ class Layers {
                         setTimeout(function () {
                             id_str = '';
                         },300);
-                        window.db.GetSupplierFeature(new Date(window.user.date),feature.values_.object.uid,function (res) {
-                            if(res[0]!==-1) {
-                                if (feature.values_.object.date.valueOf() === new Date(window.user.date).valueOf()) {
 
-                                    if(window.user.constructor.name==="Supplier"){
-                                        if(feature.values_.object.profile.type==='marketer')
-                                            return;
-                                    }
+                        if (feature.values_.object.date.valueOf() === new Date(window.user.date).valueOf()) {
 
-                                    let style = getObjectStyle(feature.values_.object, res[0].values_.object);
-                                    cluster_feature.setStyle(style);
-
-                                    if(window.user.constructor.name==="Customer") {
-                                        if(feature.values_.object.profile.type==='marketer')
-                                            return;
-
-                                        let source = that.circleLayer.getSource();
-
-                                        let radiusFeature='';
-                                        if(feature.values_.object.radius_feature) {
-                                            radiusFeature = feature.values_.object.radius_feature;
-                                        }else {
-                                            radiusFeature = new Feature({
-                                                geometry: new Circle(proj.fromLonLat([res[0].values_.object.longitude, res[0].values_.object.latitude]), res[0].values_.object.radius)
-                                                //name: cursor.value.title ? cursor.value.title : "",
-                                                //tooltip: cursor.value.title ? cursor.value.title : "",
-                                            });
-
-                                            feature.values_.object.radius_feature = radiusFeature;
-
-                                            let col = new Collection();
-                                            col.push(radiusFeature);
-                                            let draw = new Draw({
-                                                geometryName: 'circle',
-                                                source: source,
-                                                type: 'Circle',
-                                                features: col
-                                            });
-                                            source.addFeature(radiusFeature);
-                                        }
-
-                                    }
-
-                                }else{
-                                    vectorSource.removeFeature(feature);
-                                }
-                            }else{
-                                vectorSource.removeFeature(feature);
+                            if(window.user.constructor.name==="Supplier"){
+                                if(feature.values_.object.profile.type==='marketer')
+                                    return;
                             }
-                        });
+
+                            let style = getObjectStyle(feature.values_.object);
+                            cluster_feature.setStyle(style);
+
+                        }else{
+                            vectorSource.removeFeature(feature);
+                        }
                     });
                 }
                 else if(cluster_feature.values_){
@@ -202,41 +183,52 @@ class Layers {
                     let source = that.circleLayer.getSource();
                     let ic_clust = "./images/truck.png";
                     let scale = 1;
-
-                    let logo = obj.logo;
-                    scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/300;
-                    if(obj.profile.type==='marketer'){
-
-                        ic_clust = obj.img;
-                        scale = Math.pow(that.map.ol_map.getView().getZoom(),2)/500;
-                    }
                     let opacity;
                     if ( obj.apprs<1)
                         opacity = 0.9;
                     else
                         opacity = 1.0;
+                    let logo = obj.logo;
+                    scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/30000;
+                    if(obj.profile.type==='marketer'){
+                        if(that.map.ol_map.getView().getZoom()<15 && features.length===1)//non cluster
+                            return;
+                        ic_clust = obj.img;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/30000;
+                    }else if(obj.profile.type==='deliver'){
+                        // if(that.map.ol_map.getView().getZoom()<15)
+                        //     return;
+                        ic_clust = obj.img;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/10000;
+                        opacity = 0;
+                    }
 
+                    let thmb = window.location.origin +"/d2d/server/images/"+obj.profile.avatar;
+                    if(host_port.includes('nedol.ru'))
+                        thmb = host_port +"/images/"+obj.profile.avatar;
 
-                    let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
-                        // size: [50,50],
+                        let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
+                        //size: [100,100],
                         //img: image,
                         //imgSize:
-                        scale: obj.profile.thmb?scale:scale*.5, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: obj.profile.thmb?[20, 20]:[40, 40],
+                        scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        anchor: [70, 70],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
                         anchorYUnits: 'pixel',
                         color: [255, 255, 255, 1],
                         opacity: opacity,
-                        src: obj.profile.thmb?obj.profile.thmb: "./images/user.png"
+                        src: obj.profile.avatar?thmb: "./images/user.png",
+                        crossOrigin: 'anonymous'
                     }));
                     let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
                         //size: [100,100],
                         //img: image,
                         //imgSize:
-                        scale: .2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [20, 20],
+                        crossOrigin: 'anonymous',
+                        scale: scale*2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        anchor: [40*scale*10*2, 40*scale*10*2],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
@@ -250,11 +242,11 @@ class Layers {
                         iconStyle = new _ol_style_Style_({
                             text: new Text({
                                 text: cluster_feature.values_.features.length.toString(),
-                                font: '12px serif',
-                                align: 'right',
+                                font: (140*scale).toFixed(0)+'px serif',
+                                align: 'left',
                                 //scale: .1,
-                                offsetX: 25,
-                                offsetY: -5,
+                                offsetX: scale*200,
+                                offsetY: scale*70,
                                 fill: new _ol_style_Fill_({
                                     color: 'blue'
                                 }),
@@ -269,9 +261,6 @@ class Layers {
 
                         //source.clear();
                     } else {
-
-                        if(that.map.ol_map.getView().getZoom()<15)
-                            return;
 
                         iconStyle = new _ol_style_Style_({
                             text: new Text({
@@ -432,6 +421,20 @@ class Layers {
 
         }
 
+    }
+
+    getCoordsDistance(map,firstPoint, secondPoint, projection) {
+        projection = projection || 'EPSG:4326';
+
+        length = 0;
+        var sourceProj = map.getView().getProjection();
+        var c1 = proj.transform(firstPoint, sourceProj, projection);
+        var c2 = proj.transform(secondPoint, sourceProj, projection);
+
+        var wgs84Sphere = new Sphere(6378137);
+        length += wgs84Sphere.haversineDistance(c1, c2);
+
+        return length;
     }
 }
 

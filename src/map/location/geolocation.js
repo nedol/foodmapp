@@ -6,6 +6,7 @@ import {Utils} from "../../utils/utils";
 import {Feature} from "../events/feature.events";
 
 
+
 class Geo {
 
     constructor(map) {
@@ -215,13 +216,13 @@ class Geo {
     }
 
     SearchLocation(place, cb) {
-
+        var urlencode = require('urlencode');
         let that = this;
 
-        let fadr = place.split(',');
+        let fadr = urlencode.encode(place);
 
         let nominatim =
-            "https://nominatim.openstreetmap.org/search?q="+fadr[0]+"%2C+"+fadr[1]+"%2C+"+fadr[2]+"&format=json&polygon=1&addressdetails=1";///reverse";
+            "https://nominatim.openstreetmap.org/search?q="+fadr+"&format=json&polygon=1&addressdetails=1";///reverse";
         let query =
             "https://nominatim.openstreetmap.org/reverse?format=json&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1";
         let mapques =

@@ -5,15 +5,13 @@ let utils = require('../utils/utils');
 var isJSON = require('is-json');
 
 require('jquery-ui')
-require('jquery-ui-touch-punch');
+// require('jquery-ui-touch-punch');
 require('jquery.ui.touch');
 require('bootstrap');
 
 require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
 
-import {OfferEditor} from '../supplier/offer.editor';
 import {Dict} from '../dict/dict.js';
-import {Network} from "../../network";
 
 //import {RTCOperator} from "../rtc/rtc_operator"
 
@@ -28,6 +26,7 @@ import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
+import {OfferOrder} from "../customer/offer.order";
 
 var moment = require('moment/moment');
 
@@ -65,7 +64,7 @@ class Customer{
 
         });
 
-        $.getJSON('../dict/sys.dict.json', function (data) {
+        $.getJSON('../src/dict/sys.dict.json', function (data) {
             window.sysdict = new Dict(data);
             window.sysdict.set_lang(window.sets.lang, $('body'));
             window.sysdict.set_lang(window.sets.lang, $('#categories'));
@@ -112,6 +111,11 @@ class Customer{
         //     }
         // });
         this.DateTimePickerEvents();
+
+        window.user.map.geo.SearchLocation("Москва, ФудСити",function (bound) {
+            window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+            window.user.map.GetObjectsFromStorage();
+        });
     }
 
 
@@ -230,7 +234,7 @@ class Customer{
     }
 
     PickRegion(){
-        alert($('.input_address').text());
+        // alert($('.input_address').text());
     }
 
     UpdateOrderLocal(obj){
@@ -278,23 +282,36 @@ class Customer{
         });
     }
 
-    PublishOrder(obj,cb){
+    PublishOrder(obj,cb) {
         let that = this;
 
         obj.proj = "d2d";
         obj.user = window.user.constructor.name.toLowerCase(),
-        obj.func = "updateorder";
+            obj.func = "updateorder";
         obj.psw = that.psw;
         obj.cusuid = that.uid;
         obj.supuid = obj.supuid;
 
         window.network.postRequest(obj, function (data) {
-            if(data.published){
-                cb(data);
-                obj.proj = '';
-                obj.func= '';
-                obj.published = data.published;
-                that.UpdateOrderLocal(obj)
+            if (data.published) {
+                if (data.published) {
+                    cb(data);
+                    obj.proj = '';
+                    obj.func = '';
+                    obj.published = data.published;
+                    that.UpdateOrderLocal(obj);
+                }
+            }
+        });
+    };
+    //layers
+    OnClickDeliver(el){
+        window.db.GetSupplier(new Date(window.user.date), el.attributes.supuid.value, function (obj) {
+            if (obj !== -1) {
+                if (!window.user.viewer) {
+                    window.user.viewer = new OfferOrder();
+                }
+                window.user.viewer.InitCustomerOrder(obj);
             }
         });
     }
@@ -303,9 +320,8 @@ class Customer{
     OnClickUserProfile(li){
 
         $('#my_profile_container').css('display','block');
-        $('#my_profile_container iframe').attr('src',"./profile.customer.html");
-        $('#my_profile_container iframe').off();
         $('#my_profile_container iframe').on('load',function () {
+            $('#my_profile_container iframe').off();
             $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
 
             $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
@@ -313,8 +329,11 @@ class Customer{
                     $('#my_profile_container').css('display', 'none');
             });
         });
-        this.MakeDraggable($( "#my_profile_container" ));
-        $( "#my_profile_container" ).resizable({});
+        $('#my_profile_container iframe').attr('src',"./profile.customer.html");
+
+
+        // this.MakeDraggable($( "#my_profile_container" ));
+        // $( "#my_profile_container" ).resizable({});
 
 
 
@@ -322,25 +341,25 @@ class Customer{
 
     }
 
-    MakeDraggable(el){
-        $(el).draggable({
-            start: function (ev) {
-                console.log("drag start");
-
-            },
-            drag: function (ev) {
-                //$(el).attr('drag', true);
-
-            },
-            stop: function (ev) {
-
-                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
-                // $(el).css('right', rel_x + '%');
-                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
-                // $(el).css('bottom', rel_y + '%');
-            }
-        });
-    }
+    // MakeDraggable(el){
+    //     $(el).draggable({
+    //         start: function (ev) {
+    //             console.log("drag start");
+    //
+    //         },
+    //         drag: function (ev) {
+    //             //$(el).attr('drag', true);
+    //
+    //         },
+    //         stop: function (ev) {
+    //
+    //             // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
+    //             // $(el).css('right', rel_x + '%');
+    //             // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
+    //             // $(el).css('bottom', rel_y + '%');
+    //         }
+    //     });
+    // }
 
     OnMessage(data){
         let that = this;

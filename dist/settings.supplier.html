@@ -2,8 +2,17 @@
 <html lang="ru">
 <!--https://bootsnipp.com/snippets/4Mm5R-->
 <meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<!--<meta name="description" content="360&deg; Image - A-Frame">-->
+<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+<META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ДоТуДо Регистрация</title>
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<script src="../lib/load-image/load-image.all.min.js"></script>
 <script src="host.js"></script>
 <script src="supplier_settings.js"></script>
 
@@ -22,13 +31,13 @@
 
                 <div class="tab-content">
                     <form class="form" action="">
-                    <div class="tab-pane active" id="profile">
-                        <div class="row">
-                            <div class="col-sm-3 text-center">
-                                <img src="images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
-                                <h6>Загрузить мою фотографию...</h6>
-                                <input type="file" class="center-block file-upload" style="display: none">
-                            </div>
+                        <div class="tab-pane active" id="profile">
+                            <div class="row">
+                                <div class="col-sm-3 text-center">
+                                    <img src="images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
+                                    <h6>Загрузить мою фотографию...</h6>
+                                    <input type="file" class="center-block file-upload" style="display: none">
+                                </div>
                                 <div class="col-sm-9">
                                     <div class="form-group">
                                         <div class="col-xs-6">
@@ -53,6 +62,7 @@
                                             <input type="text" required class="form-control"  id="place"  placeholder="ФудСити, пав.А, 19-019 " title="как вас найти?">
                                         </div>
                                     </div>
+
                                     <div class="form-group">
                                         <div class="col-xs-6">
 
@@ -72,12 +82,10 @@
                                 </div>
                             </div>
                         </div>
-                        </form>
+                    </form>
                     </div><!--/tab-pane-->
-                </div><!--/tab-pane-->
-            </div><!--/tab-content-->
-
-        </div><!--/col-9-->
+            </div><!--/tab-pane-->
+        </div><!--/tab-content-->
     </div><!--/row-->
 </body>
 </html>

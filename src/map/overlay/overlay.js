@@ -72,7 +72,11 @@ class Overlay {
         // }, 5);
 
         $(element).on('click touchstart', window.user, function (ev) {
-            window.user.editor.OpenOffer();
+            if(window.user.profile.profile.type==='deliver')
+                window.user.editor.OpenOffer();
+            else
+                window.user.editor.InitSupplierOffer();
+
         });
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {

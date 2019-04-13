@@ -9,7 +9,7 @@ import 'bootstrap'
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.');
+        $('.alert h3').text('В этом браузере нет поддержки EventSource.').addClass('show');
         return;
     }
 

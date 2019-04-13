@@ -73,12 +73,14 @@ class CustomerSettings {
             user:"Customer",
             func:"confirmem",
             host:location.origin,
-            avatar:$(form).find('.avatar').attr('src'),
-            lang: $('html').attr('lang'),
-            email:$(form).find('#email').val(),
-            name:$(form).find('#name').val(),
-            address:$(form).find('#address').val(),
-            mobile:$(form).find('#mobile').val()
+            profile: {
+                avatar: $(form).find('.avatar').attr('src'),
+                lang: $('html').attr('lang'),
+                email: $(form).find('#email').val(),
+                name: $(form).find('#name').val(),
+                address: $(form).find('#address').val(),
+                mobile: $(form).find('#mobile').val()
+            }
         }
 
         this.network.postRequest(data_post, function (res) {

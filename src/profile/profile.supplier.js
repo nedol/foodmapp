@@ -6,7 +6,6 @@ require('jquery-ui-touch-punch');
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
-require('bootstrap');
 
 // global.jQuery = require('jquery');
 
@@ -16,9 +15,9 @@ let utils = new Utils();
 window.InitProfileSupplier = function (user, settings) {
 
     window.profile_sup = new ProfileSupplier();
-    window.profile_sup.InitComments(user, settings);
+    //window.profile_sup.InitComments(user, settings);
     window.profile_sup.InitRateSupplier();
-    window.profile_sup.InitSettingsSupplier();
+    //window.profile_sup.InitSettingsSupplier();
 
     if(user.constructor.name==='Supplier') {
         if(!user.profile.profile.avatar) {
@@ -80,13 +79,13 @@ window.InitProfileSupplier = function (user, settings) {
         $('input').prop( "readonly", false );
     }
     else if(user.user==='Customer'){
-        $('input').prop( "readonly", true );
+        //$('input').prop( "readonly", true );
     }
 }
 
 
 
-class ProfileSupplier{
+export class ProfileSupplier{
     constructor(){
         $('#prolong').on('input', function (ev) {
             
@@ -103,14 +102,14 @@ class ProfileSupplier{
     InitComments(obj, settings){
 
         $('img.avatar').attr('src', settings.profilePictureURL);
-        settings.profilePictureURL = window.parent.user.profile.profile.avatar;
+        settings.profilePictureURL = window.parent.user.profile.avatar;
         $('#comments-container').comments(Object.assign(settings,{
             getComments: function(success, error) {
                 let par = {
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'getcomments',
-                    supuid:obj.supuid
+                    supuid:obj.uid
                 }
                 window.parent.network.postRequest(par, function (data) {
                     usersArray = [
@@ -223,13 +222,13 @@ class ProfileSupplier{
     }
 
     SaveProfile(uid, psw){
+        let _ = require('lodash');
         let that = this;
-        if(!this.changed)
-            return;
-        let data_post='';
-        let k = 50/ $('.avatar').height();
-        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+        // if(!this.changed)//TODO:test uncomment
+        //     return;
+        utils.createThumb_1($('.avatar')[0],70,70,function (thmb) {
 
+            let data_post='';
             data_post ={
                 proj:'d2d',
                 user:window.parent.user.constructor.name,
@@ -251,9 +250,9 @@ class ProfileSupplier{
 
             window.parent.network.postRequest(data_post, function (res) {
 
-                window.parent.db.GetSettings(function (obj) {
-                    let _ = require('lodash');
-                    let set = _.find(obj, {uid:window.parent.user.uid});
+                window.parent.db.GetSettings( function (obj) {
+
+                    let set = obj;//_.find(obj, {uid:window.parent.user.uid});
                     set.profile = data_post.profile;
                     window.parent.db.SetObject('setStore',set, function (res) {
 
@@ -261,6 +260,7 @@ class ProfileSupplier{
                 });
             });
         });
+
     }
 
     SaveProfile_new(uid, psw){

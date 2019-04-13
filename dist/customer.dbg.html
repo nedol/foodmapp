@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
+    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Покупатель</title>
+</head>
+
+<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link rel="stylesheet" href="../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
+
+<script type="text/javascript" src="./host.js"></script>
+<script type="text/javascript" src="customer.js?v=3"></script>
+<!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
+
+
+<style>
+    html, body{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .scaled{
+        transform: scale(1.5)
+    }
+    .map{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        z-index: 0;
+        right: 0;
+    }
+
+    #marker {
+        display:block;
+        position:absolute;
+        bottom:0;
+        visibility:visible;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+    }
+
+
+    #profile_but{
+        display: block;
+        position: fixed;
+        right: 1%;
+        bottom:80%;
+        width: 40px;
+        height: 40px;
+        text-align: center;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:2;
+    }
+
+    #deliver_but{
+        display: block;
+        position: absolute;
+        right: 1%;
+        bottom:80%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        /*background-color: rgba(200,200,200,0.7);*/
+        z-index:2;
+    }
+
+    #locText{
+        display: inline-block;
+        position: fixed;
+        bottom: 0%;
+        right: 1%;
+        width: 100px;
+        text-align: right;
+        /*left: 400px;*/
+        color:red;
+        font-size: small;
+        z-index:1;
+    }
+
+    #mouse_pos_div{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        left: 10px;
+        color:dimgrey;
+        font-size: small;
+    }
+
+    .thumb {
+        height: 75px;
+        border: 1px solid #000;
+        margin: 10px 5px 0 0;
+    }
+
+    #browser{
+        height: 100%;
+        width:100%;
+        border-radius: 15px 15px;
+        background-color: white;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        padding: 0px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index:10;
+    }
+
+
+    #my_truck{
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #my_truck_2{
+        display: block;
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+        background-color: rgba(250,250,250,0);
+    }
+
+    #zoom_but{
+        display:block;
+        position: fixed;
+        /*z-index:30;*/
+        color: #1b1b1b;
+        top: 50%;
+        right: 1%;
+        width: 40px;
+        height: 30px;
+        /*line-height: auto;*/
+        border: solid 1px grey;
+        text-align:center;
+        font-size: 170%;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: whitesmoke;
+        cursor: n-resize;
+    }
+
+    #search_but{
+        display: block;
+        position: fixed;
+        right: 1%;
+        bottom: 20%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #loc_ctrl {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 30%;
+        width: 40px;
+        height: 40px;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #location_img {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:10;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #pin {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: transparent;
+        z-index:12;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    .form-group{
+        position:absolute;
+        width:250px;
+        right:50px;
+        top:10px;
+        z-index: 10;
+    }
+
+</style>
+
+<body>
+
+<div id="map" class="map"></div>
+
+<section id="marker" title="kolobot">
+    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="47px" width="40px" crossorigin="anonymous"/>
+</section>
+
+<style>
+    #period_list .ui-selecting { background: #FECA40; }
+    #period_list .ui-selected { background: #F39814; color: white; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+</style>
+
+<div>
+    <button id="profile_but" class="btn btn-default" type="button"
+            onclick="window.user.OnClickUserProfile()" style="display:inline-block;float:left">
+        <a href="#">
+            <span class="glyphicon glyphicon-user scaled"></span>
+        </a>
+    </button>
+</div>
+
+<input type="image" id="deliver_but" src="https://nedol.ru/server/images/1415f4832d63cb093b61696c3bff87ee"
+       style="display:none;position:absolute;left:1%;bottom:80%;width:40px;"
+       onclick="window.user.OnClickDeliver(this)"/>
+
+
+
+<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
+<span id="locText" style="font-family: serif">Lat Lon</span>
+
+<img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
+
+<div id="main_window">
+    <div>
+        <div class="date_ctrl form-group"  style="position:fixed;right:0px;top:1px;">
+            <div class='input-group date' style="width:auto" >
+                <input type='text' class="form-control dt_val"/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+
+                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
+                        data-width="fit" style="display:inline-block;float:right">
+                    <span class="caret"></span>
+                </button>
+                <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                    <li href="#">06:00 - 08:00</li>
+                    <li href="#">08:00 - 10:00</li>
+                    <li href="#">10:00 - 12:00</li>
+                    <li href="#">12:00 - 14:00</li>
+                    <li href="#">14:00 - 16:00</li>
+                    <li href="#">16:00 - 18:00</li>
+                    <li href="#">18:00 - 20:00</li>
+                    <li href="#">20:00 - 22:00</li>
+                    <li href="#">22:00 - 24:00</li>
+                </ol>
+
+            </div>
+        </div>
+    </div>
+    <style>
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:40%;
+            right:60%;
+            top:40%; bottom:60%;
+            z-index: 11;
+        }
+    </style>
+    <div id="dtp_container">
+        <div id="datetimepicker"
+             style="
+             display: block;
+             position: absolute;
+             transform: scale(2.2);
+              margin:0 auto;">
+        </div>
+    </div>
+</div>
+
+<div id="category_include" style="display:none;
+             /*overflow-y: hidden;*/
+  	         overflow-y: scroll;">
+    <style>
+        .category{
+            margin-left: 50px;
+            margin-right: 50px;
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 40px;
+            /*width: 120px;*/
+        }
+
+        .category:hover{
+            /*height: 50px;*/
+            /*width: 50px;*/
+        }
+
+        #categories{
+            position: fixed;
+            bottom:0px;
+            width:100%;
+            padding-top: 5px;
+            background-color: rgba(0, 140, 201, 1.0);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index:100;
+        }
+    </style>
+
+    <div id="category_container">
+        <img src="https://nedol.ru/d2d/dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; bottom: 15px; right: 50%; left:50%"/>
+    </div>
+
+    <div align="center" id="categories">
+        <input type="image" class="category" cat="food" id="0" title="Food" src="https://nedol.ru/d2d/dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="veges" id="10" title="Veges" src="https://nedol.ru/d2d/dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="https://nedol.ru/d2d/dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="https://nedol.ru/d2d/dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="https://nedol.ru/d2d/dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="https://nedol.ru/d2d/dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="https://nedol.ru/d2d/dist/images/ic_60.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="https://nedol.ru/d2d/dist/images/ic_70.png" state="1"  data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
+        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="https://nedol.ru/d2d/dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
+        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="https://nedol.ru/d2d/dist/images/ic_90.png" state="0"  data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="https://nedol.ru/d2d/dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="https://nedol.ru/d2d/dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="https://nedol.ru/d2d/dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
+    </div>
+
+    <script>
+        function OnClickCat(el) {
+            let tab = $(el).parent().parent().find("a[data-toggle=tab]");
+            $(tab).text($(el).text());
+            $(tab).attr("cat",$(el).attr('cat'));
+            $(tab).trigger('click');
+        }
+    </script>
+
+</div>
+<div>
+    <div id="client_frame_container"
+         class=""
+         style="display:none;
+             z-index:2000;
+             position: absolute;
+             height: 100%;
+             max-height: 100% !important;
+             min-height: 50% !important;
+             /*width: 100%;*/
+             /*max-width: 95%;*/
+             -webkit-overflow-scrolling: auto;
+             /*overflow-y: hidden;*/
+             overflow-x: auto;
+             white-space: nowrap;
+             /*padding-bottom: 10px;*/
+  	         overflow-y: scroll;
+             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+
+    </div>
+
+    <iframe class="client_frame_tmplt"  src="./client/client.html?v=1"
+        style="
+            display:none;
+            position:relative;
+            overflow: hidden;
+            z-index: 10;
+            width:100%;
+            height: 100%">
+    </iframe>
+
+</div>
+
+<div class="browser_container" id="my_profile_container"
+     style="display:none;
+         overflow: visible; z-index:2000;
+         position: absolute;
+         -webkit-overflow-scrolling: auto;
+         height: auto;
+         max-height: 80% !important;
+         min-height: 50% !important;
+         width:80%; left: 10%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+</div>
+
+
+
+<div class="alert alert-warning alert-dismissible fade">
+    <button type="button" class="close">&times;</button>
+    <h3></h3>
+</div>
+
+<data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
+
+<data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
+
+<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
+
+<data class="tariff" id="price_editable" value="true"></data>
+
+
+</body>
+</html>

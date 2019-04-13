@@ -13,7 +13,7 @@ class DB {
         this.version = 30;
 
         if (!window.indexedDB) {
-            console.log("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
+            alert("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
         }
 
         this.iDB = window.indexedDB || window.mozIndexedDB || window.webkitIndexedDB || window.msIndexedDB,
@@ -29,8 +29,10 @@ class DB {
         if (!this.DBcon) {
             this.connectDB(function (con) {
                 DB.prototype.DBcon = con;
-                f();
             });
+            setTimeout(function () {
+                f();
+            }, 200);
         }
     }
 
@@ -405,6 +407,17 @@ class DB {
         } catch (ex) {
             console.log(ex);
         }
+    }
+
+    GetOfferTmplt(cb){
+        var tx = this.DBcon.transaction([this.offerStore], "readonly");
+        var objectStore = tx.objectStore(this.offerStore);
+        var myIndex = objectStore.index('date');
+        myIndex.get("tmplt");
+        myIndex.openCursor().onsuccess = function(event) {
+            // report the success of our request
+            cb(event.target.result.value);
+        };
     }
 
     GetOffer(date,  cb) {

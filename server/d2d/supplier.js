@@ -25,6 +25,21 @@ module.exports = class Supplier extends D2D{
 
     }
 
+    isValidSupplier(q, res, cb){
+        let that = this;
+
+        var sql =  "SELECT sup.*"+
+            " FROM  supplier as sup"+
+            " WHERE sup.uid='"+q.uid+"' AND sup.psw='"+q.psw+"'";
+
+        global.con_obj.query(sql, function (err, result) {
+            if (err)
+                throw err;
+
+            cb(result);
+        });
+
+    }
 
     UpdProfile(q, res) {
 
@@ -67,113 +82,57 @@ module.exports = class Supplier extends D2D{
         });
     }
 
-    Auth(q, res, req) {
-        let values, sql, uid;
-        let psw = shortid.generate();
-        if(q.user==='Customer'){
-            uid = md5(new Date())
-            values = [uid, psw,'tariff'];
-            sql = "REPLACE INTO customer SET  uid=?, psw=?, tariff=?";
-        }else if(q.user==='Supplier'){
-            uid = md5(q.email);
-            values = [uid, psw, q.email,'tariff'];
-            sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
-        }
-        global.con_obj.query(sql, values, function (err, result) {
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            try{
-                if (err) {
-                    res.end(JSON.stringify({err: err}));
-                }else{
-                    res.end(JSON.stringify({uid: uid,psw:psw}));
-                }
-            }catch(ex) {
-                res.end(JSON.stringify({err: ex}));
-            }
-        });
-
-    }
-
-    OnClickUserProfile(li){
-
-        $('#profile_container').css('display','block');
-        $('#profile_container iframe').attr('src',"../src/profile/profile.customer.html");
-        $('#profile_container iframe').off();
-        $('#profile_container iframe').on('load',function () {
-            $('#profile_container iframe')[0].contentWindow.InitProfileUser();
-
-            $('.close_browser',$('#profile_container iframe').contents()).on('touchstart click', function (ev) {
-                $('#profile_container iframe')[0].contentWindow.profile_cus.Close();
-                $('#profile_container').css('display', 'none');
-            });
-        });
-        this.MakeDraggable($( "#profile_container" ));
-        $( "#profile_container" ).resizable({});
-
-
-
-        //this.MakeDraggable($('body', $('#profile_container iframe').contents()));
-
-    }
 
     UpdateOffer(q, res){
         let that = this;
-        let now = moment().format('YYYY-MM-DD h:mm:ss');
-        let sql =
-            "SELECT of.*, sup.uid as supuid, deluid.uid as deliver" +
-            " FROM  supplier as sup, offers as of, (SELECT del.uid FROM deliver as del WHERE LOCATE('"+q.uid+"',del.suppliers)>0) as deluid "+
-            " WHERE of.supuid=sup.uid AND sup.uid=\""+q.uid+"\" AND sup.psw=\""+q.psw +"\"" +
-            " AND of.date=\""+q.date+"\" AND of.published IS NOT NULL AND of.deleted IS NULL"+
-            " ORDER BY of.id DESC";
 
-        global.con_obj.query(sql, function (err, sel) {
-            if (err) {
-                throw err;
+        this.isValidSupplier(q,res, function (result) {
+            if (result.length <=0) {
+                res.writeHead(200, {'Content-Type': 'application/json'});
+                res.end(JSON.stringify({err:'Пройдите регистрацию',link:'https://'+window.location.hostname+'/d2d/dist/settings.supplier.html'}));
+                return;
             }
-            let values;
-            if(sel.length>0) {
-                if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
+
+            let now = moment().format('YYYY-MM-DD h:mm:ss');
+            let sql =
+                "SELECT of.*, sup.uid as supuid" +
+                " FROM  supplier as sup, offers as of"+
+                " WHERE of.supuid=sup.uid " +
+                " AND of.date='"+q.date+"' AND of.published IS NOT NULL AND of.deleted IS NULL"+
+                " ORDER BY of.id DESC";
+
+            global.con_obj.query(sql, function (err, sel) {
+                if (err) {
+                    throw err;
+                }
+                let values;
+
+                if(sel.length>0) {
+                    if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
+                        let offer = urlencode.decode(q.offer);
+                        that.replaceImg(offer,function (offer) {
+                            values = [offer, q.location[1], q.location[0], q.radius, sel[0].id];
+                            let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, radius=? WHERE id=?";
+                            that.updateOfferDB(q, res, sql_upd, values, now);
+                            if(sel[0].deliver) {
+                                //copy offer to deliver's offer
+                                //that.updateOfferDeliver(q, res, sel[0].deliver,offer);
+                            }
+                        });
+                    }
+
+                }else {
                     let offer = urlencode.decode(q.offer);
                     that.replaceImg(offer,function (offer) {
-                        values = [offer, q.location[1], q.location[0], q.radius, sel[0].id];
-                        let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, radius=? WHERE id=?";
-                        that.updateOfferDB(q, res, sql_upd, values, now);
-                        if(sel[0].deliver) {
-                            //copy offer to deliver's offer
-                            //that.updateOfferDeliver(q, res, sel[0].deliver,offer);
-                        }
+
+                        values = [q.uid,offer,JSON.stringify(q.categories), parseFloat(q.location[0]),parseFloat(q.location[1]), q.date];
+
+                        sql = 'REPLACE INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?';
+
+                        that.updateOfferDB(q, res, sql, values,now);
                     });
                 }
-                if(sel[0].prolong>0){
-                    let date = moment(q.date).add(sel[0].prolong, 'days').format('YYYY-MM-DD');
-
-                    let sql_ins = "REPLACE INTO offers SET ";
-                    for(let key in sel[0]){
-                        if(key==='id')
-                            continue;
-                        if(key==='date')
-                            sql_ins += key+"='"+date+"',";
-                        else
-                            sql_ins += key+"='"+sel[0][key]+"',";
-                    }
-                    sql_ins = sql_ins.replace(/,(\s+)?$/, '');
-                    global.con_obj.query(sql_ins,function (err, sel) {
-                        if (err) {
-                            res.end(JSON.stringify({err: err}));
-                            return;
-                        }
-                    });
-                }
-
-            }else {
-                let offer = urlencode.decode(q.offer);
-                that.replaceImg(offer,function (offer) {
-                    values = [q.uid,offer,JSON.stringify(q.categories), q.location[0].toFixed(6),q.location[1].toFixed(6), q.date];
-                    sql = 'REPLACE INTO offers SET supuid=?, data=?, categories=?, longitude=?, latitude=?, date=?';
-                    that.updateOfferDB(q, res, sql, values,now);
-                });
-            }
-
+            });
         });
     }
 
@@ -182,8 +141,8 @@ module.exports = class Supplier extends D2D{
         let sql =
             "SELECT of.*" +
             " FROM  deliver as del, offers as of"+
-            " WHERE del.uid=of.supuid AND del.uid=\""+deliver+"\""+
-            " AND of.date=\""+q.date+"\"";
+            " WHERE del.uid=of.supuid AND del.uid='"+deliver+"'"+
+            " AND of.date='"+q.date+"'";
 
         global.con_obj.query(sql, function (err, sel) {
             if (err) {
@@ -312,9 +271,9 @@ module.exports = class Supplier extends D2D{
             " FROM  supplier as sup, customer as cus, orders as ord" +
             //", tariff as tar"+
             " WHERE sup.uid=ord.supuid  AND ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
-            " AND cus.psw=\""+q.psw+"\"" +
-            //" AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
-            " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
+            " AND cus.psw='"+q.psw+"'" +
+            //" AND cus.tariff=tar.id AND tar.applicant='c'" +
+            " AND cus.uid=ord.cusuid AND ord.date='"+q.date+"'" +
             " ORDER BY ord.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
@@ -376,7 +335,7 @@ module.exports = class Supplier extends D2D{
             "SELECT ord.*,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
             " WHERE sup.email=\'"+q.supuid+"\' AND sup.uid=\'"+q.uid+"\'" +
-            " AND of.sup_uid=sup.uid AND cus.email=ord.cusuid AND ord.cusuid=\""+q.cusuid+"\" AND ord.date=\""+q.date+"\"" +
+            " AND of.sup_uid=sup.uid AND cus.email=ord.cusuid AND ord.cusuid='"+q.cusuid+"' AND ord.date='"+q.date+"'" +
             " AND ord.date=\'"+q.date+"\'"+
             " ORDER BY of.id DESC";
 
@@ -563,9 +522,8 @@ module.exports = class Supplier extends D2D{
             " FROM  supplier as sup, offers as off"+
             " WHERE sup.uid = '"+ q.uid+"' AND sup.psw = '"+q.psw+"'" +
             " AND off.supuid=sup.uid " +
-            " AND off.date<(NOW() + INTERVAL sup.prolong DAY)"+
-            " AND off.date>NOW()"+
-            " AND sup.prolong>0";
+            // " AND off.date<(NOW() + INTERVAL sup.prolong DAY)"+
+            " AND off.date>NOW()";
         global.con_obj.query(sql, function (err, result) {
             if (err) {
                 throw err;

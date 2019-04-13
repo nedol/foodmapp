@@ -9,13 +9,15 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 module.exports = {
 
     devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':null,
-    //context: __dirname+'/js',
+    // context: __dirname+'/js',
 
     entry: {
-        'jQuery':'jquery',
+        // 'jQuery':'jquery',
         'supplier': __dirname+'/src/supplier/supplier.entry.js'
+        ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
         ,'deliver': __dirname+'/src/deliver/deliver.entry.js'
         ,'customer': __dirname+'/src/customer/customer.entry.js'
+        ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'
         ,'supplier_profile':__dirname+'/src/profile/profile.supplier.js'
         ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
         ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
@@ -32,7 +34,15 @@ module.exports = {
         aggregateTimeout:100
     },
     module: {
-        rules: [
+    noParse:/jquery-ui\/ui\/widgets\/tabs.js/,
+    noParse:/jquery-ui\/ui\/widgets\/dialog.js/,
+    noParse:/jquery-ui\/ui\/widgets\/autocomplete.js/,
+    noParse:/jquery-ui\/ui\/widgets\/sortable.js/,
+    noParse:/jquery-ui\/index.js/,
+    noParse:/jquery-ui\/draggable.js/,
+    noParse:/lodash\/lodash.js/,
+
+    rules: [
             {
                 test: /\.(jpe?g|png|gif)$/i,
                 loader:"file-loader",
@@ -90,10 +100,8 @@ module.exports = {
         alias: {
             jquery: path.join(__dirname, 'node_modules/jquery/src/jquery'),
         },
-    }
-    ,
+    },
     externals: {
 
     }
-
 };

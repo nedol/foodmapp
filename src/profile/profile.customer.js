@@ -8,7 +8,7 @@ import {Dict} from '../dict/dict.js';
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-window.InitProfileUser = function (obj, avatar) {
+window.InitProfileUser = function () {
 
     window.profile_cus = new ProfileCustomer();
 
@@ -125,7 +125,7 @@ class ProfileCustomer{
 
     OnSubmit(){
         let that = this;
-
+        try {
         let k = 50/ $('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
 
@@ -133,12 +133,11 @@ class ProfileCustomer{
             let data_post = {
                 proj: $(form).find('#proj').val(),
                 host: location.origin,
-                user: "Customer",
+                user:'customer',
                 func: "confirmem",
                 uid: window.parent.user.uid,
                 psw: window.parent.user.psw,
                 profile: {
-                    user:'customer',
                     email: $('#email').val(),
                     avatar: $('.avatar').attr('src'),
                     thmb: thmb.src,
@@ -149,7 +148,7 @@ class ProfileCustomer{
                 }
             }
 
-            try {
+
                 window.parent.network.postRequest(data_post, function (res) {
 
                     delete data_post.proj;
@@ -183,58 +182,61 @@ class ProfileCustomer{
                     }
 
                 });
-            }
-            catch
-                (ex) {
 
-            }
         });
+
+        }catch(ex) {
+
+        }
 
         return true;
     }
 
     InitUserOrders(){
         let that = this;
+        $('#menu_item_style').load('../client/client.html #menu_item_style', function (response, status, xhr) {
+
+        });
         window.parent.db.GetCusOrders(window.parent.user.date, function (res) {
             for(let i in res){
                 let order = res[i];
-
-                for(let item in order.data) {
-                    let ovc = $(window.parent.menu_item_tmplt).clone();
-
-                    window.parent.db.GetSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
-                        if(res!=-1) {
-                            let dict = new Dict(res.dict.dict);
-                            dict.set_lang(window.parent.sets.lang, ovc[0]);
+                let ovc = '' ;
+                $('#menu_item_tmplt').load('../client/client.html #menu_item_tmplt', function (response, status, xhr) {
+                    ovc = $('#menu_item_tmplt').clone();
+                    for(let item in order.data) {
+                        window.parent.db.GetSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
+                            if(res!=-1) {
+                                let dict = new Dict(res.dict.dict);
+                                dict.set_lang(window.parent.sets.lang, ovc[0]);
+                            }
+                        });
+                        $(ovc).attr('id', 'ovc'+ '_' + i);
+                        $(ovc).css('display','block');
+                        $(ovc).addClass('menu_item');
+                        $(ovc).attr('order',item);
+                        $(ovc).attr('supuid',order.supuid);
+                        $(ovc).find('.item_title').text(item);
+                        $(ovc).find('.item_title').attr('contenteditable', 'false');
+                        $(ovc).find('.item_price').text(order.data[item].price);
+                        $(ovc).find('.item_price').attr('contenteditable', 'false');
+                        $(ovc).find('.period_div').css('visibility', 'visible');
+                        $(ovc).find('.approved').css('visibility', 'hidden');
+                        $(ovc).find('.ordperiod').text(order.period);
+                        if(item){
+                            $(ovc).find('.item_title').attr('data-translate', item);
                         }
-                    });
-                    $(ovc).attr('id', 'ovc'+ '_' + i);
-                    $(ovc).css('display','block');
-                    $(ovc).addClass('menu_item');
-                    $(ovc).attr('order',item);
-                    $(ovc).attr('supuid',order.supuid);
-                    $(ovc).find('.item_title').text(item);
-                    $(ovc).find('.item_title').attr('contenteditable', 'false');
-                    $(ovc).find('.item_price').text(order.data[item].price);
-                    $(ovc).find('.item_price').attr('contenteditable', 'false');
-                    $(ovc).find('.period_div').css('visibility', 'visible');
-                    $(ovc).find('.approved').css('visibility', 'hidden');
-                    $(ovc).find('.ordperiod').text(order.period);
-                    if(item){
-                        $(ovc).find('.item_title').attr('data-translate', item);
+                        $(ovc).find('.amount').text(order.data[item].qnty);
+                        $(ovc).find('.pack_container').css('visibility','visible');
+                        $(ovc).find('.item_pack').text(order.data[item].pack);
+                        $(ovc).find('li>a[role=packitem]').on('click', {that: that, off:order.data[item]},function(ev){
+                            that.changed = true;
+                            let pl = ev.data.off.packlist;
+                            $(ovc).find('.item_pack').text($(ev.target).text());
+                            $(ovc).find('.item_price').text(pl[$(ev.target).text()]);
+                        });
+                        $('.ord_container').append(ovc);
                     }
-                    $(ovc).find('.amount').text(order.data[item].qnty);
-                    $(ovc).find('.pack_container').css('visibility','visible');
-                    $(ovc).find('.item_pack').text(order.data[item].pack);
-                    $(ovc).find('li>a[role=packitem]').on('click', {that: that, off:order.data[item]},function(ev){
-                        that.changed = true;
-                        let pl = ev.data.off.packlist;
-                        $(ovc).find('.item_pack').text($(ev.target).text());
-                        $(ovc).find('.item_price').text(pl[$(ev.target).text()]);
-                    });
-                    $('.ord_container').append(ovc);
-
-                }
+                });
             }
         });
     }

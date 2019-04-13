@@ -8,13 +8,23 @@ import axios from 'axios';//
 
 class Network{
 
-    constructor(url){
+    constructor(url) {
         this.host = url;
         this.work = true;
-        this.CancelToken = axios.CancelToken;
+        //this.CancelToken = axios.CancelToken;
         this.cancel;
         this.send_req_func;
 
+    }
+
+    Init(user, cb){
+        let par = {
+            proj:'d2d',
+            user:user
+        }
+        this.postRequest(par, function (res) {
+            cb();
+        });
     }
 
     InitSSE(user, cb){
@@ -55,15 +65,15 @@ class Network{
     postRequest(par, cb){
 
         let post_par = JSON.stringify(par);
-
+        let cb_this = cb;
         axios.post(this.host, post_par
             , { crossDomain: true}
         )
             .then(function (response) {
-                cb(response.data);
+                cb_this(response.data);
             })
             .catch(function (error) {//waiting for rem_client
-                console.log(error);
+                cb_this({err:error});
             });
 
     }

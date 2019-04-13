@@ -2,7 +2,8 @@
 
 export {SupplierSettings}
 
-require('jquery-ui')
+require('bootstrap');
+
 import {Network} from "../../network";
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -11,7 +12,7 @@ let utils = new Utils();
 class SupplierSettings {
     constructor(db){
         this.db = db;
-        this.network = new Network(host_port);
+        // this.network = new Network(host_port);
         this.fillForm();
         $(document).on('submit', this, function (ev) {
             let form = $('.form');
@@ -31,18 +32,20 @@ class SupplierSettings {
 
     OnSubmit(form){
         let that = this;
-        let k = 50/  $(form).find('.avatar').height();
-        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
-
+        console.log('OnSubmit');
+        let k = 200/  $(form).find('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+            k = 50/  $(form).find('.avatar').height();
+            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
             var data_post = {
                 proj: 'd2d',
                 user: "Supplier",
                 func: 'confirmem',
-                host: location.origin,
+                host: location.origin.replace('http://','https://'),
                 promo: $(form).find('#promo').val(),
                 profile: {
                     type: 'marketer',
-                    avatar: $(form).find('.avatar').attr('src'),
+                    avatar: avatar.src,
                     thmb: thmb.src,
                     email: $(form).find('#email').val(),
                     name: $(form).find('#name').val(),
@@ -52,21 +55,33 @@ class SupplierSettings {
                 }
             }
 
-            that.network.postRequest(data_post, function (obj) {
-                if (obj.err) {
-                    alert(obj.err);
-                    return;
-                }
-                delete data_post.proj;
-                delete data_post.func;
-                delete data_post.profile.email;
-                delete data_post.host;
+                $.ajax({
+                    url: host_port,
+                    type: "POST",
+                    crossDomain: true,
+                    data: JSON.stringify(data_post),
+                    dataType: "json",
+                    success: function (obj) {
+                        if (obj.err) {
+                            alert(obj.err);
+                            return;
+                        }
+                        delete data_post.proj;
+                        delete data_post.func;
+                        delete data_post.profile.email;
+                        delete data_post.host;
 
-                that.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
-                    alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                        that.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
+                            alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                        });
+                    },
+                    error: function (xhr, status) {
+                        alert("error");
+                    }
                 });
-            });
+
         });
+    });
     }
 
     fillForm(){

@@ -1,11 +1,10 @@
 'use strict'
 
 
-global.jQuery = require('jquery');
-
+let jQuery = require('jquery');
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
+// require('jquery-ui-touch-punch');
 
 require('dialog-polyfill');
 
@@ -24,7 +23,6 @@ require('bootstrap/js/tooltip.js');
 require('bootstrap/js/tab.js');
 require('bootstrap-select');
 
-//global.jQuery = require('jquery');
 
 const shortid = require('shortid');
 
@@ -32,15 +30,15 @@ const shortid = require('shortid');
 let utils = new Utils();
 window.sets.lang = utils.getParameterByName('lang');
 
-    // $(window).on( "orientationchange", function( event ) {
-    //     let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
-    //     $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
-    // });
+    $(window).on( "orientationchange", function( event ) {
+        let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
+        $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
+    });
 
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.');
+        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
         return;
     }
 
@@ -70,10 +68,10 @@ $(document).on('readystatechange', function () {
 
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
                 uObj['set'] = set[res];
-                window.network = new Network(host_port);
 
                 // window.db.DeleteObject('setStore',uObj['set'].uid);
                 // return;
+                window.network = new Network(host_port);
 
                 if(set[res]['profile'] && !set[res]['profile'].email) {
 
@@ -82,26 +80,24 @@ $(document).on('readystatechange', function () {
                         utils.getParameterByName('uid') === uObj['set'].uid) {
                             uObj['set']['profile'].user = 'Supplier';
                             uObj['set']['profile'].email = utils.getParameterByName('email');
-                        window.network.RegUser(uObj['set'], function (reg) {
-                            if (!reg ||reg.err) {
-                                alert(res.err);
-                                return;
-                            }
-                            // try {
-                            //     uObj.set.profile.promo = JSON.parse(reg.promo);
-                            //
-                            // }catch(ex) {
-                            //
-                            // }
-                            uObj.set.id = reg.id;
-                            window.db.SetObject('setStore', uObj.set, function (res) {
-                                window.user = new Supplier(uObj);
-                                window.user.IsAuth_test(function (data) {//TODO:
+
+                            window.network.RegUser(uObj['set'], function (reg) {
+                                if (!reg || reg.err) {
+                                    $('.alert h3').text(reg.err).addClass('show');
+                                    return;
+                                }
+                                uObj.set.id = reg.id;
+                                //if(false)
+                                window.db.SetObject('setStore', uObj.set, function (res) {
+                                    window.user = new Supplier(uObj);
+                                    window.user.IsAuth_test(function (data) {//TODO:
+                                    });
                                 });
                             });
-                        });
+
 
                     }else{
+
                         window.user = new Supplier(uObj);
                         window.user.IsAuth_test(function (data) {//TODO:
                         });
@@ -122,11 +118,13 @@ $(document).on('readystatechange', function () {
                 }
 
             } else {
-                if(window.location.hostname==='localhost')
+                if(window.location.hostname==='localhost') {
                     window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
+                }
 
-                else if(window.location.hostname==='nedol')
+                else if(window.location.hostname==='nedol.ru') {
                     window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
+                }
             }
 
         });
@@ -159,20 +157,22 @@ $(document).on('readystatechange', function () {
         let dt_h = $('#dtp_container').css('height');
         let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
 
-        $(window).on("resize", function (event) {
-            let dt_w = $('#dtp_container').css('width');
-            let dt_h = $('#dtp_container').css('height');
-            scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
-        });
+        // $(window).on("resize", function (event) {
+        //     let dt_w = $('#dtp_container').css('width');
+        //     let dt_h = $('#dtp_container').css('height');
+        //     scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
+        //     $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+        // });
 
         $('#datetimepicker').data("DateTimePicker").toggle();
+
+        $('#debug').text(scale);
 
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
 
-            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+            $('#dtp_container').css('transform', 'scale(' + (scale - 2) + ',' + (scale - 2) + ')');
         });
 
         $('#datetimepicker').on('dp.hide', function (ev) {

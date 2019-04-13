@@ -1,6 +1,10 @@
 'use strict'
 export {Profile};
 
+require('jquery-ui')
+// require('jquery-ui-touch-punch');
+require('jquery.ui.touch');
+require('bootstrap');
 
 class Profile{
 
@@ -9,7 +13,7 @@ class Profile{
     }
 
     //Supplier
-    InitSupplierProfile(){
+    InitSupplierProfile(user){
         let that = this;
         //profile iframe
         let browser =  $('#profile_container').find('.browser');
@@ -19,7 +23,7 @@ class Profile{
 
         browser.off();
         browser.on('load', function () {
-            browser[0].contentWindow.InitProfileSupplier(window.user,
+            browser[0].contentWindow.InitProfileSupplier(user,
             {
                 readOnly: true,
                 profilePictureURL: that.profile.avatar,
@@ -132,12 +136,12 @@ class Profile{
         });
     }
     //Customer
-    OpenSupplierProfile(that,ovc, rating){
+    LoadSupplierProfile(that, ovc, rating){
         //profile iframe
         let browser = ovc.find('.browser');
         let avatar = ovc.find('.avatar').attr('src');
-        browser.draggable();
-        browser.attr('src', './profile.supplier.html');
+
+        browser.attr('src', '../profile.supplier.html');
         browser.off('load');
         browser.on('load', function () {
             browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},
@@ -161,8 +165,8 @@ class Profile{
             });
 
             if(that.profile) {
-                $('input',browser.contents()).prop('readonly', true);
-                $('input',browser.contents()).attr('placeholder', '');
+                // $('input',browser.contents()).prop('readonly', true);
+                // $('input',browser.contents()).attr('placeholder', '');
                 $('input',browser.contents()).attr('title', '');
                 $('#name', browser.contents()).val(that.profile.name);
                 $('#email', browser.contents()).val(that.profile.email);

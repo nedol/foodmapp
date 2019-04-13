@@ -13,12 +13,12 @@ class Categories {
         $('#category_include').css('display', 'block');
 
         let catAr = [
-            {"id": "0", "state": "1"},
-            {"id": "10", "state": "1"},
-            {"id": "3", "state": "0"},
-            {"id": "20", "state": "0"},
-            {"id": "30", "state": "0"},
-            {"id": "40", "state": "0"},
+            {"id": "0", "state": "0"},
+            {"id": "10", "state": "0"},
+            {"id": "3", "state": "1"},
+            {"id": "20", "state": "1"},
+            {"id": "30", "state": "1"},
+            {"id": "40", "state": "1"},
             {"id": "50", "state": "0"},
             {"id": "60", "state": "0"},
             {"id": "70", "state": "0"},
@@ -48,9 +48,9 @@ class Categories {
                     let cat = $(inputs[c]).attr('id');
                     if (!localStorage.getItem("ic_" + cat)) {
                         let img = new Image();
-                        img.src = '../src/categories/images/ic_' + cat + ".png";
+                        img.src = './images/ic_' + cat + ".png";
                         img.alt = cat;
-                        localStorage.setItem("ic_" + cat, '../src/categories/images/ic_' + cat + ".png");
+                        localStorage.setItem("ic_" + cat, './images/ic_' + cat + ".png");
                         img.onload = function (ev) {
                             let w = this.width;
                             let h = this.height;
@@ -86,6 +86,8 @@ class Categories {
     }
 
     OnClickCategory(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
         let that = ev.data;
         let el = ev.target;
         $(el).attr('state', $(el).attr('state') === '1' ? '0' : '1');

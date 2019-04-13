@@ -36,7 +36,9 @@ class OfferViewer {
 
         this.period = $('.sel_period').text();
 
-
+        this.path  = window.location.origin +"/d2d/";
+        if(host_port.includes('nedol.ru'))
+            this.path = host_port;
 
     }
 
@@ -81,7 +83,7 @@ class OfferViewer {
         this.offer = offer;
         window.supplier = new Supplier();
         window.supplier.profile = new Profile(offer.profile);
-        window.supplier.profile.InitSupplierProfile();
+        window.supplier.profile.InitSupplierProfile(window.supplier);
 
         this.date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
@@ -136,10 +138,10 @@ class OfferViewer {
                 }
 
                 let t = tab;
-                window.db.GetOffer(new Date(window.supplier.date), function (ar) {
+                window.db.GetOfferTmplt(function (obj) {
                     let title = $(menu_item).find('.item_title').attr('data-translate');
-                    if(ar[0] && ar[0].data[t]){
-                        let incl = _.find(ar[0].data[t],{title:title,owner:offer.data[tab][i].supuid});
+                    if(obj && obj.data[t]){
+                        let incl = _.find(obj.data[t],{title:title,owner:offer.data[tab][i].supuid});
                         if(incl && incl.markuplist) {
                             $(menu_item).find(':checkbox').prop('checked', true);
                             $(menu_item).find('.item_markup').attr('markuplist', JSON.stringify(incl.markuplist));
@@ -171,7 +173,9 @@ class OfferViewer {
 
                 if (offer.data[tab][i].img) {
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    $(menu_item).find('.img-fluid').attr('src', offer.data[tab][i].img.src);
+                    //the offer attr
+                    $(menu_item).find('.img-fluid').attr('hash',offer.data[tab][i].img.src);
+                    $(menu_item).find('.img-fluid').attr('src', that.path+'/images/'+offer.data[tab][i].img.src);
                     // $(menu_item).find('.img-fluid').css('left', offer.data[tab][i].img.left);
                     // $(menu_item).find('.img-fluid').css('top', offer.data[tab][i].img.top ? offer.data[tab][i].img.top : 0);
                     //
@@ -234,7 +238,7 @@ class OfferViewer {
 
                 $.each(offer.data[tab][i].cert, function (i, data) {
                     let img = new Image();
-                    img.src = data.src;
+                    img.src = that.path+'/images/'+data.src;
                     //$(img).offset(data.pos);TODO:
                     img.height = '100';
                     $(menu_item).find('.gallery').append(img);
@@ -500,11 +504,7 @@ class OfferViewer {
                 item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$(that.ovc).width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-                    let left =$(miAr[i]).find('.img-fluid').css('left');
-                    item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
-                    item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
-
+                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('hash')};
                 }else {
                     delete item.img;
                 }

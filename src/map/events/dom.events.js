@@ -18,19 +18,17 @@ class DOMEvents {
             console.log("search_but left position " + $("#search_but").position().left);
             console.log("search_but top position " + $("#search_but").position().top);
 
-            $("#bucket").css('left', parseInt(screen.width - 50) + 'px');
-
-            $("#zoom_but").css('left', parseInt(screen.width - 50) + 'px');
-
-            $("#search_but").css('left', parseInt(screen.width - 50 /*$("#search_but").css('left')*/) + 'px');
-            $("#search_but").css('top', parseInt(screen.height - $("#search_but").css('top')) + 'px');
-
-            $("#loc_ctrl").css('left', parseInt(screen.width - 50/*- $("#loc_ctrl").css('left')*/) + 'px');
-            $("#loc_ctrl").css('top', parseInt(screen.height - $("#loc_ctrl").css('top')) + 'px');
+            // $("#zoom_but").css('left', parseInt(screen.width - 50) + 'px');
+            //
+            // $("#search_but").css('left', parseInt(screen.width - 50 /*$("#search_but").css('left')*/) + 'px');
+            // $("#search_but").css('top', parseInt(screen.height - $("#search_but").css('top')) + 'px');
+            //
+            // $("#loc_ctrl").css('left', parseInt(screen.width - 50/*- $("#loc_ctrl").css('left')*/) + 'px');
+            // $("#loc_ctrl").css('top', parseInt(screen.height - $("#loc_ctrl").css('top')) + 'px');
 
         });
 
-        $('#loc_ctrl').on('click ontouchstart', this, ev=> {
+        $('#loc_ctrl').on('click touchstart', this, ev=> {
             window.user.map.geo.StartLocation(ev);
             if(window.user.SendLocation && !window.user.isShare_loc){
                 if (window.user.date === moment().format('YYYY-MM-DD') &&
@@ -42,12 +40,12 @@ class DOMEvents {
             }
         });
 
-        $('#pin').on('click ontouchstart', this, ev=>{
+        $('#pin').on('click touchstart', this, ev=>{
             window.user.map.geo.StopLocation(ev);
             window.user.isShare_loc = false;
         });
 
-        $('#search_but').on('click ontouchstart', this, function (ev) {
+        $('#search_but').on('click touchstart', this, function (ev) {
 
             if ($("#search_but").attr('drag') === 'true') {
                 $("#search_but").attr('drag', false);
@@ -57,45 +55,47 @@ class DOMEvents {
             let hint = "London, Trafalgar Square";
             if (window.window.sets.lang === 'ru') {
                 text = "Введите название местоположения";
-                hint = "Москва, Красная площадь";
+                hint = "Москва, ФудСити";
             }
             let place = prompt(text, hint);
-
-            window.user.map.geo.SearchLocation(text,function (bound) {
-                ev.data.map.SetBounds({sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
-            });
-        });
-
-
-        $("#search_but").draggable({
-            start: function () {
-                console.log("drag start");
-            },
-            drag: function () {
-                $("#search_but").attr('drag', true);
-            },
-            stop: function () {
-                var rel_x = parseInt($("#search_but").position().left / window.innerWidth * 100);
-                $("#search_but").css('right', rel_x + '%');
-                var rel_y = parseInt($("#search_but").position().bottom / window.innerHeight * 100);
-                $("#search_but").css('top', rel_y + '%');
+            if(place) {
+                window.user.map.geo.SearchLocation(place, function (bound) {
+                    window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+                });
             }
         });
-        $("#loc_ctrl").draggable({
-            distance: 20,
-            start: function () {
-                console.log("");
-            },
-            drag: function () {
-                $("#loc_ctrl").attr('drag', true);
-            },
-            stop: function () {
-                var rel_x = parseInt($("#loc_ctrl").position().left / window.innerWidth * 100);
-                $("#loc_ctrl").css('left', rel_x + '%');
-                var rel_y = parseInt($("#loc_ctrl").position().top / window.innerHeight * 100);
-                $("#loc_ctrl").css('top', rel_y + '%');
-            }
-        });
+
+
+        // TODO: $("#search_but").draggable({
+        //     start: function () {
+        //         console.log("drag start");
+        //     },
+        //     drag: function () {
+        //         $("#search_but").attr('drag', true);
+        //     },
+        //     stop: function () {
+        //         var rel_x = parseInt($("#search_but").position().left / window.innerWidth * 100);
+        //         $("#search_but").css('right', rel_x + '%');
+        //         var rel_y = parseInt($("#search_but").position().bottom / window.innerHeight * 100);
+        //         $("#search_but").css('top', rel_y + '%');
+        //     }
+        // });
+
+        //TODO: $("#loc_ctrl").draggable({
+        //     distance: 20,
+        //     start: function () {
+        //         console.log("");
+        //     },
+        //     drag: function () {
+        //         $("#loc_ctrl").attr('drag', true);
+        //     },
+        //     stop: function () {
+        //         var rel_x = parseInt($("#loc_ctrl").position().left / window.innerWidth * 100);
+        //         $("#loc_ctrl").css('left', rel_x + '%');
+        //         var rel_y = parseInt($("#loc_ctrl").position().top / window.innerHeight * 100);
+        //         $("#loc_ctrl").css('top', rel_y + '%');
+        //     }
+        // });
 
         var zoom_y_0;
         var drag_zoom;

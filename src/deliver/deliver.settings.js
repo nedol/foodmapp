@@ -8,6 +8,9 @@ import {DB} from "../map/storage/db"
 import 'bootstrap'
 import {Network} from "../../network";
 
+import {Utils} from "../utils/utils";
+let utils = new Utils();
+
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
@@ -63,31 +66,37 @@ class DeliverSettings {
 
     OnSubmit(form){
         let that = this;
+        let k = 50/  $(form).find('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
 
-        var data_post ={
-            proj:'d2d',
-            user:"Deliver",
-            func:'confirmem',
-            type:'deliver',
-            host:location.origin,
-            //avatar:$(form).find('.avatar').attr('src'),
-            lang: $('html').attr('lang'),
-            email:$(form).find('#email').val(),
-            name:$(form).find('#name').val(),
-            address:$(form).find('#address').val(),
-            mobile:$(form).find('#mobile').val(),
-            promo:$(form).find('#promo').val()
-        }
-
-        this.network.postRequest(data_post, function (obj) {
-            if(obj.err || obj.code){
-                alert(obj.err+obj.code);
-                return;
+            var data_post ={
+                proj:'d2d',
+                user:"Deliver",
+                func:'confirmem',
+                host:location.origin,
+                profile: {
+                    type:'deliver',
+                    avatar:$(form).find('.avatar').attr('src'),
+                    thmb: thmb.src,
+                    lang: $('html').attr('lang'),
+                    email: $(form).find('#email').val(),
+                    name: $(form).find('#name').val(),
+                    address: $(form).find('#address').val(),
+                    mobile: $(form).find('#mobile').val(),
+                    promo: $(form).find('#promo').val()
+                }
             }
-            delete data_post.proj; delete data_post.func; delete data_post.email;
-            that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
-                alert('На указанный email-адрес была выслана ссылка для входа в программу');
-                window.location.replace("../dist/deliver.html?lang="+data_post.lang);
+
+            this.network.postRequest(data_post, function (obj) {
+                if(obj.err || obj.code){
+                    //alert(obj.err+obj.code);
+                    return;
+                }
+                delete data_post.proj; delete data_post.func; delete data_post.email;
+                that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
+                    alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                    window.location.replace("../dist/deliver.html?lang="+data_post.lang);
+                });
             });
         });
     }

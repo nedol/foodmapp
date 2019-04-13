@@ -202,7 +202,7 @@ class ProfileDeliver{
                 uid: uid,
                 psw: psw,
                 profile: {
-                    type:window.parent.user.profile.profile.type,
+                    type:'deliver',
                     host:location.origin,
                     email: $('#email').val(),
                     avatar: $('.avatar').attr('src'),

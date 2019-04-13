@@ -112,16 +112,15 @@ module.exports = class D2D {
         }
     }
 
+
+
     ConfirmEmail(q, res) {
 
         let that = this;
+        let uid = md5(q.profile.email);
         let sql = "SELECT user.*" +
             " FROM "+q.user.toLowerCase()+" as user" +
-            " WHERE user.email='"+q.profile.email+"'";
-
-// res.writeHead(200, {'Content-Type': 'application/json'});
-// res.end(JSON.stringify(sql));
-// return;
+            " WHERE (user.email='"+q.profile.email+"' OR user.uid='"+uid+"')";
 
         global.con_obj.query(sql, function (err, result) {
             if (err)
@@ -139,31 +138,39 @@ module.exports = class D2D {
 
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 that.replaceImg_2(q.profile.avatar, function (avatar) {
-                    that.replaceImg_2(q.profile.thmb, function (thmb) {
-                        q.profile.avatar = avatar;
-                        q.profile.thmb = thmb;
-                        values = [uid, psw, 'tariff', q.promo, JSON.stringify(q.profile)];
-                        sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?, tariff=? ,promo=?, profile=?";
-                        global.con_obj.query(sql, values, function (err, result) {
-                            if (err) {
-                                res.end(JSON.stringify({err: 'Неверные данные'}));
-                                return;
-                            }
+                    setTimeout(function () {
+                        that.replaceImg_2(q.profile.thmb, function (thmb) {
+                            q.profile.avatar = avatar;
+                            q.profile.thmb = thmb;
+                            values = [uid, psw, 'tariff', q.promo, JSON.stringify(q.profile)];
+                            sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?, tariff=? ,promo=?, profile=?";
 
-                            let em = new Email();
-                            let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.profile.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
+                            global.con_obj.query(sql, values, function (err, result) {
 
-                            em.SendMail("nedol.infodesk@gmail.com", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
-                                res.end(JSON.stringify({result: result, uid: uid, psw: psw, email: q.profile.email}));
+                                if (err) {
+                                    res.end(JSON.stringify({err: 'Неверные данные'}));
+                                    return;
+                                }else {
+
+                                    let em = new Email();
+                                    let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + uid + "&email=" + q.profile.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>Удачных покупок!</p>";
+
+                                    em.SendMail("nedol.infodesk@gmail.com", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
+                                        res.end(JSON.stringify({
+                                            result: result,
+                                            uid: uid,
+                                            psw: psw,
+                                            email: q.profile.email
+                                        }));
+                                    });
+                                }
                             });
                         });
-                    });
+                    },100);
                 });
             }
-
         });
     }
-
 
     RegUser(q, res) {
 
@@ -187,60 +194,40 @@ module.exports = class D2D {
                 if(result[0].em_cnt>0){
                     res.end(JSON.stringify({"err": "Email уже используется в системе"}));
                     return;
-                }
-                let values, sql;
-                if(md5(q.profile.email)===q.uid) {
-                    that.replaceImg_2(q.profile.avatar, function (avatar) {
-                        that.replaceImg_2(q.profile.thmb, function (thmb) {
-                            q.profile.avatar = avatar;
-                            q.profile.thmb = thmb;
-                            values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
-                            sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
-                            global.con_obj.query(sql, values, function (err, res_upd) {
+                }else {
 
-                                if (err) {
-                                    res.end(JSON.stringify({err: err}));
+                    let values, sql;
+                    if (md5(q.profile.email) === q.uid) {
+
+                        that.replaceImg_2(q.profile.avatar, function (avatar) {
+                            setTimeout(function () {
+                                that.replaceImg_2(q.profile.thmb, function (thmb) {
+                                    q.profile.avatar = avatar;
+                                    q.profile.thmb = thmb;
+                                    values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
+                                    sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
+                                    if (!res._header)
+                                        res.writeHead(200, {'Content-Type': 'application/json'});
+                                    res.end(JSON.stringify(result));
                                     return;
-                                }
-                                res.end(JSON.stringify({id: result[0].id}));
-                            });
+                                    global.con_obj.query(sql, values, function (err, res_upd) {
+                                        if (err) {
+                                            throw err;
+                                        }
+
+                                        res.end(JSON.stringify({id: result[0].id}));
+                                    });
+                                });
+                            }, 200);
                         });
-                    });
+
+                    } else {
+                        res.end(JSON.stringify({err: "Неверный email"}));
+                    }
                 }
             }
         });
     }
-
-    Auth(q, res, req) {
-        let values, sql, uid;
-        let psw = shortid.generate();
-        if(q.user==='Customer'){
-            uid = md5(new Date())
-            values = [uid, psw,'tariff'];
-            sql = "REPLACE INTO customer SET  uid=?, psw=?, tariff=?";
-        }else if(q.user==='Supplier'){
-            uid = md5(q.email);
-            values = [uid, psw, q.email,'tariff'];
-            sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
-        }
-        global.con_obj.query(sql, values, function (err, result) {
-            if (err) {
-                throw err;
-            }
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            try{
-                if (err) {
-                    res.end(JSON.stringify({err: err}));
-                }else{
-                    res.end(JSON.stringify({uid: uid,psw:psw}));
-                }
-            }catch(ex) {
-                res.end(JSON.stringify({err: ex}));
-            }
-        });
-
-    }
-
 
     updateOfferDB(q, res, sql, values,now){
         let that = this;
@@ -266,7 +253,8 @@ module.exports = class D2D {
         let ofobj = JSON.parse(offer);
         for(let tab in ofobj) {
             for (let item in ofobj[tab]) {
-                if(!ofobj[tab][item].img.src || ofobj[tab][item].img.src.includes(requrl)>0)
+
+                if(!ofobj[tab][item].img.src || ofobj[tab][item].img.src.includes('http')>0)
                     continue;
                 const base64Data = ofobj[tab][item].img.src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
                 const hash = md5(base64Data);
@@ -280,9 +268,9 @@ module.exports = class D2D {
 
                     });
 
-                    offer = offer.replace(ofobj[tab][item].cert[c].src,requrl+'/d2d/server/images/'+hash);
+                    offer = offer.replace(ofobj[tab][item].cert[c].src,hash);
                 }
-                offer = offer.replace(ofobj[tab][item].img.src,requrl+'/d2d/server/images/'+hash);
+                offer = offer.replace(ofobj[tab][item].img.src,hash);
             }
         }
         cb(offer);
@@ -303,7 +291,7 @@ module.exports = class D2D {
         const hash = md5(base64Data);
         let hn  = os.hostname();
         fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
-            cb(requrl+'/d2d/server/images/'+hash);
+            cb(hash);
         });
     }
 

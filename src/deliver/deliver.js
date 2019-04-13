@@ -50,7 +50,7 @@ class Deliver{
         this.email = uObj.set.profile.email;
 
         this.profile = new Profile(uObj.set.profile);
-        this.profile.InitDeliverProfile();
+        this.profile.InitDeliverProfile(this);
 
         this.map = new OLMap();
 
@@ -241,6 +241,9 @@ class Deliver{
                             }
                             that.offer.stobj.date = that.date;
                             delete that.offer.stobj.published;
+                            window.db.SetObject('offerStore',that.offer.stobj,function (res) {
+
+                            });
                         }
                     });
                 }else{

@@ -39,6 +39,14 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
+      <webServer id="b13ec357-d7d2-453f-9b5c-0f8ac622afa1" name="beget_server" url="http://a07513cy.beget.tech">
+        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/nedol/public_html/server">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

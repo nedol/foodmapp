@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
     <!--<meta name="description" content="360&deg; Image - A-Frame">-->
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2019 11:12:01 GMT">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Покупатель</title>
 </head>
@@ -14,11 +16,15 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
 <link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
 <link rel="stylesheet" href="../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js"></script>
+<script type="text/javascript" src="customer.js?v=3"></script>
 <script src="../lib/jquery.ui.touch-punch.min.js"></script>
+
+
 <style>
     html, body{
         padding: 0px;
@@ -26,6 +32,7 @@
         height: 100%;
         width: 100%;
     }
+
     .scaled{
         transform: scale(1.5)
     }
@@ -34,8 +41,9 @@
         margin: 0px;
         height: 100%;
         width: 100%;
-        position: fixed;
+        position: absolute;
         z-index: 0;
+        right: 0;
     }
 
     #marker {
@@ -49,38 +57,40 @@
         -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
         filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
     }
-    #dtp_container {
-        display: none;
-        position: absolute;
-        margin: auto;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-        width: 250px;
-        height: 250px;
-        z-index: 11;
-    }
 
-    #reg_button{
+
+    #profile_but{
         display: block;
-        position: absolute;
-        left: 10px;
-        top: 0%;
+        position: fixed;
+        right: 1%;
+        bottom:80%;
         width: 40px;
         height: 40px;
+        text-align: center;
         border-radius: 5px;
         background-color: rgba(200,200,200,0.7);
         z-index:2;
     }
 
+    #deliver_but{
+        display: block;
+        position: absolute;
+        right: 1%;
+        bottom:80%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        /*background-color: rgba(200,200,200,0.7);*/
+        z-index:2;
+    }
+
     #locText{
         display: inline-block;
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
+        position: fixed;
+        bottom: 0%;
+        right: 1%;
         width: 100px;
-        /*text-align: right;*/
+        text-align: right;
         /*left: 400px;*/
         color:red;
         font-size: small;
@@ -118,19 +128,6 @@
         z-index:10;
     }
 
-    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
-
-    @-webkit-keyframes bounce {
-        0%       { -webkit-transform:  scale(1, 1);}
-        25%      { -webkit-transform:  scale(1.2, 1.2);}
-        50%      { -webkit-transform:  scale(0.7, 0.7);}
-        75%      { -webkit-transform:  scale(1.1, 1.1);}
-        100%     { -webkit-transform:  scale(1, 1);}
-    }
-    .grow { transition: all .2s ease-in-out; }
-    .grow:hover { transform: scale(1.75); }
 
     #my_truck{
         display: block;
@@ -154,17 +151,16 @@
 
     #zoom_but{
         display:block;
-        position: absolute;
+        position: fixed;
         /*z-index:30;*/
         color: #1b1b1b;
         top: 50%;
-        right: 10px;
+        right: 1%;
         width: 40px;
-        height: 40px;
+        height: 30px;
         /*line-height: auto;*/
         border: solid 1px grey;
         text-align:center;
-        vertical-align:middle;
         font-size: 170%;
         font-weight: bold;
         border-radius: 5px;
@@ -176,7 +172,7 @@
         display: block;
         position: fixed;
         right: 1%;
-        bottom: 10%;
+        bottom: 20%;
         width: 40px;
         height: 40px;
         border-radius: 5px;
@@ -231,7 +227,7 @@
 <div id="map" class="map"></div>
 
 <section id="marker" title="kolobot">
-    <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
+    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px" crossorigin="anonymous"/>
 </section>
 
 <style>
@@ -241,18 +237,35 @@
     /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
 </style>
 
-<div class="dropdown">
-    <button id="reg_button" class="btn btn-default dropdown-toggle scaled" type="button"
-            onclick="window.user.OnClickUserProfile()"  data-toggle="dropdown" data-width="fit" style="display:inline-block;float:left">
+<div>
+    <button id="profile_but" class="btn btn-default" type="button"
+            onclick="window.user.OnClickUserProfile()" style="display:inline-block;float:left">
         <a href="#">
-            <span class="glyphicon glyphicon-user"></span>
+            <span class="glyphicon glyphicon-user scaled"></span>
         </a>
     </button>
 </div>
 
-<div id="main_window" class="container">
+<input type="image" id="deliver_but" src="https://nedol.ru/server/images/1415f4832d63cb093b61696c3bff87ee"
+       style="display:none;position:absolute;left:1%;bottom:80%;width:40px;"
+       onclick="window.user.OnClickDeliver(this)"/>
+
+
+
+<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
+<span id="locText" style="font-family: serif">Lat Lon</span>
+
+<img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
+
+<div id="main_window">
     <div>
-        <div class="date_ctrl form-group">
+        <div class="date_ctrl form-group"  style="position:fixed;right:0px;top:1px;">
             <div class='input-group date' style="width:auto" >
                 <input type='text' class="form-control dt_val"/>
                 <span class="input-group-addon">
@@ -260,7 +273,7 @@
                 </span>
 
                 <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
-                    data-width="fit" style="display:inline-block;float:right">
+                        data-width="fit" style="display:inline-block;float:right">
                     <span class="caret"></span>
                 </button>
                 <ol id="period_list" class="dropdown-menu period_list" role="menu">
@@ -278,23 +291,30 @@
             </div>
         </div>
     </div>
+    <style>
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:40%;
+            right:60%;
+            top:40%; bottom:60%;
+            z-index: 11;
+        }
+    </style>
     <div id="dtp_container">
-        <div id="datetimepicker" style="display: inline-block"></div>
-    </div>
-
-    <div class="row" style="display:none;position:fixed;bottom:0%;width: 80%;left: 10%">
-        <div class="col-xs-12">
-            <div class="panel-group">
-                <div class="panel panel-default"  align="center">
-                    <div class="panel-heading">Panel Header</div>
-                    <div class="panel-body">Panel Content</div>
-                </div>
-            </div>
+        <div id="datetimepicker"
+             style="
+             display: block;
+             position: absolute;
+             transform: scale(2.2);
+              margin:0 auto;">
         </div>
     </div>
 </div>
 
-<div id="category_include" style="display:none">
+<div id="category_include" style="display:none;
+             /*overflow-y: hidden;*/
+  	         overflow-y: scroll;">
     <style>
         .category{
             margin-left: 50px;
@@ -312,7 +332,7 @@
 
         #categories{
             position: fixed;
-            top:0px;
+            bottom:0px;
             width:100%;
             padding-top: 5px;
             background-color: rgba(0, 140, 201, 1.0);
@@ -323,23 +343,23 @@
     </style>
 
     <div id="category_container">
-        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px; right: 50%; left:50%"/>
+        <img src="https://nedol.ru/d2d/dist/images/ic_menu.png" style="position: absolute;width: auto; height: 20px; bottom: 20px; right: 50%; left:50%"/>
     </div>
 
     <div align="center" id="categories">
-        <input type="image" class="category" cat="food" id="0" title="Food" src="../dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
-        <input type="image" class="category" cat="veges" id="10" title="Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
-        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
-        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
-        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
-        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="../dist/images/ic_60.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../dist/images/ic_70.png" state="1"  data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
-        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
-        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="../dist/images/ic_90.png" state="0"  data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
-        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
-        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="food" id="0" title="Food" src="https://nedol.ru/d2d/dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="veges" id="10" title="Veges" src="https://nedol.ru/d2d/dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="https://nedol.ru/d2d/dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="https://nedol.ru/d2d/dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="https://nedol.ru/d2d/dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="https://nedol.ru/d2d/dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="https://nedol.ru/d2d/dist/images/ic_60.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="https://nedol.ru/d2d/dist/images/ic_70.png" state="1"  data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
+        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="https://nedol.ru/d2d/dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
+        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="https://nedol.ru/d2d/dist/images/ic_90.png" state="0"  data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="https://nedol.ru/d2d/dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="https://nedol.ru/d2d/dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="https://nedol.ru/d2d/dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
     </div>
 
     <script>
@@ -352,367 +372,36 @@
     </script>
 
 </div>
+<div>
+    <div id="client_frame_container"
+         class=""
+         style="display:none;
+             z-index:2000;
+             position: absolute;
+             height: 100%;
+             max-height: 100% !important;
+             min-height: 50% !important;
+             /*width: 100%;*/
+             /*max-width: 95%;*/
+             -webkit-overflow-scrolling: auto;
+             /*overflow-y: hidden;*/
+             overflow-x: auto;
+             white-space: nowrap;
+             /*padding-bottom: 10px;*/
+  	         overflow-y: scroll;
+             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
-<div id="offer_order" class="order_container" style="
-     display: none; position: absolute;
-     color:black;  background-color: #f0f0f0;
-     overflow-x: hidden; overflow-y: hidden; z-index:1000; margin: auto;
-     width:84%;  left: 0; right:0;top:5%;bottom:5%;
-     border: solid 0px lightslategrey;
-     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <div style="display: inline-block; position:absolute; font-size:xx-large; right: 10px; padding-left: 20px;">
-        <span class="close_browser glyphicon glyphicon-remove-sign" title="Опубликовать и закрыть"></span>
     </div>
 
-    <ul class="nav nav-tabs">
-        <li>
-            <div  data-toggle="tab"  href="#profile" style="height: 50px; width: 180px">
-                <img src="./images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
-                     style="max-width:60px;max-height:60px;">
-                <div class="sup_container" style="position: absolute;top:0px;left: 60px;background-color: transparent; color:grey">
-                    <!-- botstrap-rating doesn't work here-->
-                    <!--<input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>-->
-                    <div class="rating_container"></div>
-                    <div class="name" style="display:none">name</div>
-                    <!--<div class="email">supplier@d2d.com</div>-->
-                </div>
-            </div>
-        </li>
-        <li class="active"><a data-toggle="tab" href="#order" data-translate="">Заказ</a></li>
-
-        <form class="navbar-form navbar-middle" action="#" style="text-align: center">
-            <div class="input-group" style="width:50%;">
-                <textarea type="text" class="address form-control" rows="1" placeholder="Введите адрес доставки" name="address"
-                    style="text-align: center;background-color:transparent;color: #737373;border-color: #737373"></textarea>
-            </div>
-        </form>
-    </ul>
-
-    <div class="tab-content">
-        <div class="tab-pane active" id="order" style="width: 97%;  margin: 0 auto;">
-            <style>
-                .order-content{
-                    position: absolute;
-                    height: 90%;
-                    width: 98%;
-                    left: 1%;
-                    margin: auto;
-                }
-                .order-header{
-                    display:none;
-                    position: relative;
-                    color:white;
-                    width: 100%;
-                }
-
-                .order-body{
-                    position: relative;
-                    height:95%;
-                    width: 100%;
-                    margin: auto;
-                    color: #ffffff;
-                    padding:9px 15px;
-
-                }
-                .order-footer {
-                    position: relative;
-                    height:5%;
-                    padding: 9px 10px;
-                    border-bottom: 0px solid black;
-                    border-top: 0px;
-                    -webkit-border-top-left-radius: 5px;
-                    -webkit-border-top-right-radius: 5px;
-                    -moz-border-radius-topleft: 5px;
-                    -moz-border-radius-topright: 5px;
-                    border-top-left-radius: 5px;
-                    border-top-right-radius: 5px;
-                }
-                .comment{
-                    position: absolute;
-                    height:100%;
-                    text-align:left;
-                    width: 99%;
-                    font-family:'Segoe Script';
-                    font-size: large;
-                    color: #ff6d6b;
-                    border-color: #737373
-                }
-                textarea:focus {
-                    outline: none !important;
-                    border-color: #719ECE;
-                    box-shadow: 0 0 10px #719ECE;
-                }
-                .tab-content::-webkit-scrollbar {
-                    width: 0 !important;
-                }
-                li {
-                    float: left;
-                }
-
-                li a {
-                    display: inline-block;
-                    text-align: center;
-                    padding: 14px 16px;
-                    text-decoration: none;
-                }
-
-                li a:hover, .dropdown:hover .dropbtn {
-
-                }
-
-                .dropdown {
-                    display: inline-block;
-                }
-
-                .dropdown-content {
-                    display: none;
-                    position: absolute;
-                    background-color: #f9f9f9;
-                    min-width: 160px;
-                    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
-                    z-index: 1;
-                }
-
-                .dropdown-content a {
-                    color: white;
-                    padding: 12px 16px;
-                    text-decoration: none;
-                    display: block;
-                    text-align: left;
-                }
-
-                .dropdown-content a:hover {background-color: #f1f1f1}
-
-                .dropdown:hover .dropdown-content {
-                    display: block;
-                }
-                textarea{
-                    background-color: white;
-                }
-                [href=".tacollapse"]{
-                    color: whitesmoke;
-                    font-size: 30px;
-                }
-                .custom-star {
-                    font-size: 1.0em;
-                    color: red;
-                }
-            </style>
-            <div class="order-content">
-                <div class="order order-header">
-                    <div class="row" style="display: inline-block; width:95%; margin: 0 auto;">
-
-                        <div class="col-sm-3 col-xs-3">
-
-                        </div>
-
-                        <div class="col-sm-6 col-xs-6">
-                            <div>
-                                <textarea name="address" class="address form-control" rows="1" contenteditable="true"
-                                     placeholder="Введите адрес доставки"
-                                    style="text-align: center; background-color:#e6e6e6;color: #c4e3f3;border-color: #737373"></textarea>
-                            </div>
-                        </div>
-
-                        <div class="col-sm-3 col-xs-3">
-                        </div>
-                    </div>
-                    <div class="ord_status" style="position: absolute;right: 0;bottom: 0; color:grey;font-size: x-small;"></div>
-                </div>
-                <div class="order order-body">
-                    <div class="row" style="float: right; word-wrap: break-word; width: 40%;margin-right: 10px; text-align:center;padding: 20px 0px 0px; color:gray">
-                        <h5 class="col-sm-3 col-xs-3" style="display: inline;">Расфасовка:</h5>
-                        <h5 class="col-sm-3 col-xs-3" style="display: inline;" >Цена:</h5>
-                        <h5 class="col-sm-3 col-xs-3"  style="display: inline;">Количество:</h5>
-                        <h5 class="col-sm-3 col-xs-3"  style="display: inline;">Подтверждено:</h5>
-                    </div>
-
-                    <ul class="nav nav-tabs menu_tabs" style="">
-                        <li id="add_tab_li" title="add tab" style="display: none;">
-                            <!--<span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>-->
-                        </li>
-                    </ul>
-                    <div class="tab-content"  style="position:relative;height: 95%;overflow-y: scroll;">
-                        <div id="add_tab_div" class="tab-pane fade"></div>
-                    </div>
-                </div>
-
-                <div class="order order-footer">
-                    <!--<span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>-->
-                    <textarea  class="input  comment" rows="3" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
-                </div>
-            </div>
-
-            <style>
-                #menu_item_tmplt {
-                    display: none;
-                }
-                .label{
-                    text-align: center;
-                    white-space: nowrap;
-                }
-                .ctrl{
-                    font-family: "arial";
-                    font-size: x-large;
-                    padding: 10px;
-                }
-                .menu_item{
-                    position: relative;
-                    border-radius: 5px;
-                    border: 0px solid #343434;
-                    padding-left: 5px;
-                    margin: 5px;
-                    width: 98.7%;
-                    height: auto;
-                    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
-                }
-
-                .item_title:focus{
-                    outline: none !important;
-                    border-color: #719ECE;
-                    box-shadow: 0 0 10px #719ECE;
-                }
-                .item_title{
-                    display: inline-block;
-                    position: absolute;
-                    width: 50%;
-                    top:5px;
-                    background-color: transparent;
-                    font-family:"Courier New";
-                    font-weight:bold;
-                    font-size: x-large;
-                    color:#0088bb;
-                    border-width: 0px;
-                }
-
-                .content_text{
-                    color: grey;
-                    width: 100%;
-                    overflow-y: scroll;
-                    font-family:'Segoe Script';
-                    font-size: medium;
-                    margin-left:10px;
-                    background-color: transparent;
-                    border-width: 0;
-                    -webkit-appearance: textarea;
-                    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                    box-sizing: border-box;         /* IE 8+ */
-                }
-
-                .item_price{
-                    color: #0088bb;
-                    position: relative;
-                    font-weight:normal;
-                    font-size:24px;
-                    word-wrap:normal
-                }
-                .item_pack{
-                    color: #0088bb;
-                    position: relative;
-                    font-weight:normal;
-                    font-size:24px;
-                    word-wrap:normal
-                }
-                .qnty{
-                    color: #0088bb;
-                    position: relative;
-                    font-weight:normal;
-                    font-size:18px;
-                }
-                [contentEditable=true]:empty:not(:focus):before{
-                    content:attr(placeholder);
-                    color:gray;
-                }
-
-
-
-            </style>
-            <div  id="menu_item_tmplt" style="display:none;background-color: #f0f0f0;">
-                <!--<div class="supuid" style="display: none"></div>-->
-                <div class="row  menu_item_row">
-                    <div style="display:inline-block;">
-                        <div type="text" class="item_title input input-sm"  data-translate contenteditable="false" placeholder="название" data-toggle="collapse"></div>
-                    </div>
-                    <div  class="row" style="display:inline-block;width:40%;float: right; text-align: center">
-                        <div class="pack_container col-sm-3 col-xs-3" style="display:inline-block;background-color:#f0f0f0;visibility: hidden;">
-                            <div class="dropdown">
-                                <ul class="pack_list dropdown-menu" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
-
-                                <div class="item_pack input dropdown-toggle" data-toggle="dropdown"  placeholder="     гр."
-                                     style="display:inline-block;font-weight:normal;font-size:24px;white-space: nowrap;">
-                                </div>
-                                <span class="caret" style="display:inline-block;"></span>
-                            </div>
-                        </div>
-
-                        <div class="input item_price  col-sm-3 col-xs-3" placeholder="руб"
-                             style="display:inline-block;background-color:#f0f0f0;font-weight:normal;font-size:24px;white-space: nowrap;">
-                        </div>
-
-                        <div class="row col-sm-3 col-xs-3"  style="display: inline-block; white-space: nowrap;color:grey;">
-
-                            <span class="reduce ctrl scaled glyphicon glyphicon-minus"
-                                  onclick="
-                                if(parseInt($(this).siblings('.btn').text())>0){
-                                    $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())-1);
-                                    if(parseInt($(this).siblings('.btn').text())===0)
-                                        $(this).closest('.menu_item').attr('deleted', true);
-                                }
-                            "></span>
-                            <button class="amount input btn btn-sm btn-primary" type="button"
-                                    style="vertical-align: top; font-size: large">0
-                            </button>
-                            <span class="increase ctrl scaled glyphicon glyphicon-plus" onclick="
-                                $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())+1);
-
-                            "></span>
-
-                        </div>
-                        <div class="period_div  col-sm-3 col-xs-3" style="visibility: hidden;display:inline-block;color: red;vertical-align: middle;">
-                            <div class="ordperiod" style="font-size: .75em;white-space: nowrap;">Время доставки</div>
-                            <div style="text-align: center">
-                                <span class="fa fa-handshake-o approved" style="font-size: 20px;"></span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="item_content collapse">
-                        <div class="row">
-                            <div class="col-sm-10 col-xs-10">
-                                <div class="content">
-                                    <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate disabled>
-                                    </textarea>
-                                </div>
-                                <div class="gallery" style="position: relative;float: left;margin-left: 20px"></div>
-                            </div>
-                            <div class="col-sm-2 col-xs-2">
-                                <img class="input img-fluid center-block" style="width:90%; margin-right: 50px" src="">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        </div>
-
-        <div class="tab-pane" id="profile">
-            <div class="browser_container" id="profile_container"
-                 style="display:block;
-                 overflow: visible; z-index:2147483646;
-                 position: absolute;
-                 height: 90%;
-                 /*width:90%; */
-                 left: 1%; right: 1%;
-                 max-height: 98% !important;
-                 min-height: 50% !important;
-
-                 border: solid 0px lightslategrey;
-                 box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-                <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
-            </div>
-        </div>
-    </div>
+    <iframe class="client_frame_tmplt"  src="./client/client.html?v=1"
+        style="
+            display:none;
+            position:relative;
+            overflow: hidden;
+            z-index: 10;
+            width:100%;
+            height: 100%">
+    </iframe>
 
 </div>
 
@@ -720,6 +409,7 @@
      style="display:none;
          overflow: visible; z-index:2000;
          position: absolute;
+         -webkit-overflow-scrolling: auto;
          height: auto;
          max-height: 80% !important;
          min-height: 50% !important;
@@ -729,16 +419,12 @@
     <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
 
-<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
-<span id="locText" style="font-family: serif">Lat Lon</span>
 
-<img id="search_but"  src="../dist/images/ic_map_search.png" title="Search">
-<section id="loc_ctrl"  title="Location">
-    <img id="location_img" src="../dist/images/ic_location.png">
-    <img id="pin" src="../dist/images/ic_pin.png">
-</section>
-<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
 
+<div class="alert alert-warning alert-dismissible fade">
+    <button type="button" class="close">&times;</button>
+    <h3></h3>
+</div>
 
 <data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
 

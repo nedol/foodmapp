@@ -25,6 +25,14 @@ Date.prototype.addDays = function(days) {
 
 class Utils{
 
+    JSONParse(result) {
+        try {
+            return JSON.parse(result);
+        } catch (e) {
+            throw e;
+        }
+    }
+
     getParameterByName(name, url) {
         if (!url) url = window.location.href;
         name = name.replace(/[\[\]]/g, "\\$&");
@@ -50,6 +58,32 @@ class Utils{
         } catch (err) {}
         return false;
     }
+
+    parseURL(url) {
+        var parser = document.createElement('a'),
+            searchObject = {},
+            queries, split, i;
+        // Let the browser do the work
+        parser.href = url;
+        // Convert query string to object
+        queries = parser.search.replace(/^\?/, '').split('&');
+        for( i = 0; i < queries.length; i++ ) {
+            split = queries[i].split('=');
+            searchObject[split[0]] = split[1];
+        }
+        return {
+            protocol: parser.protocol,
+            host: parser.host,
+            hostname: parser.hostname,
+            port: parser.port,
+            pathname: parser.pathname,
+            search: parser.search,
+            searchObject: searchObject,
+            hash: parser.hash
+        };
+    }
+
+
 
     QueryMethod(protocol,options, postData, res, cb) {
         let http_;
@@ -77,6 +111,26 @@ class Utils{
 
     }
 
+    loadScript(src, callback) {
+
+        var head = document.getElementsByTagName('head')[0],
+            script = document.createElement('script');
+        done = false;
+        script.setAttribute('src', src);
+        script.setAttribute('type', 'text/javascript');
+        script.setAttribute('charset', 'utf-8');
+        script.onload = script.onreadstatechange = function() {
+            if (!done && (!this.readyState || this.readyState == 'loaded' || this.readyState == 'complete')) {
+                done = true;
+                script.onload = script.onreadystatechange = null;
+                if (callback) {
+                    callback();
+                }
+            }
+        }
+        head.insertBefore(script, head.firstChild);
+    }
+
     resizeBase64Img(base64, width, height) {
         var canvas = document.createElement("canvas");
         canvas.width = width;
@@ -91,10 +145,10 @@ class Utils{
         return deferred.promise();
     }
 
-    createThumb(el){
+    createThumb(el, maxWidth){
         var thmbImg = loadImage.scale(
             $(el)[0], // img or canvas element
-            {maxWidth: 50}
+            {maxWidth: maxWidth?maxWidth:50}
         );
         return thmbImg.src;
     }

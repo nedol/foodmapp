@@ -31,7 +31,9 @@ module.exports = class Customer extends D2D{
         let sql = "SELECT user.*" +
             " FROM " + q.user.toLowerCase() + " as user" +
             " WHERE user.uid='" + q.uid + "'";
-
+        // res.writeHead(200, {'Content-Type': 'application/json'});
+        // res.end(JSON.stringify(sql));
+        // return;
         global.con_obj.query(sql, function (err, result) {
             if (err)
                 throw err;
@@ -129,8 +131,8 @@ module.exports = class Customer extends D2D{
             if (err) {
                 throw err;
             }
-            res.writeHead(200, {'Content-Type': 'application/json'});
 
+            res.writeHead(200, {'Content-Type': 'application/json'});
             if (result.length === 0) {
                 res.end(JSON.stringify({"err": "Аккаунт не используется в системе"}));
                 return;
@@ -171,7 +173,7 @@ module.exports = class Customer extends D2D{
             "SELECT ord.*"+ //, tar.options as tariff"+ // cus.email as cusuid,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  customer as cus, orders as ord" +
             //", tariff as tar"+
-            " WHERE ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
+            " WHERE ord.supuid='"+q.supuid+"'  AND ord.cusuid='"+q.cusuid+"'" +
             " AND cus.psw=\""+q.psw+"\"" +
             //" AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
             " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
@@ -211,9 +213,9 @@ module.exports = class Customer extends D2D{
         let sql =
             "SELECT ord.*,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
             " FROM  supplier as sup, offers as of, customer as cus, orders as ord"+
-            " WHERE sup.email=\'"+q.supuid+"\' AND sup.uid=\'"+q.uid+"\'" +
+            " WHERE sup.email='"+q.supuid+"' AND sup.uid='"+q.uid+"'" +
             " AND of.sup_uid=sup.uid AND cus.email=ord.cusuid AND ord.cusuid=\""+q.cusuid+"\" AND ord.date=\""+q.date+"\"" +
-            " AND ord.date=\'"+q.date+"\'"+
+            " AND ord.date='"+q.date+"'"+
             " ORDER BY of.id DESC";
 
         global.con_obj.query(sql, function (err, sel) {
@@ -282,30 +284,36 @@ module.exports = class Customer extends D2D{
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
             " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL";
-
+        // if (!res._header)
+        //     res.writeHead(200, {'Content-Type': 'application/json'});
+        // res.end(JSON.stringify(sql));
+        // return;
         global.con_obj.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
             res.writeHead(200, {'Content-Type': 'application/json'});
+
             let now = moment().format('YYYY-MM-DD');
             sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date='"+now+"' WHERE uid='"+q.uid+"'";
 
             global.con_obj.query(sql, function (err, result) {
                 if (err) {
-                    console.log(JSON.stringify({'err':err}));
+                    throw err;
                 }
             });
 
             if(result.length>0) {
                 for(let i in result) {
                     let cats = JSON.parse(result[i].cats);
+
                     if (intersection(cats, q.categories).length > 0) {
 
                     }else{
                         delete result[i];
                     }
                 }
+
                 res.write(urlencode.encode(JSON.stringify(result)));
             }
 
@@ -384,14 +392,14 @@ module.exports = class Customer extends D2D{
         let sql = " SELECT sup.email as email" +
             " FROM supplier as sup" +
             " WHERE" +
-            " SPLIT_STR(sup.region,',',1)<\'"+q.location[1]+"\' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(sup.region,',',3)<\'"+q.location[0]+"\' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"\'"+
+            " SPLIT_STR(sup.region,',',1)<'"+q.location[1]+"' AND SPLIT_STR(sup.region,',',2)>'"+q.location[1]+"'"+
+            " AND SPLIT_STR(sup.region,',',3)<'"+q.location[0]+"' AND SPLIT_STR(sup.region,',',4)>'"+q.location[0]+"'"+
             " UNION" +
             " SELECT cus.email as email" +
             " FROM customer as cus" +
             " WHERE " +
-            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"\'"+
-            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"\'";
+            " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"'"+
+            " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"'";
 
         global.con_obj.query(sql, function (err, result) {
             if (err) {

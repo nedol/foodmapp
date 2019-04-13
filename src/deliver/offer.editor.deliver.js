@@ -13,9 +13,8 @@ require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
 let Dict = require('../dict/dict.js');
 const langs = require("../dict/languages");
 
+var Url = require('url-parse');
 // var moment = require('moment');
-
-
 
 
 import {Utils} from "../utils/utils";
@@ -30,6 +29,11 @@ class OfferEditorDeliver{
         this.changed = false;
 
         this.arCat = [];
+
+
+        this.path  = window.location.origin +"/d2d/";
+        if(host_port.includes('nedol.ru'))
+            this.path = host_port;
 
     }
 
@@ -142,7 +146,7 @@ class OfferEditorDeliver{
                         $(menu_item).find('.item_total').val(parseInt(base.packlist[pack])+parseInt(offer.data[tab][i].markuplist[pack]));
                         $(menu_item).find('.item_price').val(parseInt(base.packlist[pack]));
                         window.dict.dict = Object.assign(sup.dict.dict, window.dict.dict);
-                        this.lang = window.sets.lang;
+                        that.lang = window.sets.lang;
                         window.dict.set_lang(window.sets.lang,$(menu_item));
 
                     });
@@ -202,7 +206,8 @@ class OfferEditorDeliver{
 
                     if (offer.data[tab][i].img) {
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                        $(menu_item).find('.img-fluid').attr('src', offer.data[tab][i].img.src);
+                        $(menu_item).find('.img-fluid').attr('hash',offer.data[tab][i].img.src);
+                        $(menu_item).find('.img-fluid').attr('src', that.path+'/images/'+offer.data[tab][i].img.src);
                     }
 
                     $(menu_item).find('.img-fluid').attr('id', 'img_' + tab +'_'+of+ '_' + i);
@@ -617,7 +622,7 @@ class OfferEditorDeliver{
                     img.src = data;
                     img.height = '50';
                     $("#" + el.id).append(img);
-                    $(img).on('click',that.onClickCert);
+                    $(img).on('click',that.onClickImage);
                     that.MakeDraggable(img);
                 }
 
@@ -915,10 +920,8 @@ class OfferEditorDeliver{
                 item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
-                    item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-                    let left =$(miAr[i]).find('.img-fluid').css('left');
-                    item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
-                    item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
+
+                    item.img = {src: $(miAr[i]).find('.img-fluid').attr('hash')};
 
                 }else {
                     delete item.img;

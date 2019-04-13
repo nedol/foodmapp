@@ -32,6 +32,11 @@ class MapEvents{
                 window.user.isShare_loc = false;
             }
 
+            // $('.menu_item', $('.client_frame').contents()).remove();
+            // $('#client_frame_container').css('display','none');
+            // $('.carousel-indicators', $('.client_frame').contents()).empty();
+            // $('.carousel-inner', $('.client_frame').contents()).empty();
+
             var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
 
             var latlon = proj.toLonLat(event.coordinate);
@@ -63,6 +68,7 @@ class MapEvents{
                 let period = $('.sel_period').text().split(' - ');
                 if(feature.values_)
                 if(feature.values_.features && feature.values_.features.length >1) {//cluster
+
                     var coordinates = [];
                     $.each(feature.values_.features, function (key, feature) {
                         coordinates.push(feature.getGeometry().flatCoordinates);
@@ -80,6 +86,7 @@ class MapEvents{
 
                         });
                 }else {
+
                     if(feature){
                         if(feature.values_.features && feature.values_.features.length === 1)
                             feature = feature.values_.features[0];
@@ -90,15 +97,23 @@ class MapEvents{
                                     if (window.user.constructor.name === 'Supplier') {
                                         //window.user.viewer = new OfferViewer(obj.dict);
                                         $("a[href=#profile]").text('Мой профиль')
-                                    }else if (window.user.constructor.name === 'Deliver')
-                                        window.user.viewer = new OfferViewer(obj.dict);
+                                    }else if (window.user.constructor.name === 'Deliver') {
 
-                                    else if (window.user.constructor.name === 'Customer') {
+                                        window.user.viewer = new OfferViewer(obj.dict);
+                                        window.user.profile.InitDeliverProfile(obj);
+
+                                        window.user.viewer.OpenOffer(obj);
+
+                                        // window.user.viewer = new OfferOrder();
+                                        // window.user.viewer.InitCustomerOrder(obj);
+
+                                    }else if (window.user.constructor.name === 'Customer') {
                                         if (!window.user.viewer) {
                                             window.user.viewer = new OfferOrder();
                                         }
+                                        window.user.viewer.InitCustomerOrder(obj);
                                     }
-                                    window.user.viewer.OpenOffer(obj);
+
                                 }
                             });
                         } else if (feature.values_.type === 'customer') {
@@ -116,19 +131,19 @@ class MapEvents{
 
 
         this.map.ol_map.on('movestart', function (event) {
-
+            $(this).trigger('click');
             //Map.getLayers().item(0).setProperties({opacity: 1.0, contrast:1.0});//setBrightness(1);
 
             //var extent = Map.getView().calculateExtent(Map.getSize());
 
-            if (!event.loc_mode && $('#categories').is(':visible'))
-                $('#categories').slideToggle('slow', function () {
+            // if (!event.loc_mode && $('#categories').is(':visible'))
+            //     $('#categories').slideToggle('slow', function () {
+            //
+            //     });
 
-                });
-
-            if (!event.loc_mode && $('#menu_items').is(':visible'))
-                $('#menu_items').slideToggle('slow', function () {
-                });
+            // if (!event.loc_mode && $('#menu_items').is(':visible'))
+            //     $('#menu_items').slideToggle('slow', function () {
+            //     });
 
         });
 

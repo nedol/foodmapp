@@ -1,16 +1,21 @@
 'use strict'
 export {Supplier};
 
-let utils = require('../utils/utils');
+import {Utils} from "../utils/utils";
+let utils = new Utils();
+
 var isJSON = require('is-json');
 
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
 require('bootstrap');
+require('bootstrap-select');
 
+require('bootstrap/js/modal.js');
 import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
+import 'tablesorter/dist/css/theme.default.min.css';
 
 import {OLMap} from '../map/map'
 
@@ -31,15 +36,13 @@ var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-require('bootstrap');
-require('bootstrap-select');
 
-require('bootstrap/js/modal.js');
 
 
 class Supplier{
 
     constructor(uObj) {
+
 
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
@@ -54,7 +57,7 @@ class Supplier{
             this.email = uObj.set.profile.email;
 
             this.profile = new Profile(uObj.set.profile);
-            this.profile.InitSupplierProfile();
+            this.profile.InitSupplierProfile(this);
 
             this.map = new OLMap();
 
@@ -73,7 +76,7 @@ class Supplier{
 
         });
 
-        $.getJSON('../dict/sys.dict.json', function (data) {
+        $.getJSON('../src/dict/sys.dict.json', function (data) {
             window.sysdict = new Dict(data);
             window.sysdict.set_lang(window.sets.lang, $('body'));
             window.sysdict.set_lang(window.sets.lang, $('#categories'));
@@ -113,19 +116,24 @@ class Supplier{
             }
 
             window.network.postRequest(data_obj, function (data) {
-                for(let i in data){
-                    window.db.IsOffer(data.offer[i].date, function (res) {
-                        if(!res){
-                            //delete data.offer[i].id;delete data.offer[i].supuid;
+                if(data.err){
 
-                            data[i].location = proj.fromLonLat([data[i].longitude,data[i].latitude]);
-                            data[i].data = JSON.parse(data.offer[i].data);
-                            data[i].data.data = Object.assign(that.offer.stobj.data,data[i].data.data);
-                            window.db.SetObject('offerStore',data[i],function (res) {
+                }
+                else if(data.offer.length>0) {
+                    for (let i in data) {
+                        window.db.IsOffer(data.offer[i].date, function (res) {
+                            if (!res) {
+                                //delete data.offer[i].id;delete data.offer[i].supuid;
 
-                            });
-                        }
-                    });
+                                data[i].location = proj.fromLonLat([data[i].longitude, data[i].latitude]);
+                                data[i].data = JSON.parse(data.offer[i].data);
+                                data[i].data.data = Object.assign(that.offer.stobj.data, data[i].data.data);
+                                window.db.SetObject('offerStore', data[i], function (res) {
+
+                                });
+                            }
+                        });
+                    }
                 }
             });
             
@@ -374,10 +382,9 @@ class Supplier{
             func: 'updateoffer',
             uid: that.uid,
             psw: that.psw,
-            categories: that.editor.arCat,
+            categories: data.arCat,
             date:  date,
-            period: $('.sel_period').text(),
-            location: proj.toLonLat(data.offer.location),
+            location: proj.toLonLat(this.offer.stobj.location),
             radius: data.offer.radius,
             offer: urlencode.encode(JSON.stringify(menu)),
             dict: JSON.stringify(window.dict)
@@ -385,8 +392,9 @@ class Supplier{
 
         window.network.postRequest(data_obj, function (res) {
             let data = res;
-            if(data.err){
-                console.log(data.err.code);
+            if(data && data.err){
+                alert(data.err);
+                window.location.replace(data.link);
             }else if(data.result.affectedRows>0){
                 window.db.GetOffer(new Date(window.user.date), function (obj) {
                     obj[0].published = res.published;
@@ -445,6 +453,7 @@ class Supplier{
             }
         });
     }
+
 
     SendLocation(loc){
 

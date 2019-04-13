@@ -12,95 +12,9 @@
 
 <script src="customer_profile.js"></script>
 
-
     <style>
-        .scaled{
-            transform: scale(1.5)
-        }
-        .custom-star{
-            font-size: 2.5em;
-            color: red;
-        }
-         .label{
-             text-align: center;
-             white-space: nowrap;
-         }
-        .ctrl{
-            font-family: "arial";
-            font-size: x-large;
-            padding: 10px;
-        }
-        .menu_item{
-            position: relative;
-            color:white;
-            border-radius: 5px;
-            border: 1px solid #343434;
-            margin-bottom: 5px;
-            width: 100%;
-
-        }
-        #menu_item_tmplt {
-            display: none;
-        }
-        .item_title:focus{
-            outline: none !important;
-            border-color: #719ECE;
-            box-shadow: 0 0 10px #719ECE;
-        }
-        .item_title{
-            font-family:'Courier New';
-            font-size: x-large;
-            word-wrap: break-word;
-        }
-
-        .content_text{
-            font-family:'Segoe Script';
-            font-size: medium;
-            /*height: 240px;*/
-            /*width:100%;*/
-            border-width: 0px;
-            /*overflow:auto;*/
-            /*user-select: none;*/
-            /*-webkit-appearance: textarea;*/
-            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-            box-sizing: border-box;         /* IE 8+ */
-        }
-        .image_div{
-            position: absolute;
-            padding:15px;
-            right:0px;
-            bottom:0;
-        }
-        .item_price{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .item_pack{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:24px;
-            word-wrap:normal
-        }
-        .qnty{
-            color: #0088bb;
-            position: relative;
-            font-weight:normal;
-            font-size:18px;
-        }
-        [contentEditable=true]:empty:not(:focus):before{
-            content:attr(placeholder);
-            color:gray;
-        }
-
-    </style>
-    <style>
-    #menu_item_tmplt {
-        display: none;
+    .container{
+        -webkit-overflow-scrolling: touch;
     }
     .label{
         text-align: center;
@@ -180,9 +94,9 @@
         color:gray;
     }
 
-
-
 </style>
+<style id="menu_item_style"></style>
+
     <div class="dropdown" style="display: none">
         <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
                 data-width="fit" type="button" style="background-color: #ffffff">
@@ -216,7 +130,7 @@
                     <div class="tab-pane active" id="profile">
                         <div class="row">
                             <div class="col-sm-3 text-center">
-                                <img class="avatar img-circle img-thumbnail" src="../../door2door/dist/images/avatar_2x.png" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
+                                <img class="avatar img-circle img-thumbnail" src="https://nedol.ru/d2d/dist/images/avatar_2x.png" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
                                 <h6>Загрузить мою фотографию...</h6>
                                 <input type="file" class="center-block file-upload" style="display: none">
                             </div>
@@ -254,5 +168,5 @@
             </div>
         </div><!--/col-9-->
     </div><!--/row-->
-
+    <div id="menu_item_tmplt" style="display:none"></div>
 </html>

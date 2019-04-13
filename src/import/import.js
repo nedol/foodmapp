@@ -81,7 +81,7 @@ class Import {
             });
 
         }catch (ex) {
-            console.log();
+                                                                                                                                                                                                                                                                                                                                                                                                console.log();
         }
 
         function processResult(res) {

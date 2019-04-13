@@ -8,11 +8,15 @@ import Cluster from 'ol/source/cluster';
 import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
-
+import Projection from 'ol/proj/projection';
 import Point from 'ol/geom/point';
-import Feature from 'ol/feature';
-import proj from 'ol/proj';
 
+import proj from 'ol/proj';
+import Draw from 'ol/interaction/draw';
+
+import Circle from 'ol/geom/circle';
+import Collection from 'ol/collection';
+import Feature from 'ol/feature';
 import {Geo} from './location/geolocation';
 
 import {Categories} from "./categories/categories";
@@ -21,7 +25,6 @@ import {DB} from './storage/db';
 import {Layers} from './layers/layers';
 import {Events} from './events/events';
 
-// import {Feature} from "./events/feature.events";
 
 import {Marker} from "./marker/marker";
 
@@ -37,6 +40,19 @@ class OLMap {
         this.lat_param = '55.739';//getParameterByName('lat');
         this.lon_param = '37.687';//getParameterByName('lon');
         this.zoom_param = '15';//getParameterByName('zoom');
+
+        var projection = new Projection({
+            code: 'EPSG:3857',//'EPSG:4326', //
+            units: 'm'
+        });
+
+        let view =new View({
+            center: proj.fromLonLat([this.lon_param, this.lat_param]),
+            //rotation: Math.PI / 5,
+            // extent: proj.get("EPSG:3857").getExtent(),
+            //projection:projection,
+            zoom: 15
+        });
 
         this.osm = new OSM();
         if (!this.ol_map) {
@@ -56,19 +72,13 @@ class OLMap {
                         collapsible: false
                     })
                 }).extend([
-//            full_screen
+           // full_screen
                 ]),
                 target: 'map',
-                view: new View({
-                    center: proj.fromLonLat([this.lon_param, this.lat_param]),
-                    //rotation: Math.PI / 5,
-                    extent: proj.get("EPSG:3857").getExtent(),
-                    zoom: 17
-                })
+                view: view
             });
 
         }
-
 
 
         this.marker = new Marker( this, document.getElementById('marker'));
@@ -186,6 +196,41 @@ class OLMap {
                             });
 
                             layer.setSource(clusterSource);
+                        }else if(objs[o].profile.type === 'deliver'){
+                            objs[o].img = objs[o].profile.thmb;
+                            let clusterSource = new Cluster({
+                                distance: 150,
+                                source: source
+                            });
+                            layer.setSource(clusterSource);
+
+                            let circle_source = window.user.map.layers.circleLayer.getSource();
+
+                            let radiusFeature='';
+                            if(objs[o].radius_feature) {
+                                radiusFeature = objs[o].radius_feature;
+                            }else {
+                                radiusFeature = new Feature({
+                                    geometry: new Circle(proj.fromLonLat([objs[o].longitude, objs[o].latitude]), objs[o].radius*2),
+                                    //name: cursor.value.title ? cursor.value.title : "",
+                                    //tooltip: cursor.value.title ? cursor.value.title : "",
+                                    obj:objs[o]
+                                });
+
+                                objs[o].radius_feature = radiusFeature;
+
+                                let col = new Collection();
+                                col.push(radiusFeature);
+                                let draw = new Draw({
+                                    geometryName: 'circle',
+                                    source: source,
+                                    type: 'Circle',
+                                    features: col
+                                });
+                                circle_source.addFeature(radiusFeature);
+                            }
+
+
                         }
                     }
                 }
@@ -221,6 +266,7 @@ class OLMap {
             //Marker.overlay.setPosition(data.data[data.data.length-1]);
         });
     }
+
     MoveToLocation(location) {
         let that = this;
         that.ol_map.getView().animate({
@@ -234,6 +280,11 @@ class OLMap {
             $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
             $("#zoom_but").text(that.zoom_param ? that.zoom_param : 15);
         });
+    }
+
+    MoveToBound(bound){
+        let location = proj.fromLonLat([parseFloat(bound[2]), parseFloat(bound[0])]);
+        this.MoveToLocation(location);
     }
 
     SetBounds(obj) {

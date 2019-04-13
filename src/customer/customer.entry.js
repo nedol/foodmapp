@@ -2,7 +2,7 @@
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
+// require('jquery-ui-touch-punch');
 
 require('dialog-polyfill');
 
@@ -47,7 +47,7 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
-    $('.date_ctrl').draggable();
+    // $('.date_ctrl').draggable();
     let date;
 
     (function initDP() {
@@ -73,16 +73,14 @@ $(document).on('readystatechange', function () {
         date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         $('.dt_val').val(date);
 
-        let dt_w = $('#dtp_container').css('width');
-        let dt_h = $('#dtp_container').css('height');
-        let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
 
-        $(window).on("resize", function (event) {
-            let dt_w = $('#dtp_container').css('width');
-            let dt_h = $('#dtp_container').css('height');
-            scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
-        });
+        // //
+        // $(window).on("resize", function (event) {
+        //     let dt_w = $('#dtp_container').css('width');
+        //     let dt_h = $('#dtp_container').css('height');
+        //     let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
+        //     $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
+        // });
 
         $('#datetimepicker').data("DateTimePicker").toggle();
 
@@ -90,28 +88,31 @@ $(document).on('readystatechange', function () {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
 
-            $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
+            let dt_w = $('#dtp_container').css('width');
+            let dt_h = $('#dtp_container').css('height');
+            let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
+
+            $('#debug').text(scale);
+
+            // $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
         });
 
         $('#datetimepicker').on('dp.hide', function (ev) {
             $('#dtp_container').css('display', 'none');
         })
 
-        $('.glyphicon-calendar').on('click', function (ev) {
+        $('.glyphicon-calendar').on('click touchstart', function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
-        setTimeout(function () {
-            $('#datetimepicker').trigger("dp.change");
-            $('#datetimepicker').data("DateTimePicker").toggle();
-        }, 200);
     })();
 
 
-    // $(window).on( "orientationchange", function( event ) {
-    //     let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
-    //     $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
-    // });
+    $(window).on( "orientationchange", function( event ) {
+        console.log();
+    });
 
     window.network = new Network(host_port);
 
