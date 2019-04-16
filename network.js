@@ -66,8 +66,11 @@ class Network{
 
         let post_par = JSON.stringify(par);
         let cb_this = cb;
-        axios.post(this.host, post_par
-            , { crossDomain: true}
+
+        axios.post(this.host, post_par,
+            {
+                crossDomain: true
+            }
         )
             .then(function (response) {
                 cb_this(response.data);

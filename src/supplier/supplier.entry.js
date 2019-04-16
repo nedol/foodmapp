@@ -83,7 +83,7 @@ $(document).on('readystatechange', function () {
 
                             window.network.RegUser(uObj['set'], function (reg) {
                                 if (!reg || reg.err) {
-                                    $('.alert h3').text(reg.err).addClass('show');
+                                    alert(reg.err.message);
                                     return;
                                 }
                                 uObj.set.id = reg.id;
@@ -97,7 +97,6 @@ $(document).on('readystatechange', function () {
 
 
                     }else{
-
                         window.user = new Supplier(uObj);
                         window.user.IsAuth_test(function (data) {//TODO:
                         });

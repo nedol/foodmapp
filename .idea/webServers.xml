@@ -47,6 +47,14 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
+      <webServer id="c3765641-eaef-4ef2-85e4-316b90884d2b" name="a07513cy.bget.ru" url="http://a07513cy.bget.ru">
+        <fileTransfer host="a07513cy.bget.ru" port="21">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
     </option>
   </component>
 </project>

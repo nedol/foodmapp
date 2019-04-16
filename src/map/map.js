@@ -211,7 +211,7 @@ class OLMap {
                                 radiusFeature = objs[o].radius_feature;
                             }else {
                                 radiusFeature = new Feature({
-                                    geometry: new Circle(proj.fromLonLat([objs[o].longitude, objs[o].latitude]), objs[o].radius*2),
+                                    geometry: new Circle(proj.fromLonLat([objs[o].longitude, objs[o].latitude]), objs[o].radius),
                                     //name: cursor.value.title ? cursor.value.title : "",
                                     //tooltip: cursor.value.title ? cursor.value.title : "",
                                     obj:objs[o]
@@ -229,8 +229,6 @@ class OLMap {
                                 });
                                 circle_source.addFeature(radiusFeature);
                             }
-
-
                         }
                     }
                 }

@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1">-->
+
+    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Покупатель</title>
+</head>
+
+<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../../lib/style.css">
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" href="../../lib/datetimepicker/bootstrap-datetimepicker.css">
+
+<script type="text/javascript" src="../host.js"></script>
+<script type="text/javascript" src="../customer.js"></script>
+<script src="../../lib/jquery.ui.touch-punch.min.js"></script>
+
+
+<style>
+    html, body{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .scaled{
+        transform: scale(1.5)
+    }
+    .map{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        z-index: 0;
+    }
+
+    #marker {
+        display:block;
+        position:absolute;
+        bottom:0;
+        visibility:visible;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+    }
+    #dtp_container {
+        display: none;
+        position: absolute;
+        margin: auto;
+        top: 0;
+        right: 100%;
+        bottom: 0;
+        left: 50%;
+        width: 25%;
+        height: 25%;
+        z-index: 11;
+    }
+
+    #profile_but{
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 0%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:2;
+    }
+
+    #locText{
+        display: inline-block;
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 100px;
+        /*text-align: right;*/
+        /*left: 400px;*/
+        color:red;
+        font-size: small;
+        z-index:1;
+    }
+
+    #mouse_pos_div{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        left: 10px;
+        color:dimgrey;
+        font-size: small;
+    }
+
+    .thumb {
+        height: 75px;
+        border: 1px solid #000;
+        margin: 10px 5px 0 0;
+    }
+
+    #browser{
+        height: 100%;
+        width:100%;
+        border-radius: 15px 15px;
+        background-color: white;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        padding: 0px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index:10;
+    }
+
+    /*@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }*/
+    /*@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }*/
+    /*@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}*/
+
+    /*@-webkit-keyframes bounce {*/
+    /*0%       { -webkit-transform:  scale(1, 1);}*/
+    /*25%      { -webkit-transform:  scale(1.2, 1.2);}*/
+    /*50%      { -webkit-transform:  scale(0.7, 0.7);}*/
+    /*75%      { -webkit-transform:  scale(1.1, 1.1);}*/
+    /*100%     { -webkit-transform:  scale(1, 1);}*/
+    /*}*/
+    /*.grow { transition: all .2s ease-in-out; }*/
+    /*.grow:hover { transform: scale(1.75); }*/
+
+
+
+    #my_truck{
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #my_truck_2{
+        display: block;
+        position: absolute;
+        width: 50px;
+        height: 50px;
+        border-radius: 5px;
+        background-color: rgba(250,250,250,0);
+    }
+
+    #zoom_but{
+        display:block;
+        position: absolute;
+        /*z-index:30;*/
+        color: #1b1b1b;
+        top: 50%;
+        right: 1%;
+        width: 40px;
+        height: 40px;
+        /*line-height: auto;*/
+        border: solid 1px grey;
+        text-align:center;
+        vertical-align:middle;
+        font-size: 170%;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: whitesmoke;
+        cursor: n-resize;
+    }
+
+    #search_but{
+        display: block;
+        position: fixed;
+        right: 1%;
+        bottom: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #loc_ctrl {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 30%;
+        width: 40px;
+        height: 40px;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #location_img {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:10;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #pin {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: transparent;
+        z-index:12;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    .form-group{
+        position:absolute;
+        width:250px;
+        right:50px;
+        top:10px;
+        z-index: 10;
+    }
+
+</style>
+
+<body>
+
+<div id="map" class="map"></div>
+
+<section id="marker" title="kolobot">
+    <img src="../../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
+</section>
+
+<style>
+    #period_list .ui-selecting { background: #FECA40; }
+    #period_list .ui-selected { background: #F39814; color: white; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+</style>
+
+<div class="dropdown">
+    <button id="profile_but" class="btn btn-default dropdown-toggle scaled" type="button"
+            onclick="window.user.OnClickUserProfile()" data-toggle="dropdown" data-width="fit" style="display:inline-block;float:left">
+        <a href="#">
+            <span class="glyphicon glyphicon-user"></span>
+        </a>
+    </button>
+</div>
+
+
+<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
+<span id="locText" style="font-family: serif">Lat Lon</span>
+
+<img id="search_but" src="../images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="../images/ic_location.png">
+    <img id="pin" src="../images/ic_pin.png">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
+
+<div id="main_window" class="container">
+    <div>
+        <div class="date_ctrl form-group"  style="margin-right:10px;margin-top:2px;">
+            <div class='input-group date' style="width:auto" >
+                <input type='text' class="form-control dt_val"/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+
+                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
+                        data-width="fit" style="display:inline-block;float:right">
+                    <span class="caret"></span>
+                </button>
+                <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                    <li href="#">06:00 - 08:00</li>
+                    <li href="#">08:00 - 10:00</li>
+                    <li href="#">10:00 - 12:00</li>
+                    <li href="#">12:00 - 14:00</li>
+                    <li href="#">14:00 - 16:00</li>
+                    <li href="#">16:00 - 18:00</li>
+                    <li href="#">18:00 - 20:00</li>
+                    <li href="#">20:00 - 22:00</li>
+                    <li href="#">22:00 - 24:00</li>
+                </ol>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="dtp_container">
+        <div id="datetimepicker"
+             style="
+             display: block;
+             position: absolute;
+             transform: scale(2.4);
+             margin: auto;">
+        </div>
+    </div>
+</div>
+
+<div id="category_include" style="display:none">
+    <style>
+        .category{
+            margin-left: 50px;
+            margin-right: 50px;
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 40px;
+            /*width: 120px;*/
+        }
+
+        .category:hover{
+            /*height: 50px;*/
+            /*width: 50px;*/
+        }
+
+        #categories{
+            position: fixed;
+            top:0px;
+            width:100%;
+            padding-top: 5px;
+            background-color: rgba(0, 140, 201, 1.0);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index:100;
+        }
+    </style>
+
+    <div id="category_container">
+        <img src="../images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px; right: 50%; left:50%"/>
+    </div>
+
+    <div align="center" id="categories">
+        <input type="image" class="category" cat="food" id="0" title="Food" src="../images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="veges" id="10" title="Veges" src="../images/ic_10.png" state="1" data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="../images/ic_30.png" state="0" data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../images/ic_20.png" state="1" data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../images/ic_40.png" state="1" data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../images/ic_50.png" state="1" data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="../images/ic_60.png" state="0" data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../images/ic_70.png" state="1" data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
+        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
+        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="../images/ic_90.png" state="0" data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../images/ic_100.png" data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../images/ic_110.png" state="0" data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../images/ic_120.png" state="0" data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
+    </div>
+
+    <script>
+        function OnClickCat(el) {
+            let tab = $(el).parent().parent().find("a[data-toggle=tab]");
+            $(tab).text($(el).text());
+            $(tab).attr("cat",$(el).attr('cat'));
+            $(tab).trigger('click');
+        }
+    </script>
+
+</div>
+
+<style>
+    @media only screen and (orientation:portrait){
+        body {
+            /*height: 100vw;*/
+            transform: scale(1);
+        }
+        .date_ctrl{
+            transform: scale(2.5) translateX(-100px)
+        }
+        #offer_order{
+            width: 50vw;
+            height: 80vw;
+            transform: scale(2) translate(120px, 10px)
+        }
+    }
+    @media only screen and (orientation:landscape){
+        body {
+            /*height: 200vw;*/
+            /*width: 200vw;*/
+            transform: scale(1) /*translate(-300px, -300px);*/
+        }
+        .date_ctrl{
+            transform: scale(1.5)
+        }
+        #offer_order{
+            width: 80%;
+            right: 10%;left:10%;
+            /*height: 100vw;*/
+            transform: scale(1) /*translate(120px, 10px)*/
+        }
+    }
+</style>
+<div>
+    <div id="offer_order" class="order_container" style="
+         display: none; position: fixed;
+         color:black;  background-color: #f0f0f0;
+         overflow-x: hidden; overflow-y: hidden; z-index:1000; margin: auto;
+         top:5%;bottom:5%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+        <div style="display: inline-block; position:absolute; font-size:xx-large; right: 10px; padding-left: 20px;">
+            <span class="close_browser glyphicon glyphicon-remove-sign" title="Опубликовать и закрыть"></span>
+        </div>
+
+        <ul class="nav nav-tabs">
+            <li>
+                <div  data-toggle="tab"  href="#profile" style="height: 50px; width: 140px">
+                    <img src="../images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
+                         style="max-width:60px;max-height:60px;">
+                    <div class="sup_container" style="position: absolute;top:0px;left: 60px;background-color: transparent; color:grey">
+                        <!-- botstrap-rating doesn't work here-->
+                        <!--<input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>-->
+                        <div class="rating_container"></div>
+                        <div class="name" style="display:none">name</div>
+                        <!--<div class="email">supplier@d2d.com</div>-->
+                    </div>
+                </div>
+            </li>
+            <li class="active">
+                <a data-toggle="tab" href="#order" data-translate="">Заказ</a>
+            </li>
+
+            <form class="navbar-form navbar-middle" action="#" style="text-align: center">
+                <div class="input-group" style="width:50%;">
+                    <input type="address" class="address form-control" placeholder="Введите адрес доставки" name="address"
+                           style="text-align: center;background-color:transparent;color: #737373;border-color: #737373">
+                </div>
+            </form>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="order" style="width: 98%;  margin: 0 auto;">
+                <style>
+                    .order-content{
+                        position: absolute;
+                        height: 90%;
+                        width: 98%;
+                        left: 1%;
+                        margin: auto;
+                    }
+                    .order-header{
+                        display:none;
+                        position: relative;
+                        color:white;
+                        width: 100%;
+                    }
+
+                    .order-body{
+                        position: relative;
+                        height:95%;
+                        width: 100%;
+                        margin: auto;
+                        color: #ffffff;
+                        padding:9px 15px;
+
+                    }
+                    .order-footer {
+                        position: relative;
+                        height:5%;
+                        padding: 9px 10px;
+                        border-bottom: 0px solid black;
+                        border-top: 0px;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                    }
+                    .comment{
+                        position: absolute;
+                        height:100%;
+                        bottom:1px;
+                        text-align:left;
+                        width: 95%;
+                        font-family:'Segoe Script';
+                        font-size: large;
+                        color: #ff6d6b;
+                        border-color: #737373
+                    }
+                    textarea:focus {
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .tab-content::-webkit-scrollbar {
+                        width: 0 !important;
+                    }
+                    li {
+                        float: left;
+                    }
+
+                    li a {
+                        display: inline-block;
+                        text-align: center;
+                        padding: 14px 16px;
+                        text-decoration: none;
+                    }
+
+                    li a:hover, .dropdown:hover .dropbtn {
+
+                    }
+
+                    .dropdown {
+                        display: inline-block;
+                    }
+
+                    .dropdown-content {
+                        display: none;
+                        position: absolute;
+                        background-color: #f9f9f9;
+                        min-width: 160px;
+                        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                        z-index: 1;
+                    }
+
+                    .dropdown-content a {
+                        color: white;
+                        padding: 12px 16px;
+                        text-decoration: none;
+                        display: block;
+                        text-align: left;
+                    }
+
+                    .dropdown-content a:hover {background-color: #f1f1f1}
+
+                    .dropdown:hover .dropdown-content {
+                        display: block;
+                    }
+                    textarea{
+                        background-color: white;
+                    }
+                    [href=".tacollapse"]{
+                        color: whitesmoke;
+                        font-size: 30px;
+                    }
+                    .custom-star {
+                        font-size: 1.0em;
+                        color: red;
+                    }
+                </style>
+                <div class="order-content">
+                    <div class="order order-header">
+                        <div class="row" style="display: inline-block; width:100%; margin: 0 auto;">
+
+                            <div class="col-sm-3 col-xs-3">
+                            </div>
+
+                            <div class="col-sm-6 col-xs-6">
+                                <div>
+                                    <input type="address" class="address form-control" contenteditable="true"
+                                           placeholder="Введите адрес доставки"
+                                           style="text-align: center; background-color:#e6e6e6;color: #c4e3f3;border-color: #737373">
+                                </div>
+                            </div>
+
+                            <div class="col-sm-3 col-xs-3">
+                            </div>
+                        </div>
+                        <div class="ord_status" style="position: absolute;right: 0;bottom: 0; color:grey;font-size: x-small;"></div>
+                    </div>
+                    <div class="order order-body">
+                        <ul class="nav nav-tabs menu_tabs" style="">
+                            <li id="add_tab_li" title="add tab" style="display: none;">
+                                <!--<span class="glyphicon glyphicon-plus-sign add_tab" data-toggle="tab"  href="#add_tab" style="position: relative;opacity: .5;font-size: 30px;padding:10px; "></span>-->
+                            </li>
+                        </ul>
+                        <div class="tab-content"  style="position:relative;height:90%;overflow-y:auto;">
+                            <div id="add_tab_div" class="tab-pane fade"></div>
+                        </div>
+                    </div>
+
+                    <div class="order order-footer">
+                        <!--<span class="fa fa-comment-o" data-toggle="collapse" href=".tacollapse"></span>-->
+                        <textarea  class="input  comment" rows="3" data-translate placeholder="a38a2e843b153d64253d762e23696e17"></textarea>
+                    </div>
+                </div>
+            </div>
+            <style>
+                #menu_item_tmplt {
+                    display: none;
+                }
+                .label{
+                    text-align: center;
+                    white-space: nowrap;
+                }
+                .ctrl{
+                    font-family: "arial";
+                    font-size: x-large;
+                    padding: 10px;
+                }
+                .menu_item{
+                    position: relative;
+                    border-radius: 5px;
+                    border: 0px solid #343434;
+                    padding-left: 5px;
+                    margin: 5px;
+                    width: 97.5%;
+                    height: auto;
+                    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+                }
+
+                .item_title:focus{
+                    outline: none !important;
+                    border-color: #719ECE;
+                    box-shadow: 0 0 10px #719ECE;
+                }
+                .item_title{
+                    display: inline-block;
+                    position: relative;
+                    width: 90%;
+                    top:5px;
+                    background-color: transparent;
+                    font-family:"Courier New";
+                    font-weight:bold;
+                    font-size: x-large;
+                    color:#0088bb;
+                    border-width: 0px;
+                }
+
+                .content_text{
+                    color: grey;
+                    width: 100%;
+                    overflow-y: scroll;
+                    font-family:'Segoe Script';
+                    font-size: medium;
+                    margin-left:10px;
+                    background-color: transparent;
+                    border-width: 0;
+                    -webkit-appearance: textarea;
+                    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                    box-sizing: border-box;         /* IE 8+ */
+                }
+
+                .item_price{
+                    color: #0088bb;
+                    position: relative;
+                    font-weight:normal;
+                    font-size:24px;
+                    word-wrap:normal
+                }
+                .item_pack{
+                    color: #0088bb;
+                    position: relative;
+                    font-weight:normal;
+                    font-size:24px;
+                    word-wrap:normal
+                }
+                .qnty{
+                    color: #0088bb;
+                    position: relative;
+                    font-weight:normal;
+                    font-size:18px;
+                }
+                [contentEditable=true]:empty:not(:focus):before{
+                    content:attr(placeholder);
+                    color:gray;
+                }
+
+
+
+            </style>
+            <div  id="menu_item_tmplt" style="display:none;background-color: #f0f0f0;">
+                <!--<div class="supuid" style="display: none"></div>-->
+                <div class="row  menu_item_row">
+
+                    <div type="text" class="item_title input input-sm"  data-translate contenteditable="false" placeholder="название" data-toggle="collapse"></div>
+                    <div class="row" style="float: right;word-wrap: break-word; width: 95%; margin-right:10px; text-align:center; color:gray">
+                        <h6 class="col-sm-2 col-xs-2">Подтв-но:</h6>
+                        <h6 class="col-sm-4 col-xs-4">Расфасовка:</h6>
+                        <h6 class="col-sm-3 col-xs-3">Цена:</h6>
+                        <h6 class="col-sm-3 col-xs-3">Кол-во:</h6>
+                    </div>
+                    <div  class="row" style="width:95%;float: right; margin-right:10px;font-weight:normal;font-size:small;text-align: center">
+                        <div class="period_div  col-sm-2 col-xs-2" style="visibility: hidden;display:inline-block;color: red;vertical-align: middle;">
+                            <div class="ordperiod" style="font-size: .75em;white-space: nowrap;">Время доставки</div>
+                            <div style="text-align: center">
+                                <span class="fa fa-handshake-o approved" style="font-size: 20px;"></span>
+                            </div>
+                        </div>
+                        <div class="pack_container col-sm-4 col-xs-4" style="background-color:#f0f0f0;visibility: hidden;">
+                            <div class="dropdown">
+                                <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+
+                                <div class="item_pack input dropdown-toggle" data-toggle="dropdown"  placeholder="     гр."
+                                     style="display:inline-block;white-space: nowrap;">
+                                </div>
+                                <span class="caret" style="display:inline-block;"></span>
+                            </div>
+                        </div>
+
+                        <div class="input item_price  col-sm-3 col-xs-3" placeholder="руб"
+                             style="background-color:#f0f0f0;font-weight:normal;font-size:24px;white-space: nowrap;">
+                        </div>
+
+                        <div class="row col-sm-3 col-xs-3"  style="white-space: nowrap;color:grey;">
+
+                                <span class="reduce ctrl scaled glyphicon glyphicon-minus"
+                                      onclick="
+                                    if(parseInt($(this).siblings('.btn').text())>0){
+                                        $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())-1);
+                                        if(parseInt($(this).siblings('.btn').text())===0)
+                                            $(this).closest('.menu_item').attr('deleted', true);
+                                    }
+                                "></span>
+                            <button class="amount input btn btn-sm btn-primary" type="button"
+                                    style="vertical-align: top; font-size: large">0
+                            </button>
+                            <span class="increase ctrl scaled glyphicon glyphicon-plus" onclick="
+                                    $(this).siblings('.btn').text(parseInt($(this).siblings('.btn').text())+1);
+
+                                "></span>
+
+                        </div>
+
+                    </div>
+
+                    <div class="item_content collapse">
+                        <div class="row">
+                            <div class="col-sm-8 col-xs-8">
+                                <div class="content">
+                                    <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate>
+                                    </textarea>
+                                </div>
+                                <div class="gallery" style="position: relative;float: left;margin-left: 20px"></div>
+                            </div>
+                            <div class="col-sm-4 col-xs-4">
+                                <img class="input img-fluid center-block" style="width:90%; margin-right: 50px" src="">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="tab-pane" id="profile">
+                <div class="browser_container" id="profile_container"
+                     style="display:block;
+                     overflow: visible; z-index:2147483646;
+                     position: absolute;
+                     height: 90%;
+                     /*width:90%; */
+                     left: 1%; right: 1%;
+                     max-height: 98% !important;
+                     min-height: 50% !important;
+
+                     border: solid 0px lightslategrey;
+                     box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<div class="browser_container" id="my_profile_container"
+     style="display:none;
+         overflow: visible; z-index:2000;
+         position: absolute;
+         height: auto;
+         max-height: 80% !important;
+         min-height: 50% !important;
+         width:80%; left: 10%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+</div>
+
+
+<data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
+
+<data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
+
+<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
+
+<data class="tariff" id="price_editable" value="true"></data>
+
+
+</body>
+</html>

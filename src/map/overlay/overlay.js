@@ -24,6 +24,26 @@ import Circle from 'ol/geom/circle';
 
 let utils = new Utils();
 
+(function($) {
+    $.fn.doubleTap = function(doubleTapCallback) {
+        return this.each(function(){
+            var elm = this;
+            var lastTap = 0;
+            $(elm).on('touchstart', function (e) {
+                var now = (new Date()).valueOf();
+                var diff = (now - lastTap);
+                lastTap = now ;
+                if (diff < 250) {
+                    if($.isFunction( doubleTapCallback ))
+                    {
+                        doubleTapCallback.call(elm);
+                    }
+                }
+            });
+        });
+    }
+})(jQuery);
+
 class Overlay {
 
     constructor(map, element, offer) {
@@ -39,7 +59,7 @@ class Overlay {
             element: element,
             position: offer.location,
             positioning: 'center-center',
-            offset:[-20,-20]
+            offset:[40,40]
         });
         if(window.user.profile.profile.type==='deliver')
             this.CreateCircle(offer);
@@ -71,13 +91,20 @@ class Overlay {
         //     // $(element).css('transition', 'transform 100ms');
         // }, 5);
 
-        $(element).on('click touchstart', window.user, function (ev) {
+        $(element).on('dblclick', window.user, function (ev) {
             if(window.user.profile.profile.type==='deliver')
                 window.user.editor.OpenOffer();
             else
                 window.user.editor.InitSupplierOffer();
 
         });
+
+        $(element).doubleTap(function (el) {
+            if(window.user.profile.profile.type==='deliver')
+                window.user.editor.OpenOffer();
+            else
+                window.user.editor.InitSupplierOffer();
+        })
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {
 

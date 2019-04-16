@@ -6,7 +6,8 @@ import proj from 'ol/proj';
 import Extent from 'ol/extent';
 import {OfferOrder} from "../../customer/offer.order";
 import {OfferViewer} from "../../supplier/offer.viewer";
-
+import {UtilsMap} from "../../utils/utils.map"
+let utils_map = new UtilsMap();
 class MapEvents{
 
     constructor(map){
@@ -25,6 +26,7 @@ class MapEvents{
         $(window).on('click', function (event) {
             console.log();
         });
+
 
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
@@ -63,9 +65,13 @@ class MapEvents{
                 $('#menu_items').slideToggle('slow', function () {
                 });
 
+
+
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
                 let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-                let period = $('.sel_period').text().split(' - ');
+
+                let closest = feature.getGeometry().getClosestPoint(event.pixel);
+
                 if(feature.values_)
                 if(feature.values_.features && feature.values_.features.length >1) {//cluster
 

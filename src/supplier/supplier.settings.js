@@ -2,22 +2,25 @@
 
 export {SupplierSettings}
 
-require('bootstrap');
 
-import {Network} from "../../network";
+import {DB} from "../map/storage/db";
+import 'bootstrap';
+
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
 
+
 class SupplierSettings {
-    constructor(db){
-        this.db = db;
+    constructor(){
+
         // this.network = new Network(host_port);
-        this.fillForm();
-        $(document).on('submit', this, function (ev) {
+        //this.fillForm();
+        $('input[type="submit"]').on('click', this, function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
             let form = $('.form');
             ev.data.OnSubmit(form);
-            return false;
         });
         // $('.avatar').attr('src',location.origin+'/door2door/dist/images/avatar_2x.png');
     }
@@ -58,22 +61,27 @@ class SupplierSettings {
                 $.ajax({
                     url: host_port,
                     type: "POST",
-                    crossDomain: true,
+                    contentType: 'application/x-www-form-urlencoded',
+                    xhrFields: { withCredentials: true },
                     data: JSON.stringify(data_post),
                     dataType: "json",
                     success: function (obj) {
                         if (obj.err) {
                             alert(obj.err);
-                            return;
+                            return true;
                         }
                         delete data_post.proj;
                         delete data_post.func;
                         delete data_post.profile.email;
                         delete data_post.host;
 
-                        that.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
-                            alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                        window.db = new DB('Supplier', function () {
+                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
+                                alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                            });
                         });
+
+
                     },
                     error: function (xhr, status) {
                         alert("error");
@@ -85,7 +93,7 @@ class SupplierSettings {
     }
 
     fillForm(){
-        this.db.GetSettings(function (data) {
+        window.db.GetSettings(function (data) {
             if(data[0])
                 for(let i in data[0].profile){
                     if(i==='avatar'){
@@ -127,4 +135,37 @@ class SupplierSettings {
     }
 
 }
+
+$(document).on('readystatechange', function () {
+
+    if (!window.EventSource) {
+        alert('В этом браузере нет поддержки EventSource.');
+        return;
+    }
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+    // parent
+
+    window.cs = new SupplierSettings();
+
+
+    var readURL = function(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.avatar').attr('src', e.target.result);
+                $('.avatar').siblings('input:file').attr('changed',true);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+
+    $(".file-upload").on('change', function(){
+        readURL(this);
+    });
+});
 

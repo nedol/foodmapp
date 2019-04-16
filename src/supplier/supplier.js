@@ -208,6 +208,20 @@ class Supplier{
 
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
+                    $(my_truck_2).draggable({
+                        start: function (ev) {
+                            console.log("drag start");
+                        },
+                        drag: function (ev) {
+                            //$(el).attr('drag', true);
+                        },
+                        stop: function (ev) {
+                            console.log("drag stop");
+                            let offset  = $(my_truck_2).offset();
+                            let coor = that.map.ol_map.getCoordinateFromPixel([offset.left,offset.top]);
+                            window.user.offer.stobj.location = coor;
+                        }
+                    });
                     let status;
                     if (!that.offer.stobj.published)
                         status = 'unpublished';
@@ -221,7 +235,6 @@ class Supplier{
                         if(that.offer.stobj.location)
                             that.map.MoveToLocation(that.offer.stobj.location);
                     });
-
 
                     setTimeout(()=>{
                         that.map.MoveToLocation(that.offer.stobj.location);
@@ -394,7 +407,7 @@ class Supplier{
             let data = res;
             if(data && data.err){
                 alert(data.err);
-                window.location.replace(data.link);
+                //window.location.replace(data.link);
             }else if(data.result.affectedRows>0){
                 window.db.GetOffer(new Date(window.user.date), function (obj) {
                     obj[0].published = res.published;

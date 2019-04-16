@@ -74,7 +74,7 @@ class OfferOrder {
         $('#client_frame_container').css('display', 'inline');
         let w = document.documentElement.clientWidth;
        // if(window.devicePixelRatio<1.5)
-            w='500px';
+            w='700px';
         $(client_frame).css('width',w);
 
         $('#client_frame_container').append(client_frame);

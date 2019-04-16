@@ -137,7 +137,7 @@
                     color:red
                 }
             </style>
-            <div class="modal-content">
+            <div class="modal-content container">
                 <ul class="nav nav-tabs" id="menu_tabs">
                     <li id="add_tab_li" title="add tab" style="display: none;">
                         <span id="add_tab" class="add_tab" href="#add_tab" style="visibility: hidden;">
@@ -192,7 +192,7 @@
                     font-family:"Courier New";
                     font-weight:bold;
                     font-size: x-large;
-                    color:#0088bb;
+                    color: #f3f3f3;
                     border-width: 0px;
                     border-width: 0px;
                     -webkit-text-stroke: 1px #737373;
@@ -225,14 +225,15 @@
                     font-size:30px;
                 }
                 .content_text{
-                    width: 100%;
+                    visibility: hidden;
+                    width: 95%;
                     overflow-y: scroll;
                     font-family:'Segoe Script';
                     font-size: medium;
                     margin-left: 5px;
                     border-width: 0;
                     border-color: #9da0a4;
-                    background-color: transparent;
+                    background-color: rgba(255,255,255,0.5);
                     -webkit-appearance: textarea;
                     -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
                     -moz-box-sizing: border-box;    /* Firefox, other Gecko */
@@ -261,7 +262,7 @@
                         <h4>
                             <input type="text" class="item_title input input-sm" contenteditable="true" placeholder="название" data-toggle="collapse">
                         </h4>
-                        <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
+                        <div class="item_content" style="position: absolute; top:40px;width:100%">
 
                             <div class="content">
                                 <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true">
@@ -276,9 +277,10 @@
                     <div class="col-lg-2 col-sm-2 col-xs-2">
                         <div class="cert_container" style="
                                 /*position: absolute;*/
-                                width:95%;
+                                width:100%;
                                 max-height: 350px;
                                 margin-top:5px;
+                                margin-right:5px;
                                 background-color: rgb(240,240,240);
                                 overflow-y: scroll;
                                 /*white-space: pre-wrap;*/

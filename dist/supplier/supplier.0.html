@@ -1,0 +1,789 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Продавец</title>
+</head>
+
+
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="../node_modules/tablesorter/dist/css/theme.default.min.css">
+
+
+<script src="../lib/load-image/load-image.all.min.js"></script>
+<script type="text/javascript" src="./host.js"></script>
+<script type="text/javascript" src="supplier.js"></script>
+<script src="../lib/jquery.ui.touch-punch.min.js"></script>
+
+<style>
+
+    html, body{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .scaled{
+        transform: scale(1.5)
+    }
+    #marker {
+        display:block;
+        position:absolute;
+        bottom:0;
+        visibility:visible;
+        pointer-events: initial;
+        -webkit-user-drag: none;
+        z-index:10;
+        -webkit-filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+        filter: drop-shadow(0 2px 8px rgba(128,128,128,1));
+    }
+    .map{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+        position: fixed;
+        z-index: 0;
+    }
+
+    #main_menu{
+        display: block;
+        position: absolute;
+        left: 10px;
+        top: 0%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(213, 19, 18, 0.7);
+        z-index:2;
+    }
+    #dtp_container {
+        display: none;
+        position: absolute;
+        margin: auto;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 250px;
+        height: 250px;
+        z-index: 11;
+    }
+
+    #locText{
+        display: inline-block;
+        position: absolute;
+        bottom: 5px;
+        right: 5px;
+        width: 100px;
+        /*text-align: right;*/
+        /*left: 400px;*/
+        color:red;
+        font-size: small;
+        z-index:1;
+    }
+
+    #mouse_pos_div{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        left: 10px;
+        color:dimgrey;
+        font-size: small;
+    }
+
+    .thumb {
+        height: 75px;
+        border: 1px solid #000;
+        margin: 10px 5px 0 0;
+    }
+
+    #browser{
+        height: 100%;
+        width:100%;
+        border-radius: 15px 15px;
+        background-color: white;
+        position: absolute;
+        top: 0px;
+        left: 0px;
+        bottom: 0px;
+        right: 0px;
+        padding: 0px;
+        overflow-y: scroll;
+        overflow-x: hidden;
+        z-index:10;
+    }
+
+    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
+
+    @-webkit-keyframes bounce {
+        0%       { -webkit-transform:  scale(1, 1);}
+        25%      { -webkit-transform:  scale(1.2, 1.2);}
+        50%      { -webkit-transform:  scale(0.7, 0.7);}
+        75%      { -webkit-transform:  scale(1.1, 1.1);}
+        100%     { -webkit-transform:  scale(1, 1);}
+    }
+    .grow { transition: all .2s ease-in-out; }
+    .grow:hover { transform: scale(1.75); }
+
+    #my_truck{
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        right: 10px;
+        top: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #my_truck_2{
+        display: block;
+        position: absolute;
+        max-width: 60px;
+        max-height: 60px;
+        border-radius: 5px;
+        background-color: rgba(250,250,250,0);
+    }
+
+    #zoom_but{
+        display:block;
+        position: absolute;
+        /*z-index:30;*/
+        color: #1b1b1b;
+        top: 50%;
+        right: 10px;
+        width: 40px;
+        height: 40px;
+        /*line-height: auto;*/
+        border: solid 1px grey;
+        text-align:center;
+        vertical-align:middle;
+        font-size: 170%;
+        font-weight: bold;
+        border-radius: 5px;
+        background-color: whitesmoke;
+        cursor: n-resize;
+    }
+
+    #search_but{
+        display: block;
+        position: absolute;
+        right: 10px;
+        bottom: 10%;
+        width: 40px;
+        height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #loc_ctrl {
+        display: block;
+        position: absolute;
+        right: 10px;
+        top: 30%;
+        width: 40px;
+        height: 40px;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #location_img {
+        display: block;
+        visibility: hidden;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+        z-index:10;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+
+    #pin {
+        display: none;
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 5px;
+        background-color: transparent;
+        z-index:12;
+        /*-webkit-animation:bounce 1s infinite;*/
+    }
+</style>
+
+<body>
+
+<div id="map" class="map"></div>
+
+<section id="marker" title="kolobot">
+    <img  src="../src/map/marker/images/kolobot.png" height="57px" width="50px"/>
+</section>
+
+
+<style>
+    #feedback { font-size: 1.4em; }
+    #period_list .ui-selecting { background: #FECA40; }
+    #period_list .ui-selected { background: #F39814; color: white; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
+    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+</style>
+
+<div id="main_window" class="container">
+    <div class="row">
+        <div class="col-xm-4 col-sm-4"></div>
+        <div class="form-group  col-xm-8 col-sm-8" style="position:absolute;width:180px;right:0px;z-index: 10;">
+            <div class='input-group date'   style="width:auto" >
+                <input type='text'  class="form-control dt_val" value="Day of Delivery"/>
+                <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <div id="dtp_container" class="scaled">
+        <div id="datetimepicker" style="display: inline-block"></div>
+    </div>
+
+</div>
+
+
+<div id="category_include" style="display:none">
+    <style>
+        .category{
+            padding-left: 30px;
+            padding-right: 30px;
+            height: 40px;
+            /*width: 40px;*/
+            /*align:"left";*/
+        }
+
+        .category:hover{
+            /*height: 50px;*/
+            /*width: 50px;*/
+        }
+
+        #categories{
+            position: fixed;
+            top:0px;
+            width:100%;
+            padding-top: 5px;
+            background-color: rgba(0, 140, 201, 1.0);
+            overflow-x: auto;
+            white-space: nowrap;
+            z-index:20;
+        }
+    </style>
+
+    <div id="category_container">
+        <img src="../dist/images/ic_menu.png" style="position: absolute;width: auto; height: 15px; top: 10px; right: 50%; left:50%"/>
+    </div>
+
+    <div align="center" id="categories">
+        <input type="image" class="category" cat="food" id="0" title="Food" src="../dist/images/ic_0.png" state="0" data-translate="57ed5ecde6919ca32c4905100a06125e" style="opacity: 0.3;"/>
+        <input type="image" class="category" cat="veges" id="10" title="Veges" src="../dist/images/ic_10.png" state="1"  data-translate="5204a8300227b12b9344514e31658a57" />
+        <input type="image" class="category" cat="fruits" id="30" title="Fruits" src="../dist/images/ic_30.png" state="0"  data-translate="9894ba007958648fbb95dab79f5c49b8" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="milk" id="20" title="Milk & butter" src="../dist/images/ic_20.png" state="1"  data-translate="936beb3789addd4616f024f2cd2caac8" />
+        <input type="image" class="category" cat="meat" id="40" title="Meat" src="../dist/images/ic_40.png" state="1"  data-translate="f3d5840c5a17c2fabec8c07d8a993272" />
+        <input type="image" class="category" cat="fish" id="50" title="Fish" src="../dist/images/ic_50.png" state="1"  data-translate="b9d8d413b50edbd26d34cbd4a5a5f8e7" />
+        <input type="image" class="category" cat="chicken" id="60" title="Chicken" src="../dist/images/ic_60.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="eggs" id="70" title="Eggs" src="../dist/images/ic_70.png" state="1"  data-translate="c6bf07b78f27ac92bbb2e4ca345735ea" />
+        <!--<input type="image" class="category" cat="mushrooms" id="80" title="Mushrooms" src="../dist/images/ic_80.png" state="0"  data-translate="c1680e5a5622cdeebcf7d4e8795f3569" style="opacity: 0.3;" />-->
+        <input type="image" class="category" cat="сonfectionary" id="90" title="Confectionary" src="../dist/images/ic_90.png" state="0"  data-translate="da038785869c3814a23870b267e613e4" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="ice-cream" id="100" title="Ice-cream" src="../dist/images/ic_100.png"  data-translate="161af5daa71abf18b8ad2c9593678e78" state="1" />
+        <input type="image" class="category" cat="bread" id="110" title="Bread" src="../dist/images/ic_110.png" state="0"  data-translate="710cabd76238783bc3ebd5dc4ddf91bc" style="opacity: 0.3;" />
+        <input type="image" class="category" cat="bio" id="120" title="Bio" src="../dist/images/ic_120.png" state="0"  data-translate="54976a99e9bea2b1c5ca1b04cfcca910" style="opacity: 0.3;" />
+    </div>
+
+    <script>
+        function OnClickCat(el) {
+            let tab = $(el).parent().parent().find("a[data-toggle=tab]");
+            $(tab).text($(el).text());
+            $(tab).attr("cat",$(el).attr('cat'));
+            $(tab).trigger('click');
+        }
+    </script>
+
+</div>
+
+<div id="offer_editor" style="
+    display: none; position: absolute;
+    color:black;  background-color: #f0f0f0;
+    overflow-x: hidden; overflow-y: hidden; z-index:1000; margin: auto;
+    width:84%;  left: 0; right:0;top:5%;bottom:5%;
+    border: solid 0px lightslategrey;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div style="display: inline-block; position:absolute; top:0;right: 10px; padding-left: 20px;color: white">
+        <span class="close_browser glyphicon glyphicon-remove-sign"></span>
+    </div>
+    <div>
+        <ul class="nav nav-tabs">
+            <li class="active"><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
+            <li><a data-toggle="tab" href="#profile" data-translate="">Мой профиль</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane" id="editor" style="width: 97%;  margin: 0 auto;">
+                <style>
+                    .modal-content{
+                        position: absolute;
+                        height: 90%;
+                        width: 98%;
+                        left: 1%;
+                        margin: auto;
+                    }
+                    .modal-header{
+                        display: none;
+                        position: relative;
+                        width: 100%;
+                        padding:9px 15px;
+                        border-bottom:1px solid #737373;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                        font-family: Arial, Helvetica, sans-serif;
+                    }
+                    .modal-body{
+                        position: relative;
+                        height:100%;
+                        width: 100%;
+                        margin: auto;
+                        border: none;
+                        padding:9px 15px;
+                    }
+                    .modal-footer {
+                        height: 50px;
+                        padding: 9px 10px;
+                        border-bottom: 0px solid black;
+                        border-top: 0px;
+                        -webkit-border-top-left-radius: 5px;
+                        -webkit-border-top-right-radius: 5px;
+                        -moz-border-radius-topleft: 5px;
+                        -moz-border-radius-topright: 5px;
+                        border-top-left-radius: 5px;
+                        border-top-right-radius: 5px;
+                    }
+
+                    textarea:focus {
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .tab-content{
+                        /*height: 90%;*/
+                    }
+
+                    .tab-content::-webkit-scrollbar {
+                        width: 0 !important;
+
+                    }
+                    li {
+                        float: left;
+                    }
+
+                    li a {
+                        display: inline-block;
+                        text-align: center;
+                        padding: 14px 16px;
+                        text-decoration: none;
+                    }
+
+                    li a:hover, .dropdown:hover .dropbtn {
+
+                    }
+
+                    .dropdown {
+                        display: inline-block;
+                    }
+
+                    li.dropdown {
+                        display: inline-block;
+                    }
+
+                    .dropdown-content {
+                        display: none;
+                        position: absolute;
+                        min-width: 160px;
+                        box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+                        z-index: 1;
+                    }
+
+                    .dropdown-content a {
+                        padding: 12px 16px;
+                        text-decoration: none;
+                        display: block;
+                        text-align: left;
+                    }
+
+                    .dropdown-content a:hover {
+                        background-color: #d51312
+                    }
+
+                    .dropdown:hover .dropdown-content {
+                        display: block;
+                    }
+                    .close_browser {
+                        color: #1d2124;
+                        font-size: xx-large;
+                        opacity: 1;
+                    }
+                    .close_browser:hover {
+                        color: #d51312;
+                        opacity: 1;
+                    }
+                    .offer_status{
+                        font-size: x-small;
+                    }
+                    .display_none{
+                        display: none;
+                    }
+                    .inv_price{
+                        color:red
+                    }
+                </style>
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <div class="modal-title" style="text-align: center;"></div>
+                        <div class="offer_status" style="position: absolute;right: 0; bottom: 0;"></div>
+                    </div>
+                    <div class="modal-body">
+                        <div  class="row" style="float: right; word-wrap: break-word; width: 30%; top:10px;margin-right: 10px; text-align:center;">
+                            <h5 class="packing_header col-sm-6 col-xs-6" style="color:gray;">Расфасовка:</h5>
+                            <h5 class="price_header col-sm-4 col-xs-4" style="color:gray;">Цена:</h5>
+                            <h5  class="orders_header col-sm-2 col-xs-2" style="color:gray;display: inline;" data-translate="7442e29d7d54e549b78d94c46b8cdcfc">Заказы:</h5>
+                        </div>
+
+                        <ul class="nav nav-tabs" id="menu_tabs">
+                            <li id="add_tab_li" title="add tab" style="display: none;">
+                                <span id="add_tab" class="add_tab" href="#add_tab" style="visibility: hidden;">
+                                </span>
+                            </li>
+                        </ul>
+                        <div class="tab-content" style="position:relative;height: 95%;overflow-y: scroll">
+                            <!--div_tab_inserted-->
+                            <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
+                            <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 2px"></span>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+
+                    </div>
+                </div>
+                <div style="display:none;position:absolute; height:50px;bottom:0;left:5px;width: 15em">
+                    <span>Автоматически публиковать</span>
+                    <select class="sel_prolong"  size="1" style="">
+                        <option value="0"></option>
+                        <option value="1">на следующий день</option>
+                        <option value="7" selected>на следующую неделю</option>
+                    </select>
+                </div>
+                <style>
+                    th {
+                        text-align: center;
+                        color: #c4e3f3;
+                        font-size: 20px
+                    }
+                    #menu_item_tmplt{
+                        display: none;
+                    }
+                    .menu_item{
+                        position: relative;
+                        border-radius: 5px;
+                        border: 0px solid #343434;
+                        padding-left: 5px;
+                        margin: 5px;
+                        width: 98.8%;
+                        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+                    }
+                    .item_cb{
+                        width: 4%;
+                    }
+                    .item_title:focus{
+                        outline: none !important;
+                        border-color: #719ECE;
+                        box-shadow: 0 0 10px #719ECE;
+                    }
+                    .item_title{
+                        display: inline-block;
+                        position: absolute;
+                        width: 50%;
+                        top:5px;
+                        background-color: transparent;
+                        font-family:"Courier New";
+                        font-weight:bold;
+                        font-size: x-large;
+                        color:#0088bb;
+                        border-width: 0px;
+
+                    }
+                    li.active a{
+                        color:blue;
+                        background-color:grey;
+                    }
+                    .item_pack{
+                        color: #0088bb;
+                        text-align: center;
+                        font-weight:normal;
+                        font-size:24px;
+                        width:100%;
+                        white-space: nowrap;
+                        border: none;
+                        resize: none;
+                    }
+                    .item_price{
+                        color: #0088bb;
+                        font-weight:normal;
+                        font-size:24px;
+                        white-space: nowrap;
+                    }
+                    .order_ctrl{
+                        width: 7%;
+                        position: relative;
+                        color: #80afbb;
+                        font-weight:normal;
+                        font-size:30px;
+                    }
+                    .content_text{
+                        width: 100%;
+                        overflow-y: scroll;
+                        font-family:'Segoe Script';
+                        font-size: medium;
+                        margin-left: 20px;
+                        border-color: #9da0a4;
+                        -webkit-appearance: textarea;
+                        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+                        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+                        box-sizing: border-box;         /* IE 8+ */
+                    }
+                    .orders{
+                        visibility: hidden;
+                        margin-top: 15px;
+                    }
+                    .cert{
+                        z-index: 50;
+                        padding: 5px;
+                    }
+                    .notoday{
+                        display:none;!important;
+                    }
+                    [contentEditable=true]:empty:not(:focus):before{
+                        content:attr(placeholder);
+                        color:gray;
+                    }
+
+                </style>
+
+                <div  id="menu_item_tmplt">
+                    <div class="row menu_item_row">
+                        <div style="display: inline-block">
+                            <label  class="item_cb btn" title="Опубликовать" style="margin-right:20px;visibility:hidden">
+                                <input type="checkbox" class="checkbox-inline" style="display: none">
+                                <i class="fa fa-square-o fa-2x"></i>
+                                <i class="fa fa-check-square-o fa-2x"></i>
+                            </label>
+                            <input type="text" class="item_title input input-sm" contentEditable="true" placeholder="название" data-toggle="collapse">
+                        </div>
+                        <div style="width: 30%;float: right;text-align:center;outline: none;">
+                            <div class="row">
+                                <div class="pack_container col-sm-6 col-xs-6">
+                                    <div class="dropdown">
+                                        <ul class="pack_list" role="menu" aria-labelledby="menu2" data-width="fit">
+                                        </ul>
+                                        <textarea  class="item_pack input" rows="1"   contentEditable="true"  placeholder="....."></textarea>
+                                        <span class="caret" style="display: inline-block; visibility: hidden"></span>
+                                        <span class="add_pack glyphicon glyphicon-plus-sign scaled"  style="display:none;visibility:hidden; float: right"></span>
+                                    </div>
+                                </div>
+                                <div class="price_div col-sm-4 col-xs-4">
+                                    <div class="input item_price"  contenteditable="true" placeholder="руб"></div>
+                                </div>
+                                <div  class="orders_div col-sm-2 col-xs-2">
+                                    <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
+                                    <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="item_content collapse">
+                            <div class="row">
+                                <div class="col-sm-10 col-xs-10">
+                                    <div class="content">
+                                        <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true">
+                                        </textarea>
+                                    </div>
+                                    <div class="gallery" style="position: relative;float: left; margin-left: 20px"></div>
+                                </div>
+                                <div class="col-sm-2 col-xs-2">
+                                    <img class="input img-fluid center-block" style="width:90%;margin-right: 50px" src="" >
+                                </div>
+                            </div>
+
+                            <div class="toolbar"  style="display:none; position:relative;width:20%; margin-left: auto; margin-right: auto;">
+                                <span class="glyphicon glyphicon-comment add_content" title="Добавить описание" style="display: inline-block; position: relative;font-size:30px; padding:10px; "></span>
+                                <span class="glyphicon glyphicon-picture add_picture"  title="Добавить изображение" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                                <span class="glyphicon glyphicon-modal-window add_cert"  title="Добавить сертификаты" style="display: inline-block; position: relative;font-size:30px; margin:10px;"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div  class="collapse orders">
+                        <table class="table tablesorter">
+                            <thead style="color:gray;background-color: #f3f3f3">
+                            <tr>
+                                <th>
+                                    <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                </th>
+                                <th class="marketer">
+                                    <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                                </th>
+                                <th class="marketer">
+                                    <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                                </th>
+                                <th>
+                                    <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
+                                </th>
+                            </tr>
+                            </thead>
+                            <tbody style="background-color: #e6e6e6"></tbody>
+                        </table>
+                    </div>
+                    <input type="file" class="file" multiple accept="image/*" style="display: none"/>
+                </div>
+            </div><!--/tab-pane-->
+
+            <div class="tab-pane" id="profile">
+                <div class="browser_container" id="profile_container"
+                     style="
+                     position: absolute;
+                    overflow: visible; z-index:2147483646;
+                    height: 80%; left:1%;
+                    /*max-height: 90% !important;*/
+                    /*min-height: 70% !important;*/
+                   width:98%;
+                   border: solid 0px lightslategrey;
+                   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%;height:100%"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
+<data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
+<data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
+<data class="alerts" id="show_orders" data-translate="54a228ac1da8df4602aa2052461c1349" style="display: none">Show Orders</data>
+<data class="alerts" id="offer_delivery" data-translate="2dd63ed2ec0b1a276c6a24eed9ddf874" style="display: none">Предложение по доставке</data>
+<data class="alerts" id="published" data-translate="44ec8d4ee84b681847b88ee0c5b3b790" style="display: none">Опубликовано</data>
+<data class="tariff" id="items_limit" value="5" style="display: none"></data>
+
+<div id="offer_viewer" class="order_container"
+       style="display:none;   position: fixed;
+       overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       width:70%;  height: auto; left: 20%; top: 5%;
+       border: solid 0px lightslategrey;
+       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
+    <div>
+        <div class="modal-content">
+            <div class="modal-header" style="position: relative;width: 100%;">
+                <div class="row">
+                    <div class="col-sm-6 col-xs-6">
+                        <h4 class="modal-title"  style="display: inline-block">Order for</h4>
+                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
+                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
+                    </div>
+                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; top:0;right: 5px;color: white">
+                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content dropup">
+                    <ul class="nav nav-tabs menu_tabs">
+                        <li class="add_tab_li" title="add tab">
+                        </li>
+                    </ul>
+                    <div class="tab-content">
+                        <div class="tab-pane fade add_tab_div" style="border: none"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <data class="alerts choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
+
+</div>
+
+<span id="locText" style="font-family: serif">Lat Lon</span>
+
+<div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
+
+<!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
+    <!--visibility: visible" align="center"/>-->
+
+<style>
+    .unpublished{
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .published{
+        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(0%);
+    }
+</style>
+
+<img id="my_truck" class="unpublished" src="../dist/images/my_truck.png"
+     title="My Truck" draggable="true" >
+
+<img id="search_but"  src="../dist/images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="../dist/images/ic_location.png">
+    <img id="pin" src="../dist/images/ic_pin.png">
+</section>
+<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+
+
+
+</body>
+</html>

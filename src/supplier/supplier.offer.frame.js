@@ -232,13 +232,6 @@ class SupplierOffer{
                     $(menu_item).find('.content_text').attr('contenteditable', 'true');
                     if (that.offer[tab][i].content_text)
                         $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
-                    if (that.offer[tab][i].content_text)
-                        $(menu_item).find('.content_text').css('visibility', 'visible');
-                    // if(that.offer[tab][i].content_text && that.offer[tab][i].content_text.width)
-                    //     $(menu_item).find('.content_text').css('width',that.offer[tab][i].content_text.width);
-
-                    // if(that.offer[tab][i].content_text && that.offer[tab][i].content_text.left)
-                    //     $(menu_item).find('.content_text').css('left',that.offer[tab][i].content_text.left);
 
                     if (that.offer[tab][i].img) {
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
@@ -294,18 +287,23 @@ class SupplierOffer{
                         //$(img).offset(data.pos);TODO:
                         img.width = '90';
                         $(menu_item).find('.cert_container').append(img);
-                        $(img).on('click',{id:$(menu_item).attr('id')}, that.onClickImage);
-                        //that.MakeDraggable(img);
+                        $(img).on('click', {id: $(menu_item).attr('id')}, that.onClickImage);
+                        $(img).draggable({
+                            start: function (ev) {
+                                console.log("drag start");
+                            },
+                            drag: function (ev) {
+                                //$(el).attr('drag', true);
+                            },
+                            stop: function (ev) {
+                                console.log("drag stop");
+                                $(img).remove();
+                            }
+                        });
                     });
 
                     $('#' + tab).append(menu_item);//добавить продукт в закладку
 
-
-                    if ($(menu_item).find('.item_content').css('display') == 'block'
-                        && $(menu_item).find('.img-fluid').attr('src') === ''
-                        && $(menu_item).find('.content_text').text() === "") {
-                        $(menu_item).find('.item_content').slideToggle("fast");
-                    }
 
                     $(menu_item).find('input:file').on('change', this, that.OnImportImage);
 
@@ -321,19 +319,7 @@ class SupplierOffer{
 
                     });
 
-                    $(menu_item).find('.add_content').on('click touchstart', menu_item, function (ev) {
-                        let menu_item = $(ev.data);
-                        $(menu_item).find('.item_content').slideDown("slow");
-                        let vis = $(this).closest('.menu_item').find('.content_text').css('visibility');
-                        if (vis === 'visible') {
-                            vis = 'hidden';
-                        } else {
-                            vis = 'visible';
-                        }
 
-                        $(menu_item).find('.content_text').css('visibility', vis);
-                        $(menu_item).find('.content_text').focus();
-                    });
 
                     $(menu_item).find('.img_cert').on('click touchstart', menu_item,function (ev) {
                         let menu_item = $(this).closest('.menu_item');
@@ -358,10 +344,10 @@ class SupplierOffer{
 
                     $('a[href="#' + tab + '"]').css('color', 'blue');
 
-                    $(menu_item).find('.cert_container').sortable({
-                        connectWith: "div",
-                        placeholder: "ui-state-highlight"
-                    });
+                    // $(menu_item).find('.cert_container').sortable({
+                    //     connectWith: "div",
+                    //     placeholder: "ui-state-highlight"
+                    // });
 
                     // $(menu_item).find('.cert_container').find('img').draggable({
                     //
@@ -772,6 +758,10 @@ class SupplierOffer{
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
 
+        $(menu_item).find('.item_content').on('shown.bs.collapse',function (ev) {
+            $(this).find('.content_text').focus();
+        });
+
         hash = md5(new Date().getTime()+1);
         //window.dict.dict[hash] = {};
         // $(menu_item).find('.content_text').attr('data-translate', hash);
@@ -890,6 +880,18 @@ class SupplierOffer{
                     $("#" + el.id).css('visibility', 'visible');
                     $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
                     $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
+                    $(img).draggable({
+                        start: function (ev) {
+                            console.log("drag start");
+                        },
+                        drag: function (ev) {
+                            //$(el).attr('drag', true);
+                        },
+                        stop: function (ev) {
+                            console.log("drag stop");
+                            $(img).remove();
+                        }
+                    });
                     $(img).on('click touchstart',{id:$("#" + el.id).closest('.menu_item').attr('id')},window.sup_off.onClickImage);
                     let thumb = false;
                     $("#" + el.id).on('load', function (ev) {

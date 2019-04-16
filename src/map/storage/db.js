@@ -28,11 +28,14 @@ class DB {
 
         if (!this.DBcon) {
             this.connectDB(function (con) {
+                let first =false;
+                if(!DB.prototype.DBcon)
+                    first = true;
                 DB.prototype.DBcon = con;
+                if(first)
+                    f();
             });
-            setTimeout(function () {
-                f();
-            }, 200);
+
         }
     }
 
@@ -56,7 +59,7 @@ class DB {
 
             request.onupgradeneeded = function (e) {
 
-                var db = event.target.result;
+                var db = e.target.result;
                 db.onerror = function (event) {
                     console.log(event);
                 };

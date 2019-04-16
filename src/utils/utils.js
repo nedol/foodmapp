@@ -161,8 +161,7 @@ class Utils{
         c.width = w;                                 // set size = thumb
         c.height = h;
         ctx.drawImage(base, 0, 0, w, h);             // draw in frame
-        img.onload = function() {                    // handle async loading
-
+        img.onload = function() {                   // handle async loading
             callback(this);                // provide image to callback
         };
         img.src = c.toDataURL();             // convert canvas to URL

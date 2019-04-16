@@ -42,7 +42,7 @@
         margin: 0px;
         height: 100%;
         width: 100%;
-
+        scrollbar-width: none;
     }
     ::-webkit-scrollbar {
         width: 0;
@@ -51,17 +51,17 @@
     .scaled{
         transform: scale(1.5)
     }
-    .custom-toggler.navbar-toggler {
-        border-color: rgb(255,102,203);
-    }
+    /*.custom-toggler.navbar-toggler {*/
+        /*border-color: rgb(255,102,203);*/
+    /*}*/
     .custom-toggler .navbar-toggler-icon {
         background-image: url("data:image/svg+xml;charset=utf8,%3Csvg viewBox='0 0 32 32' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath stroke='rgba(255,102,203, 0.7)' stroke-width='2' stroke-linecap='round' stroke-miterlimit='10' d='M4 8h24M4 16h24M4 24h24'/%3E%3C/svg%3E");
     }
 
     .active a[data-toggle=tab] {
-        background-color: #c8c8c8 !important;
-        border: 1px solid  #8f8f8f;
-        border-radius: 5px;
+        background-color: #f0f0f0 !important;
+        /*border: 1px solid  #8f8f8f;*/
+        /*border-radius: 5px;*/
     }
 
 </style>
@@ -69,10 +69,11 @@
 
 
 <!-- Nav tabs -->
-<ul class="nav nav-tabs  container">
+<ul class="nav nav-tabs">
     <li class="active"><a data-toggle="tab" href="#order_pane" data-translate="">Ассортимент</a></li>
     <li><a data-toggle="tab" href="#profile_pane" data-translate="">Профиль</a></li>
 </ul>
+
 <div class="input-group" style="display:none;position:relative;width: 100%">
 
     <input type="address" class="form-control"  id="address" placeholder="введите адрес доставки" title="введите адрес доставки"
@@ -193,8 +194,7 @@
             .inv_price{
                 color:red
             }
-        </style>
-        <style>
+
             th {
                 text-align: center;
                 color: #c4e3f3;
@@ -207,20 +207,21 @@
                 font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
             }
             #menu_item_tmplt{
-                display: block;
-                visibility: hidden;
+                display: none;
             }
 
             #menu_item_empty{
-                display: block;
+                /*display: block;!important;*/
                 visibility: hidden;
             }
             .menu_item{
+                display:block;
                 position: relative;
                 border-radius: 5px;
                 border: 0px solid #343434;
-                margin: 15px;
-                width:auto;
+                padding-left: 5px;
+                margin: 5px;
+                width: 98%;
                 box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
             }
             .item_cb{
@@ -249,20 +250,13 @@
                 color:blue;
                 background-color:grey;
             }
-            /*textarea{*/
-            /*color: #0088bb;*/
-            /*text-align: center;*/
-            /*font-weight:normal;*/
-            /*font-size:24px;*/
-            /*width:100%;*/
-            /*white-space: nowrap;*/
-            /*border: none;*/
-            /*resize: none;*/
-            /*}*/
+
             .item_price{
                 display:block;
-                position:absolute;
-                bottom:1%;
+                position:relative;
+                bottom:0%;
+                margin-top: 50px;
+                float:left;
                 left:5%;
                 background-color:transparent;
                 -webkit-text-stroke: 1px white;;
@@ -331,7 +325,6 @@
                     <input type="text" readonly class="item_title input input-sm" placeholder="название" data-toggle="collapse">
 
                     <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
-
                         <div class="content">
                             <textarea class="content_text" readonly placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="false">
                             </textarea>
@@ -339,29 +332,30 @@
 
                     </div>
 
-                    <img class="img-fluid" style="width:100%;margin-top:15px;z-index: 1000" src="http://placehold.it/700x400" crossorigin="anonymous" alt="">
-
+                    <div style="width: 300px;margin: 0 auto">
+                        <img class="card-img-top img-fluid" style="width: 100%;z-index: 1000" src="https://nedol.ru/d2d/dist/images/700x400.png" crossorigin="anonymous" alt="">
+                    </div>
                     <div class="input item_price text-center" placeholder="руб">
                     </div>
                 </div>
                 <div class="col-lg-3 col-sm-3 col-xs-3">
                     <div class="cert_container" style="
-                    /*position: absolute;*/
-                    width:100%;
-                    max-height: 500px;
-                    margin: 0 auto;
-                    margin-top:15px;
-                    background-color: rgb(240,240,240);
-                    overflow:hidden;
-                    overflow-y:auto;
-                    /*white-space: pre-wrap;*/
-                    z-index:20;">
+                                /*position: absolute;*/
+                                width:100%;
+                                max-height: 350px;
+                                margin-top:5px;
+                                margin-right:5px;
+                                background-color: rgb(240,240,240);
+                                overflow-y: scroll;
+                                /*white-space: pre-wrap;*/
+                                z-index:20;">
                     </div>
                 </div>
 
             </div>
-            <div class="" style="display: block;position: relative;height: 50px;margin-top: 10px">
-                <div class="dropup pack_container" style="position:absolute;left:5%;background-color:#a2a2a2;">
+
+            <div class="" style="display: block;position: relative;height: 50px;margin-top: 20px">
+                <div class="dropup pack_container" style="position:absolute;left:40px;background-color:#a2a2a2;">
                     <button class="pack_btn btn btn-secondary dropdown-toggle scaled" type="button" data-toggle="dropdown"  role="menu" href="" aria-haspopup="true" aria-expanded="false"></button>
 
                     <div class="pack_list input dropdown-menu"   placeholder="     гр."
@@ -370,7 +364,7 @@
                     <span class="caret"></span>
                 </div>
 
-                <div class="" style="position:absolute;left:50%;">
+                <div class="" style="position:absolute;left:60%;">
                     <div class=""  style="align-items: stretch; white-space: nowrap;color:#273be6;">
                         <span class="reduce ctrl"
                               onclick="

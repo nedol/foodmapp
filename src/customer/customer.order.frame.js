@@ -213,7 +213,6 @@ class CustomerOrder{
 
                         $(menu_item).find('.item_price').text(data);
                     }
-
                 }
 
                 if(that.offer[tab][i].owner) {
@@ -221,14 +220,6 @@ class CustomerOrder{
                     window.parent.db.GetSupplier(new Date(window.parent.user.date),that.offer[tab][i].owner,function (offer) {
                         let title = that.offer[tab][i].title;
                         let incl = _.find(offer.data[tab],{title:title});
-
-
-                        $(menu_item).find('a[role=packitem]').on('click', {off:incl},function(ev){
-                            that.changed = true;
-                            let pl = incl.packlist;
-                            $(menu_item).find('.pack_btn').text($(ev.target).text());
-                            $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
-                        });
 
                         $(menu_item).find('.card-text').attr('contenteditable', 'false');
                         if(incl.content_text)
@@ -239,8 +230,8 @@ class CustomerOrder{
                         if(incl.img) {
                             $(menu_item).find('.img-fluid').css('visibility', 'visible');
                             $(menu_item).find('.img-fluid').attr('src',  that.path+"/images/"+incl.img.src);
-                            $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
-                            $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
+                            // $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
+                            // $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
                         }
 
                         $.each(incl.cert, function (ind, data) {
@@ -269,6 +260,13 @@ class CustomerOrder{
 
                         setPrice(incl.packlist,menu_item);
 
+                        $(menu_item).find('a[role=packitem]').on('click', {off:incl},function(ev){
+                            that.changed = true;
+                            let pl = incl.packlist;
+                            $(menu_item).find('.pack_btn').text($(ev.target).text());
+                            $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
+                        });
+
                         that.ovc.find('#' + tab).append(menu_item);
                         that.dict.dict = Object.assign(offer.dict.dict,that.dict.dict);
                         that.dict.set_lang(window.parent.sets.lang,that.ovc[0]);
@@ -289,7 +287,7 @@ class CustomerOrder{
                     let img = new Image();
                     img.src = that.path+"/images/"+that.offer[tab][i].cert[c].src;
                     //$(img).offset(data.pos); TODO:
-                    img.height = '100';
+                    img.width = '90';
                     $(menu_item).find('.cert_container').append(img);
                     $(img).on('click',menu_item, that.onClickImage);
                 }

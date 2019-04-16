@@ -2,7 +2,7 @@
 
 require('bootstrap');
 require('webpack-jquery-ui/draggable');
-require('jquery-ui-touch-punch');
+
 import {Dict} from '../dict/dict.js';
 
 import {Utils} from "../utils/utils";
@@ -194,14 +194,14 @@ class ProfileCustomer{
 
     InitUserOrders(){
         let that = this;
-        $('#menu_item_style').load('../client/client.html #menu_item_style', function (response, status, xhr) {
+        $('#menu_item_style').load('./client/client.html #menu_item_style', function (response, status, xhr) {
 
         });
         window.parent.db.GetCusOrders(window.parent.user.date, function (res) {
             for(let i in res){
                 let order = res[i];
                 let ovc = '' ;
-                $('#menu_item_tmplt').load('../client/client.html #menu_item_tmplt', function (response, status, xhr) {
+                $('#menu_item_tmplt').load('./client/client.html #menu_item_tmplt', function (response, status, xhr) {
                     ovc = $('#menu_item_tmplt').clone();
                     for(let item in order.data) {
                         window.parent.db.GetSupplier(new Date(window.parent.user.date), order.supuid,function (res) {

@@ -58,7 +58,7 @@ class Layers {
                     source: new srcVector(),
                     style: new _ol_style_Style_({
                         fill: new _ol_style_Fill_({
-                            color: 'rgba(255, 255, 255, 0.1)'
+                            color: 'rgba(255, 255, 255, 0)'
                         }),
                         stroke: new _ol_style_Stroke_({
                             color: 'rgba(255, 0, 0, 0.5)',
@@ -80,13 +80,14 @@ class Layers {
                     let map_center = that.map.ol_map.getView().getCenter();
                     let dist = //utils.getCoordsDistance( that.map.ol_map,center,event.coordinate);
                     utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
-                    if(dist*1800<=radius && features[f].values_.obj.uid){
+                    if(dist*1800<=radius && features[f].values_.obj && features[f].values_.obj.uid){
                         $('#deliver_but').css('display','block');
                         $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar)
                         $('#deliver_but').attr('supuid',features[f].values_.obj.uid);
-
+                        that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)'
                     }else{
                         $('#deliver_but').css('display','none');
+                        that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
                     }
                 }
             });
