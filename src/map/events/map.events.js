@@ -4,7 +4,7 @@ export {MapEvents}
 
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
-import {OfferOrder} from "../../customer/offer.order";
+import {OfferOrder} from "../../customer/init.frame";
 import {OfferViewer} from "../../supplier/offer.viewer";
 import {UtilsMap} from "../../utils/utils.map"
 let utils_map = new UtilsMap();

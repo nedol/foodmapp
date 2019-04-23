@@ -27,7 +27,7 @@ class Offer{
         this.stobj.data = obj.data;
         window.db.SetObject('offerStore',obj,function (res) {
             obj.date = 'tmplt';
-            obj.published = '';
+            delete obj.published;
             window.db.SetObject('offerStore',obj);
         });
         if(dict){

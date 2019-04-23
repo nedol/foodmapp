@@ -9,6 +9,9 @@ class Import {
     constructor(map){
         this.map = map;
         this.areasAr = [];
+        $('#datetimepicker').on("dp.change",this, (ev)=> {
+            this.areasAr = [];
+        });
     }
 
     ImportDataByLocation(event) {

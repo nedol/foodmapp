@@ -265,7 +265,7 @@
 
 <div id="main_window">
     <div>
-        <div class="date_ctrl form-group"  style="position:fixed;right:0px;top:1px;">
+        <div class="date_ctrl form-group"  style="position:fixed;top:1px;">
             <div class='input-group date' style="width:auto" >
                 <input type='text' class="form-control dt_val"/>
                 <span class="input-group-addon">
@@ -384,11 +384,12 @@
              /*width: 100%;*/
              /*max-width: 95%;*/
              -webkit-overflow-scrolling: auto;
-             /*overflow-y: hidden;*/
-             overflow-x: auto;
+             overflow-y: scroll;
+
+             /*overflow-x: auto;*/
              white-space: nowrap;
              /*padding-bottom: 10px;*/
-  	         overflow-y: scroll;
+
              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
     </div>
@@ -433,7 +434,7 @@
 <data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
 
 <data class="tariff" id="price_editable" value="true"></data>
-
+<div id="debug" style="display: block;position: fixed;bottom: 0;left: 0;width: 100px"></div>
 
 </body>
 </html>

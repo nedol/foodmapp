@@ -46,6 +46,13 @@ $(document).on('readystatechange', function () {
         return;
     }
 
+    // parent
+    window.alert = function(text){
+        $(".alert h4").text(text);
+        $(".alert").removeClass("in").show();
+        $(".alert").delay(200).addClass("in").fadeOut(3000);
+    }
+
     //!!! jquery polyfill
     $.ajaxPrefilter(function (options, original_Options, jqXHR) {
         options.async = true;
@@ -63,6 +70,8 @@ $(document).on('readystatechange', function () {
             let res = _.findKey(set, function(k) {
                 return k.uid === uid;
             });
+            if(!res && set[0])
+                res = 0;
             if (set[res]){
                 let uObj = {};
 
@@ -155,7 +164,7 @@ $(document).on('readystatechange', function () {
         let dt_w = $('#dtp_container').css('width');
         let dt_h = $('#dtp_container').css('height');
         let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-
+        let w = document.documentElement.clientWidth;
         // $(window).on("resize", function (event) {
         //     let dt_w = $('#dtp_container').css('width');
         //     let dt_h = $('#dtp_container').css('height');
@@ -171,7 +180,7 @@ $(document).on('readystatechange', function () {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
 
-            $('#dtp_container').css('transform', 'scale(' + (scale - 2) + ',' + (scale - 2) + ')');
+            $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
         });
 
         $('#datetimepicker').on('dp.hide', function (ev) {

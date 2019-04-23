@@ -54,12 +54,12 @@ class Overlay {
         this.modify;
         this.snap; // global so we can remove them later
 
-
+        let domRect = $(element)[0].getBoundingClientRect();
         this.overlay = new _ol_Overlay_({
             element: element,
             position: offer.location,
-            positioning: 'center-center',
-            offset:[40,40]
+            positioning: 'center-center',//'bottom-right',//'top-left',//'bottom-left',
+            offset: [0,0]
         });
         if(window.user.profile.profile.type==='deliver')
             this.CreateCircle(offer);
@@ -69,13 +69,13 @@ class Overlay {
         $(element).on('map:pointerdrag', function (ev) {
 
             try {
-                var offset = $(this).offset();
-                var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
-                var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
-                var x = utils.LatLonToMeters(center[0], 0, coor[0], 0);
-                x = center[0] > coor[0] ? x : -x;
-                var y = utils.LatLonToMeters(0, center[1], 0, coor[1]);
-                y = center[1] < coor[1] ? y : -y;
+                // var offset = $(this).offset();
+                // var center = proj.transform(that.map.ol_map.getView().getCenter(), 'EPSG:3857', 'EPSG:4326');
+                // var coor = proj.transform(this.ovl.getPosition(), 'EPSG:3857', 'EPSG:4326');
+                // var x = utils.LatLonToMeters(center[0], 0, coor[0], 0);
+                // x = center[0] > coor[0] ? x : -x;
+                // var y = utils.LatLonToMeters(0, center[1], 0, coor[1]);
+                // y = center[1] < coor[1] ? y : -y;
             }catch(ex){
             }
         });
@@ -108,13 +108,14 @@ class Overlay {
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {
 
-            //var scale = Math.pow((Map.getView().getZoom()/15),3).toFixed(3);
-            //$(element).css('transform', 'scale('+scale+')');
-
+            // var scale = Math.pow((this.getZoom()/15),3).toFixed(3);
+            // $(element).css('width', parseInt(parseInt($(element).attr('width'))*scale));
+            // $(element).css('height', parseInt(parseInt($(element).attr('width'))*scale));
+            //
             // $(element).css('transition', 'transform 100ms');
             // $("#"+$(element).attr('id')+"_img").height(scale);
             // $("#"+$(element).attr('id')+"_img").width(scale);
-            //$( element ).trigger("change:zoom", [event]);
+            $( element ).trigger("change:zoom", [event]);
         });
 
         this.overlay.on('change:position', function (e) {

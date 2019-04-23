@@ -5,7 +5,7 @@ require('bootstrap/js/tab.js');
 require('bootstrap/js/collapse.js')
 import {Dict} from '../dict/dict.js';
 import {ProfileSupplier} from "../profile/profile.supplier";
-
+require('jquery.nicescroll')
 
 let _ = require('lodash')
 
@@ -21,6 +21,8 @@ $(document).on('readystatechange', function () {
     if (document.readyState !== 'complete') {
         return;
     }
+
+
     window.InitCustomerOrder = function (data) {
         window.cus_oder = new CustomerOrder();
         window.cus_oder.OpenOffer(data);
@@ -32,7 +34,7 @@ $(document).on('readystatechange', function () {
 class CustomerOrder{
     constructor(){
 
-        this.path  = window.location.origin +"/d2d/";
+        this.path  ="http://localhost:63342/d2d/server";
         if(host_port.includes('nedol.ru'))
             this.path = host_port;
 
@@ -120,6 +122,11 @@ class CustomerOrder{
             that.ovc.find(".carousel_collapse").css('display','none');
         });
 
+        $('.nav-tabs a').on('shown.bs.tab', function(event){
+            var x = $(event.target).text();         // active tab
+            var y = $(event.relatedTarget).text();  // previous tab
+        });
+
 
         window.parent.db.GetSettings(function (obj) {
             if(obj[0].profile && obj[0].profile.address)
@@ -132,15 +139,17 @@ class CustomerOrder{
             if(!tab || !that.offer[tab])
                 return;
             if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted"><a class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+                $('<li class="tab_inserted"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
                     '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                $('<div id="'+tab+'" class="tab-pane active div_tab_inserted" style="border: border: 2px solid grey;">' +
+                $('<div id="'+tab+'" class="tab-pane active div_tab_inserted" style="border: border: 1px solid grey;">' +
                     // '<div class="row"><div>' +
                     '</div>').insertBefore(that.ovc.find('#add_tab_div'));
             }
 
+            // $('#'+tab).niceScroll();
+            let last = 0;
             for (let i in that.offer[tab]) {
-
+                last = i;
                 let menu_item  = $('#menu_item_tmplt').clone();
                 $(menu_item).attr('id', tab + '_' + i);
 
@@ -171,16 +180,18 @@ class CustomerOrder{
                 if(that.offer[tab][i].img) {
                     let src = that.path+ "/images/"+that.offer[tab][i].img.src;
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    // $(menu_item).find('.img-fluid').css('display', 'none');
+                    $(menu_item).find('.img-fluid').parent().css('display', 'block');
                     $(menu_item).find('.img-fluid').attr('src', src);
                     let active= '';
                     if(!$('.carousel-inner').find('.active')[0])
                         active = 'active';
-                    $('.carousel-indicators').append('<li class="'+active+'" data-slide-to="'+that.offer[tab][i].title+'" data-target="#carouselExampleIndicators"></li>');
-                    let item ='<div class="carousel-item '+active+'">'+
-                    '<h1 class="carousel_price" title="'+that.offer[tab][i].title+'"></h1>'+
-                    '<img class="d-block img-fluid img-responsive" src='+src+' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
-                    $('.carousel-inner').append(item);
+                    if(!that.offer[tab][i].owner) {
+                        $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
+                        let item = '<div class="carousel-item ' + active + '">' +
+                            '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
+                            '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
+                        $('.carousel-inner').append(item);
+                    }
                 }
 
                 $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
@@ -205,6 +216,7 @@ class CustomerOrder{
                         if(!$('.carousel_price[title='+that.offer[tab][i].title+']').text())
                             $('.carousel_price[title='+that.offer[tab][i].title+']').text(data+'р/'+p);
                         pl[p] = data;
+                        $('a[href="#'+tab+'"]').css('display','block');
                         $(menu_item).find('.dropdown').css('visibility', 'visible');
                         $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem'>" + p + "</a>");
                         $(menu_item).find('.pack_btn').text(p);
@@ -220,7 +232,9 @@ class CustomerOrder{
                     window.parent.db.GetSupplier(new Date(window.parent.user.date),that.offer[tab][i].owner,function (offer) {
                         let title = that.offer[tab][i].title;
                         let incl = _.find(offer.data[tab],{title:title});
-
+                        if(!incl)
+                            return;
+                        $('a[href="#'+tab+'"]').css('display','block');
                         $(menu_item).find('.card-text').attr('contenteditable', 'false');
                         if(incl.content_text)
                             $(menu_item).find('.card-text').attr('data-translate', incl.content_text.value);
@@ -238,7 +252,9 @@ class CustomerOrder{
                             let img = new Image();
                             img.src = that.path+"/images/"+data.src;
                             //$(img).offset(data.pos); TODO:
-                            img.height = '100';
+                            img.style.height = '90%';
+                            img.style.width = '90%';
+
                             $(menu_item).find('.cert_container').append(img);
                             $(img).on('click',menu_item, that.onClickImage);
                         });
@@ -281,16 +297,20 @@ class CustomerOrder{
                         let pl = ev.data.off.packlist;
                         $(this).closest('.menu_item').find('.item_price').text(pl[$(ev.target).text()]);
                     });
+
+                    for(let c in that.offer[tab][i].cert) {
+                        let img = new Image();
+                        img.src = that.path+"/images/"+that.offer[tab][i].cert[c].src;
+                        //$(img).offset(data.pos); TODO:
+                        img.style.width = '100%';
+                        img.style.height = '100%';
+
+                        $(menu_item).find('.cert_container').append(img);
+                        $(img).on('click',menu_item, that.onClickImage);
+                    }
                 }
 
-                for(let c in that.offer[tab][i].cert) {
-                    let img = new Image();
-                    img.src = that.path+"/images/"+that.offer[tab][i].cert[c].src;
-                    //$(img).offset(data.pos); TODO:
-                    img.width = '90';
-                    $(menu_item).find('.cert_container').append(img);
-                    $(img).on('click',menu_item, that.onClickImage);
-                }
+
 
                 if ($(menu_item).find('.item_content').css('display') === 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
@@ -306,14 +326,20 @@ class CustomerOrder{
                     }).find( 'textarea' ).change();
                 });
             }
+
+            setTimeout(function () {
+                let empty = $('#menu_item_tmplt').clone();
+                // $(empty).addClass('menu_item');
+                $(empty).attr('id','menu_item_empty');
+                $(empty).insertAfter($('#'+ tab + '_' + last));
+            },200)
+
+
             //
             // if($('.carousel-inner').children().length<=1)
             //    $(".carousel_collapse").css('display','none');
 
-            let empty = $('#menu_item_tmplt').clone();
-            // $(empty).addClass('menu_item');
-            $(empty).attr('id','menu_item_empty');
-            $(empty).insertAfter($('.menu_item').last());
+
         });
 
 

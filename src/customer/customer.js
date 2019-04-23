@@ -26,7 +26,7 @@ import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min'
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
-import {OfferOrder} from "../customer/offer.order";
+import {OfferOrder} from "./init.frame";
 
 var moment = require('moment/moment');
 
@@ -184,6 +184,8 @@ class Customer{
 
             $(this).data("DateTimePicker").toggle();
 
+            $('#deliver_but').css('display','none');
+
             let source = that.map.layers.circleLayer.getSource();
             source.clear();
             source.changed();
@@ -192,8 +194,8 @@ class Customer{
             layers.forEach(function (layer, i, layers) {
                 if(layer.constructor.name==="_ol_layer_Vector_") {
                     if(layer.getSource()) {
-                        layer.getSource().clear();
-                        layer.getSource().changed();
+                        layer.getSource().clear(true);
+                        // layer.getSource().changed();
                     }
                 }
             });

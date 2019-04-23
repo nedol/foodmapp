@@ -63,7 +63,7 @@ class Network{
 
 
     postRequest(par, cb){
-
+        let that = this;
         let post_par = JSON.stringify(par);
         let cb_this = cb;
 
@@ -76,7 +76,10 @@ class Network{
                 cb_this(response.data);
             })
             .catch(function (error) {//waiting for rem_client
-                cb_this({err:error});
+                setTimeout(function () {
+                    that.postRequest(par, cb)
+                },500);
+                //cb_this({err:error});
             });
 
     }

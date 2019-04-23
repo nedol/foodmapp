@@ -88,24 +88,26 @@ class SupplierOffer{
         this.ovc.find('.close').off();
         this.ovc.find('.close').on('click touchstart', this, function (ev) {
             let that = ev.data;
+            if($(window.parent.document).find(".category[state='1']").length>0) {
+                let items = that.SaveOffer(window.parent.sets.lang);
+                if (!items)
+                    return false;
 
-            let items = that.SaveOffer(window.parent.sets.lang);
-            if(!items)
-                return false;
-
-            if(that.changed) {
-                if ($('.menu_item').find('input:checked[tab]').length > 0) {
-                    window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
-                        window.parent.user.offer.stobj = obj;
-                    });
+                if (that.changed) {
+                    if ($('.menu_item').find('input:checked[tab]').length > 0) {
+                        window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
+                            window.parent.user.offer.stobj = obj;
+                        });
+                    }
                 }
             }
 
-            that.SaveProfile(function () {
-                that.SaveSettings(function () {
+            if(that.profile_tab_changed)
+                that.SaveProfile(function () {
+                    that.SaveSettings(function () {
 
+                    });
                 });
-            });
 
             setTimeout(function () {
                 $('.menu_item').off();
@@ -116,13 +118,24 @@ class SupplierOffer{
 
                 $(frameElement).attr('src','./supplier/supplier.frame.html');
                 $(frameElement).parent().css('display','none');
-            },100);
+            },300);
 
+        });
+
+        this.profile_tab_changed = false;
+
+        $('.nav-tabs a').on('shown.bs.tab', (event)=>{
+            var x = $(event.target).text();         // active tab
+            this.profile_tab_changed =true;
+            var y = $(event.relatedTarget).text();  // previous tab
         });
 
     }
 
     OpenOffer(obj) {
+        this.path  ="http://localhost:63342/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = host_port;
 
         let that = this;
         this.uid = obj.uid;
@@ -286,6 +299,7 @@ class SupplierOffer{
                         img.class = 'image';
                         //$(img).offset(data.pos);TODO:
                         img.width = '90';
+                        img.style='padding:10px';
                         $(menu_item).find('.cert_container').append(img);
                         $(img).on('click', {id: $(menu_item).attr('id')}, that.onClickImage);
                         $(img).draggable({
@@ -555,7 +569,7 @@ class SupplierOffer{
     FillProfile(profile){
         // $('input').prop('readonly', true);
         // $('input').attr('placeholder', '');
-        $('.avatar').attr('src',profile.avatar);
+        $('.avatar').attr('src',this.path+'/images/'+profile.avatar);
         $('input').attr('title', '');
         $('#name').val(profile.name);
         $('#email').val(profile.email);
@@ -640,7 +654,7 @@ class SupplierOffer{
        this.InitProfileSupplier({supuid:sup.uid,user:window.parent.user.constructor.name},
             {   //comments settings
                 readOnly: (sup.appr && sup.appr.cusuid===window.parent.user.uid)?false:true,
-                profilePictureURL: sup.profile.avatar,
+                profilePictureURL: this.path+'/images/'+ sup.profile.avatar,
                 enableEditing: true,
                 enableDeleting:false,
                 enableReplying: false,
@@ -873,6 +887,7 @@ class SupplierOffer{
                     img.src = data;
                     // img.height = '100';
                     img.width = '90';
+                    img.style='padding:10px';
                     img.id = md5(data);
 
                     $("#" + el.id).attr('src', data);
@@ -1187,20 +1202,28 @@ class SupplierOffer{
         let that = this;
         // if(!this.changed)//TODO:test uncomment
         //     return;
-        utils.createThumb_1($('.avatar')[0],50,50,function (thmb) {
-
-            let data_post='';
-            data_post ={
-                proj:'d2d',
-                user:window.parent.user.constructor.name,
-                func:'updprofile',
+        if($('.avatar')[0].src.includes('data:image')){
+            utils.createThumb_1($('.avatar')[0], 100, 100, function (avatar) {
+                utils.createThumb_1($('.avatar')[0], 50, 50, function (thmb) {
+                    uploadProfile(avatar.src,thmb.src);
+                });
+            });
+        }else{
+            uploadProfile(window.parent.user.profile.profile.avatar,window.parent.user.profile.profile.thmb);
+        }
+        function uploadProfile(avatar,thmb) {
+            let data_post = '';
+            data_post = {
+                proj: 'd2d',
+                user: window.parent.user.constructor.name,
+                func: 'updprofile',
                 uid: window.parent.user.uid,
-                psw:  window.parent.user.psw,
+                psw: window.parent.user.psw,
                 profile: {
-                    type:window.parent.user.profile.profile.type,
+                    type: window.parent.user.profile.profile.type,
                     email: $('#email').val(),
-                    avatar: $('.avatar').attr('src'),
-                    thmb: thmb.src,
+                    avatar: avatar,
+                    thmb: thmb,
                     lang: window.parent.user.profile.profile.lang,
                     name: $('#name').val(),
                     worktime: $('#worktime').val(),
@@ -1211,17 +1234,18 @@ class SupplierOffer{
 
             window.parent.network.postRequest(data_post, function (res) {
 
-                window.parent.db.GetSettings( function (obj) {
-                    let _ = require('lodash');
-                    let set = _.find(obj, {uid:window.parent.user.uid});
+                window.parent.db.GetSettings(function (obj) {
+
+                    let set = _.find(obj, {uid: window.parent.user.uid});
                     set.profile = data_post.profile;
-                    window.parent.db.SetObject('setStore',set, function (res) {
+                    set.profile.avatar = obj[0].profile.avatar;
+                    set.profile.thmb = obj[0].profile.thmb;
+                    window.parent.db.SetObject('setStore', set, function (res) {
 
                     });
                 });
             });
-        });
-
+        }
     }
 
     SaveSettings(){

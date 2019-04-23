@@ -160,7 +160,9 @@ module.exports = class D2D {
                                             result: result,
                                             uid: uid,
                                             psw: psw,
-                                            email: q.profile.email
+                                            email: q.profile.email,
+                                            avatar: q.profile.avatar,
+                                            thmb:q.profile.thmb
                                         }));
                                     });
                                 }

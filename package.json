@@ -72,6 +72,7 @@
     "jquery-textcomplete": "^1.8.4",
     "jquery-ui": "^1.12.1",
     "jquery-ui-touch-punch": "^0.2.3",
+    "jquery.nicescroll": "^3.7.6",
     "jquery.ui.touch": "0.0.1",
     "js-md5": "^0.7.3",
     "js-yaml": "^3.12.0",

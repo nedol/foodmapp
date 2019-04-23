@@ -442,11 +442,12 @@ class DB {
                 var cursor = event.target.result;
                 if (cursor) {
                     ar.push(cursor.value);
-                }
-                try {
-                    cursor.continue();
-                } catch (ex) {
-                    console.log();
+
+                    try {
+                        cursor.continue();
+                    } catch (ex) {
+                        console.log();
+                    }
                 }
             };
 

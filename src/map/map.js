@@ -188,6 +188,7 @@ class OLMap {
 
                         source.addFeature(markerFeature);
 
+
                         if (objs[o].profile.type === 'marketer') {
                             objs[o].img = "./images/ic_" + cat + ".png";
                             let clusterSource = new Cluster({
@@ -196,6 +197,7 @@ class OLMap {
                             });
 
                             layer.setSource(clusterSource);
+                            clusterSource.changed();
                         }else if(objs[o].profile.type === 'deliver'){
                             objs[o].img = objs[o].profile.thmb;
                             let clusterSource = new Cluster({
@@ -203,7 +205,7 @@ class OLMap {
                                 source: source
                             });
                             layer.setSource(clusterSource);
-
+                            clusterSource.changed();
                             let circle_source = window.user.map.layers.circleLayer.getSource();
 
                             let radiusFeature='';
@@ -230,6 +232,9 @@ class OLMap {
                                 circle_source.addFeature(radiusFeature);
                             }
                         }
+
+                    }else{
+                        //source.getFeatureById(markerFeature.getId()).changed();
                     }
                 }
 

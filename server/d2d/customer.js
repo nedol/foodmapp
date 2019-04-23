@@ -257,7 +257,7 @@ module.exports = class Customer extends D2D{
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
             " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
             " apprs.totals as apprs"+//общее кол-во подтверждений
-            " FROM  supplier as sup, offers as of," +
+            " FROM  supplier as sup, promo, offers as of," +
             " (" +
             " SELECT COUNT(*) as  totals" +
             " FROM supplier as sup, approved as appr" +
@@ -265,6 +265,7 @@ module.exports = class Customer extends D2D{
             " AND appr.date='"+q.date.split('T')[0]+"'" +
             " ) AS apprs"+
             " WHERE sup.uid = of.supuid"+
+            " AND LCASE(sup.promo)=LCASE(promo.code)"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
             " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL " +

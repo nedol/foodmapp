@@ -55,7 +55,20 @@ module.exports = class Supplier extends D2D{
 
             if (result.length > 0) {
                 let profile,values, sql;
-                if(q.profile.avatar && q.profile.avatar.length<IMG_SIZE_LIMIT &&
+
+                if(!q.profile.avatar || fs.existsSync("./images/"+q.profile.avatar)){
+                    values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
+                    sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
+                    setTimeout(function () {
+                        global.con_obj.query(sql, values, function (err, result) {
+                            if (err) {
+                                throw err;
+                            }
+                            res.writeHead(200, {'Content-Type': 'application/json'});
+                            res.end(JSON.stringify({profile: q.profile}));
+                        });
+                    },100);
+                }else if(q.profile.avatar && q.profile.avatar.length<IMG_SIZE_LIMIT &&
                     q.profile.thmb && q.profile.thmb.length<IMG_SIZE_LIMIT) {
                     that.replaceImg_2(q.profile.avatar, function (avatar) {
                         that.replaceImg_2(q.profile.thmb, function (thmb) {
@@ -89,7 +102,7 @@ module.exports = class Supplier extends D2D{
         this.isValidSupplier(q,res, function (result) {
             if (result.length <=0) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err:'Пройдите регистрацию',link:'https://'+window.location.hostname+'/d2d/dist/settings.supplier.html'}));
+                res.end(JSON.stringify({err:'Пройдите регистрацию',link:'https://'+q.host+'/d2d/dist/settings.supplier.html'}));
                 return;
             }
 

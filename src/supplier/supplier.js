@@ -42,7 +42,9 @@ var ColorHash = require('color-hash');
 class Supplier{
 
     constructor(uObj) {
-
+        this.path  ="http://localhost:63342/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = host_port;
 
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
@@ -190,7 +192,10 @@ class Supplier{
             that.map.GetObjectsFromStorage();
 
             window.db.GetOffer(that.date, function (off) {
-                if(!off[0]) {
+               let not_empty = $.grep(off, function (el,i) {
+                   return (el && !_.isEmpty(el.data));
+               });
+                if(!off[0] || not_empty.length===0) {
                     window.db.GetLastOffer(function (res) {
                         if(!res){
                             that.offer.stobj = {date:that.date}
@@ -206,9 +211,11 @@ class Supplier{
 
                 if(that.offer.stobj && that.offer.stobj.location) {
 
-                    let my_truck_2 = $('#my_truck').clone()[0];
+                    let my_truck_2 = $('#my_truck_container').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
+                    if(false)
                     $(my_truck_2).draggable({
+                        cancel: ".non_draggable",
                         start: function (ev) {
                             console.log("drag start");
                         },
@@ -217,9 +224,14 @@ class Supplier{
                         },
                         stop: function (ev) {
                             console.log("drag stop");
+                            let domRect = $(my_truck_2)[0].getBoundingClientRect();
+                            let ev_coor = that.map.ol_map.getEventCoordinate(ev);
                             let offset  = $(my_truck_2).offset();
                             let coor = that.map.ol_map.getCoordinateFromPixel([offset.left,offset.top]);
-                            window.user.offer.stobj.location = coor;
+                            window.user.offer.stobj.location = ev_coor;
+                            that.my_truck_ovl.overlay.values_.position = ev_coor;
+                            //$(my_truck_2).addClass('non_draggable');
+
                         }
                     });
                     let status;
@@ -227,9 +239,9 @@ class Supplier{
                         status = 'unpublished';
                     else
                         status = 'published';
-                    $(my_truck_2).addClass(status);
+                    $(my_truck_2).find('img').addClass(status);
                     if(that.profile.profile.type==='marketer')
-                        $(my_truck_2).attr('src',that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar);
+                        $(my_truck_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar));
                     that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
                     $('#my_truck').on('click touchstart', (ev)=> {
                         if(that.offer.stobj.location)
@@ -249,10 +261,10 @@ class Supplier{
                     let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
                     window.user.offer.stobj.location = coor;
                     if(!that.my_truck_ovl) {
-                        let my_truck_2 = $('#my_truck').clone()[0];
+                        let my_truck_2 = $('#my_truck_container').clone()[0];
                         $(my_truck_2).attr('id', 'my_truck_2');
                         if(that.profile.profile.type==='marketer')
-                            $(my_truck_2).attr('src',that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar);
+                            $(my_truck_2).attr('src',that.path+'/images/'+ (that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar));
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';
@@ -393,6 +405,7 @@ class Supplier{
             proj: 'd2d',
             user: window.user.constructor.name.toLowerCase(),
             func: 'updateoffer',
+            host:window.location.origin,
             uid: that.uid,
             psw: that.psw,
             categories: data.arCat,

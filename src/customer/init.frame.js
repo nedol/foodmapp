@@ -73,8 +73,11 @@ class OfferOrder {
         $(client_frame).css('display', 'inline-block');
         $('#client_frame_container').css('display', 'inline');
         let w = document.documentElement.clientWidth;
-       // if(window.devicePixelRatio<1.5)
-            w='700px';
+        //if(window.devicePixelRatio<1.5)
+        $('#debug').text('client w:'+w);
+        if(w>600)
+            w='600';
+
         $(client_frame).css('width',w);
 
         $('#client_frame_container').append(client_frame);

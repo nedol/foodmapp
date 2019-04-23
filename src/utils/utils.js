@@ -3,6 +3,7 @@ let http = require('http');
 let https = require('https');
 
 
+
 $.fn.setCursorPosition = function(pos) {
     this.each(function(index, elem) {
         if (elem.setSelectionRange) {

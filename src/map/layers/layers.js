@@ -205,7 +205,7 @@ class Layers {
                     }
 
                     let thmb = window.location.origin +"/d2d/server/images/"+obj.profile.avatar;
-                    if(host_port.includes('nedol.ru'))
+                    if(host_port.includes('nedol.ru/server'))
                         thmb = host_port +"/images/"+obj.profile.avatar;
 
                         let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({

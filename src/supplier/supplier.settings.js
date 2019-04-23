@@ -10,6 +10,24 @@ import {Utils} from "../utils/utils";
 let utils = new Utils();
 
 
+$(document).on('readystatechange', function () {
+
+    if (!window.EventSource) {
+        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
+        return;
+    }
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+
+    // parent
+    window.alert = function (text) {
+        $(".alert h4").text(text);
+        $(".alert").removeClass("in").show();
+        $(".alert").delay(200).addClass("in").fadeOut(3000);
+    }
+});
 
 class SupplierSettings {
     constructor(){
@@ -34,6 +52,7 @@ class SupplierSettings {
     }
 
     OnSubmit(form){
+        var urlencode = require('urlencode');
         let that = this;
         console.log('OnSubmit');
         let k = 200/  $(form).find('.avatar').height();
@@ -44,11 +63,11 @@ class SupplierSettings {
                 proj: 'd2d',
                 user: "Supplier",
                 func: 'confirmem',
-                host: location.origin.replace('http://','https://'),
+                host: location.origin.replace('https://','http://'),
                 promo: $(form).find('#promo').val(),
                 profile: {
                     type: 'marketer',
-                    avatar: avatar.src,
+                    avatar:avatar.src,
                     thmb: thmb.src,
                     email: $(form).find('#email').val(),
                     name: $(form).find('#name').val(),
@@ -62,7 +81,7 @@ class SupplierSettings {
                     url: host_port,
                     type: "POST",
                     contentType: 'application/x-www-form-urlencoded',
-                    xhrFields: { withCredentials: true },
+                    crossDomain: true,
                     data: JSON.stringify(data_post),
                     dataType: "json",
                     success: function (obj) {
@@ -74,17 +93,19 @@ class SupplierSettings {
                         delete data_post.func;
                         delete data_post.profile.email;
                         delete data_post.host;
-
+                        data_post.profile.avatar = obj.avatar;
+                        data_post.profile.thmb = obj.thmb;
                         window.db = new DB('Supplier', function () {
                             window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
                                 alert('На указанный email-адрес была выслана ссылка для входа в программу');
                             });
                         });
-
-
                     },
                     error: function (xhr, status) {
-                        alert("error");
+                        setTimeout(function () {
+                            that.OnSubmit(form)
+                        },500);
+                        console.log("error");
                     }
                 });
 
