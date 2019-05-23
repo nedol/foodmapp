@@ -24,6 +24,25 @@ Date.prototype.addDays = function(days) {
     return this;
 };
 
+// parent
+window.alert_ = function(msg,type,fadeout){
+    if(typeof msg ==='string') {
+        msg = {text: msg}
+    }
+    $(".alert_container").css('display','block');
+    if(type)
+        $(".alert").addClass(type);
+    $(".alert").find('a').text(msg.text);
+    $(".alert").find('a').attr('href',msg.link);
+    $(".alert").removeClass("in").show();
+    $(".alert").delay(200).addClass("in");
+    if(fadeout)
+        $(".alert").fadeOut(fadeout);
+    $('.alert button').on('click touchstart',function (ev) {
+        $(".alert_container").css('display','none')
+    });
+}
+
 class Utils{
 
     JSONParse(result) {
@@ -166,6 +185,46 @@ class Utils{
             callback(this);                // provide image to callback
         };
         img.src = c.toDataURL();             // convert canvas to URL
+    }
+
+    resetOrientation(srcBase64, srcOrientation, callback) {
+        var img = new Image();
+
+        img.onload = function() {
+            var width = img.width,
+                height = img.height,
+                canvas = document.createElement('canvas'),
+                ctx = canvas.getContext("2d");
+
+            // set proper canvas dimensions before transform & export
+            if (4 < srcOrientation && srcOrientation < 9) {
+                canvas.width = height;
+                canvas.height = width;
+            } else {
+                canvas.width = width;
+                canvas.height = height;
+            }
+
+            // transform context before drawing image
+            switch (srcOrientation) {
+                case 2: ctx.transform(-1, 0, 0, 1, width, 0); break;
+                case 3: ctx.transform(-1, 0, 0, -1, width, height ); break;
+                case 4: ctx.transform(1, 0, 0, -1, 0, height ); break;
+                case 5: ctx.transform(0, 1, 1, 0, 0, 0); break;
+                case 6: ctx.transform(0, 1, -1, 0, height , 0); break;
+                case 7: ctx.transform(0, -1, -1, 0, height , width); break;
+                case 8: ctx.transform(0, -1, 1, 0, 0, width); break;
+                default: break;
+            }
+
+            // draw image
+            ctx.drawImage(img, 0, 0);
+
+            // export base64
+            callback(canvas.toDataURL());
+        };
+
+        img.src = srcBase64;
     }
 
     isIntersec(from, from_1, to, to_1) {

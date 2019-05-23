@@ -10,8 +10,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Покупатель</title>
 </head>
-
+<!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
@@ -21,11 +24,13 @@
 <link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js?v=3"></script>
+<script type="text/javascript" src="customer.js?v=4"></script>
 <script src="../lib/jquery.ui.touch-punch.min.js"></script>
-
+<!-- Popper JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 
 <style>
+
     html, body{
         padding: 0px;
         margin: 0px;
@@ -49,7 +54,7 @@
     #marker {
         display:block;
         position:absolute;
-        bottom:0;
+        top:1%;
         visibility:visible;
         pointer-events: initial;
         -webkit-user-drag: none;
@@ -129,10 +134,10 @@
     }
 
 
-    #my_truck{
+    #user{
         display: block;
         position: absolute;
-        right: 10px;
+        right: 1%;
         top: 10%;
         width: 40px;
         height: 40px;
@@ -238,7 +243,7 @@
 </style>
 
 <div>
-    <button id="profile_but" class="btn btn-default" type="button"
+    <button id="profile_but" class="btn btn-default" type="button" title="Мой профиль"
             onclick="window.user.OnClickUserProfile()" style="display:inline-block;float:left">
         <a href="#">
             <span class="glyphicon glyphicon-user scaled"></span>
@@ -247,6 +252,7 @@
 </div>
 
 <input type="image" id="deliver_but" src="https://nedol.ru/server/images/1415f4832d63cb093b61696c3bff87ee"
+       title="Доставка"
        style="display:none;position:absolute;left:1%;bottom:80%;width:40px;"
        onclick="window.user.OnClickDeliver(this)"/>
 
@@ -266,14 +272,15 @@
 <div id="main_window">
     <div>
         <div class="date_ctrl form-group"  style="position:fixed;top:1px;">
-            <div class='input-group date' style="width:auto" >
-                <input type='text' class="form-control dt_val"/>
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
+            <div class='input-group date row' style="width:auto" >
+                <input type='text' class="form-control dt_val col" style="width: 90px;font-size: medium"/>
+                <span class="input-group-addon col" style="width: auto">
+                    <span class="glyphicon glyphicon-calendar" style="font-size: medium"></span>
                 </span>
 
-                <button class="btn btn-default dropdown-toggle sel_period" type="button" data-toggle="dropdown"
-                        data-width="fit" style="display:inline-block;float:right">
+                <button class="btn btn-block dropdown-toggle sel_period col"
+                        type="button" data-toggle="dropdown"
+                        data-width="fit" style="float:right;background-color:white;font-size: medium">
                     <span class="caret"></span>
                 </button>
                 <ol id="period_list" class="dropdown-menu period_list" role="menu">
@@ -302,7 +309,7 @@
         }
     </style>
     <div id="dtp_container">
-        <div id="datetimepicker"
+        <div id="datetimepicker" class="center-block"
              style="
              display: block;
              position: absolute;
@@ -380,21 +387,19 @@
              position: absolute;
              height: 100%;
              max-height: 100% !important;
-             min-height: 50% !important;
+             /*min-height: 50% !important;*/
              /*width: 100%;*/
              /*max-width: 95%;*/
              -webkit-overflow-scrolling: auto;
              overflow-y: scroll;
-
              /*overflow-x: auto;*/
              white-space: nowrap;
              /*padding-bottom: 10px;*/
-
              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
     </div>
 
-    <iframe class="client_frame_tmplt"  src="./client/client.html?v=1"
+    <iframe class="client_frame_tmplt"  src="customer/customer.frame.html?v=1"
         style="
             display:none;
             position:relative;
@@ -411,7 +416,7 @@
          overflow: visible; z-index:2000;
          position: absolute;
          -webkit-overflow-scrolling: auto;
-         height: auto;
+         height: 90%;
          max-height: 80% !important;
          min-height: 50% !important;
          width:80%; left: 10%;
@@ -419,12 +424,51 @@
          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
+<style>
+    .carousel{
+        border: 0px solid #a2a2a2;
+        border-radius: 5px;
+    }
+    #items_carousel{
+        position: absolute;
+        height:100px;
+        width:200px;
+        left:1%;
+        bottom:150px;
+    }
+    .carousel-item{
+        background-color: rgba(255,255,255,0.7);
+        position: relative;
+        height: 200px;
+    }
+    .carousel_title{
+        -webkit-text-stroke: 1px white;
+        color:red;
+        top:0;
+    }
+    .carousel_price{
+        position: absolute;
+        font-size: 2em;
+        -webkit-text-stroke: 1px white;
+        color: red;
+        bottom:0;
+        left:0;
+    }
+</style>
+
+<div id="items_carousel" class="carousel slide carousel-fade">
+    <div class="carousel-inner"></div>
+</div>
 
 
 
-<div class="alert alert-warning alert-dismissible fade">
-    <button type="button" class="close">&times;</button>
-    <h3></h3>
+<div class="alert_container  center-block" style="display:none;position:fixed;top:30%;white-space:pre;">
+    <div class="span4">
+        <div class="alert alert-primary">
+            <button type="button" class="close">×</button>
+            <h4><a></a></h4>
+        </div>
+    </div>
 </div>
 
 <data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
@@ -437,4 +481,27 @@
 <div id="debug" style="display: block;position: fixed;bottom: 0;left: 0;width: 100px"></div>
 
 </body>
+<style>
+    @media screen and (min-width: 480px) {
+        #items_carousel{
+            position: absolute;
+            height:200px;
+            /*width:300px;*/
+            left:1%;
+            bottom:50px;
+        }
+        .carousel-item{
+            background-color: rgba(255,255,255,0.7);
+            position: relative;
+            height: 200px;
+        }
+        .carousel_price{
+            font-size: 2em;
+            -webkit-text-stroke: 1px white;
+            color: blue;
+            bottom:0;
+            float:left;
+        }
+    }
+</style>
 </html>

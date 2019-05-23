@@ -28,7 +28,7 @@ class DOMEvents {
 
         });
 
-        $('#loc_ctrl').on('click touchstart', this, ev=> {
+        $('#loc_ctrl').on('click', this, ev=> {
             window.user.map.geo.StartLocation(ev);
             if(window.user.SendLocation && !window.user.isShare_loc){
                 if (window.user.date === moment().format('YYYY-MM-DD') &&
@@ -40,12 +40,12 @@ class DOMEvents {
             }
         });
 
-        $('#pin').on('click touchstart', this, ev=>{
+        $('#pin').on('click', this, ev=>{
             window.user.map.geo.StopLocation(ev);
             window.user.isShare_loc = false;
         });
 
-        $('#search_but').on('click touchstart', this, function (ev) {
+        $('#search_but').on('click', this, function (ev) {
 
             if ($("#search_but").attr('drag') === 'true') {
                 $("#search_but").attr('drag', false);

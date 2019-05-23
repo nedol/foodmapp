@@ -2,6 +2,7 @@ export {CustomerSettings}
 
 import {Network} from "../../network";
 
+
 class CustomerSettings {
     constructor(db){
         this.db = db;

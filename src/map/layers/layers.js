@@ -79,7 +79,7 @@ class Layers {
                     let center = features[f].values_.geometry.getCenter();
                     let map_center = that.map.ol_map.getView().getCenter();
                     let dist = //utils.getCoordsDistance( that.map.ol_map,center,event.coordinate);
-                    utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
+                        utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
                     if(dist*1800<=radius && features[f].values_.obj && features[f].values_.obj.uid){
                         $('#deliver_but').css('display','block');
                         $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar)
@@ -87,7 +87,7 @@ class Layers {
                         that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)'
                     }else{
                         $('#deliver_but').css('display','none');
-                        that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
+                        // that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
                     }
                 }
             });
@@ -190,9 +190,10 @@ class Layers {
                     else
                         opacity = 1.0;
                     let logo = obj.logo;
-                    scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/30000;
+                    let zoom = that.map.ol_map.getView().getZoom();
+                    scale = Math.pow(zoom,3)/30000;
                     if(obj.profile.type==='marketer'){
-                        if(that.map.ol_map.getView().getZoom()<15 && features.length===1)//non cluster
+                        if(zoom<15 && features.length===1)//non cluster
                             return;
                         ic_clust = obj.img;
                         scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/30000;
@@ -223,31 +224,33 @@ class Layers {
                         src: obj.profile.avatar?thmb: "./images/user.png",
                         crossOrigin: 'anonymous'
                     }));
-                    let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
-                        //size: [100,100],
-                        //img: image,
-                        //imgSize:
-                        crossOrigin: 'anonymous',
-                        scale: scale*2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [40*scale*10*2, 40*scale*10*2],
-                        anchorOrigin: 'bottom-left',
-                        offset: [0, 0],
-                        anchorXUnits: 'pixel',
-                        anchorYUnits: 'pixel',
-                        color: [255, 255, 255, 1],
-                        opacity: opacity,
-                        src: ic_clust
-                    }));
+
                     let iconStyle;
                     if (features.length > 1) {//cluster
+                        ic_clust = features[0].values_.object.img;
+                        let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
+                            //size: [100,100],
+                            //img: image,
+                            //imgSize:
+                            crossOrigin: 'anonymous',
+                            scale: scale*2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                            anchor: [40*scale*10*2, 40*scale*10*2],
+                            anchorOrigin: 'bottom-left',
+                            offset: [0, 0],
+                            anchorXUnits: 'pixel',
+                            anchorYUnits: 'pixel',
+                            color: [255, 255, 255, 1],
+                            opacity: opacity,
+                            src: ic_clust
+                        }));
                         iconStyle = new _ol_style_Style_({
                             text: new Text({
                                 text: cluster_feature.values_.features.length.toString(),
                                 font: (140*scale).toFixed(0)+'px serif',
-                                align: 'left',
+                                align: 'right',
                                 //scale: .1,
-                                offsetX: scale*200,
-                                offsetY: scale*70,
+                                offsetX: scale*10,
+                                offsetY: scale*100,
                                 fill: new _ol_style_Fill_({
                                     color: 'blue'
                                 }),
@@ -265,15 +268,15 @@ class Layers {
 
                         iconStyle = new _ol_style_Style_({
                             text: new Text({
-                                text: (obj.overlay === '' || !obj.overlay ? obj.title : ''),
-                                font: '8px serif',
-                                align: 'center',
+                                text: zoom>=17?obj.profile.name:'',
+                                font: (100*scale).toFixed(0)+'px serif',
+                                align: 'left',
                                 //scale: 1.5,
-                                offsetX: 15,
+                                offsetX: 0,
                                 offsetY: 0,
-                                baseline: 'top',
+                                baseline: 'bottom',
                                 fill: new _ol_style_Fill_({
-                                    color: 'red'
+                                    color: 'gray'
                                 }),
                                 stroke: new _ol_style_Stroke_({
                                     color: 'white',

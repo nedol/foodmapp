@@ -4,8 +4,7 @@ export {OfferEditor}
 require('webpack-jquery-ui/draggable');
 require('jquery-ui-touch-punch');
 
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
+require('bootstrap');
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
@@ -16,7 +15,7 @@ const langs = require("../dict/languages");
 // var moment = require('moment');
 //
 var md5 = require('md5');
-var isJSON = require('is-json');
+// var isJSON = require('is-json');
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -46,11 +45,14 @@ class OfferEditor{
         this.offer.uid =  window.user.uid;
         this.offer.dict = window.dict.dict;
 
-        that.off_frame[0].contentWindow.InitSupplierOffer(this.offer);
-        // $('#client_frame_container').draggable();
-        // $('#client_frame_container').resizable({
-        //     aspectRatio: 16 / 9
-        // });
+        setTimeout(function () {
+            that.off_frame[0].contentWindow.InitSupplierOffer(that.offer);
+            // $('#client_frame_container').draggable();
+            // $('#client_frame_container').resizable({
+            //     aspectRatio: 16 / 9
+            // });
+        },200);
+
     }
 
 

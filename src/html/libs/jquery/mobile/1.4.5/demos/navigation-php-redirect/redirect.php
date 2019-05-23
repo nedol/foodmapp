@@ -1,7 +1,7 @@
 <?php
 	// ************************************************************************
 	// The two-second sleep simulates network delays, hopefully causing a
-	// loading indicator message to appear on the client side.
+	// loading indicator message to appear on the customer side.
 	// ************************************************************************
 	sleep(2);
 

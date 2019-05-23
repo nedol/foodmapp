@@ -18,8 +18,6 @@ var countries = require("i18n-iso-countries");
 
 require('bootstrap');
 
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
 require('bootstrap-select');
 
 //let moment = require('moment');

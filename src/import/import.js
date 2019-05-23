@@ -44,8 +44,9 @@ class Import {
                         that.areasAr.push(date+"_"+cats +  "_" +  area);
                     });
                 }
-
-                that.map.GetObjectsFromStorage(area);
+                let extent = that.map.ol_map.getView().calculateExtent();
+                let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
 
             } catch (ex) {
                 console.log(ex);
@@ -79,6 +80,7 @@ class Import {
             window.network.postRequest(data_obj, function (data) {
                 if(data) {
                     processResult(data);
+                    that.map.GetObjectsFromStorage(area);
                 }
 
             });
@@ -143,8 +145,9 @@ class Import {
                 dict: obj.dict?JSON.parse(obj.dict):{},
                 rating: obj.rating?JSON.parse(obj.rating).value:'',
                 profile: obj.profile?JSON.parse(obj.profile):'',
-                apprs: obj.apprs//общее кол-во подтверждений
-
+                apprs: obj.apprs,//общее кол-во подтверждений
+                published: obj.published,
+                deleted: obj.deleted
             };
         }
     }

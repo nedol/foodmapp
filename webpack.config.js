@@ -59,6 +59,13 @@ module.exports = {
             }
         ],
         loaders:[
+            {
+                test: /\.js$/,
+                loader: 'babel-loader',
+                query: {
+                    presets: ['es2015']
+                }
+            },
             { test: /\.css/, loader: "style-loader!css-loader" },
             { test: /\.less$/, loader: "style-loader!css-loader!less-loader" },
             //{ test: /\.jsx?$/, exclude: /(node_modules|bower_components)/, loader: 'babel?optional[]=runtime&stage=0'},

@@ -5,7 +5,7 @@ var urlencode = require('urlencode');
 require('jquery-ui')
 // require('jquery-ui-touch-punch');
 require('jquery.ui.touch');
-require('bootstrap/js/tooltip.js');
+require('bootstrap');
 
 // require('bootstrap/dist/css/bootstrap.css');
 // require('font-awesome/css/font-awesome.css');
@@ -14,9 +14,6 @@ require('bootstrap/js/tooltip.js');
 
 const langs = require("../dict/languages");
 
-// var moment = require('moment');
-
-var isJSON = require('is-json');
 
 import {utils} from "../utils/utils";
 
@@ -66,22 +63,23 @@ class OfferOrder {
         $(client_frame).removeClass('client_frame_tmplt');
         $(client_frame).addClass('client_frame');
 
+
         $(client_frame).on('load', function () {
             client_frame[0].contentWindow.InitCustomerOrder(obj);
         });
 
         $(client_frame).css('display', 'inline-block');
         $('#client_frame_container').css('display', 'inline');
+
         let w = document.documentElement.clientWidth;
         //if(window.devicePixelRatio<1.5)
-        $('#debug').text('client w:'+w);
+        // $('#debug').text('customer w:'+w);
         if(w>600)
             w='600';
 
         $(client_frame).css('width',w);
 
-        $('#client_frame_container').append(client_frame);
-
+        $('#client_frame_container').prepend(client_frame);
         // $('#client_frame_container').draggable();
         // $('#client_frame_container').resizable({
         //     aspectRatio: 16 / 9

@@ -10,19 +10,16 @@ require('dialog-polyfill');
 
 require("../../global");
 
+require('bootstrap');
+
+require('bootstrap-select');
+
 
 import {Utils} from "../utils/utils";
 import {Supplier} from './supplier'
 
 import {Network} from "../../network";
 import {DB} from "../map/storage/db";
-
-require('bootstrap');
-
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
-require('bootstrap-select');
-
 
 const shortid = require('shortid');
 
@@ -38,7 +35,7 @@ window.sets.lang = utils.getParameterByName('lang');
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
+        alert('В этом браузере нет поддержки EventSource.').addClass('show');
         return;
     }
 
@@ -46,12 +43,7 @@ $(document).on('readystatechange', function () {
         return;
     }
 
-    // parent
-    window.alert = function(text){
-        $(".alert h4").text(text);
-        $(".alert").removeClass("in").show();
-        $(".alert").delay(200).addClass("in").fadeOut(3000);
-    }
+
 
     //!!! jquery polyfill
     $.ajaxPrefilter(function (options, original_Options, jqXHR) {
@@ -172,8 +164,6 @@ $(document).on('readystatechange', function () {
         //     $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
         // });
 
-        $('#datetimepicker').data("DateTimePicker").toggle();
-
         $('#debug').text(scale);
 
         $('#datetimepicker').on('dp.show', function (ev) {
@@ -187,14 +177,14 @@ $(document).on('readystatechange', function () {
             $('#dtp_container').css('display', 'none');
         })
 
-        $('.glyphicon-calendar').on('click', function (ev) {
+        $('.dt_val').on('click', function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
         setTimeout(function () {
             $('#datetimepicker').trigger("dp.change");
             $('#datetimepicker').data("DateTimePicker").toggle();
-        }, 200);
+        }, 2000);
     }
 });
 

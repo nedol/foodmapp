@@ -17,6 +17,8 @@ var requrl = '';
 
 const IMG_SIZE_LIMIT = 500000;
 
+const MSG_NO_REG = 0x0001;
+
 module.exports = class Supplier extends D2D{
 
 
@@ -33,8 +35,9 @@ module.exports = class Supplier extends D2D{
             " WHERE sup.uid='"+q.uid+"' AND sup.psw='"+q.psw+"'";
 
         global.con_obj.query(sql, function (err, result) {
-            if (err)
+            if (err) {
                 throw err;
+            }
 
             cb(result);
         });
@@ -102,7 +105,7 @@ module.exports = class Supplier extends D2D{
         this.isValidSupplier(q,res, function (result) {
             if (result.length <=0) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({err:'Пройдите регистрацию',link:'https://'+q.host+'/d2d/dist/settings.supplier.html'}));
+                res.end(JSON.stringify({err:'',link:'https://'+q.host+'/d2d/dist/settings.supplier.html'}));
                 return;
             }
 
@@ -110,7 +113,7 @@ module.exports = class Supplier extends D2D{
             let sql =
                 "SELECT of.*, sup.uid as supuid" +
                 " FROM  supplier as sup, offers as of"+
-                " WHERE of.supuid=sup.uid " +
+                " WHERE of.supuid=sup.uid AND sup.uid='" +q.uid+"'"+
                 " AND of.date='"+q.date+"' AND of.published IS NOT NULL AND of.deleted IS NULL"+
                 " ORDER BY of.id DESC";
 
@@ -124,8 +127,8 @@ module.exports = class Supplier extends D2D{
                     if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
                         let offer = urlencode.decode(q.offer);
                         that.replaceImg(offer,function (offer) {
-                            values = [offer, q.location[1], q.location[0], q.radius, sel[0].id];
-                            let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, radius=? WHERE id=?";
+                            values = [offer, q.location[1], q.location[0], JSON.stringify(q.categories), sel[0].id];
+                            let sql_upd = "UPDATE offers SET data=?, latitude=?, longitude=?, categories=? WHERE id=?";
                             that.updateOfferDB(q, res, sql_upd, values, now);
                             if(sel[0].deliver) {
                                 //copy offer to deliver's offer
@@ -412,19 +415,17 @@ module.exports = class Supplier extends D2D{
             }
             res.writeHead(200, {'Content-Type': 'application/json'});
 
-            that.replaceImg_2(q.profile.avatar,function (path) {
-                q.profile.avatar = path;
-                let values = [JSON.stringify(q.profile), q.settings.prolong];
-                sql = " UPDATE   supplier  SET  profile=?, prolong=?"+
-                    " WHERE supplier.uid = '" + q.uid+"'";
-                global.con_obj.query(sql, values,function (err, result) {
-                    if (err) {
-                        res.end(JSON.stringify({'err': err}));
-                        return;
-                    }
-                    res.end();
-                });
+            let values = [JSON.stringify(q.profile), q.settings.prolong];
+            sql = " UPDATE   supplier  SET prolong=?"+
+                " WHERE supplier.uid = '" + q.uid+"'";
+            global.con_obj.query(sql, values,function (err, result) {
+                if (err) {
+                    res.end(JSON.stringify({'err': err}));
+                    return;
+                }
+                res.end();
             });
+
         });
     }
 
@@ -477,20 +478,19 @@ module.exports = class Supplier extends D2D{
         //     " AND DAY(appr.date)=DAY(NOW()))";
 
          let sql=
-             " SELECT ord.*, cus.profile as profile, sup.dict " +
-             " FROM orders as ord, supplier as sup, customer as cus" +
-             " WHERE ord.supuid=sup.uid  AND ord.cusuid=cus.uid" +
+             " SELECT ord.*, sup.dict " +
+             " FROM orders as ord, supplier as sup" +
+             " WHERE ord.supuid=sup.uid" +
              " AND sup.uid='" + q.uid+"'"+
              " AND sup.psw='"+q.psw +"'"+
-             " AND ord.date='"+q.date+"'" +
-             " UNION" +
-             " SELECT ord.*,NULL,NULL " +
-             " FROM  orders as ord,  approved as appr  " +
-             " WHERE  " +
-             " ord.date='"+q.date+"'" +
-             " AND appr.date=ord.date"+
-             " AND ord.data NOT LIKE CONCAT('%',appr.title, '%') ";
-
+             " AND ord.date='"+q.date+"'" ;
+             // " UNION" +
+             // " SELECT ord.*,NULL,NULL " +
+             // " FROM  orders as ord,  approved as appr  " +
+             // " WHERE  " +
+             // " ord.date='"+q.date+"'" +
+             // " AND appr.date=ord.date"+
+             // " AND ord.data NOT LIKE CONCAT('%',appr.title, '%') "
 
         global.con_obj.query(sql, function (err, result) {
             if (err) {
@@ -537,6 +537,7 @@ module.exports = class Supplier extends D2D{
             " AND off.supuid=sup.uid " +
             // " AND off.date<(NOW() + INTERVAL sup.prolong DAY)"+
             " AND off.date>NOW()";
+
         global.con_obj.query(sql, function (err, result) {
             if (err) {
                 throw err;
@@ -547,3 +548,7 @@ module.exports = class Supplier extends D2D{
         });
     }
 }
+
+// res.writeHead(200, {'Content-Type': 'application/json'});
+// res.end(JSON.stringify(result));
+// return;

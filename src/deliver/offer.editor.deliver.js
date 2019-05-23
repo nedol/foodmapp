@@ -4,8 +4,7 @@ export {OfferEditorDeliver}
 require('webpack-jquery-ui/draggable');
 require('jquery-ui-touch-punch');
 
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
+require('bootstrap');
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');

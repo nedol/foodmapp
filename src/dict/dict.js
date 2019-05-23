@@ -62,10 +62,9 @@ class Dict {
     getValByKey(lang, k) {
 
         try {
-            let val = this.dict[k][lang] ?
+            return this.dict[k][lang] ?
                 this.dict[k][lang] :
                 (this.dict[k]['en'] ? this.dict[k]['en'] : '');
-            return val;
         } catch (ex) {
             return '';
         }

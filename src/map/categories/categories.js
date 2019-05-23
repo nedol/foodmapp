@@ -106,5 +106,7 @@ class Categories {
             return {id: $(el).attr('id'), state: $(el).attr('state')};
         });
         localStorage.setItem("state_category", JSON.stringify(cats));
+
+        window.user.import.ImportDataByLocation(ev);
     }
 }

@@ -2,12 +2,11 @@
 export {Customer};
 
 let utils = require('../utils/utils');
-var isJSON = require('is-json');
 
 require('jquery-ui')
 // require('jquery-ui-touch-punch');
 require('jquery.ui.touch');
-require('bootstrap');
+
 
 require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
 
@@ -114,7 +113,9 @@ class Customer{
 
         window.user.map.geo.SearchLocation("Москва, ФудСити",function (bound) {
             window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
-            window.user.map.GetObjectsFromStorage();
+
+            $('#datetimepicker').trigger("dp.change");
+
         });
     }
 
@@ -159,16 +160,16 @@ class Customer{
             $(this).data("DateTimePicker").toggle();
         });
 
-        $('#date').on("click touchstart",this,function (ev) {
+        $('#date').on("click",this,function (ev) {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
-        $('.period').find('.from').on("click touchstart",this,function (ev) {
+        $('.period').find('.from').on("click",this,function (ev) {
             if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
                 $('#dt_from').data("DateTimePicker").toggle();
         });
 
-        $('.period').find('.to').on("click touchstart", this,function (ev) {
+        $('.period').find('.to').on("click", this,function (ev) {
             if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
                 $('#dt_to').data("DateTimePicker").toggle();
         });
@@ -186,33 +187,36 @@ class Customer{
 
             $('#deliver_but').css('display','none');
 
-            let source = that.map.layers.circleLayer.getSource();
-            source.clear();
-            source.changed();
+            if (ev) {
+                window.user.import.ImportDataByLocation(ev);
+            }
+
+            setTimeout(()=>{
+                //TODO: that.map.MoveToLocation(that.offer.stobj.location);
+            },300);
 
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
-                if(layer.constructor.name==="_ol_layer_Vector_") {
-                    if(layer.getSource()) {
+                if (layer.type === "VECTOR") {
+                    if (layer.getSource())
                         layer.getSource().clear(true);
-                        // layer.getSource().changed();
+                    if (layer.getSource().source) {
+                        layer.getSource().source.clear(true);
                     }
                 }
             });
-            // window.db.GetOffer(that.date ,function (res) {
-            //     if(res){
-            //         $('.sel_period').text(res.period);
-            //     }else{
-            //         window.db.SetObject('offerStore',{date:that.date,period:$('.sel_period').text()},function (res) {
-            //
-            //         });
-            //     }
-            // });
-            that.import.GetApprovedCustomer(function () {
+
+            $("#items_carousel").carousel('dispose');
+            $('.carousel-item').remove();
+
+            let source = that.map.layers.circleLayer.getSource();
+            //source.clear();
+
+             that.import.GetApprovedCustomer(function () {
 
             });
 
-            that.map.GetObjectsFromStorage();
+            //that.map.GetObjectsFromStorage();
         });
     }
 
@@ -435,11 +439,7 @@ class Customer{
                 });
             });
         }
-
-
     }
-
-
 }
 
 

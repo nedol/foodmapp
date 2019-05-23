@@ -1,15 +1,11 @@
 'use strict'
 
-
+require('bootstrap');
 require('bootstrap-select');
 
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
-require('bootstrap/js/collapse.js')
-require('bootstrap/js/dropdown.js')
-require('bootstrap/js/modal.js');
+
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
 import {Dict} from '../dict/dict.js';
@@ -19,15 +15,15 @@ import 'tablesorter/dist/css/theme.default.min.css';
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-
 let _ = require('lodash')
 
-var md5 = require('md5');
+let md5 = require('md5');
+
 
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.');
+        window.parent.alert('В этом браузере нет поддержки EventSource.');
         return;
     }
 
@@ -35,9 +31,11 @@ $(document).on('readystatechange', function () {
         return;
     }
     window.InitSupplierOffer = function (data) {
-        window.sup_off = new SupplierOffer();
+        if(!window.sup_off )
+            window.sup_off = new SupplierOffer();
         window.sup_off.OpenOffer(data);
     };
+
 
 
     $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
@@ -46,37 +44,30 @@ $(document).on('readystatechange', function () {
     });
 
 
-    var readURL = function (input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
 
-            reader.onload = function (e) {
-                $('.avatar').css('visibility','visible');
-                $('.avatar').attr('src',e.target.result);
-
-                // $('.avatar').on('load',function (ev) {
-                //     ev.preventDefault();
-                //     let k = 70/$(this).height();
-                //     utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
-                //         $('.avatar').attr('thmb', thmb.src);
-                //         $('.avatar').off('load');
-                //         // $('.avatar').attr('src', thmb.src);
-                //         $('.avatar').css('visibility','visible');
-                //     });
-                // });
-                // $('.avatar').on('load',function (ev) {
-                //     let thmb = utils.createThumb_1($('.avatar')[0]);
-                //     $('.avatar').attr('thmb',thmb);
-                // })
-
-                $('.avatar').siblings('input:file').attr('changed', true);
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
+                }
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
             }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
+        );
 
-    $(".file-upload").on('change', function () {
-        readURL(this);
     });
 
 });
@@ -86,43 +77,48 @@ class SupplierOffer{
 
         this.ovc = $('body');
         this.ovc.find('.close').off();
-        this.ovc.find('.close').on('click touchstart', this, function (ev) {
+        this.ovc.find('.close').on('click', this, function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
             let that = ev.data;
-            if($(window.parent.document).find(".category[state='1']").length>0) {
-                let items = that.SaveOffer(window.parent.sets.lang);
-                if (!items)
-                    return false;
+            function closeWindow() {
+                $(frameElement).parent().css('display', 'none');
+            };
 
-                if (that.changed) {
-                    if ($('.menu_item').find('input:checked[tab]').length > 0) {
-                        window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
-                            window.parent.user.offer.stobj = obj;
-                        });
+            let confirm = window.confirm("Сохранить и опубликовать?");
+            if(confirm) {
+                if ($(window.parent.document).find(".category[state='1']").length > 0) {
+
+                    let items = that.SaveOffer(window.parent.sets.lang);
+                    if (!items)
+                        return false;
+
+                    if (that.changed) {
+
+                        if ($('.menu_item').find('input:checked[tab]').length > 0) {
+
+                            window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
+                                window.parent.user.offer.stobj = obj;
+                            });
+                        }
                     }
                 }
+
+                if (that.profile_tab_changed) {
+                    that.SaveProfile(function () {
+                        that.SaveSettings();
+                    });
+                }
+
+                setTimeout(function () {
+                    closeWindow();
+                }, 300);
+            }else{
+                closeWindow();
             }
 
-            if(that.profile_tab_changed)
-                that.SaveProfile(function () {
-                    that.SaveSettings(function () {
-
-                    });
-                });
-
-            setTimeout(function () {
-                $('.menu_item').off();
-
-                $('.menu_item').remove();
-                $('.tab_inserted').remove();
-                $('.div_tab_inserted').remove();
-
-                $(frameElement).attr('src','./supplier/supplier.frame.html');
-                $(frameElement).parent().css('display','none');
-            },300);
-
+            this.profile_tab_changed = false;
         });
-
-        this.profile_tab_changed = false;
 
         $('.nav-tabs a').on('shown.bs.tab', (event)=>{
             var x = $(event.target).text();         // active tab
@@ -133,6 +129,11 @@ class SupplierOffer{
     }
 
     OpenOffer(obj) {
+        $('.menu_item').off();
+        $('.menu_item').remove();
+        $('.tab_inserted').remove();
+        $('.div_tab_inserted').remove();
+
         this.path  ="http://localhost:63342/d2d/server";
         if(host_port.includes('nedol.ru'))
             this.path = host_port;
@@ -173,18 +174,16 @@ class SupplierOffer{
         $(window.parent.document).find(".category[state='1']").each(function (i, cat) {
             let cat_tab = $(cat).text();
             if ($('[href="#' + cat_tab + '"]').length === 0) {
-                $('<li class="tab_inserted"><a data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '">' + cat_tab + '</a>' +
+                $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '">' + cat_tab + '</a>' +
                     '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                $('<div id="'+cat_tab+'" class="tab-pane fade div_tab_inserted" style="border: none">'+
+                $('<div id="'+cat_tab+'" class="div_tab_inserted tab-pane" style="border: none">'+
                     '</div>').insertBefore($('#add_tab_div'));
             }
-
 
             $('.dropdown').css('visibility', 'visible');
             $('#order_menu_button').css('visibility', 'visible');
 
             $('#add_tab_li').css('visibility', 'visible');
-            $('#add_item').css('visibility', 'visible');
 
             let isEditable = true;
 
@@ -199,7 +198,6 @@ class SupplierOffer{
             window.parent.sysdict.set_lang(window.parent.sets.lang, $("#menu_item_tmplt"));
             window.parent.sysdict.set_lang(window.parent.sets.lang, $("#editor"));
 
-            $('#add_item').css('display', 'block');
             $('#add_tab_li').css('display', 'block');
 
             for (let tab in that.offer) {
@@ -263,7 +261,7 @@ class SupplierOffer{
                             continue;
                         let data = pl[i];
                         $(menu_item).find('.pack_container').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + i + "</a></li>");
+                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + i + "</a>");
                         $(menu_item).find('.item_pack').text(i);
                         $(menu_item).find('.item_pack').attr('pack', i);
                         $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
@@ -275,7 +273,6 @@ class SupplierOffer{
                                 delete pl[pack];
                                 $(this).attr('packlist', JSON.stringify(pl));
                             }
-                            //$(menu_item).find('.add_pack').css('visibility', 'hidden');
                         });
 
                         $(menu_item).find('.item_price').val(data);
@@ -289,7 +286,6 @@ class SupplierOffer{
 
                     $(menu_item).find('.item_price').on('click touchstart', that, function(ev) {
                         //$(menu_item).find('.add_pack').css('visibility', 'visible');
-
                         //$(this).focus();
                     });
 
@@ -311,7 +307,8 @@ class SupplierOffer{
                             },
                             stop: function (ev) {
                                 console.log("drag stop");
-                                $(img).remove();
+                                if($(img).position().left>$(img).width()-20)
+                                    $(img).remove();
                             }
                         });
                     });
@@ -351,12 +348,14 @@ class SupplierOffer{
 
                     $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + that.offer[tab][i].title);
 
-                    $(menu_item).find('li>a[role=packitem]').on('click', {
+                    $(menu_item).find('a[role=packitem]').on('click', {
                         that: that,
                         mi: $(menu_item)
                     }, that.OnClickPack);
 
                     $('a[href="#' + tab + '"]').css('color', 'blue');
+
+                    $(menu_item).find('.item_title').collapse('hide');
 
                     // $(menu_item).find('.cert_container').sortable({
                     //     connectWith: "div",
@@ -387,6 +386,12 @@ class SupplierOffer{
         });
 
         $($('.tab_inserted a')[0]).tab('show');
+        $($('.tab_inserted')[0]).addClass('active');
+
+        $('.tab_inserted').on('click', function (ev) {
+            $('.tab_inserted').removeClass('active');
+            $(this).addClass('active');
+        });
 
         if(window.parent.user.date.getDate()=== new Date().getDate()){
             $('.notoday').removeClass('notoday');
@@ -441,6 +446,7 @@ class SupplierOffer{
                         "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
                         "</label>" +
                         "</td>" +
+
                         "<td "+ inv_qnty+">"  + data[kAr[k]].qnty + "</td>" +
                         "<td>" + data[kAr[k]].pack + "</td>" +
                         "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
@@ -465,6 +471,7 @@ class SupplierOffer{
                         "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
                         "</label>" +
                         "</td>" +
+
                         "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
 
                     if(window.parent.user.profile.profile.type==='marketer'){
@@ -538,11 +545,12 @@ class SupplierOffer{
             $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
                 $(this).height(0).height(h);//this.scrollHeight);
             }).find( 'textarea' ).change();
+            $(this).find('.content_text').focus();
         });
 
 
-        $("#editor").find('#add_item').off();
-        $("#editor").find('#add_item').on('click', this, this.AddOfferItem);
+        $('#add_item').off();
+        $('#add_item').on('click', this, this.AddOfferItem);
 
 
 
@@ -697,7 +705,7 @@ class SupplierOffer{
         // $(menu_item).find('.pack_list').append("<li><a role='packitem' style='color: red'>добавить</a></li>");
         for (let i in pl) {
             if (i) {
-                $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem'>" + i + "</a></li>");
+                $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem'>" + i + "</a>");
             }
         }
 
@@ -706,7 +714,7 @@ class SupplierOffer{
         $(menu_item).find('.pack_list').addClass('dropdown-menu');
         $(menu_item).find('.caret').css('visibility', 'visible');
 
-        $(menu_item).find('li>a[role=packitem]').on('click', {
+        $(menu_item).find('a[role=packitem]').on('click', {
             that: that,
             mi: $(menu_item)
         }, that.OnClickPack);
@@ -742,7 +750,8 @@ class SupplierOffer{
 
         ev.data.changed = true;
 
-        let tab = $('#menu_tabs').find('li.active').find('a').attr('href');
+        let tab = $('.tab_inserted.active').text();
+        //alert('tab:'+tab);
         if(!tab)
             return;
 
@@ -771,10 +780,6 @@ class SupplierOffer{
 
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
-
-        $(menu_item).find('.item_content').on('shown.bs.collapse',function (ev) {
-            $(this).find('.content_text').focus();
-        });
 
         hash = md5(new Date().getTime()+1);
         //window.dict.dict[hash] = {};
@@ -841,7 +846,7 @@ class SupplierOffer{
         $(menu_item).find('.add_pack').attr('id', 'pack_' + tab.replace('#','') );
         $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:that},that.OnClickAddPack);
 
-        $(tab).append(menu_item[0]);
+        $('#'+tab).append(menu_item[0]);
 
         $(menu_item).find('.item_title').focus();
 
@@ -893,7 +898,7 @@ class SupplierOffer{
                     $("#" + el.id).attr('src', data);
 
                     $("#" + el.id).css('visibility', 'visible');
-                    $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
+                    // $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
                     $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
                     $(img).draggable({
                         start: function (ev) {
@@ -904,7 +909,8 @@ class SupplierOffer{
                         },
                         stop: function (ev) {
                             console.log("drag stop");
-                            $(img).remove();
+                            if($(img).position().left>$(img).width()-20)
+                                $(img).remove();
                         }
                     });
                     $(img).on('click touchstart',{id:$("#" + el.id).closest('.menu_item').attr('id')},window.sup_off.onClickImage);
@@ -1203,15 +1209,21 @@ class SupplierOffer{
         // if(!this.changed)//TODO:test uncomment
         //     return;
         if($('.avatar')[0].src.includes('data:image')){
-            utils.createThumb_1($('.avatar')[0], 100, 100, function (avatar) {
-                utils.createThumb_1($('.avatar')[0], 50, 50, function (thmb) {
-                    uploadProfile(avatar.src,thmb.src);
+
+            let k = 200/  $('.avatar').height();
+            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+                k = 50/  $('.avatar').height();
+                utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+                    uploadProfile(that,avatar.src,thmb.src,cb);
                 });
             });
         }else{
-            uploadProfile(window.parent.user.profile.profile.avatar,window.parent.user.profile.profile.thmb);
+            uploadProfile(that,window.parent.user.profile.profile.avatar,window.parent.user.profile.profile.thmb,cb);
         }
-        function uploadProfile(avatar,thmb) {
+
+
+        function uploadProfile(that,avatar,thmb,cb) {
+
             let data_post = '';
             data_post = {
                 proj: 'd2d',
@@ -1233,15 +1245,21 @@ class SupplierOffer{
             }
 
             window.parent.network.postRequest(data_post, function (res) {
-
+                let res_ = res;
+                cb();
                 window.parent.db.GetSettings(function (obj) {
 
                     let set = _.find(obj, {uid: window.parent.user.uid});
                     set.profile = data_post.profile;
-                    set.profile.avatar = obj[0].profile.avatar;
-                    set.profile.thmb = obj[0].profile.thmb;
-                    window.parent.db.SetObject('setStore', set, function (res) {
 
+                    if(res_.profile) {
+                        set.profile.avatar = res_.profile.avatar;
+                        set.profile.thmb = res_.profile.thmb;
+                    }
+                    window.parent.db.SetObject('setStore', set, function (res) {
+                        $('#user_2', window.parent.document).find('img').attr('src',that.path+'/images/'+ set.profile.avatar);
+                        that.profile = set.profile;
+                        window.parent.user.profile.profile = set.profile;
                     });
                 });
             });
@@ -1249,6 +1267,37 @@ class SupplierOffer{
     }
 
     SaveSettings(){
-        this.profile_sup.SaveSettings();
+        if(!this.changed)
+            return;
+        this.changed = false;
+
+        let settings = {};
+        $('#settings').find('select').each(function (i,item) {
+            settings[$(item).attr('id')] = $(item).closest('div').find('.sel_prolong').val();
+        });
+
+        window.parent.db.GetSettings(function (obj) {
+            let _ = require('lodash');
+            let set = _.find(obj, {uid:window.parent.user.uid});
+            set.settings = settings;
+            window.parent.db.SetObject('setStore',set,function (res) {
+                window.parent.user.profile.profile =  set.profile;
+            });
+            let data_obj ={
+                proj:"d2d",
+                user: window.parent.user.constructor.name.toLowerCase(),
+                func:"setsup",
+                psw: window.parent.user.psw,
+                uid: window.parent.user.uid
+                //profile:set.profile
+            }
+            data_obj['settings'] = settings;
+            //data_obj['profile'] = set.profile;
+            window.parent.network.postRequest(data_obj, function (data) {
+
+            });
+        });
+
     }
+
 }

@@ -2,7 +2,6 @@
 export {Deliver};
 
 let utils = require('../utils/utils');
-var isJSON = require('is-json');
 
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
@@ -30,8 +29,6 @@ var ColorHash = require('color-hash');
 
 require('bootstrap');
 require('bootstrap-select');
-
-require('bootstrap/js/modal.js');
 
 
 class Deliver{

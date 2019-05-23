@@ -17,21 +17,30 @@ $(document).on('readystatechange', function () {
         window.cs.Open();
     });
 
-    var readURL = function(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
 
-            reader.onload = function (e) {
-                $('.avatar').attr('src', e.target.result);
-                $('.avatar').siblings('input:file').attr('changed',true);
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
+
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
+                }
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
             }
+        );
 
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-
-    $(".file-upload").on('change', function(){
-        readURL(this);
     });
 });

@@ -21,12 +21,6 @@ $(document).on('readystatechange', function () {
         return;
     }
 
-    // parent
-    window.alert = function (text) {
-        $(".alert h4").text(text);
-        $(".alert").removeClass("in").show();
-        $(".alert").delay(200).addClass("in").fadeOut(3000);
-    }
 });
 
 class SupplierSettings {
@@ -54,7 +48,14 @@ class SupplierSettings {
     OnSubmit(form){
         var urlencode = require('urlencode');
         let that = this;
-        console.log('OnSubmit');
+        if(!$(form).find('#email').val()) {
+            $(form).find('#email').focus();
+            return;
+        }
+        if(!$(form).find('#place').val()) {
+            $(form).find('#place').focus();
+            return;
+        }
         let k = 200/  $(form).find('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
             k = 50/  $(form).find('.avatar').height();
@@ -63,7 +64,7 @@ class SupplierSettings {
                 proj: 'd2d',
                 user: "Supplier",
                 func: 'confirmem',
-                host: location.origin.replace('https://','http://'),
+                host: location.origin,
                 promo: $(form).find('#promo').val(),
                 profile: {
                     type: 'marketer',
@@ -104,8 +105,7 @@ class SupplierSettings {
                     error: function (xhr, status) {
                         setTimeout(function () {
                             that.OnSubmit(form)
-                        },500);
-                        console.log("error");
+                        },1000);
                     }
                 });
 
@@ -172,21 +172,38 @@ $(document).on('readystatechange', function () {
     window.cs = new SupplierSettings();
 
 
+
     var readURL = function(input) {
         if (input.files && input.files[0]) {
-            var reader = new FileReader();
 
-            reader.onload = function (e) {
-                $('.avatar').attr('src', e.target.result);
-                $('.avatar').siblings('input:file').attr('changed',true);
-            }
-            reader.readAsDataURL(input.files[0]);
         }
     }
 
 
-    $(".file-upload").on('change', function(){
-        readURL(this);
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
+
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
+                }
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
+            }
+        );
+
     });
 });
 

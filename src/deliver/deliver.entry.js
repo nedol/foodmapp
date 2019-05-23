@@ -19,8 +19,6 @@ import {DB} from "../map/storage/db";
 
 require('bootstrap');
 
-require('bootstrap/js/tooltip.js');
-require('bootstrap/js/tab.js');
 require('bootstrap-select');
 
 global.jQuery = require('jquery');

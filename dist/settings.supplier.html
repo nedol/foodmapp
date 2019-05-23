@@ -9,94 +9,101 @@
 <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ДоТуДо Регистрация</title>
-<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 
-<script src="../lib/load-image/load-image.all.min.js"></script>
+<script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script src="host.js"></script>
 
+<script src="supplier_settings.js"></script>
 
 <body>
-    <div class="container bootstrap snippet">
-        <div class="row">
-            <div class="col-sm-10"><h1>Мой профиль</h1></div>
-            <div class="col-sm-2"></div>
-        </div>
-        <div class="row">
-            <div class="col-sm-12">
-                <ul class="nav nav-tabs">
-                    <li class="active"><a data-toggle="tab" href="#profile">Общедоступная информация</a></li>
-                    <!--<li><a data-toggle="tab" href="#menu">Menu 2</a></li>-->
-                </ul>
+<div class="container bootstrap snippet">
+    <div class="row">
+        <div class="col-sm-10"><h1>Мой профиль</h1></div>
+        <div class="col-sm-2"></div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <ul class="nav nav-tabs">
+                <li class="active"><a data-toggle="tab" href="#profile">Общедоступная информация</a></li>
+                <!--<li><a data-toggle="tab" href="#menu">Menu 2</a></li>-->
+            </ul>
 
-                <div class="tab-content">
-                    <div class="form">
-                        <div class="tab-pane active" id="profile">
-                            <div class="row">
-                                <div class="col-sm-3 text-center">
-                                    <img src="images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
-                                    <h6>Загрузить мою фотографию...</h6>
-                                    <input type="file" class="center-block file-upload" style="display: none">
+            <div class="tab-content">
+                <div class="form">
+                    <div class="tab-pane active" id="profile">
+                        <div class="row">
+                            <div class="col-sm-3 text-center">
+                                <img src="images/avatar_2x.png" class="avatar img-circle img-thumbnail" alt="avatar"
+                                     style="image-orientation: from-image;"
+                                     onclick="$(this).siblings('.file-upload').trigger('click');">
+                                <h6>Загрузить мою фотографию...</h6>
+                                <input type="file" class="center-block file-upload" style="display: none">
+                            </div>
+                            <div class="col-sm-9">
+                                <div class="form-group">
+                                    <div class="col-xs-6">
+                                        <label for="name"><h4>Имя</h4></label>
+                                        <input type="text" id="name" class="form-control" name="name"  placeholder="Имя" title="Введите ваше имя">
+                                    </div>
+
+                                    <div class="col-xs-6">
+                                        <label for="email"><h4>Email *</h4></label>
+                                        <input type="email"  required id="email" class="form-control" name="email"  placeholder="Введите ваш email-адрес." value="foodcity@дотудо.рф" title="you@email.com" data-toggle="tooltip">
+                                    </div>
                                 </div>
-                                <div class="col-sm-9">
-                                    <div class="form-group">
-                                        <div class="col-xs-6">
-                                            <label for="name"><h4>Имя</h4></label>
-                                            <input type="text" id="name" class="form-control" name="name"  placeholder="Имя" title="Введите ваше имя">
-                                        </div>
 
-                                        <div class="col-xs-6">
-                                            <label for="email"><h4>Email *</h4></label>
-                                            <input type="email"  required id="email" class="form-control" name="email"  placeholder="you@email.com" title="Введите ваш email-адрес." data-toggle="tooltip">
-                                        </div>
+                                <div class="form-group">
+                                    <div class="col-xs-6">
+                                        <label for="mobile"><h4>Телефон</h4></label>
+                                        <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="номер телефона" title="введите номер телефона">
                                     </div>
 
-                                    <div class="form-group">
-                                        <div class="col-xs-6">
-                                            <label for="mobile"><h4>Телефон</h4></label>
-                                            <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="номер телефона" title="введите номер телефона">
-                                        </div>
+                                    <div class="col-xs-6">
+                                        <label for="place"><h4>Адрес торговой точки *</h4></label>
+                                        <input type="text" required class="form-control"  id="place"  value="тест дом" placeholder="Введите адрес торгового места" title="ФудСити, пав.А, 19-019 ">
+                                    </div>
+                                </div>
 
-                                        <div class="col-xs-6">
-                                            <label for="place"><h4>Адрес торговой точки *</h4></label>
-                                            <input type="text" required class="form-control"  id="place"  placeholder="ФудСити, пав.А, 19-019 " title="как вас найти?">
-                                        </div>
+                                <div class="form-group">
+                                    <div class="col-xs-6">
+
                                     </div>
 
-                                    <div class="form-group">
-                                        <div class="col-xs-6">
-
-                                        </div>
-
-                                        <div class="col-xs-6">
-                                            <label for="promo"><h4>Промо-код</h4></label>
-                                            <input type="text" class="form-control"  id="promo"  placeholder="промо-код" title="введите промо-код">
-                                        </div>
+                                    <div class="col-xs-6">
+                                        <label for="promo"><h4>Промо-код</h4></label>
+                                        <input type="text" class="form-control"  id="promo"  placeholder="промо-код" title="введите промо-код">
                                     </div>
-                                    <div class="form-group">
-                                        <div class="col-xs-12">
-                                            <br>
-                                            <input type="submit"  value="Регистрация"></input>
-                                        </div>
+                                </div>
+                                <div class="form-group">
+                                    <div class="col-xs-12">
+                                        <br>
+                                        <input type="submit"  value="Регистрация"></input>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    </div><!--/tab-pane-->
+                </div>
             </div><!--/tab-pane-->
-        </div><!--/tab-content-->
-    </div><!--/row-->
-</body>
-<div class="container center-block">
+        </div><!--/tab-pane-->
+    </div><!--/tab-content-->
+</div><!--/row-->
+
+<div class="alert_container  center-block" style="display:none;position:fixed;top:30%;white-space:pre;">
     <div class="span4">
-        <div class="alert alert-warning fade">
-            <strong><h4></h4></strong>
+        <div class="alert alert-primary">
+            <button type="button" class="close">×</button>
+            <h4><a></a></h4>
         </div>
     </div>
 </div>
-<script src="supplier_settings.js"></script>
+</body>
+
 
 </html>

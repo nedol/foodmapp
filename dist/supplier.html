@@ -11,24 +11,37 @@
     <title>ДоТуДо Продавец</title>
 </head>
 
+<!-- for datetimepicker-->
+<link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
+<link rel='stylesheet' href='https://use.fontawesome.com/releases/v5.7.0/css/all.css' integrity='sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ' crossorigin='anonymous'>
+
+<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">
 <link rel="stylesheet" href="../lib/style.css">
 
 
-<!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+<!-- Latest compiled JavaScript -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 
 <script src="../lib/DragDropTouch.js"></script>
 
-<script src="../lib/load-image/load-image.all.min.js"></script>
+<script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
-
+<script type="text/javascript" src="supplier.js"></script>
 <!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
-
+<style>
+    .unpublished{
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .published{
+        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(0%);
+    }
+</style>
 
 <style>
 
@@ -81,23 +94,17 @@
         right: 0;
         bottom: 0;
         left: 0;
-        width: 250px;
-        height: 250px;
+        width: 200px;
+        height: 300px;
         z-index: 11;
     }
 
-    #locText{
-        display: inline-block;
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 100px;
-        /*text-align: right;*/
-        /*left: 400px;*/
-        color:red;
-        font-size: small;
-        z-index:1;
+    .dt_val{
+        font-size: x-large;
+        text-align: center;
     }
+
+
 
     #mouse_pos_div{
         display: block;
@@ -144,12 +151,15 @@
     .grow { transition: all .2s ease-in-out; }
     .grow:hover { transform: scale(1.75); }
 
-    #my_truck{
+    #user_container{
+        position:absolute;
+        bottom:75%;
+        right: 10px;
+    }
+
+    #user{
         display: block;
         visibility: hidden;
-        position: absolute;
-        right: 10px;
-        top: 10%;
         width: 40px;
         height: 40px;
         border-radius: 5px;
@@ -189,7 +199,7 @@
         display: block;
         position: absolute;
         right: 10px;
-        bottom: 10%;
+        bottom: 15%;
         width: 40px;
         height: 40px;
         border-radius: 5px;
@@ -200,7 +210,7 @@
         display: block;
         position: absolute;
         right: 10px;
-        top: 30%;
+        bottom:55%;
         width: 40px;
         height: 40px;
         /*-webkit-animation:bounce 1s infinite;*/
@@ -228,6 +238,19 @@
         z-index:12;
         /*-webkit-animation:bounce 1s infinite;*/
     }
+
+    #locText{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        width: 100px;
+        font-family: serif;
+        color:red;
+        font-size: small;
+        text-align: right;
+        z-index:1;
+    }
 </style>
 <body>
 <div id="map" class="map"></div>
@@ -248,18 +271,15 @@
 <div id="main_window" class="container">
     <div class="row">
         <div class="col-xm-4 col-sm-4"></div>
-        <div class="form-group  col-xm-8 col-sm-8" style="position:absolute;width:180px;right:0px;z-index: 10;">
-            <div class='input-group date'   style="width:auto" >
-                <input type='text'  class="form-control dt_val" value="Day of Delivery"/>
-                <span class="input-group-addon">
-                    <span class="glyphicon glyphicon-calendar"></span>
-                </span>
+        <div class="form-group  col-xm-8 col-sm-8" style="position:absolute;width:200px;right:0px;z-index: 10;">
+            <div class='input-group date'   style="width:auto;" >
+                <input type='text' onfocus="return false;" class="dt_val form-control" value="Дата"/>
             </div>
         </div>
     </div>
 
-    <div id="dtp_container" class="scaled">
-        <div id="datetimepicker" style="display: inline-block"></div>
+    <div id="dtp_container" class="center-block scaled">
+        <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
     </div>
 
 </div>
@@ -320,7 +340,9 @@
 
 <div id="supplier_frame_container"
      style="display:none;
-         overflow-y: hidden;
+         -webkit-overflow-scrolling: touch;
+         overflow: scroll;
+         -webkit-transform: translateZ(0px);
          z-index:2000;
          top:0%;
          position: absolute;
@@ -328,13 +350,13 @@
          max-height: 100% !important;
          min-height: 50% !important;
          max-width: 700px;
-         width: 100%;
+         width: 85%;
          left: 0%;
-          -webkit-overflow-scrolling: auto;
          border: solid 0px lightslategrey;
          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <iframe id="supplier_frame"  src="./supplier/supplier.frame.html" style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+    <iframe id="supplier_frame"  src="./supplier/supplier.frame.html" scrolling="yes" style="position:absolute;overflow: auto;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
+
 
 
 <data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
@@ -346,8 +368,11 @@
 <data class="tariff" id="items_limit" value="5" style="display: none"></data>
 
 <div id="offer_viewer" class="order_container"
-       style="display:none;   position: fixed;
-       overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
+       style="display:none;
+       position: fixed;
+       overflow-x: hidden;
+       overflow-y: hidden;
+       z-index:2147483646; margin: auto;
        width:70%;  height: auto; left: 20%; top: 5%;
        border: solid 0px lightslategrey;
        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
@@ -362,7 +387,7 @@
                         <h4 class="modal-menu-number"  style="display: none">Offer</h4>
                     </div>
                     <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; top:0;right: 5px;color: white">
-                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
+                        <span class="close_browser fa fa-remove scaled"></span>
                     </div>
                 </div>
             </div>
@@ -384,49 +409,53 @@
 
 </div>
 
-<span id="locText" style="font-family: serif">Lat Lon</span>
 
 <div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
 
 <!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
     <!--visibility: visible" align="center"/>-->
 
-<style>
-    .unpublished{
-        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-        filter: grayscale(100%);
-    }
-    .published{
-        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
-        filter: grayscale(0%);
-    }
-</style>
 
 
-<div id="my_truck_container" width="50" style="display:block;position:absolute;width:50px;height:50px;right: .2%">
-    <img id="my_truck" class="unpublished" src="https://nedol.ru/d2d/dist/images/my_truck.png"
-         title="My Truck" draggable="true" style="width:100%;height: 100%">
+
+<div id="user_container">
+    <!--<i class='far fa-user' style='font-size:48px;color:red'></i>-->
+    <img id="user" class="" src="https://nedol.ru/d2d/dist/images/user.png"
+         title="Продавец" draggable="true" style="image-orientation: from-image;width: auto">
 </div>
 
 <img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
+
 <section id="loc_ctrl"  title="Location">
     <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
     <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
 </section>
+
 <h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
 
-<div id="debug" style="display: block;position: fixed;bottom: 0;left: 0;width: 100px"></div>
+<span id="locText">Lat Lon</span>
 
-</body>
+<div id="debug" style="display: none;position: fixed;bottom: 0;left: 0;width: 100px"></div>
 
-<div class="container center-block">
+
+<div class="alert_container center-block" style="display:none;position:fixed;white-space:pre;top:30%;left:40%;margin:0 auto;z-index: 1000">
     <div class="span4">
-        <div class="alert alert-danger fade">
-            <button type="button" class="close" data-dismiss="alert">×</button>
-            <strong><h4></h4></strong>
+        <div class="alert alert-primary">
+            <button type="button" class="close">×</button>
+            <h4><a></a></h4>
         </div>
     </div>
-</div>
 
-<script type="text/javascript" src="supplier.js"></script>
+</div>
+<style>
+    @media screen and (min-width: 480px) {
+        #supplier_frame_container{
+            width: 50%;
+        }
+    }
+</style>
+</body>
+
+
+
 </html>

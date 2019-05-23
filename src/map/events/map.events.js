@@ -5,7 +5,7 @@ export {MapEvents}
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
 import {OfferOrder} from "../../customer/init.frame";
-import {OfferViewer} from "../../supplier/offer.viewer";
+import {OfferViewer} from "../../supplier/offer.viewer.js.old";
 import {UtilsMap} from "../../utils/utils.map"
 let utils_map = new UtilsMap();
 class MapEvents{

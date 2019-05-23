@@ -11,33 +11,38 @@
     <title>ДоТуДо Продавец</title>
 </head>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
 <link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
-<link rel="canonical" href="http://www.bootstraptoggle.com">
+
 <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css" rel="stylesheet" >
-
-
-<!--<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">-->
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 
 <!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
 <link rel="stylesheet" href="../../lib/style.css">
 
-<script src="../../lib/load-image/load-image.all.min.js"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<script src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="../host.js"></script>
 <script type="text/javascript" src="../supplier_offer.js"></script>
 <script src="../../lib/jquery.ui.touch-punch.min.js"></script>
 
 <style>
 
-    html, body{
+    html{
         padding: 0px;
         margin: 0px;
         height: 100%;
         width: 100%;
+    }
+
+    body {
+        /* Resolves iOS overflow rendering bug */
+        max-width: 100vw !important;
     }
 
     .scaled{
@@ -46,15 +51,50 @@
 
 </style>
 
+<script type='application/javascript'>
+    document.addEventListener("touchstart", function() {}, false);
+</script>
+
 <body>
 
-    <div style="display: block; position:fixed; top:5px;right: 5px; color: white; z-index: 1000">
-        <span class="close glyphicon glyphicon-remove-sign"></span>
+    <div style="display:block; float: right; margin: 10px; color: white; z-index: 1000">
+        <span class="close 	fa fa-share-square-o" style="color:#0088BB" title="Опубликовать"></span>
     </div>
 
+    <div style="display:block; position:fixed;bottom: 5%;right: 1%; margin: 10px;  z-index: 1000">
+        <span id="add_item" class="fa fa-plus" style="color: black; opacity:.5;font-size: 30px;"></span>
+    </div>
+
+    <style>
+        .nav-tabs>li>a {
+            background-color: #f0f0f0;
+            border-color: #777777;
+            color: #3533ff;
+        }
+        /* active tab color */
+        .nav-tabs>li>a.active {
+            color: #fff;
+            background-color: #afafaf;
+            border: 1px solid #4f4f4f;
+        }
+        /* active tab color */
+        .nav-tabs>li>a.active>a:hover, .nav-tabs>li>a.active:focus {
+            color: #fff;
+            background-color: #c1e1ff;
+            border: 1px solid #4f4f4f;
+        }
+
+        /* hover tab color */
+        .nav-tabs>li>a:hover {
+            border-color: #000000;
+            background-color: #4f4f4f;
+        }
+    </style>
+
     <ul class="nav nav-tabs">
-        <li class="active"><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
+        <li><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
         <li><a data-toggle="tab" href="#profile_pane" data-translate="">Мой профиль</a></li>
+        <li><a data-toggle="tab" href="#payment_pane" data-translate="">Оплата</a></li>
     </ul>
 
     <div class="tab-content">
@@ -130,24 +170,21 @@
                 .offer_status{
                     font-size: x-small;
                 }
-                .display_none{
-                    display: none;
-                }
                 .inv_price{
                     color:red
                 }
             </style>
-            <div class="modal-content container">
+
+            <div class="modal-content" style="margin-top: 10px;">
                 <ul class="nav nav-tabs" id="menu_tabs">
-                    <li id="add_tab_li" title="add tab" style="display: none;">
-                        <span id="add_tab" class="add_tab" href="#add_tab" style="visibility: hidden;">
-                        </span>
+                    <li id="add_tab_li" class="nav-item" title="add tab" style="display: none;">
+                        <span id="add_tab" class="add_tab nav-link" href="#add_tab" style="visibility: hidden;"></span>
                     </li>
                 </ul>
-                <div class="tab-content" style="position:relative;height: 92%;overflow-y: scroll">
+                <div class="tab-content" style="position:relative;height: 80%;overflow-y: scroll">
                     <!--div_tab_inserted-->
-                    <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
-                    <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; position:fixed; top:95%; right:5px; opacity: .5;font-size: 30px; margin-left: 2px"></span>
+                    <div id="add_tab_div"  class="tab-pane fade" style="border: none;"></div>
+
                 </div>
             </div>
             <style>
@@ -224,19 +261,21 @@
                     font-size:30px;
                 }
                 .content_text{
-                    visibility: hidden;
+                    position: absolute;
+                    color:black;
                     width: 95%;
                     overflow-y: scroll;
+                    text-align: left;
+                    word-wrap: break-word;      /* IE 5.5-7 */
+                    white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
+                    white-space: normal;      /* current browsers */
                     font-family:'Segoe Script';
                     font-size: medium;
-                    margin-left: 5px;
+                    margin-left: 10px;
                     border-width: 0;
                     border-color: #9da0a4;
-                    background-color: rgba(255,255,255,0.5);
-                    -webkit-appearance: textarea;
-                    -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-                    -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-                    box-sizing: border-box;         /* IE 8+ */
+                    background-color: rgba(255,255,255,0.7);
+                    z-index: 3000;
                 }
                 .orders{
                     visibility: hidden;
@@ -251,7 +290,7 @@
                 }
                 [contentEditable=true]:empty:not(:focus):before{
                     content:attr(placeholder);
-                    color:gray;
+                    color: #c8c8c8;
                 }
 
             </style>
@@ -259,9 +298,10 @@
                 <div class="row">
                     <div class="content_div col-lg-10 col-sm-10 col-xs-10">
                         <h4>
-                            <input type="text" class="item_title input input-sm" contenteditable="true" placeholder="название" data-toggle="collapse">
+                            <input type="text" class="item_title input input-sm " contenteditable="true" placeholder="название"
+                                   data-toggle="collapse">
                         </h4>
-                        <div class="item_content" style="position: absolute; top:40px;width:100%">
+                        <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
 
                             <div class="content">
                                 <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true">
@@ -269,15 +309,15 @@
                             </div>
 
                         </div>
-                        <div style="width: 300px;margin: 0 auto">
-                            <img class="card-img-top img-fluid" style="width: 100%;z-index: 1000" src="http://placehold.it/700x400" alt="">
+                        <div style="width: 100%;margin: 0 auto;">
+                            <img class="card-img-top img-fluid" style="image-orientation:from-image;width: 100%;z-index: 1000" src="http://placehold.it/700x400" alt="">
                         </div>
                     </div>
                     <div class="col-lg-2 col-sm-2 col-xs-2">
                         <div class="cert_container" style="
                                 /*position: absolute;*/
-                                width:100%;
-                                max-height: 350px;
+                                width:100px;
+                                /*max-height: 350px;*/
                                 margin-top:5px;
                                 margin-right:5px;
                                 background-color: rgb(240,240,240);
@@ -286,10 +326,9 @@
                                 z-index:20;">
                         </div>
                     </div>
-
                 </div>
                 <div class="row">
-                    <div class="col-lg-2 col-sm-2 col-xs-2">
+                    <div class="col">
                         <label  class="item_cb btn" title="Опубликовать" style="width: 4%;margin-right:20px;visibility:visible">
                             <input type="checkbox" class="checkbox-inline" style="display: none">
                             <i class="fa fa-square-o fa-2x"></i>
@@ -297,17 +336,16 @@
                         </label>
                     </div>
 
-                    <div class="pack_container col-lg-4 col-sm-4 col-xs-4 dropup" style="  text-align: center;">
-                        <ul class="pack_list dropdown-menu" role="menu"  data-width="fit">
-                        </ul>
+                    <div class="pack_container col dropup" style="width:75%;text-align: center;">
+                        <ul class="pack_list dropdown-menu" role="menu" ></ul>
                         <textarea  class="item_pack input" rows="1"  data-toggle="dropdown"  contentEditable="true"  placeholder="расфасовка"></textarea>
-                        <span class="caret" style="display: inline-block;  visibility: hidden"></span>
+                        <!--<span class="caret" style="display: inline-block;  visibility: hidden"></span>-->
                     </div>
 
-                    <div class="price_div col-lg-4 col-sm-4 col-xs-4">
+                    <div class="price_div col">
                         <textarea class="input item_price"  rows="1" contentEditable="true" placeholder="руб"></textarea>
                     </div>
-                    <div  class="orders_div col-lg-2 col-sm-2 col-xs-2">
+                    <div  class="orders_div col-lg-1 col-sm-1 col-xs-1">
                         <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
                         <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
                     </div>
@@ -359,23 +397,30 @@
         </div><!--/tab-pane-->
 
         <div class="tab-pane" id="profile_pane">
-            <div class="row">
-                <div class="col-sm-12">
+            <div>
+                <div class="col">
                     <div class="browser_container" id="profile_container"
                          style="
-                         position: absolute;
-                        overflow: visible; z-index:2147483646;
-                        height: 90%; left:2%;
+                        position: absolute;
+                        margin-top: 10px;
+                        overflow: visible;
+                        z-index:2000;
+                        height: 90%;
+                        right:10px;
                         /*max-height: 90% !important;*/
                         /*min-height: 70% !important;*/
-                       width:96%;
-                       border: solid 0px lightslategrey;
-                       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                        width:96%;
+                        border: solid 0px lightslategrey;
+                        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <ul class="nav nav-tabs">
                         <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Профиль</a></li>
                         <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
                         <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
+                        <li>
+
+                        </li>
                     </ul>
+
                     <div class="tab-content">
                         <input type="hidden" id="supuid" class="form-control" name="supuid">
                         <div class="tab-pane active" id="profile">
@@ -436,12 +481,7 @@
                         </div>
                     </div><!--/tab-pane-->
                     <div class="tab-pane fade" id="comments" style="overflow-y: auto; height: 400px">
-                        <div style="position: absolute;right: 0;top:0px;">
-                            <input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star">
-                        </div>
                         <div id="comments-container" style="overflow-y: hidden"></div>
-
-
                     </div><!--/tab-pane-->
                     <div class="tab-pane fade" id="settings">
                         <div style="margin: 20px"></div>
@@ -462,10 +502,17 @@
                         </div>
                     </div><!--/tab-pane-->
                 </div><!--/tab-content-->
+                    <div style="position: absolute;right: 0">
+                        <input type="hidden" class="rating"  data-filled="fa fa-star fa-2x  custom-star" data-empty="fa fa-star-o fa-2x  custom-star">
+                    </div>
             </div>
 
-                </div>
             </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="payment_pane">
+
         </div>
     </div>
 
@@ -484,7 +531,13 @@
     }
 </style>
 
-
+    <div class="container center-block" style="display:none;position:absolute;bottom:10%;right:40%;z-index: 3000">
+        <div class="span4">
+            <div class="alert alert-danger fade">
+                <strong><h4></h4></strong>
+            </div>
+        </div>
+    </div>
 
 </body>
 </html>

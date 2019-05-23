@@ -1,8 +1,11 @@
 'use strict'
 
 require('bootstrap');
-require('webpack-jquery-ui/draggable');
+// require('bootstrap-select');
 
+require('tablesorter/dist/js/jquery.tablesorter.js');
+require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
+import 'tablesorter/dist/css/theme.default.min.css';
 import {Dict} from '../dict/dict.js';
 
 import {Utils} from "../utils/utils";
@@ -194,47 +197,75 @@ class ProfileCustomer{
 
     InitUserOrders(){
         let that = this;
-        $('#menu_item_style').load('./client/client.html #menu_item_style', function (response, status, xhr) {
+        let date = window.parent.user.date;
+        $('#menu_item_style').load('./customer/customer.frame.html #menu_item_style', function (response, status, xhr) {
 
         });
         window.parent.db.GetCusOrders(window.parent.user.date, function (res) {
+            that.path  ="http://localhost:63342/d2d/server";
+            if(host_port.includes('nedol.ru'))
+                that.path = host_port;
             for(let i in res){
                 let order = res[i];
-                let ovc = '' ;
-                $('#menu_item_tmplt').load('./client/client.html #menu_item_tmplt', function (response, status, xhr) {
-                    ovc = $('#menu_item_tmplt').clone();
+                $('#menu_item_tmplt').load('./customer/customer.frame.html #menu_item_tmplt', function (response, status, xhr) {
+                    let element = $(this).find('td.title');
+                    let inv_period = '', inv_qnty = '', tr_class='', tr_disabled='',tr_style = '';
                     for(let item in order.data) {
-                        window.parent.db.GetSupplier(new Date(window.parent.user.date), order.supuid,function (res) {
-                            if(res!=-1) {
-                                let dict = new Dict(res.dict.dict);
-                                dict.set_lang(window.parent.sets.lang, ovc[0]);
+                        let title = new Promise(function (resolve, reject) {
+                            if (res[i].supuid) {
+                                window.parent.db.GetSupplier(new Date(window.parent.user.date), res[i].supuid, function (sup) {
+                                    if (res != -1) {
+                                        let dict = new Dict(sup.dict.dict);
+                                        resolve(element,dict.getValByKey(window.parent.sets.lang,item));
+                                    }else{
+                                        resolve(element,'undefined');
+                                    }
+                                });
+                            } else {
+                                resolve(element,'undefined');
                             }
                         });
-                        $(ovc).attr('id', 'ovc'+ '_' + i);
-                        $(ovc).css('display','block');
-                        $(ovc).addClass('menu_item');
-                        $(ovc).attr('order',item);
-                        $(ovc).attr('supuid',order.supuid);
-                        $(ovc).find('.item_title').text(item);
-                        $(ovc).find('.item_title').attr('contenteditable', 'false');
-                        $(ovc).find('.item_price').text(order.data[item].price);
-                        $(ovc).find('.item_price').attr('contenteditable', 'false');
-                        $(ovc).find('.period_div').css('visibility', 'visible');
-                        $(ovc).find('.approved').css('visibility', 'hidden');
-                        $(ovc).find('.ordperiod').text(order.period);
-                        if(item){
-                            $(ovc).find('.item_title').attr('data-translate', item);
-                        }
-                        $(ovc).find('.amount').text(order.data[item].qnty);
-                        $(ovc).find('.pack_container').css('visibility','visible');
-                        $(ovc).find('.item_pack').text(order.data[item].pack);
-                        $(ovc).find('li>a[role=packitem]').on('click', {that: that, off:order.data[item]},function(ev){
-                            that.changed = true;
-                            let pl = ev.data.off.packlist;
-                            $(ovc).find('.item_pack').text($(ev.target).text());
-                            $(ovc).find('.item_price').text(pl[$(ev.target).text()]);
+
+
+                        $("<tr style='text-align: center;"+tr_style+"' "+tr_disabled+">" +
+                            "<td class='tablesorter-no-sort'>"+
+                            "<label  class='item_cb btn'  style='width: 4%;margin-right:20px;visibility:visible'>" +
+                            "<input type='checkbox' class='checkbox-inline approve' title='"+item+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " style='display: none'>" +
+                            "<i class='fa fa-square-o fa-2x'></i>" +
+                            "<i class='fa fa-check-square-o fa-2x'></i>" +
+                            "</label>" +
+                            "</td>" +
+                            "<td class='title'></td>" +
+                            "<td "+ inv_qnty+">"  + order.data[item].qnty + "</td>" +
+                            "<td>" + order.data[item].pack + "</td>" +
+                            "<td class='marketer'>" + order.data[item].price + "</td>" +
+                            "<td>"+order.address+"</td>" +
+                            "<td "+inv_period+">" + order.period + "</td>" +
+                            "<td class='tablesorter-no-sort'>"+
+                            (order.comment?"<span class='tacomment'>" + order.comment + "</span>":'') +
+                            "</td>"+
+                            "<td  class='marketer'>" +
+                            //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
+                            //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
+                            //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
+                            //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
+                            "</td>" +
+                            "</tr>").appendTo($('tbody'));
+
+                        title.then(function(el,value) {
+                            $(el).text(value);
                         });
-                        $('.ord_container').append(ovc);
+
+                        window.parent.db.GetApproved(new Date(date), window.parent.user.uid,res[i].cusuid, item,function (appr) {
+                            if(appr && appr.data.qnty===res[i].data[item].qnty &&
+                                appr.data.price===res[i].data[item].price) {
+                                $(".approve[title='" + item + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
+                                $(".approve[title='" + item + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
+                            }
+                        });
+
+
+
                     }
                 });
             }

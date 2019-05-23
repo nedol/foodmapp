@@ -1,10 +1,11 @@
 'use strict'
 
 require("../../lib/bootstrap-rating/bootstrap-rating.js")
-require('bootstrap/js/tab.js');
-require('bootstrap/js/collapse.js')
+require('bootstrap');
+
 import {Dict} from '../dict/dict.js';
 import {ProfileSupplier} from "../profile/profile.supplier";
+import proj from 'ol/proj';
 require('jquery.nicescroll')
 
 let _ = require('lodash')
@@ -14,7 +15,7 @@ var md5 = require('md5');
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
+        window.alert('В этом браузере нет поддержки EventSource.');
         return;
     }
 
@@ -74,29 +75,68 @@ class CustomerOrder{
         //
         //     }
         // });
-
-        $('.close').on('click',this,function (ev) {
-            let items = that.SaveOrder(that.cus_oder, window.parent.sets.lang, function (res) {
-
-            });
-
-            let q =  _.findKey(items.data, function(o) { return o.qnty >0; });
-            if(q)
-                if(that.profile.type==='deliver' && !$('#address').val()){
-                    alert($('#address').attr('placeholder'));
-                    $('#address').focus();
-                    return false;
-                }
-
-            if($('#client_frame_container',window.parent.document).find('.client_frame').length>0) {
-                $('#client_frame_container',window.parent.document).empty();
-                $('#client_frame_container',window.parent.document).css('display', 'none');
+        this.moveend;
+        $('#client_frame_container',window.parent.document).css('height','100%');
+        $('#address_loc').on('click',this,(ev)=> {
+            if( $('#client_frame_container',window.parent.document).css('height')==='100px'){
+                $('#client_frame_container',window.parent.document).css('height','100%');
+                $(window.parent.user.map.ol_map).off('moveend');
+                if($('#address').val().includes(';'))
+                    window.parent.user.map.geo.SearchPlace($('#address').val().split(';'),19,function (res) {
+                        $('#address').val(res.city+','+res.street+','+res.house);
+                    });
+            }else {
+                $('#client_frame_container', window.parent.document).css('height', '100px');
+                $(window.parent.user.map.ol_map).on('moveend', (ev) => {
+                    that.moveend = ev;
+                    let loc = proj.toLonLat(ev.target.focus_);
+                    $('#address').attr('loc', JSON.stringify([loc[1], loc[0]]));
+                    $('#address').val(String(loc[1].toFixed(6)) + ';' + String(loc[0].toFixed(6)));
+                });
+                console.log();
             }
+        });
+
+        $('a[data-toggle="tab"]').on('click',(ev)=> {
+            $('#client_frame_container',window.parent.document).css('height','100%');
+            $(window.parent.user.map.ol_map).off('moveend');
+            if($('#address').val().includes(';'))
+                window.parent.user.map.geo.SearchPlace($('#address').val().split(';'),19,function (res) {
+                    $('#address').val(res.city+','+res.street+','+res.house);
+                });
+        });
+
+        this.ovc.find('#close_frame').off();
+        this.ovc.find('#close_frame').on('click touchstart', this, function (ev) {
+            let that = ev.data;
+
+            let confirm = window.confirm("Сохранить заказ?");
+            if(confirm) {
+                let items = that.SaveOrder(that.cus_oder, window.parent.sets.lang, function (res) {
+
+                });
+
+                let q =  _.findKey(items.data, function(o) { return o.qnty >0; });
+                if(q)
+                    if(that.profile.type==='deliver' && !$('#address').val()){
+                        alert($('#address').attr('placeholder'));
+                        $('#address').focus();
+                        return false;
+                    }else {
+
+
+                    }
+
+            }
+            $(frameElement).css('display','none');
+            setTimeout(function () {
+                $(frameElement).remove();
+            }, 1000);
         });
 
         this.FillProfile(obj);
 
-        $('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
+        this.ovc.find('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
         window.parent.db.GetSupApproved(obj.uid, function (res) {
             that.appr = res;
         });
@@ -133,15 +173,15 @@ class CustomerOrder{
                 that.ovc.find('#address').val(obj[0].profile.address);
         });
 
-        $(window.parent.document).find(".category[state='1']").each(function (i, cat) {
+        $(window.parent.document).find(".category[state='1']").each(function (c, cat) {
             let tab = $(cat).text();
             //for (let tab in this.offer) {
             if(!tab || !that.offer[tab])
                 return;
             if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
+                $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
                     '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                $('<div id="'+tab+'" class="tab-pane active div_tab_inserted" style="border: border: 1px solid grey;">' +
+                $('<div id="'+tab+'" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
                     // '<div class="row"><div>' +
                     '</div>').insertBefore(that.ovc.find('#add_tab_div'));
             }
@@ -178,6 +218,7 @@ class CustomerOrder{
                     $(menu_item).find('.content_text').css('visibility','visible');
 
                 if(that.offer[tab][i].img) {
+
                     let src = that.path+ "/images/"+that.offer[tab][i].img.src;
                     $(menu_item).find('.img-fluid').css('visibility', 'visible');
                     $(menu_item).find('.img-fluid').parent().css('display', 'block');
@@ -191,6 +232,8 @@ class CustomerOrder{
                             '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
                             '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
                         $('.carousel-inner').append(item);
+                    }else{
+                        $('.carousel_collapse').css('display', 'block');
                     }
                 }
 
@@ -289,6 +332,24 @@ class CustomerOrder{
                     });
 
                 }else{
+                    //deliver
+                    let title = that.offer[tab][i].title;
+                    let deliver = $('#deliver_but', window.parent.document).attr('supuid');
+                    if(deliver)
+                    window.parent.db.GetSupplier(window.parent.user.date,deliver, function (obj) {
+                        let key = _.findKey(obj.data,function(o) {
+                            for(let i in o) {
+                                if(o[i].title !== title)
+                                    continue;
+                                else
+                                    return true;
+                            }
+                        });
+                        if(key) {
+                            $(menu_item).find('.deliver_but').css('display', 'block');
+                            $(menu_item).find('.deliver_but').attr('supuid', $('#deliver_but', window.parent.document).attr('supuid'));
+                        }
+                    });
                     setPrice(that.offer[tab][i].packlist);
                     that.ovc.find('#' + tab).append(menu_item);
                     $(menu_item).find('a[role=packitem]').on('click', {off:that.offer[tab][i]},function(ev){
@@ -310,8 +371,6 @@ class CustomerOrder{
                     }
                 }
 
-
-
                 if ($(menu_item).find('.item_content').css('display') === 'block'
                     && $(menu_item).find('.img-fluid').attr('src')===''
                     && $(menu_item).find('.card-text').text()===""){
@@ -332,6 +391,7 @@ class CustomerOrder{
                 // $(empty).addClass('menu_item');
                 $(empty).attr('id','menu_item_empty');
                 $(empty).insertAfter($('#'+ tab + '_' + last));
+
             },200)
 
 
@@ -348,6 +408,7 @@ class CustomerOrder{
         this.dict.set_lang(window.parent.sets.lang,that.ovc[0]);
         // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
+        $('li.active a').tab('show');
         $($('.tab_inserted a')[0]).tab('show');
 
         window.parent.db.GetSupOrders(new Date(this.date),obj.uid,function (arObj) {
@@ -413,7 +474,7 @@ class CustomerOrder{
 
     InitSupplierReview(sup){
 
-       this.InitProfileSupplier({supuid:sup.uid,user:window.parent.user.constructor.name},
+       this.InitProfileSupplier({supplier:sup,user:'Supplier'},
             {   //comments settings
                 readOnly: (sup.appr && sup.appr.cusuid===window.parent.user.uid)?false:true,
                 profilePictureURL: this.path+'/images/'+sup.profile.avatar,
@@ -441,18 +502,19 @@ class CustomerOrder{
         this.profile_sup.InitRateSupplier();
         this.profile_sup.InitSettingsSupplier();
 
-        if(user.constructor.name==='Supplier') {
-            if(!user.profile.profile.avatar) {
+        if(user.user==='Supplier') {
+            if(!user.supplier.profile.avatar) {
                 utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
                     $('.avatar').attr('src', src);
                 });
             }else{
-                $('.avatar').attr('src', this.path+'/images/'+user.profile.profile.avatar);
+                $('.avatar').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
+                $('#profile_img').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
             }
-            $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
-            $('img.avatar').on('click',function (ev) {
-                $(this).siblings('.file-upload').trigger('click');
-            });
+            // $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
+            // $('img.avatar').on('click',function (ev) {
+            //     $(this).siblings('.file-upload').trigger('click');
+            // });
             var readURL = function (input) {
                 if (input.files && input.files[0]) {
                     var reader = new FileReader();
@@ -696,9 +758,15 @@ class CustomerOrder{
 
         let that = this;
 
+        if($('#address').val()){
+            window.parent.db.GetSettings((obj) =>{
+                obj[0].profile.address = $('#address').val();
+                window.parent.db.SetObject('setStore', obj[0], (res) => {
 
+                });
+            });
+        }
         let items = this.GetOrderItems();
-
         if(Object.keys(items.data).length>0) {
             window.parent.user.UpdateOrderLocal(items);
 

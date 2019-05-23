@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>ДоТуДо Покупатель</title>
+    <!-- Bootstrap core CSS -->
+    <link href="vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="css/shop-homepage.css" rel="stylesheet">
+    <script src="../customer_order.js"></script>
+
+</head>
+
+<body>
+<div style="display: inline-block; position:absolute; font-size:xx-large; right: 10px; padding-left: 20px;">
+    <span class="close_browser glyphicon glyphicon-remove-sign" title="Опубликовать и закрыть"></span>
+</div>
+
+<ul class="nav nav-tabs">
+    <li>
+        <div data-toggle="tab" href="#profile" style="height: 50px; width: 140px">
+            <img src="../../server/images/57ad3696615fb809d4e2d15111b1ac86" class="avatar img-circle img-thumbnail" alt="avatar" style="max-width:60px;max-height:60px;">
+            <div class="sup_container" style="position: absolute;top:0px;left: 60px;background-color: transparent; color:grey">
+                <!-- botstrap-rating doesn't work here-->
+                <!--<input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star"/>-->
+                <div class="rating_container"><span style="cursor: default;"><div class="rating-symbol" style="display: inline-block; position: relative;"><div class="rating-symbol-background fa fa-star-o fa-3x  custom-star" style="visibility: visible;"></div><div class="rating-symbol-foreground" style="display: inline-block; position: absolute; overflow: hidden; left: 0px; right: 0px; width: 0%;"><span class="fa fa-star fa-3x  custom-star"></span></div></div><div class="rating-symbol" style="display: inline-block; position: relative;"><div class="rating-symbol-background fa fa-star-o fa-3x  custom-star" style="visibility: visible;"></div><div class="rating-symbol-foreground" style="display: inline-block; position: absolute; overflow: hidden; left: 0px; right: 0px; width: 0px;"><span class="fa fa-star fa-3x  custom-star"></span></div></div><div class="rating-symbol" style="display: inline-block; position: relative;"><div class="rating-symbol-background fa fa-star-o fa-3x  custom-star" style="visibility: visible;"></div><div class="rating-symbol-foreground" style="display: inline-block; position: absolute; overflow: hidden; left: 0px; right: 0px; width: 0px;"><span class="fa fa-star fa-3x  custom-star"></span></div></div><div class="rating-symbol" style="display: inline-block; position: relative;"><div class="rating-symbol-background fa fa-star-o fa-3x  custom-star" style="visibility: visible;"></div><div class="rating-symbol-foreground" style="display: inline-block; position: absolute; overflow: hidden; left: 0px; right: 0px; width: 0px;"><span class="fa fa-star fa-3x  custom-star"></span></div></div><div class="rating-symbol" style="display: inline-block; position: relative;"><div class="rating-symbol-background fa fa-star-o fa-3x  custom-star" style="visibility: visible;"></div><div class="rating-symbol-foreground" style="display: inline-block; position: absolute; overflow: hidden; left: 0px; right: 0px; width: 0px;"><span class="fa fa-star fa-3x  custom-star"></span></div></div></span><input type="hidden" class="rating" data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star" value=""></div>
+                <div class="name" style="display: block;">Адмирал</div>
+                <!--<div class="email">supplier@d2d.com</div>-->
+            </div>
+        </div>
+    </li>
+    <li class="active"><a data-toggle="tab" href="#order" data-translate="">Заказ</a></li>
+
+    <form class="navbar-form navbar-middle" action="#" style="text-align: center">
+        <div class="input-group" style="width:50%;">
+            <input type="address" class="address form-control" placeholder="Введите адрес доставки" name="address" style="text-align: center; background-color: transparent; color: rgb(115, 115, 115); border-color: rgb(115, 115, 115); display: none;">
+        </div>
+    </form>
+</ul>
+
+<!-- Navigation -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Start Bootstrap</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item active">
+                    <a class="nav-link" href="#">Home
+                        <span class="sr-only">(current)</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">About</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Services</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Contact</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<!-- Page Content -->
+<div class="container">
+
+    <div class="row">
+
+        <div class="col-lg-3">
+
+            <h1 class="my-4">Shop Name</h1>
+
+        </div>
+        <!-- /.col-lg-3 -->
+
+        <div class="col-lg-9">
+
+            <div id="carouselExampleIndicators" class="carousel slide my-4" data-ride="carousel">
+                <ol class="carousel-indicators">
+                    <li data-target="#carouselExampleIndicators" data-slide-to="0" class="active"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="1"></li>
+                    <li data-target="#carouselExampleIndicators" data-slide-to="2"></li>
+                </ol>
+                <div class="carousel-inner" role="listbox">
+                    <div class="carousel-item active">
+                        <img class="d-block img-fluid" src="http://placehold.it/900x350" alt="First slide">
+                    </div>
+                    <div class="carousel-item">
+                        <img class="d-block img-fluid" src="http://placehold.it/900x350" alt="Second slide">
+                    </div>
+                    <div class="carousel-item">
+                        <img class="d-block img-fluid" src="http://placehold.it/900x350" alt="Third slide">
+                    </div>
+                </div>
+                <a class="carousel-control-prev" href="#carouselExampleIndicators" role="button" data-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Previous</span>
+                </a>
+                <a class="carousel-control-next" href="#carouselExampleIndicators" role="button" data-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="sr-only">Next</span>
+                </a>
+            </div>
+
+
+            <div class="order order-body">
+
+                <ul class="nav nav-tabs menu_tabs">
+
+                    <li class="tab_inserted active"><a data-toggle="tab" contenteditable="false" data-translate="17709ca6dc73b85331a7519b37c4ddc8" href="#Рыба" aria-expanded="true">Рыба</a></li><li id="add_tab_li" title="add tab" style="display: none;"></li>
+                </ul>
+                <div class="tab-content">
+
+                    <div id="Рыба" class="tab-pane div_tab_inserted row active" style="border: none"><div id="Рыба_0" class="menu_item" style="display: block;">
+                        <div class="card h-100">
+                            <a href="#"><img class="card-img-top img-fluid" src="../../server/images/93feff82629b4e3133addec3a8c5f83d" alt="" id="img_Рыба_0" style="visibility: visible;"></a>
+                            <div class="card-body">
+                                <h4 class="card-title item_title" contenteditable="false" data-target="#content_Рыба_0" data-translate="07ec6bdfbf74da838a25025316a6b3ea">Дорадо</h4>
+                                <h5>$24.99</h5>
+                                <div class="pack_container col-sm-4 col-xs-4" style="background-color:#f0f0f0;visibility: hidden;">
+                                    <div class="dropdown" style="visibility: visible;">
+                                        <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit"><li href="#"><a role="packitem">1 кг</a></li><li href="#"><a role="packitem">2 кг</a></li></ul>
+
+                                        <div class="item_pack input dropdown-toggle" data-toggle="dropdown" placeholder="     гр." style="display:inline-block;white-space: nowrap;" packlist="{&quot;1 кг&quot;:&quot;300&quot;,&quot;2 кг&quot;:&quot;600&quot;}" pack="2 кг">2 кг</div>
+                                        <span class="caret" style="display: inline-block; visibility: visible;"></span>
+                                    </div>
+                                </div>
+                                <p class="card-text content_text" contenteditable="false" data-translate="f48f1cab15dd2655d649abe347d571bd" style="visibility: visible;">                                        </p>
+                            </div>
+                            <div class="card-footer">
+                                <small class="text-muted">★ ★ ★ ★ ☆</small>
+                            </div>
+                        </div>
+                    </div></div></div>
+
+                <div id="menu_item_tmplt" class="col-lg-4 col-md-6 mb-4" style="display: none">
+                    <div class="card h-100">
+                        <a href="#"><img class="card-img-top img-fluid" src="http://placehold.it/700x400" alt=""></a>
+                        <div class="card-body">
+                            <h4 class="card-title item_title">
+                                <a href="#">Item One</a>
+                            </h4>
+                            <h5>$24.99</h5>
+                            <div class="pack_container col-sm-4 col-xs-4" style="background-color:#f0f0f0;visibility: hidden;">
+                                <div class="dropdown">
+                                    <ul class="pack_list dropdown-menu scaled" role="menu" aria-labelledby="menu2" data-width="fit"></ul>
+
+                                    <div class="item_pack input dropdown-toggle" data-toggle="dropdown" placeholder="     гр." style="display:inline-block;white-space: nowrap;">
+                                    </div>
+                                    <span class="caret" style="display:inline-block;"></span>
+                                </div>
+                            </div>
+                            <p class="card-text content_text">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Amet numquam aspernatur!</p>
+                        </div>
+                        <div class="card-footer">
+                            <small class="text-muted">★ ★ ★ ★ ☆</small>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        <!-- /.col-lg-9 -->
+
+    </div>
+    <!-- /.row -->
+
+</div>
+<!-- /.container -->
+
+<!-- Footer -->
+<footer class="py-5 bg-dark">
+    <div class="container">
+        <p class="m-0 text-center text-white">Copyright © Your Website 2019</p>
+    </div>
+    <!-- /.container -->
+</footer>
+
+<!-- Bootstrap core JavaScript -->
+<script src="vendor/jquery/jquery.min.js"></script>
+<script src="vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+</body>
+
+</html>
+
+

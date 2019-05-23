@@ -4,14 +4,14 @@ export {Supplier};
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-var isJSON = require('is-json');
-
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
 require('bootstrap');
 require('bootstrap-select');
 
-require('bootstrap/js/modal.js');
+
+import("../../lib/glyphicons/glyphicons.css");
+
 import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
@@ -30,13 +30,11 @@ import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferEditor} from "./offer.editor";
 
-
-
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-
+const MSG_NO_REG = 0x0001;
 
 
 class Supplier{
@@ -48,7 +46,7 @@ class Supplier{
 
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-        this.my_truck_ovl;
+        this.user_ovl;
 
         if(uObj) {
             this.offer = new Offer(this.date, uObj);
@@ -147,11 +145,15 @@ class Supplier{
     DateTimePickerEvents(){
         let that = this;
 
-        $('#date').on("click touchstart",this,function (ev) {
-            $('#datetimepicker').data("DateTimePicker").toggle();
-        });
+        // $('.date').on("click",this,function (ev) {
+        //     $('#datetimepicker').data("DateTimePicker").toggle();
+        // });
 
-
+        // $('.dt_val').on('change',function (ev) {
+        //     $('#datetimepicker').data("DateTimePicker").viewDate($('.dt_val').val());
+        //     $('#datetimepicker').trigger("dp.change");
+        //
+        // });
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
             that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
@@ -164,29 +166,29 @@ class Supplier{
 
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
-                if(layer.constructor.name==="_ol_layer_Vector_") {
-                    if(layer.getSource()) {
-                        let features = layer.getSource().getFeatures();
-                        features.forEach((feature) => {
-                            layer.getSource().removeFeature(feature);
-                        });
+                if (layer.type === "VECTOR") {
+                    if (layer.getSource())
+                        layer.getSource().clear(true);
+                    if (layer.getSource().source) {
+                        layer.getSource().source.clear(true);
                     }
                 }
             });
+
+            let source = that.map.layers.circleLayer.getSource();
+            source.clear();
 
             $('.sel_period').text('06:00 - 24:00');
 
             if(!window.user.email)
                 return;
 
-            $('#my_truck').css('visibility','visible');
+            $('#user').css('visibility','visible');
 
-            let source = that.map.layers.circleLayer.getSource();
-            source.clear();
 
-            if(that.my_truck_ovl) {
-                that.my_truck_ovl.RemoveOverlay();
-                that.my_truck_ovl = '';
+            if(that.user_ovl) {
+                that.user_ovl.RemoveOverlay();
+                that.user_ovl = '';
             }
 
             that.map.GetObjectsFromStorage();
@@ -211,10 +213,11 @@ class Supplier{
 
                 if(that.offer.stobj && that.offer.stobj.location) {
 
-                    let my_truck_2 = $('#my_truck_container').clone()[0];
-                    $(my_truck_2).attr('id', 'my_truck_2');
+                    let user_2 = $('#user_container').clone()[0];
+                    $(user_2).attr('id', 'user_2');
+                    // $(user_2).width('30px');
                     if(false)
-                    $(my_truck_2).draggable({
+                    $(user_2).draggable({
                         cancel: ".non_draggable",
                         start: function (ev) {
                             console.log("drag start");
@@ -224,13 +227,13 @@ class Supplier{
                         },
                         stop: function (ev) {
                             console.log("drag stop");
-                            let domRect = $(my_truck_2)[0].getBoundingClientRect();
+                            let domRect = $(user_2)[0].getBoundingClientRect();
                             let ev_coor = that.map.ol_map.getEventCoordinate(ev);
-                            let offset  = $(my_truck_2).offset();
+                            let offset  = $(user_2).offset();
                             let coor = that.map.ol_map.getCoordinateFromPixel([offset.left,offset.top]);
                             window.user.offer.stobj.location = ev_coor;
-                            that.my_truck_ovl.overlay.values_.position = ev_coor;
-                            //$(my_truck_2).addClass('non_draggable');
+                            that.user_ovl.overlay.values_.position = ev_coor;
+                            //$(user_2).addClass('non_draggable');
 
                         }
                     });
@@ -239,19 +242,18 @@ class Supplier{
                         status = 'unpublished';
                     else
                         status = 'published';
-                    $(my_truck_2).find('img').addClass(status);
+                    $(user_2).find('img').addClass(status);
                     if(that.profile.profile.type==='marketer')
-                        $(my_truck_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar));
-                    that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
-                    $('#my_truck').on('click touchstart', (ev)=> {
-                        if(that.offer.stobj.location)
-                            that.map.MoveToLocation(that.offer.stobj.location);
+                        $(user_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
+                    that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
+                    $('#user').on('click touchstart', (ev)=> {
+                        // if(that.offer.stobj.location)
+                        //     that.map.MoveToLocation(that.offer.stobj.location);
                     });
 
                     setTimeout(()=>{
                         that.map.MoveToLocation(that.offer.stobj.location);
                     },300);
-
                 }
 
                 $('#map').on('drop',function (ev) {
@@ -260,26 +262,26 @@ class Supplier{
                     let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
                     let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
                     window.user.offer.stobj.location = coor;
-                    if(!that.my_truck_ovl) {
-                        let my_truck_2 = $('#my_truck_container').clone()[0];
-                        $(my_truck_2).attr('id', 'my_truck_2');
+                    if(!that.user_ovl) {
+                        let user_2 = $('#user_container').clone()[0];
+                        $(user_2).attr('id', 'user_2');
                         if(that.profile.profile.type==='marketer')
-                            $(my_truck_2).attr('src',that.path+'/images/'+ (that.profile.profile.thmb?that.profile.profile.thmb:that.profile.profile.avatar));
+                            $(user_2).attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';
                         else
                             status = 'published';
-                        $(my_truck_2).addClass(status);
-                        that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.offer.stobj);
-                        //$('#my_truck').css('visibility', 'hidden');
+                        $(user_2).addClass(status);
+                        that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
+                        //$('#user').css('visibility', 'hidden');
                     }
 
-                    that.my_truck_ovl.overlay.values_.position = coor;
-                    that.my_truck_ovl.overlay.changed();
-                    if(that.my_truck_ovl.modify) {
-                        that.my_truck_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
-                        that.my_truck_ovl.modify.changed();
+                    that.user_ovl.overlay.values_.position = coor;
+                    that.user_ovl.overlay.changed();
+                    if(that.user_ovl.modify) {
+                        that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
+                        that.user_ovl.modify.changed();
                     }
 
                     window.db.GetOffer(new Date(window.user.date),function (of) {
@@ -291,7 +293,6 @@ class Supplier{
                        }
                     })
                 });
-
             });
 
             that.import.GetOrderSupplier(function () {
@@ -334,7 +335,7 @@ class Supplier{
             });
         });
 
-        $("#my_truck").on('dragstart',function (ev) {
+        $("#user").on('dragstart',function (ev) {
 
         });
 
@@ -419,7 +420,7 @@ class Supplier{
         window.network.postRequest(data_obj, function (res) {
             let data = res;
             if(data && data.err){
-                alert(data.err);
+                alert({text:data.err,link:data.link},'alert-warning');
                 //window.location.replace(data.link);
             }else if(data.result.affectedRows>0){
                 window.db.GetOffer(new Date(window.user.date), function (obj) {
@@ -428,10 +429,11 @@ class Supplier{
                         if(res)
                             cb(obj[0]);
                     });
+                    alert({text:"Опубликовано: "+obj[0].published},null,3000);
                 });
 
-                $("#my_truck_2").removeClass('unpublished');
-                $("#my_truck_2").addClass('published');
+                $("#user_2").removeClass('unpublished');
+                $("#user_2").addClass('published');
             }
         });
     }
@@ -441,16 +443,16 @@ class Supplier{
         alert($('#choose_region').text());
         $('[data-dismiss=modal]').trigger('click');
 
-        let my_truck_2 = $('#my_truck').clone()[0];
-        $(my_truck_2).attr('id', 'my_truck_2');
+        let user_2 = $('#user').clone()[0];
+        $(user_2).attr('id', 'user_2');
         let status;
         if (!that.offer.stobj.published)
             status = 'unpublished';
         else
             status = 'published';
-        $(my_truck_2).addClass(status);
-        that.my_truck_ovl = new Overlay(that.map, my_truck_2, that.map.ol_map.getView().getCenter());
-        $('#my_truck').css('visibility', 'hidden');
+        $(user_2).addClass(status);
+        that.user_ovl = new Overlay(that.map, user_2, that.map.ol_map.getView().getCenter());
+        $('#user').css('visibility', 'hidden');
     }
 
     ApproveOrder(obj, title){
@@ -501,8 +503,8 @@ class Supplier{
                     console.log(data);
                 });
 
-            if(window.user.my_truck_ovl ) {
-                window.user.my_truck_ovl.overlay.setPosition(loc);
+            if(window.user.user_ovl ) {
+                window.user.user_ovl.overlay.setPosition(loc);
             }
         }
     }

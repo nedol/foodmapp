@@ -1921,11 +1921,11 @@
   }
 
   /**
-   * Get bounding client rect of given element
+   * Get bounding customer rect of given element
    * @method
    * @memberof Popper.Utils
    * @param {HTMLElement} element
-   * @return {Object} client rect
+   * @return {Object} customer rect
    */
   function getBoundingClientRect(element) {
     var rect = {};

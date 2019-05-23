@@ -44849,7 +44849,7 @@ jQuery.each( { Height: "height", Width: "width" }, function( name, type ) {
 				if ( elem.nodeType === 9 ) {
 					doc = elem.documentElement;
 
-					// Either scroll[Width/Height] or offset[Width/Height] or client[Width/Height],
+					// Either scroll[Width/Height] or offset[Width/Height] or customer[Width/Height],
 					// whichever is greatest
 					return Math.max(
 						elem.body[ "scroll" + name ], doc[ "scroll" + name ],
@@ -49959,7 +49959,7 @@ _ol_style_RegularShape_.prototype.getChecksum = function() {
 
 //
 //import axios from 'axios-cancel';
-//import io from 'socket.io-client';
+//import io from 'socket.io-customer';
 
 
 class Network{

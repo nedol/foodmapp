@@ -252,7 +252,7 @@ class DB {
         var ilatlon = objectStore.index("datelatlon");
         var lowerBound = [date,lat_0,lon_0];
         var upperBound = [date,lat_1,lon_1];
-        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
+        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, true);
 
         var features = [];
 
@@ -260,7 +260,9 @@ class DB {
 
             var cursor = event.target.result;
             if (cursor) {
-                features.push(cursor.value);
+                if(lat_0<cursor.value.latitude && lat_1>cursor.value.latitude &&
+                    lon_0<cursor.value.longitude && lon_1>cursor.value.longitude)
+                    features.push(cursor.value);
             }
             try {
                 cursor.continue();

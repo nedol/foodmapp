@@ -5,11 +5,10 @@ import {DB} from "../map/storage/db"
 
 import 'bootstrap'
 
-
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        $('.alert h3').text('В этом браузере нет поддержки EventSource.').addClass('show');
+        alert('В этом браузере нет поддержки EventSource.').addClass('show');
         return;
     }
 

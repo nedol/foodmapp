@@ -255,6 +255,7 @@ module.exports = class Customer extends D2D{
         let sql = " SELECT " +
             " DATE_FORMAT(of.date,'%Y-%m-%d') as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+            " of.published as published, of.deleted as deleted,"+
             " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
             " apprs.totals as apprs"+//общее кол-во подтверждений
             " FROM  supplier as sup, promo, offers as of," +
@@ -272,6 +273,7 @@ module.exports = class Customer extends D2D{
             " UNION" +
             " SELECT of.date as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+            " of.published as published, of.deleted as deleted,"+
             " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
             " apprs.totals as apprs"+//общее кол-во подтверждений" +
             " FROM  deliver as del, offers as of," +
