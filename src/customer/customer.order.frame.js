@@ -26,7 +26,7 @@ $(document).on('readystatechange', function () {
 
     window.InitCustomerOrder = function (data) {
         window.cus_oder = new CustomerOrder();
-        window.cus_oder.OpenOffer(data);
+        window.cus_oder.openFrame(data);
     };
 
 
@@ -53,7 +53,8 @@ class CustomerOrder{
 
 
     }
-    OpenOffer(obj) {
+
+    openFrame(obj) {
         let that = this;
         this.uid = obj.uid;
         this.profile = obj.profile;
@@ -77,8 +78,10 @@ class CustomerOrder{
         // });
         this.moveend;
         $('#client_frame_container',window.parent.document).css('height','100%');
+
         $('#address_loc').on('click',this,(ev)=> {
-            if( $('#client_frame_container',window.parent.document).css('height')==='100px'){
+            let h = $('#address_loc').parent().offset().top+$('#address_loc').width()+2;
+            if( parseInt($('#client_frame_container',window.parent.document).css('height'))<100){
                 $('#client_frame_container',window.parent.document).css('height','100%');
                 $(window.parent.user.map.ol_map).off('moveend');
                 if($('#address').val().includes(';'))
@@ -86,7 +89,7 @@ class CustomerOrder{
                         $('#address').val(res.city+','+res.street+','+res.house);
                     });
             }else {
-                $('#client_frame_container', window.parent.document).css('height', '100px');
+                $('#client_frame_container', window.parent.document).css('height', h);
                 $(window.parent.user.map.ol_map).on('moveend', (ev) => {
                     that.moveend = ev;
                     let loc = proj.toLonLat(ev.target.focus_);
@@ -107,7 +110,7 @@ class CustomerOrder{
         });
 
         this.ovc.find('#close_frame').off();
-        this.ovc.find('#close_frame').on('click touchstart', this, function (ev) {
+        this.ovc.find('#close_frame').on('click', this, function (ev) {
             let that = ev.data;
 
             let confirm = window.confirm("Сохранить заказ?");
@@ -129,8 +132,10 @@ class CustomerOrder{
 
             }
             $(frameElement).css('display','none');
+            $('#client_frame_container',window.parent.document).css('display','none');
             setTimeout(function () {
                 $(frameElement).remove();
+
             }, 1000);
         });
 
@@ -173,277 +178,284 @@ class CustomerOrder{
                 that.ovc.find('#address').val(obj[0].profile.address);
         });
 
-        $(window.parent.document).find(".category[state='1']").each(function (c, cat) {
-            let tab = $(cat).text();
-            //for (let tab in this.offer) {
-            if(!tab || !that.offer[tab])
-                return;
-            if($('[href="#'+tab+'"]').length===0) {
-                $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="'+md5(tab)+'"  href="#'+tab+'">'+tab+'</a>' +
-                    '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                $('<div id="'+tab+'" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
-                    // '<div class="row"><div>' +
-                    '</div>').insertBefore(that.ovc.find('#add_tab_div'));
-            }
-
-            // $('#'+tab).niceScroll();
-            let last = 0;
-            for (let i in that.offer[tab]) {
-                last = i;
-                let menu_item  = $('#menu_item_tmplt').clone();
-                $(menu_item).attr('id', tab + '_' + i);
-
-                $(menu_item).attr('class','menu_item');
-                $(menu_item).css('display', 'block');
-
-                $(menu_item).find('.item_title').attr('contenteditable', 'false');
-                //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
-
-                $(menu_item).find('.item_price').text(that.offer[tab][i].price);
-
-                $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
-                $(menu_item).find('.item_title').attr('data-target','#content_' + tab + '_' + i);
-
-                $(menu_item).find('.amount').val(0);
-                $(menu_item).find('.amount').text(0);
-
-                if(that.offer[tab][i].title){
-                    $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
+        function initOffer(){
+            $(window.parent.document).find(".category[state='1']").each(function (c, cat) {
+                let tab = $(cat).text();
+                //for (let tab in this.offer) {
+                if (!tab || !that.offer[tab])
+                    return;
+                if ($('[href="#' + tab + '"]').length === 0) {
+                    $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="' + md5(tab) + '"  href="#' + tab + '">' + tab + '</a>' +
+                        '</li>').insertBefore(that.ovc.find('#add_tab_li'));
+                    $('<div id="' + tab + '" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
+                        // '<div class="row"><div>' +
+                        '</div>').insertBefore(that.ovc.find('#add_tab_div'));
                 }
 
-                $(menu_item).find('.content_text').attr('contenteditable', 'false');
-                if(that.offer[tab][i].content_text)
-                    $(menu_item).find('.content_text').attr('data-translate',that.offer[tab][i].content_text.value);
-                if(that.offer[tab][i].content_text)
-                    $(menu_item).find('.content_text').css('visibility','visible');
 
-                if(that.offer[tab][i].img) {
+                // $('#'+tab).niceScroll();
+                let last = 0;
+                for (let i in that.offer[tab]) {
+                    last = i;
+                    let menu_item = $('#menu_item_tmplt').clone();
+                    $(menu_item).attr('id', tab + '_' + i);
 
-                    let src = that.path+ "/images/"+that.offer[tab][i].img.src;
-                    $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                    $(menu_item).find('.img-fluid').parent().css('display', 'block');
-                    $(menu_item).find('.img-fluid').attr('src', src);
-                    let active= '';
-                    if(!$('.carousel-inner').find('.active')[0])
-                        active = 'active';
-                    if(!that.offer[tab][i].owner) {
-                        $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
-                        let item = '<div class="carousel-item ' + active + '">' +
-                            '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
-                            '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
-                        $('.carousel-inner').append(item);
-                    }else{
-                        $('.carousel_collapse').css('display', 'block');
+                    $(menu_item).attr('class', 'menu_item');
+                    $(menu_item).css('display', 'block');
+
+                    $(menu_item).find('.item_title').attr('contenteditable', 'false');
+                    //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
+
+                    $(menu_item).find('.item_price').text(that.offer[tab][i].price);
+
+                    $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
+                    $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + i);
+
+                    $(menu_item).find('.amount').val(0);
+                    $(menu_item).find('.amount').text(0);
+
+                    if (that.offer[tab][i].title) {
+                        $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
                     }
-                }
 
-                $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
+                    $(menu_item).find('.content_text').attr('contenteditable', 'false');
+                    if (that.offer[tab][i].content_text)
+                        $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
+                    if (that.offer[tab][i].content_text)
+                        $(menu_item).find('.content_text').css('visibility', 'visible');
 
-                let setPrice = function (packlist, mi) {
-                    if(mi) menu_item = mi;
-                    $(menu_item).find('.pack_list').empty();
-                    let pl = packlist;
-                    let ml = that.offer[tab][i].markuplist;
-                    $(menu_item).find('.pack_btn').attr('packlist', JSON.stringify(pl));
-                    for (let p in pl) {
-                        if (!i)
-                            continue;
-                        let ml_val;
-                        if(!ml || !ml[p])
-                            ml_val = 0;
-                        else
-                            ml_val= parseInt(ml[p]);
-                        let data = parseInt(pl[p])+ml_val;
+                    if (that.offer[tab][i].img) {
 
-                        $(menu_item).find('.item_price').attr('base', pl[p]);
-                        if(!$('.carousel_price[title='+that.offer[tab][i].title+']').text())
-                            $('.carousel_price[title='+that.offer[tab][i].title+']').text(data+'р/'+p);
-                        pl[p] = data;
-                        $('a[href="#'+tab+'"]').css('display','block');
-                        $(menu_item).find('.dropdown').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem'>" + p + "</a>");
-                        $(menu_item).find('.pack_btn').text(p);
-                        $(menu_item).find('.caret').css('visibility', 'visible');
-                        $(menu_item).find('.pack_btn').attr('pack', p);
-
-                        $(menu_item).find('.item_price').text(data);
-                    }
-                }
-
-                if(that.offer[tab][i].owner) {
-                    $(menu_item).find('.item_title').attr('owner', that.offer[tab][i].owner);
-                    window.parent.db.GetSupplier(new Date(window.parent.user.date),that.offer[tab][i].owner,function (offer) {
-                        let title = that.offer[tab][i].title;
-                        let incl = _.find(offer.data[tab],{title:title});
-                        if(!incl)
-                            return;
-                        $('a[href="#'+tab+'"]').css('display','block');
-                        $(menu_item).find('.card-text').attr('contenteditable', 'false');
-                        if(incl.content_text)
-                            $(menu_item).find('.card-text').attr('data-translate', incl.content_text.value);
-                        if(incl.content_text)
-                            $(menu_item).find('.card-text').css('visibility','visible');
-
-                        if(incl.img) {
-                            $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                            $(menu_item).find('.img-fluid').attr('src',  that.path+"/images/"+incl.img.src);
-                            // $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
-                            // $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
+                        let src = that.path + "/images/" + that.offer[tab][i].img.src;
+                        $(menu_item).find('.img-fluid').css('visibility', 'visible');
+                        $(menu_item).find('.img-fluid').parent().css('display', 'block');
+                        $(menu_item).find('.img-fluid').attr('src', src);
+                        let active = '';
+                        if (!$('.carousel-inner').find('.active')[0])
+                            active = 'active';
+                        if (!that.offer[tab][i].owner) {
+                            $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
+                            let item = '<div class="carousel-item ' + active + '">' +
+                                '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
+                                '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
+                            $('.carousel-inner').append(item);
+                        } else {
+                            $('.carousel_collapse').css('display', 'block');
                         }
+                    }
 
-                        $.each(incl.cert, function (ind, data) {
+                    $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
+
+                    let setPrice = function (packlist, mi) {
+                        if (mi) menu_item = mi;
+                        $(menu_item).find('.pack_list').empty();
+                        let pl = packlist;
+                        let ml = that.offer[tab][i].markuplist;
+                        $(menu_item).find('.pack_btn').attr('packlist', JSON.stringify(pl));
+                        for (let p in pl) {
+                            if (!i)
+                                continue;
+                            let ml_val;
+                            if (!ml || !ml[p])
+                                ml_val = 0;
+                            else
+                                ml_val = parseInt(ml[p]);
+                            let data = parseInt(pl[p]) + ml_val;
+
+                            $(menu_item).find('.item_price').attr('base', pl[p]);
+                            if (!$('.carousel_price[title=' + that.offer[tab][i].title + ']').text())
+                                $('.carousel_price[title=' + that.offer[tab][i].title + ']').text(data + 'р/' + p);
+                            pl[p] = data;
+                            $('a[href="#' + tab + '"]').css('display', 'block');
+                            $(menu_item).find('.dropdown').css('visibility', 'visible');
+                            $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem'>" + p + "</a>");
+                            $(menu_item).find('.pack_btn').text(p);
+                            $(menu_item).find('.caret').css('visibility', 'visible');
+                            $(menu_item).find('.pack_btn').attr('pack', p);
+
+                            $(menu_item).find('.item_price').text(data);
+                        }
+                    }
+
+                    if (that.offer[tab][i].owner) {
+                        $(menu_item).find('.item_title').attr('owner', that.offer[tab][i].owner);
+                        window.parent.db.GetSupplier(new Date(window.parent.user.date), that.offer[tab][i].owner, function (offer) {
+                            let title = that.offer[tab][i].title;
+                            let incl = _.find(offer.data[tab], {title: title});
+                            if (!incl)
+                                return;
+                            $('a[href="#' + tab + '"]').css('display', 'block');
+                            $(menu_item).find('.card-text').attr('contenteditable', 'false');
+                            if (incl.content_text)
+                                $(menu_item).find('.card-text').attr('data-translate', incl.content_text.value);
+                            if (incl.content_text)
+                                $(menu_item).find('.card-text').css('visibility', 'visible');
+
+                            if (incl.img) {
+                                $(menu_item).find('.img-fluid').css('visibility', 'visible');
+                                $(menu_item).find('.img-fluid').attr('src', that.path + "/images/" + incl.img.src);
+                                // $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
+                                // $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
+                            }
+
+                            $.each(incl.cert, function (ind, data) {
+                                let img = new Image();
+                                img.src = that.path + "/images/" + data.src;
+                                //$(img).offset(data.pos); TODO:
+                                // img.style.height = '90%';
+                                img.width = '90';
+
+                                $(menu_item).find('.cert_container').append(img);
+                                $(img).on('click', menu_item, that.onClickImage);
+                            });
+
+                            if (that.offer[tab][i].img && that.profile.type === 'deliver') {
+                                let src = that.path + "/images/" + that.offer[tab][i].img.src;
+                                $(menu_item).find('.img-fluid').css('visibility', 'visible');
+                                // $(menu_item).find('.img-fluid').css('display', 'none');
+                                $(menu_item).find('.img-fluid').attr('src', src);
+                                let active = '';
+                                if (!$('.carousel-inner').find('.active')[0])
+                                    active = 'active';
+                                $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
+                                let item = '<div class="carousel-item ' + active + '">' +
+                                    '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
+                                    '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
+                                $('.carousel-inner').append(item);
+                            }
+
+                            setPrice(incl.packlist, menu_item);
+
+                            $(menu_item).find('a[role=packitem]').on('click', {off: incl}, function (ev) {
+                                that.changed = true;
+                                let pl = incl.packlist;
+                                $(menu_item).find('.pack_btn').text($(ev.target).text());
+                                $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
+                            });
+
+                            that.ovc.find('#' + tab).append(menu_item);
+                            that.dict.dict = Object.assign(offer.dict.dict, that.dict.dict);
+                            that.dict.set_lang(window.parent.sets.lang, that.ovc[0]);
+                        });
+
+                    } else {
+                        //deliver
+                        let title = that.offer[tab][i].title;
+                        let deliver = $('#deliver_but', window.parent.document).attr('supuid');
+                        if (deliver)
+                            window.parent.db.GetSupplier(window.parent.user.date, deliver, function (obj) {
+                                let key = _.findKey(obj.data, function (o) {
+                                    for (let i in o) {
+                                        if (o[i].title !== title)
+                                            continue;
+                                        else
+                                            return true;
+                                    }
+                                });
+                                if (key) {
+                                    $(menu_item).find('.deliver_but').css('display', 'block');
+                                    $(menu_item).find('.deliver_but').attr('supuid', $('#deliver_but', window.parent.document).attr('supuid'));
+                                }
+                            });
+                        setPrice(that.offer[tab][i].packlist);
+                        that.ovc.find('#' + tab).append(menu_item);
+                        $(menu_item).find('a[role=packitem]').on('click', {off: that.offer[tab][i]}, function (ev) {
+                            that.changed = true;
+                            $(this).closest('.menu_item').find('.pack_btn').text($(ev.target).text());
+                            let pl = ev.data.off.packlist;
+                            $(this).closest('.menu_item').find('.item_price').text(pl[$(ev.target).text()]);
+                        });
+
+                        if (that.offer[tab][i].cert.length > 1)
+                            $(menu_item).find('.cert_container').css('display', 'block');
+                        for (let c in that.offer[tab][i].cert) {
                             let img = new Image();
-                            img.src = that.path+"/images/"+data.src;
+                            img.src = that.path + "/images/" + that.offer[tab][i].cert[c].src;
                             //$(img).offset(data.pos); TODO:
-                            img.style.height = '90%';
-                            img.style.width = '90%';
+                            img.width = '90';
+                            // img.style.height = '100%';
 
                             $(menu_item).find('.cert_container').append(img);
-                            $(img).on('click',menu_item, that.onClickImage);
-                        });
+                            $(img).on('click', menu_item, that.onClickImage);
+                        }
+                    }
 
-                        if(that.offer[tab][i].img && that.profile.type==='deliver') {
-                            let src = that.path+"/images/"+that.offer[tab][i].img.src;
-                            $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                            // $(menu_item).find('.img-fluid').css('display', 'none');
-                            $(menu_item).find('.img-fluid').attr('src', src);
-                            let active= '';
-                            if(!$('.carousel-inner').find('.active')[0])
-                                active = 'active';
-                            $('.carousel-indicators').append('<li class="'+active+'" data-slide-to="'+that.offer[tab][i].title+'" data-target="#carouselExampleIndicators"></li>');
-                            let item ='<div class="carousel-item '+active+'">'+
-                                '<h1 class="carousel_price" title="'+that.offer[tab][i].title+'"></h1>'+
-                                '<img class="d-block img-fluid img-responsive" src='+src+' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
-                            $('.carousel-inner').append(item);
+                    if ($(menu_item).find('.item_content').css('display') === 'block'
+                        && $(menu_item).find('.img-fluid').attr('src') === ''
+                        && $(menu_item).find('.card-text').text() === "") {
+                        $(menu_item).find('.item_content').slideToggle("fast");
+                    }
+
+                    $(menu_item).find('.item_content').on('shown.bs.collapse', function (e) {
+                        let h = $(this).closest('.content_div')[0].scrollHeight;
+                        $(this).find('.content').off();
+                        $(this).find('.content').on('change keyup keydown paste cut', 'textarea', function () {
+                            $(this).height(0).height(h - 50);//this.scrollHeight);
+                        }).find('textarea').change();
+                    });
+                }
+
+                setTimeout(function () {
+                    let empty = $('#menu_item_tmplt').clone();
+                    // $(empty).addClass('menu_item');
+                    $(empty).attr('id', 'menu_item_empty');
+                    $(empty).insertAfter($('#' + tab + '_' + last));
+
+                }, 200)
+
+
+                //
+                // if($('.carousel-inner').children().length<=1)
+                //    $(".carousel_collapse").css('display','none');
+
+
+            });
+            that.RedrawOrder(obj);
+            that.dict.set_lang(window.parent.sets.lang, that.ovc[0]);
+
+            // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
+
+            $('li.active a').tab('show');
+            $($('.tab_inserted a')[0]).tab('show');
+
+            window.parent.db.GetSupOrders(new Date(this.date), obj.uid, function (arObj) {
+                if (arObj.length > 0) {
+                    for (let o in arObj) {
+                        let order = arObj[o];
+                        that.address = order.address;
+
+                        if (!that.address) {
+                            window.parent.user.map.geo.SearchPlace(latlon, 18, function (obj) {
+                                that.address = obj;
+                                if (obj.city && obj.street && obj.house)
+                                    $('.address').val(obj.city + "," + obj.street + "," + obj.house);
+                            });
+                        } else {
+                            if (that.address)
+                                $(that.ovc).find('#address').val(that.address);
                         }
 
-                        setPrice(incl.packlist,menu_item);
-
-                        $(menu_item).find('a[role=packitem]').on('click', {off:incl},function(ev){
-                            that.changed = true;
-                            let pl = incl.packlist;
-                            $(menu_item).find('.pack_btn').text($(ev.target).text());
-                            $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
-                        });
-
-                        that.ovc.find('#' + tab).append(menu_item);
-                        that.dict.dict = Object.assign(offer.dict.dict,that.dict.dict);
-                        that.dict.set_lang(window.parent.sets.lang,that.ovc[0]);
-                    });
-
-                }else{
-                    //deliver
-                    let title = that.offer[tab][i].title;
-                    let deliver = $('#deliver_but', window.parent.document).attr('supuid');
-                    if(deliver)
-                    window.parent.db.GetSupplier(window.parent.user.date,deliver, function (obj) {
-                        let key = _.findKey(obj.data,function(o) {
-                            for(let i in o) {
-                                if(o[i].title !== title)
-                                    continue;
-                                else
-                                    return true;
-                            }
-                        });
-                        if(key) {
-                            $(menu_item).find('.deliver_but').css('display', 'block');
-                            $(menu_item).find('.deliver_but').attr('supuid', $('#deliver_but', window.parent.document).attr('supuid'));
+                        if (order.published) {
+                            that.published = order.published;
+                            let status = window.parent.dict.getDictValue(window.parent.sets.lang, "published");
+                            //$(that.ovc).find('.ord_status').css('color', 'white');
+                            $(that.ovc).find('.ord_status').text(status + " " + order.published);
                         }
-                    });
-                    setPrice(that.offer[tab][i].packlist);
-                    that.ovc.find('#' + tab).append(menu_item);
-                    $(menu_item).find('a[role=packitem]').on('click', {off:that.offer[tab][i]},function(ev){
-                        that.changed = true;
-                        $(this).closest('.menu_item').find('.pack_btn').text($(ev.target).text());
-                        let pl = ev.data.off.packlist;
-                        $(this).closest('.menu_item').find('.item_price').text(pl[$(ev.target).text()]);
-                    });
 
-                    for(let c in that.offer[tab][i].cert) {
-                        let img = new Image();
-                        img.src = that.path+"/images/"+that.offer[tab][i].cert[c].src;
-                        //$(img).offset(data.pos); TODO:
-                        img.style.width = '100%';
-                        img.style.height = '100%';
+                        if (order.comment) {
+                            $(that.ovc).find('.comment').text(that.dict.getDictValue(window.sets.lang, order.comment));
+                        }
 
-                        $(menu_item).find('.cert_container').append(img);
-                        $(img).on('click',menu_item, that.onClickImage);
                     }
+                    if ($('.menu_item[ordered]')[0])
+                        $('li.publish_order.disabled').removeClass('disabled');
                 }
+            });
+        };
 
-                if ($(menu_item).find('.item_content').css('display') === 'block'
-                    && $(menu_item).find('.img-fluid').attr('src')===''
-                    && $(menu_item).find('.card-text').text()===""){
-                    $(menu_item).find('.item_content').slideToggle("fast");
-                }
-
-                $(menu_item).find('.item_content').on('shown.bs.collapse', function (e) {
-                    let h = $(this).closest('.content_div')[0].scrollHeight;
-                    $(this).find('.content').off();
-                    $(this).find('.content').on( 'change keyup keydown paste cut', 'textarea', function (){
-                        $(this).height(0).height(h-50);//this.scrollHeight);
-                    }).find( 'textarea' ).change();
-                });
-            }
-
-            setTimeout(function () {
-                let empty = $('#menu_item_tmplt').clone();
-                // $(empty).addClass('menu_item');
-                $(empty).attr('id','menu_item_empty');
-                $(empty).insertAfter($('#'+ tab + '_' + last));
-
-            },200)
-
-
-            //
-            // if($('.carousel-inner').children().length<=1)
-            //    $(".carousel_collapse").css('display','none');
-
-
-        });
-
-
-        this.RedrawOrder(obj);
-
-        this.dict.set_lang(window.parent.sets.lang,that.ovc[0]);
-        // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
-
-        $('li.active a').tab('show');
-        $($('.tab_inserted a')[0]).tab('show');
-
-        window.parent.db.GetSupOrders(new Date(this.date),obj.uid,function (arObj) {
-            if(arObj.length>0){
-                for(let o in arObj) {
-                    let order = arObj[o];
-                    that.address = order.address;
-
-                    if (!that.address) {
-                        window.parent.user.map.geo.SearchPlace(latlon, 18, function (obj) {
-                            that.address = obj;
-                            if(obj.city && obj.street && obj.house)
-                                $('.address').val(obj.city+ "," + obj.street + "," + obj.house);
-                        });
-                    } else {
-                        if(that.address)
-                            $(that.ovc).find('#address').val(that.address);
-                    }
-
-                    if(order.published) {
-                        that.published = order.published;
-                        let status = window.parent.dict.getDictValue(window.parent.sets.lang, "published");
-                        //$(that.ovc).find('.ord_status').css('color', 'white');
-                        $(that.ovc).find('.ord_status').text(status + " "+order.published);
-                    }
-
-                    if(order.comment){
-                        $(that.ovc).find('.comment').text(that.dict.getDictValue(window.sets.lang, order.comment));
-                    }
-
-                }
-                if($('.menu_item[ordered]')[0])
-                    $('li.publish_order.disabled').removeClass('disabled');
-            }
-        });
+        setTimeout(function () {
+            initOffer();
+        },1000);
 
     }
 

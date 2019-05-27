@@ -71,26 +71,17 @@ $(document).on('readystatechange', function () {
         date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         $('.dt_val').val(date);
 
-
-        // //
-        // $(window).on("resize", function (event) {
-        //     let dt_w = $('#dtp_container').css('width');
-        //     let dt_h = $('#dtp_container').css('height');
-        //     let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
-        //     $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
-        // });
-
         $('#datetimepicker').data("DateTimePicker").toggle();
 
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
 
-            let dt_w = $('#dtp_container').css('width');
-            let dt_h = $('#dtp_container').css('height');
-            let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
-
-            $('#debug').text(scale);
+            // let dt_w = $('#dtp_container').css('width');
+            // let dt_h = $('#dtp_container').css('height');
+            // let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
+            //
+            // $('#debug').text(scale);
 
             // $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
         });

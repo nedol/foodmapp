@@ -99,8 +99,7 @@
         </style>
         <div class="carousel_collapse" style="display: none">
             <div id="carouselIndicators" class="carousel slide" data-ride="carousel">
-                <ol class="carousel-indicators">
-                </ol>
+                <ol class="carousel-indicators"></ol>
                 <div class="carousel-inner" role="listbox">
                 </div>
                 <a class="carousel-control-prev" href="#carouselIndicators" role="button" data-slide="prev">
@@ -122,7 +121,7 @@
                 margin: auto;
                 border-width: 0px;
                 overflow-y: scroll;
-                /*-webkit-overflow-scrolling: touch;*/
+                -webkit-overflow-scrolling: touch;
             }
 
             textarea:focus {
@@ -252,15 +251,13 @@
 
             .item_price{
                 display:block;
-                position:relative;
-                bottom:0%;
-                padding-top: 10px;
-                float:left;
+                position:absolute;
+                bottom:60px;
                 left:5%;
                 background-color:transparent;
                 -webkit-text-stroke: 1px white;;
                 font-weight: bold;
-                font-size:32px;
+                font-size:3em;
                 color: #bb0209;
                 white-space: nowrap;
             }
@@ -284,7 +281,7 @@
                 margin-left: 10px;
                 border-width: 0;
                 border-color: #9da0a4;
-                background-color: rgba(240, 240, 240, 0.7);
+                /*background-color: rgba(255, 255, 255, 0.7);*/
                 z-index: 3000;
             }
             .orders{
@@ -293,7 +290,6 @@
             }
             .cert{
                 z-index: 50;
-                padding: 10px;
             }
             .notoday{
                 display:none;!important;
@@ -320,8 +316,8 @@
             </div>
         </div>
         <div id="menu_item_tmplt">
-            <div class="row">
-                <div class="content_div col-lg-9 col-sm-9 col-xs-9">
+            <div>
+                <div class="content_div">
                     <input type="text" readonly class="item_title input input-sm" placeholder="название" data-toggle="collapse">
 
                     <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
@@ -332,30 +328,29 @@
 
                     </div>
 
-                    <div style="max-width: 100%;margin: 0 auto; margin-top: 20px!important;">
+                    <div style="position:relative;max-width: 100%;margin: 0 auto; margin-top: 20px!important;">
                         <img class="img-fluid" style="width: 100%;height:100%;z-index: 1000" src="https://nedol.ru/d2d/dist/images/700x400.png" crossorigin="anonymous" alt="">
-                    </div>
-                    <div class="input item_price text-center" placeholder="руб">
+                        <div class="item_price" placeholder="руб"></div>
                     </div>
                 </div>
-                <div class="col">
+                <div>
                     <div class="cert_container" style="
-                                /*position: absolute;*/
-                                width:100px;
-                                /*max-height: 200px;*/
-                                margin-top:15px;
-                                margin-right:15px;
-                                background-color: rgb(255,255,255);
-                                overflow-y: scroll;
-                                /*white-space: pre-wrap;*/
-                                z-index:20;">
-                    </div>
+                        display:none;
+                        position: relative;
+                        /*width:100px;*/
+                        /*max-height: 350px;*/
+                        margin-top:5px;
+                        margin-right:1px;
+                        /*background-color: rgb(255,255,255);*/
+                        overflow-x: scroll;
+                        white-space: nowrap;
+                        z-index:20;"></div>
                 </div>
 
             </div>
 
-            <div class="" style="display: block;position: relative;height: 50px;margin-top: 20px">
-                <div class="dropup pack_container" style="position:absolute;left:40px;background-color:#a2a2a2;">
+            <div style="display: block;position: relative;height: 50px;margin-top: 20px">
+                <div class="dropup pack_container" style="position:absolute;left:15px;background-color:#a2a2a2;">
                     <button class="pack_btn btn btn-secondary dropdown-toggle scaled" type="button"
                             data-toggle="dropdown"></button>
 
@@ -387,10 +382,15 @@
                     </div>
                 </div>
                 <!--<div class="col"></div>-->
-                <div class="period_div" style="position:absolute;left:80%;visibility: hidden;color: red;vertical-align: middle;">
-                    <div class="ordperiod" style="font-size: .75em;white-space: nowrap;">Время доставки</div>
+                <div class="period_div"
+                     style="position:absolute;
+                     right:0%;
+                     visibility: hidden;
+                     color: red;
+                     vertical-align: middle;">
+                    <div class="ordperiod" style="font-size: .6em;white-space: nowrap;">Время доставки</div>
                     <div style="text-align: center">
-                        <span class="fa fa-handshake-o approved" style="font-size: 32px;"></span>
+                        <span class="fa fa-handshake-o approved" style="font-size: 1.2em;"></span>
                     </div>
                 </div>
                 <div class="deliver_div" style="position:absolute;left:90%;">
@@ -407,12 +407,12 @@
             <div class="col-sm-12">
                 <div  id="profile_container"
                       style="
-                         position: absolute;
-                        overflow: visible; z-index:2147483646;
-                        height: 90%; left:2%;
+                        position: absolute;
+                        height: 99%;
                         /*max-height: 90% !important;*/
                         /*min-height: 70% !important;*/
-                       width:96%;
+                       width:90%;
+                       margin: auto;
                        border: solid 0px lightslategrey;
                        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
                     <ul class="nav nav-tabs">

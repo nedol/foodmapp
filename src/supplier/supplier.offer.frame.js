@@ -295,22 +295,30 @@ class SupplierOffer{
                         img.class = 'image';
                         //$(img).offset(data.pos);TODO:
                         img.width = '90';
-                        img.style='padding:10px';
+                        img.style='padding:1px';
+
                         $(menu_item).find('.cert_container').append(img);
                         $(img).on('click', {id: $(menu_item).attr('id')}, that.onClickImage);
-                        $(img).draggable({
-                            start: function (ev) {
-                                console.log("drag start");
-                            },
-                            drag: function (ev) {
-                                //$(el).attr('drag', true);
-                            },
-                            stop: function (ev) {
-                                console.log("drag stop");
-                                if($(img).position().left>$(img).width()-20)
-                                    $(img).remove();
-                            }
-                        });
+                        $(img).on('dblclick',function(){
+                            $(img).remove();
+                        })
+                        // let img_top = $(img).offset().top;
+                        // $(img).draggable({ axis: "y"} ,{
+                        //     start: function (ev) {
+                        //         img_top = $(img).offset().top;
+                        //     },
+                        //     drag: function (ev) {
+                        //         //$(el).attr('drag', true);
+                        //     },
+                        //     stop: function (ev) {
+                        //         console.log("drag stop");
+                        //         if($(img).offset().top-img_top >$(img).height()/2)
+                        //             $(img).remove();
+                        //         else{
+                        //             $(img).offset().top = img_top;
+                        //         }
+                        //     }
+                        // });
                     });
 
                     $('#' + tab).append(menu_item);//добавить продукт в закладку
@@ -472,7 +480,7 @@ class SupplierOffer{
                         "</label>" +
                         "</td>" +
 
-                        "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.row').siblings('.orders').css('visibility','visible').find('tbody'));
+                        "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').children('.orders').css('visibility','visible').find('tbody'));
 
                     if(window.parent.user.profile.profile.type==='marketer'){
                         $('.marketer').css('display','none');
@@ -864,11 +872,11 @@ class SupplierOffer{
 
 
     onClickImage(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
+        // ev.preventDefault();
+        // ev.stopPropagation();
         let mi = $('#'+ev.data.id);
         $(mi).find('.img-fluid').attr('src',this.src);
-        return true;
+        $(mi).find('.img-fluid').focus();
     };
 
     OnClickImport(ev){

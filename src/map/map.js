@@ -93,7 +93,10 @@ class OLMap {
         this.geo = new Geo(this);
 
         this.animate = new Animate(this);
-        this.categories = new Categories(this);
+
+        $('#category_container').load('./html/categories/food.html?v=1 #cat_incl',()=> {
+            this.categories = new Categories(this);
+        });
         this.layers = new Layers(this);
         this.feature = new Feature(this);
 

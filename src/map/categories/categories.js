@@ -85,6 +85,7 @@ class Categories {
         });
     }
 
+
     OnClickCategory(ev) {
         ev.preventDefault();
         ev.stopPropagation();

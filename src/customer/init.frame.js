@@ -71,15 +71,8 @@ class OfferOrder {
         $(client_frame).css('display', 'inline-block');
         $('#client_frame_container').css('display', 'inline');
 
-        let w = document.documentElement.clientWidth;
-        //if(window.devicePixelRatio<1.5)
-        // $('#debug').text('customer w:'+w);
-        if(w>600)
-            w='600';
-
-        $(client_frame).css('width',w);
-
-        $('#client_frame_container').prepend(client_frame);
+        $('#client_frame_container').empty();
+        $('#client_frame_container').prepend(client_frame[0]);
         // $('#client_frame_container').draggable();
         // $('#client_frame_container').resizable({
         //     aspectRatio: 16 / 9

@@ -283,7 +283,7 @@
                 }
                 .cert{
                     z-index: 50;
-                    padding: 5px;
+                    padding: 1px;
                 }
                 .notoday{
                     display:none;!important;
@@ -295,8 +295,8 @@
 
             </style>
             <div  id="menu_item_tmplt">
-                <div class="row">
-                    <div class="content_div col-lg-10 col-sm-10 col-xs-10">
+                <div>
+                    <div class="content_div">
                         <h4>
                             <input type="text" class="item_title input input-sm " contenteditable="true" placeholder="название"
                                    data-toggle="collapse">
@@ -313,18 +313,17 @@
                             <img class="card-img-top img-fluid" style="image-orientation:from-image;width: 100%;z-index: 1000" src="http://placehold.it/700x400" alt="">
                         </div>
                     </div>
-                    <div class="col-lg-2 col-sm-2 col-xs-2">
+                    <div class="">
                         <div class="cert_container" style="
                                 /*position: absolute;*/
-                                width:100px;
+                                /*width:100px;*/
                                 /*max-height: 350px;*/
                                 margin-top:5px;
-                                margin-right:5px;
-                                background-color: rgb(240,240,240);
-                                overflow-y: scroll;
-                                /*white-space: pre-wrap;*/
-                                z-index:20;">
-                        </div>
+                                margin-right:1px;
+                                /*background-color: rgb(240,240,240);*/
+                                overflow-x: scroll;
+                                white-space: nowrap;
+                                z-index:20;"></div>
                     </div>
                 </div>
                 <div class="row">

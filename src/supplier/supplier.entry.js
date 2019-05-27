@@ -153,10 +153,10 @@ $(document).on('readystatechange', function () {
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         $('.dt_val').val(date);
 
-        let dt_w = $('#dtp_container').css('width');
-        let dt_h = $('#dtp_container').css('height');
-        let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-        let w = document.documentElement.clientWidth;
+        // let dt_w = $('#dtp_container').css('width');
+        // let dt_h = $('#dtp_container').css('height');
+        // let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
+        // let w = document.documentElement.clientWidth;
         // $(window).on("resize", function (event) {
         //     let dt_w = $('#dtp_container').css('width');
         //     let dt_h = $('#dtp_container').css('height');
@@ -164,7 +164,7 @@ $(document).on('readystatechange', function () {
         //     $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
         // });
 
-        $('#debug').text(scale);
+        // $('#debug').text(scale);
 
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");
