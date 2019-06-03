@@ -8,15 +8,7 @@ import proj from 'ol/proj';
 import Collection from 'ol/collection';
 
 import Feature from 'ol/feature';
-import layerVector from 'ol/layer/vector';
-import srcVector from 'ol/source/vector';
-import _ol_style_Style_ from 'ol/style/style';
-import _ol_style_Circle_ from 'ol/style/circle';
-import _ol_style_Icon_ from 'ol/style/icon';
-import _ol_style_Fill_ from 'ol/style/fill';
-import Text from 'ol/style/text';
-import _ol_style_Stroke_ from 'ol/style/stroke';
-import interaction_ from 'ol/interaction';
+
 import Modify from 'ol/interaction/modify';
 import Draw from 'ol/interaction/draw';
 import Snap from 'ol/interaction/snap';
@@ -43,6 +35,10 @@ let utils = new Utils();
         });
     }
 })(jQuery);
+
+
+
+
 
 class Overlay {
 

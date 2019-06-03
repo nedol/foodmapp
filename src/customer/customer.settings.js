@@ -77,7 +77,7 @@ class CustomerSettings {
             profile: {
                 avatar: $(form).find('.avatar').attr('src'),
                 lang: $('html').attr('lang'),
-                email: $(form).find('#email').val(),
+                email: $(form).find('#email').val().toLowerCase(),
                 name: $(form).find('#name').val(),
                 address: $(form).find('#address').val(),
                 mobile: $(form).find('#mobile').val()

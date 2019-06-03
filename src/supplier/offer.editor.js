@@ -1,9 +1,10 @@
 'use strict'
 export {OfferEditor}
 
-require('webpack-jquery-ui/draggable');
-require('jquery-ui-touch-punch');
-
+// require('webpack-jquery-ui/draggable');
+// require('jquery-ui-touch-punch');
+require('jquery-ui')
+require('jquery.ui.touch');
 require('bootstrap');
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
@@ -44,15 +45,13 @@ class OfferEditor{
         this.offer.profile = window.user.profile.profile;
         this.offer.uid =  window.user.uid;
         this.offer.dict = window.dict.dict;
-
-        setTimeout(function () {
+        this.off_frame.off('load');
+        this.off_frame.on('load', function () {
             that.off_frame[0].contentWindow.InitSupplierOffer(that.offer);
-            // $('#client_frame_container').draggable();
-            // $('#client_frame_container').resizable({
-            //     aspectRatio: 16 / 9
-            // });
-        },200);
-
+        });
+        this.off_frame.css('display', 'block');
+        this.off_frame.attr('src',"./supplier/supplier.frame.html");
+        $('#supplier_frame_container').prepend(this.off_frame[0]);
     }
 
 

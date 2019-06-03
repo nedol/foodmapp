@@ -144,22 +144,25 @@ class Geo {
         //     });
         // }
 
-        if (window.sets.loc_mode) {
-            this.SetCurPosition(that,window.sets.coords.gps);
 
-            if(window.user.SendLocation)
-                window.user.SendLocation(window.sets.coords.gps);
-        }
+        this.SetCurPosition(that,window.sets.coords.gps);
+
+        if(window.user.SendLocation)
+            window.user.SendLocation(window.sets.coords.gps);
+
     }
+
     SetCurPosition(that,coordinate) {
 
         try {
             var size = that.map.ol_map.getSize();// @type {ol.Size}
             //alert(loc.toString());
 
-            if(that.map.ol_map.getView().getCenter()[0]!==coordinate[0] ||
-                that.map.ol_map.getView().getCenter()[1]!==coordinate[1])
+            if( window.sets.loc_mode && (that.map.ol_map.getView().getCenter()[0]!==coordinate[0] ||
+                that.map.ol_map.getView().getCenter()[1]!==coordinate[1])) {
                 that.map.MoveToLocation(coordinate);
+                $('#map').trigger('drop',{'coordinate': coordinate});
+            }
 
             var latlon = proj.toLonLat(coordinate);
             window.sets.coords.gps = coordinate;

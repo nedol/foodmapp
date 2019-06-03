@@ -28,8 +28,8 @@
 
     <!-- Custom styles for this template -->
     <script type="text/javascript" src="../host.js"></script>
-    <script src="../customer_order.js?v=1"></script>
-    <script src="../../lib/jquery.ui.touch-punch.min.js"></script>
+    <script src="../customer_order.js?v=5"></script>
+    <!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
 </head>
 
 <body>
@@ -231,7 +231,7 @@
                 box-shadow: 0 0 10px #719ECE;
             }
             .item_title{
-                display: inline-block;
+                /*display: inline-block;*/
                 position: absolute;
                 width: 95%;
                 top:15px;
@@ -242,7 +242,7 @@
                 color: #ffffff;
                 border-width: 0px;
                 -webkit-text-stroke: 1px #737373;
-
+                z-index: 3000;
             }
             li.active a{
                 color:blue;
@@ -318,7 +318,7 @@
         <div id="menu_item_tmplt">
             <div>
                 <div class="content_div">
-                    <input type="text" readonly class="item_title input input-sm" placeholder="название" data-toggle="collapse">
+                    <div class="item_title" placeholder="название" data-toggle="collapse"></div>
 
                     <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
                         <div class="content">
@@ -329,7 +329,7 @@
                     </div>
 
                     <div style="position:relative;max-width: 100%;margin: 0 auto; margin-top: 20px!important;">
-                        <img class="img-fluid" style="width: 100%;height:100%;z-index: 1000" src="https://nedol.ru/d2d/dist/images/700x400.png" crossorigin="anonymous" alt="">
+                        <img class="img-fluid" style="width: 100%;height:100%;z-index: 1000" src="https://nedol.ru/d2d/dist/images/700x400.png" alt="">
                         <div class="item_price" placeholder="руб"></div>
                     </div>
                 </div>

@@ -48,8 +48,11 @@ class Dict {
 
                 if(item.isEntity)//a-frame
                     item.setAttribute('text','value',val);
-                $(item).text(val);
-                $(item).val(val);
+
+                // if(item.constructor.name==='HTMLInputElement')
+                    $(item).val(val);
+                // else
+                    $(item).text(val);
                 if($(item).attr("title"))
                     $(item).attr("title", val);
                 if($(item).attr("value"))

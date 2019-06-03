@@ -24,8 +24,8 @@
 <link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js?v=4"></script>
-<script src="../lib/jquery.ui.touch-punch.min.js"></script>
+<script type="text/javascript" src="customer.js?v=5"></script>
+<!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
 <!-- Popper JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 
@@ -232,14 +232,14 @@
 <div id="map" class="map"></div>
 
 <section id="marker" title="kolobot">
-    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px" crossorigin="anonymous"/>
+    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>
 </section>
 
 <style>
     #period_list .ui-selecting { background: #FECA40; }
     #period_list .ui-selected { background: #F39814; color: white; }
-    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 25%; }
+    #period_list li { margin: 2px; padding: 0.2em; font-size: 1.4em; height: 20px; }
 </style>
 
 <div>
@@ -273,28 +273,28 @@
     <div>
         <div class="date_ctrl form-group"  style="position:fixed;top:1px;">
             <div class='input-group date row' style="width:auto" >
-                <input type='text' class="form-control dt_val col" style="width: 90px;font-size: medium"/>
-                <span class="input-group-addon col" style="width: auto">
-                    <span class="glyphicon glyphicon-calendar" style="font-size: medium"></span>
-                </span>
-
-                <button class="btn btn-block dropdown-toggle sel_period col"
-                        type="button" data-toggle="dropdown"
-                        data-width="fit" style="float:right;background-color:white;font-size: medium">
-                    <span class="caret"></span>
-                </button>
-                <ol id="period_list" class="dropdown-menu period_list" role="menu">
-                    <li href="#">06:00 - 08:00</li>
-                    <li href="#">08:00 - 10:00</li>
-                    <li href="#">10:00 - 12:00</li>
-                    <li href="#">12:00 - 14:00</li>
-                    <li href="#">14:00 - 16:00</li>
-                    <li href="#">16:00 - 18:00</li>
-                    <li href="#">18:00 - 20:00</li>
-                    <li href="#">20:00 - 22:00</li>
-                    <li href="#">22:00 - 24:00</li>
-                </ol>
-
+                <input type='text' readonly class="form-control dt_val col" style="font-size: medium"/>
+                <!--<span class="input-group-addon col" style="width: auto">-->
+                    <!--<span class="glyphicon glyphicon-calendar" style="font-size: medium"></span>-->
+                <!--</span>-->
+                <div class="dropdown">
+                    <button class="sel_period btn btn-block dropdown-toggle col"
+                            type="button" data-toggle="dropdown"
+                            style="float:right;background-color:white;font-size: medium">
+                        <span class="caret"></span>
+                    </button>
+                    <ol id="period_list" class="dropdown-menu" role="menu">
+                        <li href="#">06:00 - 08:00</li>
+                        <li href="#">08:00 - 10:00</li>
+                        <li href="#">10:00 - 12:00</li>
+                        <li href="#">12:00 - 14:00</li>
+                        <li href="#">14:00 - 16:00</li>
+                        <li href="#">16:00 - 18:00</li>
+                        <li href="#">18:00 - 20:00</li>
+                        <li href="#">20:00 - 22:00</li>
+                        <li href="#">22:00 - 24:00</li>
+                    </ol>
+                </div>
             </div>
         </div>
     </div>
@@ -338,11 +338,12 @@
 
         #categories{
             position: fixed;
+            overflow: scroll;
+            -webkit-overflow-scrolling: touch;
             bottom:0px;
             width:100%;
             padding-top: 5px;
             background-color: rgba(0, 140, 201, 1.0);
-            overflow-x: auto;
             white-space: nowrap;
             z-index:100;
         }
@@ -365,8 +366,6 @@
              -webkit-overflow-scrolling: touch;
              overflow-y: scroll;
              box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-
     </div>
 
 
@@ -453,6 +452,33 @@
 
 </body>
 <style>
+    @media screen and (min-width: 320px) {
+        #items_carousel{
+            position: absolute;
+            height:100px;
+            /*width:300px;*/
+            left:1%;
+            bottom:50px;
+        }
+        .carousel-item{
+            background-color: rgba(255,255,255,0.7);
+            position: relative;
+            height: 100px;
+        }
+        .carousel_price{
+            font-size: 2em;
+            -webkit-text-stroke: 1px white;
+            color: blue;
+            bottom:0;
+            float:left;
+        }
+        #client_frame_container{
+            max-width: 60%;
+        }
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+    }
     @media screen and (min-width: 480px) {
         #items_carousel{
             position: absolute;

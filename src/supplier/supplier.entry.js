@@ -1,36 +1,32 @@
 'use strict'
 
 
-let jQuery = require('jquery');
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-// require('jquery-ui-touch-punch');
 
 require('dialog-polyfill');
 
 require("../../global");
 
-require('bootstrap');
-
-require('bootstrap-select');
-
-
 import {Utils} from "../utils/utils";
-import {Supplier} from './supplier'
-
+import {Supplier} from './supplier';
 import {Network} from "../../network";
 import {DB} from "../map/storage/db";
 
-const shortid = require('shortid');
+
+require('bootstrap');
+require('bootstrap-select');
+
+global.jQuery = require('jquery');
 
 
 let utils = new Utils();
 window.sets.lang = utils.getParameterByName('lang');
 
-    $(window).on( "orientationchange", function( event ) {
-        let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
-        $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
-    });
+$(window).on( "orientationchange", function( event ) {
+    let scale = window.innerWidth > window.innerHeight?(window.innerHeight)/300:(window.innerWidth)/300;
+    $('#datetimepicker').css('transform', 'scale('+scale+','+scale+')');
+});
 
 $(document).on('readystatechange', function () {
 
@@ -80,7 +76,7 @@ $(document).on('readystatechange', function () {
                         utils.getParameterByName('uid') &&
                         utils.getParameterByName('uid') === uObj['set'].uid) {
                             uObj['set']['profile'].user = 'Supplier';
-                            uObj['set']['profile'].email = utils.getParameterByName('email');
+                            uObj['set']['profile'].email = utils.getParameterByName('email').toLowerCase();
 
                             window.network.RegUser(uObj['set'], function (reg) {
                                 if (!reg || reg.err) {
@@ -170,7 +166,7 @@ $(document).on('readystatechange', function () {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
 
-            $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
+            // $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
         });
 
         $('#datetimepicker').on('dp.hide', function (ev) {

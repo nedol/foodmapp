@@ -17,7 +17,6 @@ const langs = require("../dict/languages");
 var countries = require("i18n-iso-countries");
 
 require('bootstrap');
-
 require('bootstrap-select');
 
 //let moment = require('moment');
@@ -90,7 +89,7 @@ $(document).on('readystatechange', function () {
             $('#dtp_container').css('display', 'none');
         })
 
-        $('.glyphicon-calendar').on('click touchstart', function (ev) {
+        $('.dt_val').on('click touchstart', function (ev) {
             ev.preventDefault();
             ev.stopPropagation();
             $('#datetimepicker').data("DateTimePicker").toggle();

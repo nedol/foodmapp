@@ -8,7 +8,7 @@ let utils = require('../utils');
 let fs = require('fs');
 var md5 = require('md5');
 const shortid = require('shortid');
-var isJSON = require('is-json');
+// var isJSON = require('is-json');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 var intersection = require('array-intersection');
@@ -77,7 +77,7 @@ module.exports = class Supplier extends D2D{
                         that.replaceImg_2(q.profile.thmb, function (thmb) {
                             q.profile.avatar = avatar;
                             q.profile.thmb = thmb;
-                            q.profile.email = result[0].email;
+                            q.profile.email = result[0].email.toLowerCase();
                             values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
                             sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
                             setTimeout(function () {

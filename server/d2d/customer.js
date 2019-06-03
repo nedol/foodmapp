@@ -8,7 +8,7 @@ let utils = require('../utils');
 let fs = require('fs');
 var md5 = require('md5');
 const shortid = require('shortid');
-var isJSON = require('is-json');
+// var isJSON = require('is-json');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 var intersection = require('array-intersection');
@@ -253,7 +253,7 @@ module.exports = class Customer extends D2D{
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
         let sql = " SELECT " +
-            " DATE_FORMAT(of.date,'%Y-%m-%d') as date, of.categories as cats, " +
+            " '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
             " of.published as published, of.deleted as deleted,"+
             " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
@@ -269,9 +269,11 @@ module.exports = class Customer extends D2D{
             " AND LCASE(sup.promo)=LCASE(promo.code)"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL " +
+            " AND (of.date='"+q.date.split('T')[0]+"' OR " +
+            " (sup.prolong=1 AND (SELECT id  FROM offers WHERE supuid LIKE sup.uid ORDER BY date DESC LIMIT 1)= of.id))" +
+            " AND of.published IS NOT NULL AND of.deleted IS NULL " +
             " UNION" +
-            " SELECT of.date as date, of.categories as cats, " +
+            " SELECT '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
             " of.published as published, of.deleted as deleted,"+
             " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
@@ -286,7 +288,10 @@ module.exports = class Customer extends D2D{
             " WHERE del.uid = of.supuid"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND of.date='"+q.date.split('T')[0]+"' AND of.published IS NOT NULL AND of.deleted IS NULL";
+            " AND (of.date='"+q.date.split('T')[0]+"' OR del.prolong=1)" +
+            " AND of.published IS NOT NULL AND of.deleted IS NULL";
+
+
         // if (!res._header)
         //     res.writeHead(200, {'Content-Type': 'application/json'});
         // res.end(JSON.stringify(sql));

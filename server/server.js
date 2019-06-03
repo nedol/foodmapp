@@ -18,7 +18,7 @@ let email = new Email();
 
 var md5 = require('md5.js');
 
-var isJSON = require('is-json');
+// var isJSON = require('is-json');
 
 const translate = require('google-translate-api');//ISO 639-1
 

@@ -103,7 +103,17 @@ class Utils{
         };
     }
 
-
+    ValidateEmail(inputText){
+        var mailformat = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
+        if(inputText.value.match(mailformat))
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
 
     QueryMethod(protocol,options, postData, res, cb) {
         let http_;

@@ -7,7 +7,7 @@ let fs = require('fs');
 let os = require('os');
 var md5 = require('md5');
 const shortid = require('shortid');
-var isJSON = require('is-json');
+// var isJSON = require('is-json');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 var intersection = require('array-intersection');
@@ -117,7 +117,7 @@ module.exports = class D2D {
     ConfirmEmail(q, res) {
 
         let that = this;
-        let uid = md5(q.profile.email);
+        let uid = md5(q.profile.email.toLowerCase());
         let sql = "SELECT user.*" +
             " FROM "+q.user.toLowerCase()+" as user" +
             " WHERE (user.email='"+q.profile.email+"' OR user.uid='"+uid+"')";

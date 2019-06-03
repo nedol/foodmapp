@@ -56,6 +56,7 @@ class SupplierSettings {
             $(form).find('#place').focus();
             return;
         }
+
         let k = 200/  $(form).find('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
             k = 50/  $(form).find('.avatar').height();
@@ -70,7 +71,7 @@ class SupplierSettings {
                     type: 'marketer',
                     avatar:avatar.src,
                     thmb: thmb.src,
-                    email: $(form).find('#email').val(),
+                    email: $(form).find('#email').val().toLowerCase(),
                     name: $(form).find('#name').val(),
                     place: $(form).find('#place').val(),
                     mobile: $(form).find('#mobile').val(),

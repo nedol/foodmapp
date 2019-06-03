@@ -6,8 +6,10 @@ let utils = new Utils();
 
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
-require('bootstrap');
-require('bootstrap-select');
+
+require('jquery-ui')
+require('jquery-ui-touch-punch');
+require('jquery.ui.touch');
 
 
 import("../../lib/glyphicons/glyphicons.css");
@@ -36,6 +38,24 @@ var ColorHash = require('color-hash');
 
 const MSG_NO_REG = 0x0001;
 
+(function($) {
+    $.fn.longTap = function(longTapCallback) {
+        return this.each(function(){
+            var elm = this;
+            var pressTimer;
+            $(elm).on('touchend', function (e) {
+                clearTimeout(pressTimer);
+            });
+            $(elm).on('touchstart', function (e) {
+                // Set timeout
+                pressTimer = window.setTimeout(function () {
+                    longTapCallback.call(elm);
+                }, 500)
+            });
+        });
+    }
+})(jQuery);
+
 
 class Supplier{
 
@@ -58,6 +78,8 @@ class Supplier{
 
             this.profile = new Profile(uObj.set.profile);
             this.profile.InitSupplierProfile(this);
+
+            this.settings = uObj.set.settings;
 
             this.map = new OLMap();
 
@@ -88,13 +110,22 @@ class Supplier{
             cb();
         });
 
+        if(this.settings && this.settings.prolong==='1') {
+            window.db.GetOfferTmplt(function (obj) {
+                obj.date =  that.date;
+                window.db.SetObject('offerStore', obj, function (res) {
+
+                });
+            });
+        }
+
+
         this.GetWeekOffers();
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
         $('.open_off_editor').on('click touch', this, this.editor.OpenOffer);
-        $('.open_my_profile').on('click touch', this, this.profile.OpenMyProfile);
 
         this.DateTimePickerEvents();
 
@@ -193,149 +224,175 @@ class Supplier{
 
             that.map.GetObjectsFromStorage();
 
-            window.db.GetOffer(that.date, function (off) {
-               let not_empty = $.grep(off, function (el,i) {
-                   return (el && !_.isEmpty(el.data));
-               });
-                if(!off[0] || not_empty.length===0) {
-                    window.db.GetLastOffer(function (res) {
-                        if(!res){
-                            that.offer.stobj = {date:that.date}
-                        }else{
-                            that.offer.stobj = res;
-                            that.offer.stobj.date = that.date;
-                            delete that.offer.stobj.published;
-                        }
+
+            if(that.settings && that.settings.prolong==='1') {
+                window.db.GetOfferTmplt(function (obj) {
+                    obj.date =  that.date;
+                    window.db.SetObject('offerStore', obj, function (res) {
+                        getOfferData();
                     });
-                }else{
-                    that.offer.stobj = off[0];
-                }
+                });
+            }else{
+                getOfferData();
+            }
 
-                if(that.offer.stobj && that.offer.stobj.location) {
-
-                    let user_2 = $('#user_container').clone()[0];
-                    $(user_2).attr('id', 'user_2');
-                    // $(user_2).width('30px');
-                    if(false)
-                    $(user_2).draggable({
-                        cancel: ".non_draggable",
-                        start: function (ev) {
-                            console.log("drag start");
-                        },
-                        drag: function (ev) {
-                            //$(el).attr('drag', true);
-                        },
-                        stop: function (ev) {
-                            console.log("drag stop");
-                            let domRect = $(user_2)[0].getBoundingClientRect();
-                            let ev_coor = that.map.ol_map.getEventCoordinate(ev);
-                            let offset  = $(user_2).offset();
-                            let coor = that.map.ol_map.getCoordinateFromPixel([offset.left,offset.top]);
-                            window.user.offer.stobj.location = ev_coor;
-                            that.user_ovl.overlay.values_.position = ev_coor;
-                            //$(user_2).addClass('non_draggable');
-
-                        }
+            function getOfferData() {
+                window.db.GetOffer(that.date, function (off) {
+                    let not_empty = $.grep(off, function (el,i) {
+                        return (el && !_.isEmpty(el.data));
                     });
-                    let status;
-                    if (!that.offer.stobj.published)
-                        status = 'unpublished';
-                    else
-                        status = 'published';
-                    $(user_2).find('img').addClass(status);
-                    if(that.profile.profile.type==='marketer')
-                        $(user_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
-                    that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
-                    $('#user').on('click touchstart', (ev)=> {
-                        // if(that.offer.stobj.location)
-                        //     that.map.MoveToLocation(that.offer.stobj.location);
-                    });
+                    if(!off[0] || not_empty.length===0) {
+                        window.db.GetLastOffer(function (res) {
+                            if(!res){
+                                that.offer.stobj = {date:that.date}
+                            }else{
+                                that.offer.stobj = res;
+                                that.offer.stobj.date = that.date;
+                                delete that.offer.stobj.published;
+                            }
+                        });
+                    }else{
+                        that.offer.stobj = off[0];
+                    }
 
-                    setTimeout(()=>{
-                        that.map.MoveToLocation(that.offer.stobj.location);
-                    },300);
-                }
+                    if(that.offer.stobj && that.offer.stobj.location) {
 
-                $('#map').on('drop',function (ev) {
-                    ev.preventDefault();
-
-                    let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
-                    let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-                    window.user.offer.stobj.location = coor;
-                    if(!that.user_ovl) {
                         let user_2 = $('#user_container').clone()[0];
                         $(user_2).attr('id', 'user_2');
-                        if(that.profile.profile.type==='marketer')
-                            $(user_2).attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
+                        $(user_2).longTap(function (el) {
+                            $(user_2).removeClass('non_draggable');
+                        });
+                        if(false)
+                            $(user_2).draggable({
+                                //cancel: ".non_draggable",
+                                start: function (ev) {
+                                    console.log("drag start");
+                                },
+                                drag: function (ev) {
+                                    //$(el).attr('drag', true);
+                                },
+                                stop: function (ev) {
+                                    console.log("drag stop");
+                                    let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
+                                    // let pixel = that.map.ol_map.getEventPixel(ev)
+                                    let pos = $(user_2).find('img').offset();
+                                    let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
+                                    window.user.offer.stobj.location = coor;
+                                    that.user_ovl.overlay.values_.position = coor;
+                                    that.user_ovl.overlay.changed();
+                                    if(that.user_ovl.modify) {
+                                        that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
+                                        that.user_ovl.modify.changed();
+                                    }
+                                }
+                            });
+
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';
                         else
                             status = 'published';
-                        $(user_2).addClass(status);
+
+                        $(user_2).find('img').addClass(status);
+                        if(that.profile.profile.type==='marketer')
+                            $(user_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
                         that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
-                        //$('#user').css('visibility', 'hidden');
-                    }
-
-                    that.user_ovl.overlay.values_.position = coor;
-                    that.user_ovl.overlay.changed();
-                    if(that.user_ovl.modify) {
-                        that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
-                        that.user_ovl.modify.changed();
-                    }
-
-                    window.db.GetOffer(new Date(window.user.date),function (of) {
-                       if(of[0]) {
-                           of[0].location = coor;
-                           window.db.SetObject('offerStore', of[0], res => {
-
-                           });
-                       }
-                    })
-                });
-            });
-
-            that.import.GetOrderSupplier(function () {
-                var md5 = require('md5');
-                window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
-
-                    let type = 'customer';
-                    for(let o in objs) {
-                        window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
-                            if(lat && lon) {
-                                let loc = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
-                                var markerFeature = new Feature({
-                                    geometry: new Point(loc),
-                                    labelPoint: new Point(loc),
-                                    //name: cursor.value.title ? cursor.value.title : "",
-                                    //tooltip: cursor.value.title ? cursor.value.title : "",
-                                    type: type,
-                                    object: objs[o]
-                                });
-                                var id_str = md5(window.user.date + objs[o].cusuid);
-                                markerFeature.setId(id_str);
-
-                                let layer = that.map.ol_map.getLayers().get(type);
-                                if (!layer) {
-                                    layer = that.map.layers.CreateLayer(type, '1');
-                                }
-                                let source = layer.values_.vector;
-
-                                if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date === window.user.date)
-                                    that.map.layers.AddCluster(layer, markerFeature);
-                            }
+                        $('#user').on('click touchstart', (ev)=> {
+                            // if(that.offer.stobj.location)
+                            //     that.map.MoveToLocation(that.offer.stobj.location);
                         });
+
+                        setTimeout(()=>{
+                            that.map.MoveToLocation(that.offer.stobj.location);
+                        },300);
                     }
 
+                    $('#map').on('drop',function (ev, data) {
+                        ev.preventDefault();
+                        let coor;
+                        if(data)
+                            coor = data.coordinate;
+                        else {
+                            let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
+                            coor = that.map.ol_map.getCoordinateFromPixel(pixel);
+                        }
+                        window.user.offer.stobj.location = coor;
+                        if(!that.user_ovl) {
+                            let user_2 = $('#user_container').clone()[0];
+                            $(user_2).attr('id', 'user_2');
+                            if(that.profile.profile.type==='marketer')
+                                $(user_2).attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
+                            let status;
+                            if (!that.offer.stobj.published)
+                                status = 'unpublished';
+                            else
+                                status = 'published';
+                            $(user_2).addClass(status);
+                            that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
+                            //$('#user').css('visibility', 'hidden');
+                        }
+
+                        that.user_ovl.overlay.values_.position = coor;
+                        that.user_ovl.overlay.changed();
+                        if(that.user_ovl.modify) {
+                            that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
+                            that.user_ovl.modify.changed();
+                        }
+
+                        window.db.GetOffer(new Date(window.user.date),function (of) {
+                            if(of[0]) {
+                                of[0].location = coor;
+                                window.db.SetObject('offerStore', of[0], res => {
+
+                                });
+                            }
+                        })
+                    });
                 });
-            });
 
-            that.import.GetApprovedSupplier(function (res) {
+                that.import.GetOrderSupplier(function () {
+                    var md5 = require('md5');
+                    window.db.GetSupOrders(window.user.date, window.user.uid, function (objs) {
 
-            });
+                        let type = 'customer';
+                        for(let o in objs) {
+                            window.user.map.geo.SearchLocation(objs[o].address, function (bound, lat, lon) {
+                                if(lat && lon) {
+                                    let loc = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+                                    var markerFeature = new Feature({
+                                        geometry: new Point(loc),
+                                        labelPoint: new Point(loc),
+                                        //name: cursor.value.title ? cursor.value.title : "",
+                                        //tooltip: cursor.value.title ? cursor.value.title : "",
+                                        type: type,
+                                        object: objs[o]
+                                    });
+                                    var id_str = md5(window.user.date + objs[o].cusuid);
+                                    markerFeature.setId(id_str);
+
+                                    let layer = that.map.ol_map.getLayers().get(type);
+                                    if (!layer) {
+                                        layer = that.map.layers.CreateLayer(type, '1');
+                                    }
+                                    let source = layer.values_.vector;
+
+                                    if (!source.getFeatureById(markerFeature.getId()) && markerFeature.values_.object.date === window.user.date)
+                                        that.map.layers.AddCluster(layer, markerFeature);
+                                }
+                            });
+                        }
+
+                    });
+                });
+
+                that.import.GetApprovedSupplier(function (res) {
+
+                });
+            }
+
         });
 
-        $("#user").on('dragstart',function (ev) {
+        $("#map").on('dragstart',function (ev) {
 
         });
 
@@ -420,8 +477,10 @@ class Supplier{
         window.network.postRequest(data_obj, function (res) {
             let data = res;
             if(data && data.err){
-                alert({text:data.err,link:data.link},'alert-warning');
-                //window.location.replace(data.link);
+                if(promp(data.err)) {
+                    //alert({text:data.err,link:data.link},'alert-warning');
+                    window.location.replace(data.link);
+                }
             }else if(data.result.affectedRows>0){
                 window.db.GetOffer(new Date(window.user.date), function (obj) {
                     obj[0].published = res.published;
@@ -429,11 +488,11 @@ class Supplier{
                         if(res)
                             cb(obj[0]);
                     });
-                    alert({text:"Опубликовано: "+obj[0].published},null,3000);
+                    alert("Опубликовано: "+obj[0].published,null,3000);
+                    $("#user_2").removeClass('unpublished');
+                    $("#user_2").addClass('published');
                 });
 
-                $("#user_2").removeClass('unpublished');
-                $("#user_2").addClass('published');
             }
         });
     }

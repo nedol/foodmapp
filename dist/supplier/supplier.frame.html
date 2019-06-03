@@ -6,7 +6,7 @@
 
     <!--<meta name="description" content="360&deg; Image - A-Frame">-->
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2019 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Продавец</title>
 </head>
@@ -29,20 +29,20 @@
 <script src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="../host.js"></script>
 <script type="text/javascript" src="../supplier_offer.js"></script>
-<script src="../../lib/jquery.ui.touch-punch.min.js"></script>
+<!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
 
 <style>
 
-    html{
+    html, body{
         padding: 0px;
         margin: 0px;
         height: 100%;
         width: 100%;
+        scrollbar-width: none;
     }
+    ::-webkit-scrollbar {
+        width: 0;
 
-    body {
-        /* Resolves iOS overflow rendering bug */
-        max-width: 100vw !important;
     }
 
     .scaled{
@@ -61,9 +61,7 @@
         <span class="close 	fa fa-share-square-o" style="color:#0088BB" title="Опубликовать"></span>
     </div>
 
-    <div style="display:block; position:fixed;bottom: 5%;right: 1%; margin: 10px;  z-index: 1000">
-        <span id="add_item" class="fa fa-plus" style="color: black; opacity:.5;font-size: 30px;"></span>
-    </div>
+
 
     <style>
         .nav-tabs>li>a {
@@ -94,7 +92,6 @@
     <ul class="nav nav-tabs">
         <li><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
         <li><a data-toggle="tab" href="#profile_pane" data-translate="">Мой профиль</a></li>
-        <li><a data-toggle="tab" href="#payment_pane" data-translate="">Оплата</a></li>
     </ul>
 
     <div class="tab-content">
@@ -102,10 +99,17 @@
             <style>
                 .modal-content{
                     position: absolute;
-                    height: 99%;
+                    height: 100%;
                     width: 100%;
-                    margin: auto;
+                    margin: 0 auto;
                     border-width: 0px;
+                    overflow-y: scroll;
+                    -webkit-overflow-scrolling: touch;
+                }
+
+                .div_tab_inserted{
+                    margin-bottom: 50%;
+                    background-color: white;
                 }
 
                 textarea:focus {
@@ -114,7 +118,7 @@
                     box-shadow: 0 0 10px #719ECE;
                 }
                 .tab-content{
-                    height: 90%;
+                    height: 100%;
                 }
 
                 .tab-content::-webkit-scrollbar {
@@ -175,15 +179,16 @@
                 }
             </style>
 
-            <div class="modal-content" style="margin-top: 10px;">
+            <div class="modal-content">
                 <ul class="nav nav-tabs" id="menu_tabs">
                     <li id="add_tab_li" class="nav-item" title="add tab" style="display: none;">
                         <span id="add_tab" class="add_tab nav-link" href="#add_tab" style="visibility: hidden;"></span>
                     </li>
                 </ul>
-                <div class="tab-content" style="position:relative;height: 80%;overflow-y: scroll">
+                <div class="tab-content"
+                     style="position:relative;height: 100%;overflow-y: scroll">
                     <!--div_tab_inserted-->
-                    <div id="add_tab_div"  class="tab-pane fade" style="border: none;"></div>
+                    <div id="add_tab_div"  class="tab-pane fade" style="width:100%;border: none;"></div>
 
                 </div>
             </div>
@@ -208,8 +213,9 @@
                     border-radius: 5px;
                     border: 0px solid #343434;
                     padding-left: 5px;
-                    margin: 5px;
+                    /*margin: 0 auto;*/
                     width: 98%;
+                    /*background-color: #cdd0d4;*/
                     box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
                 }
                 .item_cb{
@@ -221,7 +227,7 @@
                     box-shadow: 0 0 10px #719ECE;
                 }
                 .item_title{
-                    display: inline-block;
+                    display: block;
                     position: absolute;
                     width: 100%;
                     top:7px;
@@ -298,19 +304,16 @@
                 <div>
                     <div class="content_div">
                         <h4>
-                            <input type="text" class="item_title input input-sm " contenteditable="true" placeholder="название"
-                                   data-toggle="collapse">
+                            <input type="text" class="item_title input input-sm " contenteditable="true" placeholder="название">
                         </h4>
                         <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
-
                             <div class="content">
-                                <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true">
-                                </textarea>
+                                <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true"></textarea>
                             </div>
 
                         </div>
-                        <div style="width: 100%;margin: 0 auto;">
-                            <img class="card-img-top img-fluid" style="image-orientation:from-image;width: 100%;z-index: 1000" src="http://placehold.it/700x400" alt="">
+                        <div style="width: 100%;">
+                            <img class="img-fluid" style="image-orientation:from-image;width: 100%;" src="../images/700x400.png" alt="">
                         </div>
                     </div>
                     <div class="">
@@ -415,6 +418,8 @@
                         <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Профиль</a></li>
                         <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
                         <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
+                        <li><a data-toggle="tab" href="#payment_pane" data-translate="">Оплата</a></li>
+
                         <li>
 
                         </li>
@@ -481,6 +486,9 @@
                     </div><!--/tab-pane-->
                     <div class="tab-pane fade" id="comments" style="overflow-y: auto; height: 400px">
                         <div id="comments-container" style="overflow-y: hidden"></div>
+                        <div style="position: absolute;right: 0">
+                            <input type="hidden" class="rating"  data-filled="fa fa-star fa-2x  custom-star" data-empty="fa fa-star-o fa-2x  custom-star">
+                        </div>
                     </div><!--/tab-pane-->
                     <div class="tab-pane fade" id="settings">
                         <div style="margin: 20px"></div>
@@ -488,10 +496,10 @@
                             <div class="form-group dropdown">
                                 <div class="col-xs-6">
                                     <label for="prolong"><h4>Продление предложения</h4></label>
-                                    <select id="prolong" disabled class="sel_prolong"  size="1" style="">
-                                        <option value="0"></option>
-                                        <option value="1"  selected>на следующий день</option>
-                                        <option value="7">на следующую неделю</option>
+                                    <select id="prolong"  class="sel_prolong"  size="1" style="">
+                                        <option value="0" selected></option>
+                                        <option value="1" >на следующий день</option>
+                                        <!--<option value="7">на следующую неделю</option>-->
                                     </select>
                                 </div>
                                 <div class="col-xs-6">
@@ -500,18 +508,20 @@
                             </div>
                         </div>
                     </div><!--/tab-pane-->
-                </div><!--/tab-content-->
-                    <div style="position: absolute;right: 0">
-                        <input type="hidden" class="rating"  data-filled="fa fa-star fa-2x  custom-star" data-empty="fa fa-star-o fa-2x  custom-star">
+                    <div class="tab-pane" id="payment_pane">
+
                     </div>
+                </div><!--/tab-content-->
+
             </div>
 
             </div>
             </div>
         </div>
 
-        <div class="tab-pane" id="payment_pane">
 
+        <div style="display:block; position:fixed;bottom: 7%;right: 1%; margin: 10px;  z-index: 1000">
+            <span id="add_item" class="fa fa-plus" style="color: black; opacity:.5;font-size: 30px;"></span>
         </div>
     </div>
 

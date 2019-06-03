@@ -6,7 +6,7 @@ require('bootstrap');
 import {Dict} from '../dict/dict.js';
 import {ProfileSupplier} from "../profile/profile.supplier";
 import proj from 'ol/proj';
-require('jquery.nicescroll')
+// require('jquery.nicescroll')
 
 let _ = require('lodash')
 
@@ -203,7 +203,7 @@ class CustomerOrder{
                     $(menu_item).attr('class', 'menu_item');
                     $(menu_item).css('display', 'block');
 
-                    $(menu_item).find('.item_title').attr('contenteditable', 'false');
+                    // $(menu_item).find('.item_title').attr('contenteditable', 'false');
                     //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
                     $(menu_item).find('.item_price').text(that.offer[tab][i].price);
@@ -418,7 +418,7 @@ class CustomerOrder{
             $('li.active a').tab('show');
             $($('.tab_inserted a')[0]).tab('show');
 
-            window.parent.db.GetSupOrders(new Date(this.date), obj.uid, function (arObj) {
+            window.parent.db.GetSupOrders(new Date(that.date), obj.uid, function (arObj) {
                 if (arObj.length > 0) {
                     for (let o in arObj) {
                         let order = arObj[o];
