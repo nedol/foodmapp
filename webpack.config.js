@@ -12,7 +12,6 @@ module.exports = {
     // context: __dirname+'/js',
 
     entry: {
-        // 'jQuery':'jquery',
         'supplier': __dirname+'/src/supplier/supplier.entry.js'
         ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
         ,'deliver': __dirname+'/src/deliver/deliver.entry.js'

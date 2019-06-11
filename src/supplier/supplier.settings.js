@@ -31,7 +31,7 @@ class SupplierSettings {
         $('input[type="submit"]').on('click', this, function (ev) {
             ev.preventDefault();
             ev.stopPropagation();
-            let form = $('.form');
+            let form = $('form');
             ev.data.OnSubmit(form);
         });
         // $('.avatar').attr('src',location.origin+'/door2door/dist/images/avatar_2x.png');
@@ -82,7 +82,7 @@ class SupplierSettings {
                 $.ajax({
                     url: host_port,
                     type: "POST",
-                    contentType: 'application/x-www-form-urlencoded',
+                    // contentType: 'application/x-www-form-urlencoded',
                     crossDomain: true,
                     data: JSON.stringify(data_post),
                     dataType: "json",

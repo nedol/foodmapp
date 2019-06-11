@@ -1,10 +1,10 @@
 'use strict'
 export {OfferEditor}
 
-// require('webpack-jquery-ui/draggable');
-// require('jquery-ui-touch-punch');
-require('jquery-ui')
-require('jquery.ui.touch');
+require('webpack-jquery-ui/draggable');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
+
 require('bootstrap');
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
@@ -50,7 +50,7 @@ class OfferEditor{
             that.off_frame[0].contentWindow.InitSupplierOffer(that.offer);
         });
         this.off_frame.css('display', 'block');
-        this.off_frame.attr('src',"./supplier/supplier.frame.html");
+        // this.off_frame.attr('src',"./supplier/supplier.frame.html?v="+String(Date.now()));
         $('#supplier_frame_container').prepend(this.off_frame[0]);
     }
 

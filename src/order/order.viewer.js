@@ -3,8 +3,12 @@ export {OrderViewer}
 
 var urlencode = require('urlencode');
 require('bootstrap');
-// require('bootstrap/dist/css/bootstrap.css');
-// require('font-awesome/css/font-awesome.css');
+
+
+require('webpack-jquery-ui/draggable');
+require('webpack-jquery-ui/resizable');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
 
 import proj from 'ol/proj';
 const langs = require("../dict/languages");

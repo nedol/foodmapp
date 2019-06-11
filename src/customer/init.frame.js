@@ -2,9 +2,12 @@
 export {OfferOrder}
 
 var urlencode = require('urlencode');
-require('jquery-ui')
-// require('jquery-ui-touch-punch');
-require('jquery.ui.touch');
+
+require('webpack-jquery-ui/draggable');
+
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
+
 require('bootstrap');
 
 // require('bootstrap/dist/css/bootstrap.css');

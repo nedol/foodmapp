@@ -5,7 +5,7 @@ export {MapEvents}
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
 import {OfferOrder} from "../../customer/init.frame";
-import {OfferViewer} from "../../supplier/offer.viewer.js.old";
+
 import {UtilsMap} from "../../utils/utils.map"
 let utils_map = new UtilsMap();
 class MapEvents{
@@ -27,113 +27,6 @@ class MapEvents{
             console.log();
         });
 
-
-        this.map.ol_map.on('click', function (event) {
-            if (!event.loc_mode) {
-                that.map.geo.StopLocation();
-                window.user.isShare_loc = false;
-            }
-
-            // $('.menu_item', $('.client_frame').contents()).remove();
-            // $('#client_frame_container').css('display','none');
-            // $('.carousel-indicators', $('.client_frame').contents()).empty();
-            // $('.carousel-inner', $('.client_frame').contents()).empty();
-
-            var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
-
-            var latlon = proj.toLonLat(event.coordinate);
-            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
-            // and add it to the Map
-
-            window.sets.coords.cur = event.coordinate;
-
-            $('#datetimepicker').data("DateTimePicker").hide();
-
-            var time = new Date().getTime();
-            localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
-                "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
-
-            if (!event.loc_mode && $('#categories').is(':visible'))
-                $('#categories').slideToggle('slow', function () {
-
-                });
-            if (!event.loc_mode && $('.sup_menu').is(':visible')) {
-                $('.sup_menu').animate({'width': 'toggle'});
-            }
-
-            if (!event.loc_mode && $('#menu_items').is(':visible'))
-                $('#menu_items').slideToggle('slow', function () {
-                });
-
-
-
-            that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-
-                let closest = feature.getGeometry().getClosestPoint(event.pixel);
-
-                if(feature.values_)
-                if(feature.values_.features && feature.values_.features.length >1) {//cluster
-
-                    var coordinates = [];
-                    $.each(feature.values_.features, function (key, feature) {
-                        coordinates.push(feature.getGeometry().flatCoordinates);
-                    });
-
-                    var extent = Extent.boundingExtent(coordinates);
-                    var buf_extent = Extent.buffer(extent, 5);
-                    //ol.extent.applyTransform(extent, transformFn, opt_extent)
-                    that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
-
-                    that.map.ol_map.getView().animate({
-                            center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
-                        },
-                        function () {
-
-                        });
-                }else {
-
-                    if(feature){
-                        if(feature.values_.features && feature.values_.features.length === 1)
-                            feature = feature.values_.features[0];
-
-                        if (feature.values_.type === 'supplier') {
-                            window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
-                                if (obj !== -1) {
-                                    if (window.user.constructor.name === 'Supplier') {
-                                        //window.user.viewer = new OfferViewer(obj.dict);
-                                        $("a[href=#profile]").text('Мой профиль')
-                                    }else if (window.user.constructor.name === 'Deliver') {
-
-                                        window.user.viewer = new OfferViewer(obj.dict);
-                                        window.user.profile.InitDeliverProfile(obj);
-
-                                        window.user.viewer.OpenOffer(obj);
-
-                                        // window.user.viewer = new OfferOrder();
-                                        // window.user.viewer.InitCustomerOrder(obj);
-
-                                    }else if (window.user.constructor.name === 'Customer') {
-                                        if (!window.user.viewer) {
-                                            window.user.viewer = new OfferOrder();
-                                        }
-                                        window.user.viewer.InitCustomerOrder(obj);
-                                    }
-
-                                }
-                            });
-                        } else if (feature.values_.type === 'customer') {
-                            window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
-                                let orderViewer = new OrderViewer();
-                                orderViewer.InitOrders(objs);
-                            });
-                        }
-                    }
-                }
-
-                return true;
-            });
-        });
 
 
         this.map.ol_map.on('movestart', function (event) {

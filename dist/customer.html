@@ -24,7 +24,7 @@
 <link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js?v=5"></script>
+<script type="text/javascript" src="customer.js?"></script>
 <!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
 <!-- Popper JS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
@@ -238,8 +238,8 @@
 <style>
     #period_list .ui-selecting { background: #FECA40; }
     #period_list .ui-selected { background: #F39814; color: white; }
-    #period_list { list-style-type: none; margin: 0; padding: 0; width: 25%; }
-    #period_list li { margin: 2px; padding: 0.2em; font-size: 1.4em; height: 20px; }
+    #period_list { list-style-type: none; margin: 0; padding: 0; width: 50%; }
+    #period_list li { margin: 0px; padding: 0.2em; font-size: 1.4em; height: 20px; }
 </style>
 
 <div>
@@ -272,11 +272,8 @@
 <div id="main_window">
     <div>
         <div class="date_ctrl form-group"  style="position:fixed;top:1px;">
-            <div class='input-group date row' style="width:auto" >
+            <div class='input-group date row' style="width:auto;text-align: center">
                 <input type='text' readonly class="form-control dt_val col" style="font-size: medium"/>
-                <!--<span class="input-group-addon col" style="width: auto">-->
-                    <!--<span class="glyphicon glyphicon-calendar" style="font-size: medium"></span>-->
-                <!--</span>-->
                 <div class="dropdown">
                     <button class="sel_period btn btn-block dropdown-toggle col"
                             type="button" data-toggle="dropdown"
@@ -369,7 +366,8 @@
     </div>
 
 
-    <iframe class="client_frame_tmplt"  src="customer/customer.frame.html?v=2"
+    <iframe class="client_frame_tmplt"
+            src="customer/customer.frame.html?v=5"
             style="
             display:none;
             position:absolute;
@@ -455,25 +453,30 @@
     @media screen and (min-width: 320px) {
         #items_carousel{
             position: absolute;
-            height:100px;
-            /*width:300px;*/
+            height:150px;
+            width:150px;
             left:1%;
             bottom:50px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            height: 100px;
+            height: 150px;
+        }
+        .carousel_title{
+            font-size: 1.5em;
+            -webkit-text-stroke: 1px white;
+            color:red;
+            top:0;
         }
         .carousel_price{
-            font-size: 2em;
+            font-size: 1.5em;
             -webkit-text-stroke: 1px white;
             color: blue;
             bottom:0;
-            float:left;
         }
         #client_frame_container{
-            max-width: 60%;
+            max-width: 100%;
         }
         #datetimepicker{
             transform: scale(1.4);
@@ -490,7 +493,13 @@
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            height: 200px;
+            /*height: 200px;*/
+        }
+        .carousel_title{
+            font-size: 2em;
+            -webkit-text-stroke: 1px white;
+            color:red;
+            top:0;
         }
         .carousel_price{
             font-size: 2em;

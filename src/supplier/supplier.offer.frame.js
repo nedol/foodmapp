@@ -1,4 +1,5 @@
 'use strict'
+export {SupplierOffer};
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 
@@ -172,10 +173,15 @@ class SupplierOffer{
         else
             this.ovc.find('.address').css('display','block');
 
-        window.parent.db.GetSettings(function (obj) {
-            if(obj[0].profile && obj[0].profile.address)
-                that.ovc.find('.address').val(obj[0].profile.address);
-        });
+
+        if(window.parent.user.profile.address)
+            that.ovc.find('.address').val(window.parent.user.profile.address);
+
+        if(window.parent.user.settings){
+            for(let par in window.parent.user.settings){
+                $('#settings').find('select#'+par).find('option[value='+window.parent.user.settings[par]+']').attr('selected', true);
+            }
+        }
 
         function initOrder() {
 
@@ -1277,24 +1283,43 @@ class SupplierOffer{
             }
 
             window.parent.network.postRequest(data_post, function (res) {
+                if(res.err){
+                    if(confirm(res.err)){
+                        if(window.location.hostname==='localhost') {
+                            window.parent.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
+                        }
+
+                        else if(window.location.hostname==='nedol.ru') {
+                            window.parent.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
+                        }
+                    }
+                    window.close();
+                    return;
+                }
+
                 let res_ = res;
 
-                window.parent.db.GetSettings(function (obj) {
+                let obj = window.parent.user.settings;
+                if(obj){
 
                     let set = _.find(obj, {uid: window.parent.user.uid});
-                    set.profile = data_post.profile;
+                    if(set) {
+                        set.profile = data_post.profile;
 
-                    if(res_.profile) {
-                        set.profile.avatar = res_.profile.avatar;
-                        set.profile.thmb = res_.profile.thmb;
-                    }
-                    window.parent.db.SetObject('setStore', set, function (res) {
-                        $('#user_2', window.parent.document).find('img').attr('src',that.path+'/images/'+ set.profile.avatar);
-                        that.profile = set.profile;
-                        window.parent.user.profile.profile = set.profile;
+                        if (res_.profile) {
+                            set.profile.avatar = res_.profile.avatar;
+                            set.profile.thmb = res_.profile.thmb;
+                        }
+                        window.parent.db.SetObject('setStore', set, function (res) {
+                            $('#user_2', window.parent.document).find('img').attr('src', that.path + '/images/' + set.profile.avatar);
+                            that.profile = set.profile;
+                            window.parent.user.profile.profile = set.profile;
+                            cb();
+                        });
+                    }else{
                         cb();
-                    });
-                });
+                    }
+                }
             });
         }
     }
@@ -1313,8 +1338,10 @@ class SupplierOffer{
             let _ = require('lodash');
             let set = _.find(obj, {uid:window.parent.user.uid});
             set.settings = settings;
+
             window.parent.db.SetObject('setStore',set,function (res) {
                 window.parent.user.profile.profile =  set.profile;
+                window.parent.user.settings = settings;
             });
             let data_obj ={
                 proj:"d2d",

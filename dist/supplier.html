@@ -14,19 +14,21 @@
 <!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
-
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 <script src="../lib/DragDropTouch.js"></script>
 
 <script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="supplier.js?v=5"></script>
+
 <!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
 
 <style>
     .unpublished{
@@ -334,7 +336,7 @@
     </div>
 
     <iframe id="supplier_frame"
-            src="./html/empty.html"
+            src="./supplier/supplier.frame.html"
             style="
                 display: none;
                 position:absolute;
@@ -450,9 +452,19 @@
             max-width: 40%;
         }
     }
+    @media screen and (min-width: 1200px) {
+        #supplier_frame_container{
+            max-width: 30%;
+        }
+    }
+    @media screen and (min-width: 1600px) {
+        #supplier_frame_container{
+            max-width: 20%;
+        }
+    }
 </style>
 </body>
 
-
+<script type="text/javascript" src="./supplier.js"></script>
 
 </html>

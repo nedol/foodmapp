@@ -141,7 +141,7 @@ class ProfileCustomer{
                 uid: window.parent.user.uid,
                 psw: window.parent.user.psw,
                 profile: {
-                    email: $('#email').val(),
+                    email: urlencode.encode($('#email').val().toLowerCase()),
                     avatar: $('.avatar').attr('src'),
                     thmb: thmb.src,
                     lang: $('html').attr('lang'),

@@ -15,7 +15,7 @@ class CustomerSettings {
         that.fillForm();
 
         $('.submit').on('click', this, function (ev) {
-            let form = $('.form');
+            let form = $('form');
             ev.data.OnSubmit(form);
         });
 
@@ -77,7 +77,7 @@ class CustomerSettings {
             profile: {
                 avatar: $(form).find('.avatar').attr('src'),
                 lang: $('html').attr('lang'),
-                email: $(form).find('#email').val().toLowerCase(),
+                email: urlencode.encode($(form).find('#email').val().toLowerCase()),
                 name: $(form).find('#name').val(),
                 address: $(form).find('#address').val(),
                 mobile: $(form).find('#mobile').val()

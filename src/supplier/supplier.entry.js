@@ -1,24 +1,20 @@
 'use strict'
 
+import("../../lib/glyphicons/glyphicons.css");
 
-require('webpack-jquery-ui');
-require('webpack-jquery-ui/css');
 
-require('dialog-polyfill');
 
 require("../../global");
 
+import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+
+
 import {Utils} from "../utils/utils";
-import {Supplier} from './supplier';
+
 import {Network} from "../../network";
 import {DB} from "../map/storage/db";
-
-
-require('bootstrap');
-require('bootstrap-select');
-
-global.jQuery = require('jquery');
-
+import {Supplier} from './supplier';
 
 let utils = new Utils();
 window.sets.lang = utils.getParameterByName('lang');
@@ -46,8 +42,6 @@ $(document).on('readystatechange', function () {
         options.async = true;
     });
 
-    $.fn.modal.Constructor.prototype.enforceFocus = function () {
-    };
 
     initDP();
 
@@ -58,8 +52,10 @@ $(document).on('readystatechange', function () {
             let res = _.findKey(set, function(k) {
                 return k.uid === uid;
             });
-            if(!res && set[0])
-                res = 0;
+            if(!res && set[0]) {
+                GoToReg();
+                return;
+            }
             if (set[res]){
                 let uObj = {};
 
@@ -114,17 +110,21 @@ $(document).on('readystatechange', function () {
                 }
 
             } else {
-                if(window.location.hostname==='localhost') {
-                    window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
-                }
-
-                else if(window.location.hostname==='nedol.ru') {
-                    window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
-                }
+                GoToReg();
             }
 
         });
     });
+
+    function GoToReg() {
+        if(window.location.hostname==='localhost') {
+            window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
+        }
+
+        else if(window.location.hostname==='nedol.ru') {
+            window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
+        }
+    }
 
     function initDP() {
 

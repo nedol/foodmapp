@@ -51,7 +51,7 @@ class DeliverSettings {
         this.network = new Network(host_port);
         this.fillForm();
         $('.submit').on('click', this, function (ev) {
-            let form = $('.form');
+            let form = $('form');
             ev.data.OnSubmit(form);
         });
     }
@@ -79,7 +79,7 @@ class DeliverSettings {
                     avatar:$(form).find('.avatar').attr('src'),
                     thmb: thmb.src,
                     lang: $('html').attr('lang'),
-                    email: $(form).find('#email').val(),
+                    email: urlencode.encode($(form).find('#email').val().toLowerCase()),
                     name: $(form).find('#name').val(),
                     address: $(form).find('#address').val(),
                     mobile: $(form).find('#mobile').val(),
