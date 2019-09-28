@@ -1,14 +1,30 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
+
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
 
-    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <meta name="description" content="Продуктовая карта Москвы">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Покупатель</title>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(54717046, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/54717046" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
 </head>
 <!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -22,12 +38,13 @@
 <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
 <link rel="stylesheet" href="../lib/bootstrap-rating/bootstrap-rating.css">
 <link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>-->
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js?"></script>
-<!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
-<!-- Popper JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<script type="text/javascript" src="customer.js?v=41"></script>
+
 
 <style>
 
@@ -102,6 +119,7 @@
         z-index:1;
     }
 
+
     #mouse_pos_div{
         display: block;
         position: absolute;
@@ -160,13 +178,13 @@
         /*z-index:30;*/
         color: #1b1b1b;
         top: 50%;
-        right: 1%;
+        right: .6%;
         width: 40px;
-        height: 30px;
+        height: 28px;
         /*line-height: auto;*/
         border: solid 1px grey;
         text-align:center;
-        font-size: 170%;
+        font-size: 200%;
         font-weight: bold;
         border-radius: 5px;
         background-color: whitesmoke;
@@ -187,7 +205,7 @@
     #loc_ctrl {
         display: block;
         position: absolute;
-        right: 10px;
+        right: 1%;
         top: 30%;
         width: 40px;
         height: 40px;
@@ -231,9 +249,9 @@
 
 <div id="map" class="map"></div>
 
-<section id="marker" title="kolobot">
-    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>
-</section>
+<!--<section id="marker" title="kolobot">-->
+    <!--<img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--</section>-->
 
 <style>
     #period_list .ui-selecting { background: #FECA40; }
@@ -246,40 +264,55 @@
     <button id="profile_but" class="btn btn-default" type="button" title="Мой профиль"
             onclick="window.user.OnClickUserProfile()" style="display:inline-block;float:left">
         <a href="#">
-            <span class="glyphicon glyphicon-user scaled"></span>
+            <span class="glyphicon glyphicon-shopping-cart" style="font-size:2em"></span>
         </a>
     </button>
 </div>
 
-<input type="image" id="deliver_but" src="https://nedol.ru/server/images/1415f4832d63cb093b61696c3bff87ee"
-       title="Доставка"
-       style="display:none;position:absolute;left:1%;bottom:80%;width:40px;"
-       onclick="window.user.OnClickDeliver(this)"/>
+
+<div>
+    <address style="display:inline-block;position: fixed;left: 1%;top: 0;padding: 5px">
+        <a href="mailto:1@xn--d1aa3absg.xn--p1ai">
+            <span class="mail glyphicon glyphicon-envelope" title="1@дотудо.рф" style="font-size:2em"></span>
+        </a>
+        <br>
+    </address>
+</div>
+
+
+<div id="deliver_container" style="position:absolute;left:1%;top:15%;width:40px">
+
+</div>
 
 
 
 <!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
 <span id="locText" style="font-family: serif">Lat Lon</span>
 
+
+
+
 <img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
 <section id="loc_ctrl"  title="Location">
     <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
     <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
 </section>
-<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
+<h1 id="zoom_but"  title="Zoom">15</h1>
 
 
 <div id="main_window">
-    <div>
-        <div class="date_ctrl form-group"  style="position:fixed;top:1px;">
-            <div class='input-group date row' style="width:auto;text-align: center">
-                <input type='text' readonly class="form-control dt_val col" style="font-size: medium"/>
-                <div class="dropdown">
-                    <button class="sel_period btn btn-block dropdown-toggle col"
-                            type="button" data-toggle="dropdown"
-                            style="float:right;background-color:white;font-size: medium">
-                        <span class="caret"></span>
-                    </button>
+
+    <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
+
+            <div class="d-inline-block">
+                <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: medium"></div>
+            </div>
+            <div class="dropdown  d-inline-block">
+                <div
+                       class="sel_period btn btn-block dropdown-toggle" data-toggle="dropdown"
+                        style="float:right;background-color:white;font-size: medium">
+                    <span class="caret"></span>
+                </div>
                     <ol id="period_list" class="dropdown-menu" role="menu">
                         <li href="#">06:00 - 08:00</li>
                         <li href="#">08:00 - 10:00</li>
@@ -291,10 +324,11 @@
                         <li href="#">20:00 - 22:00</li>
                         <li href="#">22:00 - 24:00</li>
                     </ol>
-                </div>
+
             </div>
-        </div>
+
     </div>
+
     <style>
         #dtp_container {
             display: none;
@@ -305,52 +339,19 @@
             z-index: 11;
         }
     </style>
-    <div id="dtp_container">
-        <div id="datetimepicker" class="center-block"
-             style="
-             display: block;
-             position: absolute;
-             transform: scale(1.5);">
-        </div>
+    <div id="dtp_container" class="center-block scaled">
+        <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
     </div>
 </div>
 
-<div id="category_include" style="display:none;
-             /*overflow-y: hidden;*/
-  	         overflow-y: scroll;">
-    <style>
-        .category{
-            margin-left: 50px;
-            margin-right: 50px;
-            /*padding-left: 10px;*/
-            /*padding-right: 10px;*/
-            height: 40px;
-            /*width: 120px;*/
-        }
+<div id="category_include" style="display:none;">
 
-        .category:hover{
-            /*height: 50px;*/
-            /*width: 50px;*/
-        }
-
-        #categories{
-            position: fixed;
-            overflow: scroll;
-            -webkit-overflow-scrolling: touch;
-            bottom:0px;
-            width:100%;
-            padding-top: 5px;
-            background-color: rgba(0, 140, 201, 1.0);
-            white-space: nowrap;
-            z-index:100;
-        }
-    </style>
-
-    <div id="category_container">
+    <div id="category_container"  style="-webkit-overflow-scrolling: touch;">
 
     </div>
 
 </div>
+
 <div>
     <div id="client_frame_container"
          class=""
@@ -367,7 +368,7 @@
 
 
     <iframe class="client_frame_tmplt"
-            src="customer/customer.frame.html?v=5"
+            src="customer/customer.frame.html?v=9"
             style="
             display:none;
             position:absolute;
@@ -379,50 +380,20 @@
 
 </div>
 
+
 <div class="browser_container" id="my_profile_container"
      style="display:none;
          overflow: visible; z-index:2000;
          position: absolute;
          -webkit-overflow-scrolling: auto;
          height: 90%;
-         max-height: 80% !important;
+         max-height: 90% !important;
          min-height: 50% !important;
-         width:80%; left: 10%;
+         width:90%; left: 5%;
          border: solid 0px lightslategrey;
          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
     <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
-<style>
-    .carousel{
-        border: 0px solid #a2a2a2;
-        border-radius: 5px;
-    }
-    #items_carousel{
-        position: absolute;
-        height:100px;
-        width:200px;
-        left:1%;
-        bottom:150px;
-    }
-    .carousel-item{
-        background-color: rgba(255,255,255,0.7);
-        position: relative;
-        height: 200px;
-    }
-    .carousel_title{
-        -webkit-text-stroke: 1px white;
-        color:red;
-        top:0;
-    }
-    .carousel_price{
-        position: absolute;
-        font-size: 2em;
-        -webkit-text-stroke: 1px white;
-        color: red;
-        bottom:0;
-        left:0;
-    }
-</style>
 
 <div id="items_carousel" class="carousel slide carousel-fade">
     <div class="carousel-inner"></div>
@@ -450,30 +421,60 @@
 
 </body>
 <style>
+    .carousel{
+        border: 0px solid #a2a2a2;
+        border-radius: 5px;
+    }
+    #items_carousel{
+        position: absolute;
+        height:500px;
+        width:500px;
+        left:1%;
+        bottom:50px;
+    }
+    .carousel-item{
+        background-color: rgba(255,255,255,0.7);
+        position: relative;
+        height: 200px;
+    }
+    .carousel_title{
+        -webkit-text-stroke: 1px white;
+        color:red;
+        top:0;
+    }
+    .carousel_price{
+        position: absolute;
+        font-size: 2em;
+        -webkit-text-stroke: 1px white;
+        color: red;
+        bottom:0;
+        left:0;
+    }
     @media screen and (min-width: 320px) {
         #items_carousel{
             position: absolute;
-            height:150px;
-            width:150px;
+            height:200px;
+            width:200px;
             left:1%;
             bottom:50px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            height: 150px;
+            height: 200px;
         }
         .carousel_title{
-            font-size: 1.5em;
+            font-size: 2em;
             -webkit-text-stroke: 1px white;
             color:red;
-            top:0;
+            top:-20px;
         }
         .carousel_price{
-            font-size: 1.5em;
+            font-size: 2em;
             -webkit-text-stroke: 1px white;
             color: blue;
-            bottom:0;
+            bottom:-20px;
+            right:0px;
         }
         #client_frame_container{
             max-width: 100%;
@@ -481,19 +482,27 @@
         #datetimepicker{
             transform: scale(1.4);
         }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:78%;
+            top:18%;
+            z-index: 11;
+        }
     }
     @media screen and (min-width: 480px) {
         #items_carousel{
             position: absolute;
-            height:200px;
-            /*width:300px;*/
+            height:250px;
+            width:250px;
             left:1%;
             bottom:50px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            /*height: 200px;*/
+            height: 250px;
         }
         .carousel_title{
             font-size: 2em;
@@ -514,6 +523,14 @@
         #datetimepicker{
             transform: scale(1.4);
         }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:80%;
+            top:25%;
+            z-index: 11;
+        }
     }
     @media screen and (min-width: 960px) {
         #client_frame_container{
@@ -521,6 +538,96 @@
         }
         #datetimepicker{
             transform: scale(1.0);
+        }
+        #items_carousel{
+            position: absolute;
+            height:350px;
+            width: 350px;
+            left:1%;
+            bottom:70px;
+        }
+        .carousel-item{
+            background-color: rgba(255,255,255,0.7);
+            position: relative;
+            height: 350px;
+
+        }
+        .carousel_title{
+            font-size: 3em;
+            -webkit-text-stroke: 2px white;
+            color:red;
+            top:-20px;
+            /*background-color: rgba(255,255,255,0.7);*/
+        }
+        .carousel_price{
+            font-size: 3em;
+            -webkit-text-stroke: 1px white;
+            color: blue;
+            bottom:-20px;
+            float:left;
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:15%;
+            top:18%;
+            z-index: 11;
+        }
+    }
+    @media screen and (min-width: 1200px) {
+        #client_frame_container{
+            max-width: 30%;
+        }
+        #datetimepicker{
+            transform: scale(1.0);
+        }
+        #items_carousel{
+            position: absolute;
+            height:300px;
+            width: 300px;
+            left:1%;
+            bottom:100px;
+        }
+        .carousel-item{
+            background-color: rgba(255,255,255,0.7);
+            position: relative;
+            height: 300px;
+
+        }
+        .carousel_title{
+            font-size: 3em;
+            -webkit-text-stroke: 2px white;
+            color:red;
+            top:-20px;
+        }
+        .carousel_price{
+            font-size: 4em;
+            -webkit-text-stroke: 1px white;
+            color: blue;
+            bottom:-20px;
+            float:left;
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:15%;
+            top:18%;
+            z-index: 11;
+        }
+    }
+    @media screen and (min-width: 1600px) {
+        #client_frame_container{
+            max-width: 20%;
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:15%;
+            top:10%;
+            z-index: 11;
         }
     }
 </style>

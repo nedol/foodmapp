@@ -4,7 +4,7 @@ export {SupplierSettings}
 
 
 import {DB} from "../map/storage/db";
-import 'bootstrap';
+
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -48,19 +48,17 @@ class SupplierSettings {
     OnSubmit(form){
         var urlencode = require('urlencode');
         let that = this;
-        if(!$(form).find('#email').val()) {
-            $(form).find('#email').focus();
-            return;
-        }
-        if(!$(form).find('#place').val()) {
-            $(form).find('#place').focus();
-            return;
-        }
+        // if(!$(form).find('#email').val()) {
+        //     $(form).find('#email').focus();
+        //     return;
+        // }
+        // if(!$(form).find('#place').val()) {
+        //     $(form).find('#place').focus();
+        //     return;
+        // }
 
         let k = 200/  $(form).find('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
-            k = 50/  $(form).find('.avatar').height();
-            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
             var data_post = {
                 proj: 'd2d',
                 user: "Supplier",
@@ -70,7 +68,6 @@ class SupplierSettings {
                 profile: {
                     type: 'marketer',
                     avatar:avatar.src,
-                    thmb: thmb.src,
                     email: $(form).find('#email').val().toLowerCase(),
                     name: $(form).find('#name').val(),
                     place: $(form).find('#place').val(),
@@ -78,6 +75,8 @@ class SupplierSettings {
                     lang: $('html').attr('lang')
                 }
             }
+
+            $('.loader').css('display','block');
 
                 $.ajax({
                     url: host_port,
@@ -87,19 +86,50 @@ class SupplierSettings {
                     data: JSON.stringify(data_post),
                     dataType: "json",
                     success: function (obj) {
+                        $('.loader').css('display','none');
                         if (obj.err) {
                             alert(obj.err);
                             return true;
                         }
                         delete data_post.proj;
                         delete data_post.func;
-                        delete data_post.profile.email;
                         delete data_post.host;
                         data_post.profile.avatar = obj.avatar;
-                        data_post.profile.thmb = obj.thmb;
                         window.db = new DB('Supplier', function () {
-                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
-                                alert('На указанный email-адрес была выслана ссылка для входа в программу');
+
+                            localStorage.clear();
+                            window.db.ClearStore('setStore',function () {
+
+                                window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
+                                    //alert('На указанный email-адрес была выслана ссылка для входа в программу');
+
+                                    if(window.location.hostname==='localhost') {
+                                        window.location.replace("http://localhost:63342/d2d/dist/supplier.html?uid="+obj.uid+"&lang=ru");
+                                    }
+
+                                    else if(window.location.hostname==='nedol.ru') {
+                                        window.location.replace("https://nedol.ru/d2d/dist/supplier.html?uid="+obj.uid+"&lang=ru");
+                                    }
+
+                                    obj = '';
+                                });
+                                 window.db.ClearStore('offerStore', function () {
+
+                                        let offer = {
+                                            date: 'tmplt',
+                                            data: {}
+
+                                        };
+
+                                        window.db.SetObject('offerStore', offer, function () {
+
+                                        });
+                                    });
+
+                                    window.db.ClearStore('dictStore', function () {
+
+                                    });
+
                             });
                         });
                     },
@@ -108,9 +138,10 @@ class SupplierSettings {
                             that.OnSubmit(form)
                         },1000);
                     }
-                });
 
         });
+                avatar = '';
+
     });
     }
 
@@ -181,30 +212,35 @@ $(document).on('readystatechange', function () {
     }
 
 
-    $(".file-upload").on('change', function(e){
-        loadImage(
-            e.target.files[0],
-            function (img, data) {
-                if(img.type === "error") {
-                    console.error("Error loading image ");
-                } else {
-                    $('.avatar').attr('src', img.toDataURL());
+    $(".file-upload").on('change', function(e) {
+        setTimeout(function () {
+            loadImage(
+                e.target.files[0],
+                function (img, data) {
+                    if (img.type === "error") {
+                        console.error("Error loading image ");
+                    } else {
+                        let data_url = img.toDataURL();
+                        img = '';
+                        $('.avatar').attr('src', data_url);
 
-                    $('.avatar').siblings('input:file').attr('changed',true);
-                    console.log("Original image width: ", data.originalWidth);
-                    console.log("Original image height: ", data.originalHeight);
+                        //$('.avatar').siblings('input:file').attr('changed',true);
+                        console.log("Original image width: ", data.originalWidth);
+                        console.log("Original image height: ", data.originalHeight);
+                    }
+                },
+                {
+                    orientation: true,
+                    maxWidth: 800,
+                    maxHeight: 500,
+                    minWidth: 100,
+                    minHeight: 50,
+                    canvas: false
                 }
-            },
-            {
-                orientation:true,
-                maxWidth: 600,
-                maxHeight: 300,
-                minWidth: 100,
-                minHeight: 50,
-                canvas: true
-            }
-        );
+            );
+            e = '';
 
+        },100);
     });
 });
 

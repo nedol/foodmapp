@@ -2,13 +2,10 @@
 export {OrderViewer}
 
 var urlencode = require('urlencode');
-require('bootstrap');
 
+require('jquery-ui');
+// require('jquery-ui-touch-punch');
 
-require('webpack-jquery-ui/draggable');
-require('webpack-jquery-ui/resizable');
-require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
 
 import proj from 'ol/proj';
 const langs = require("../dict/languages");
@@ -29,7 +26,7 @@ class OrderViewer {
 
 
         this.ordv = $("#order_viewer");
-        $(this.ordv).resizable();
+        // $(this.ordv).resizable();
         $(this.ordv).draggable();
         this.ordv.find('.toolbar').css('display', 'block');
 

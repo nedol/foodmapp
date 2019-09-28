@@ -14,6 +14,7 @@ module.exports = {
     entry: {
         'supplier': __dirname+'/src/supplier/supplier.entry.js'
         ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
+        ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
         ,'deliver': __dirname+'/src/deliver/deliver.entry.js'
         ,'customer': __dirname+'/src/customer/customer.entry.js'
         ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'
@@ -33,10 +34,10 @@ module.exports = {
         aggregateTimeout:100
     },
     module: {
-    noParse:/jquery-ui\/ui\/widgets\/tabs.js/,
-    noParse:/jquery-ui\/ui\/widgets\/dialog.js/,
-    noParse:/jquery-ui\/ui\/widgets\/autocomplete.js/,
-    noParse:/jquery-ui\/ui\/widgets\/sortable.js/,
+    noParse:/webpack-jquery-ui\/tabs.js/,
+    noParse:/jquery-ui\/dialog.js/,
+    noParse:/jquery-ui\/autocomplete.js/,
+    noParse:/jquery-ui\/sortable.js/,
     noParse:/jquery-ui\/index.js/,
     noParse:/jquery-ui\/draggable.js/,
     noParse:/lodash\/lodash.js/,
@@ -82,8 +83,6 @@ module.exports = {
             '$': 'jquery',
             jquery: 'jquery',
             jQuery: 'jquery',
-            'window.jquery': 'jquery',
-            'window.jQuery': 'jquery',
             ol:'ol'
         }),
         new webpack.DefinePlugin({

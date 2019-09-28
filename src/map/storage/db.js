@@ -142,6 +142,15 @@ class DB {
         }
     }
 
+    ClearStore(storeName, cb){
+        let objectStoreRequest = DB.prototype.DBcon.transaction([storeName], "readwrite").objectStore(storeName).clear();
+
+        objectStoreRequest.onsuccess = function(event) {
+            // report the success of our request
+            cb();
+        };
+    }
+
 
     GetStorage(storeName, f) {
 
@@ -417,11 +426,13 @@ class DB {
     GetOfferTmplt(cb){
         var tx = this.DBcon.transaction([this.offerStore], "readonly");
         var objectStore = tx.objectStore(this.offerStore);
-        var myIndex = objectStore.index('date');
-        myIndex.get("tmplt");
-        myIndex.openCursor().onsuccess = function(event) {
+        var objectStoreRequest = objectStore.get(["tmplt"]);
+
+        objectStoreRequest.onsuccess = function(event) {
             // report the success of our request
-            cb(event.target.result.value);
+            if(objectStoreRequest.result)
+                cb(objectStoreRequest.result);
+            else cb();
         };
     }
 

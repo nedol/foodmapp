@@ -27,7 +27,7 @@
     "run-sequence": "^1.0.1",
     "sw-precache": "^3.2.0",
     "sw-toolbox": "^3.2.1",
-    "webpack": "^3.12.0"
+    "webpack": "^3.3.0"
   },
   "engines": {
     "node": ">=0.12"
@@ -41,13 +41,12 @@
     "extends": "google"
   },
   "dependencies": {
+    "@babel/core": "^7.0.0",
+    "ajv": "^6.0.0",
     "array-intersection": "^0.1.2",
     "axios": "^0.18.0",
     "axios-cancel": "^0.2.2",
-    "blueimp-load-image": "^2.20.1",
     "bootstrap": "^4.3.1",
-    "bootstrap-datetimepicker": "0.0.7",
-    "bootstrap-datetimepicker-npm": "^4.17.37-npm",
     "bootstrap-select": "^1.12.4",
     "bootstrap-table": "^1.12.2",
     "bootstrap-toggle": "^2.2.2",
@@ -56,25 +55,19 @@
     "cors": "^2.8.4",
     "crypto": "^1.0.1",
     "datatables.net-dt": "^1.10.19",
-    "dialog-polyfill": "^0.4.10",
     "email": "^0.2.6",
     "encodeurl": "^1.0.2",
-    "eonasdan-bootstrap-datetimepicker": "^4.17.47",
     "expose-loader": "^0.7.5",
     "express": "^4.16.4",
     "extract-text-webpack-plugin": "^3.0.2",
     "font-awesome": "^4.7.0",
-    "freeice": "^2.2.0",
     "google-address-autocomplete": "^1.4.0",
     "google-translate-api": "^2.3.0",
     "html-webpack-plugin": "^3.2.0",
-    "i": "^0.3.6",
-    "i18n-iso-countries": "^3.7.8",
     "jquery": "^3.3.1",
     "jquery-textcomplete": "^1.8.4",
     "jquery-ui": "^1.12.1",
     "jquery-ui-touch-punch": "^0.2.3",
-    "jquery.nicescroll": "^3.7.6",
     "jquery.ui.touch": "0.0.1",
     "js-md5": "^0.7.3",
     "js-yaml": "^3.12.0",
@@ -91,7 +84,6 @@
     "ol": "^4.6.5",
     "path": "^0.12.7",
     "popper.js": "^1.14.6",
-    "pricing-template": "^1.0.1",
     "reset-image-orientation": "^2.0.0",
     "sdp-jingle-json": "^3.0.3",
     "sdp-transform": "^2.4.1",
@@ -105,7 +97,6 @@
     "urlencode": "^1.1.0",
     "web-push": "^3.3.3",
     "webpack-jquery-ui": "^2.0.1",
-    "webrtc-adapter": "^6.3.2",
-    "webticker": "^3.0.0"
+    "webrtc-adapter": "^6.3.2"
   }
 }

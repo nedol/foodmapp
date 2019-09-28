@@ -1,10 +1,18 @@
 'use strict'
 
-require("../../lib/bootstrap-rating/bootstrap-rating.js")
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
 require('bootstrap');
+require('bootstrap-select');
+require("../../lib/bootstrap-rating/bootstrap-rating.js")
+require("../../lib/jquery-comments-master/js/jquery-comments.js")
 
 import {Dict} from '../dict/dict.js';
-import {ProfileSupplier} from "../profile/profile.supplier";
+
+import {Utils} from "../utils/utils";
+let utils = new Utils();
+
 import proj from 'ol/proj';
 // require('jquery.nicescroll')
 
@@ -23,10 +31,32 @@ $(document).on('readystatechange', function () {
         return;
     }
 
+    (function($) {
+        $.fn.longTap = function(longTapCallback) {
+            return this.each(function(){
+                var elm = this;
+                var pressTimer;
+                $(elm).on('touchend mouseup', function (e) {
+                    clearTimeout(pressTimer);
+                });
+                $(elm).on('touchstart mousedown', function (e) {
+                    // Set timeout
+                    pressTimer = window.setTimeout(function () {
+                        longTapCallback.call(elm);
+                    }, 500)
+                });
+            });
+        }
+    })(jQuery);
+
 
     window.InitCustomerOrder = function (data) {
         window.cus_oder = new CustomerOrder();
-        window.cus_oder.openFrame(data);
+        window.cus_oder.openFrame(data, function () {
+            return;
+        });
+
+        window.cus_oder.InitRating();
     };
 
 
@@ -51,10 +81,10 @@ class CustomerOrder{
             $(href).css('display','none');
         });
 
-
     }
 
-    openFrame(obj) {
+    openFrame(obj, cb) {
+
         let that = this;
         this.uid = obj.uid;
         this.profile = obj.profile;
@@ -62,7 +92,9 @@ class CustomerOrder{
         obj.supuid = obj.uid;
         this.rating = obj.rating;
         let latlon = [obj.latitude,obj.longitude];
-
+        let diff =  new Date().getTime() - new Date(obj.published).getTime();
+        let days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        let isDelayed =  days  - 7;//week after publication
         this.ovc.css('display','block');
 
         this.ovc.find('#shop_name').text(obj.profile.name);
@@ -139,11 +171,10 @@ class CustomerOrder{
             }, 1000);
         });
 
-        this.FillProfile(obj);
-
         this.ovc.find('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
         window.parent.db.GetSupApproved(obj.uid, function (res) {
             that.appr = res;
+            that.FillProfile(obj);
         });
 
         this.date = window.parent.user.date;
@@ -178,27 +209,28 @@ class CustomerOrder{
                 that.ovc.find('#address').val(obj[0].profile.address);
         });
 
-        function initOffer(){
-            $(window.parent.document).find(".category[state='1']").each(function (c, cat) {
-                let tab = $(cat).text();
-                //for (let tab in this.offer) {
-                if (!tab || !that.offer[tab])
+        function initOrder(){
+            $(".category[state=\"1\"]",window.parent.document).each(function (i, cat) {
+                let cat_tab = $(cat).attr('cat');
+                let cat_img = $(cat).attr('src');
+                let state = $(cat).attr('state')==='0'?'style=\"display: none;\"':'';
+                if (!cat_tab || !that.offer[cat_tab])
                     return;
-                if ($('[href="#' + tab + '"]').length === 0) {
-                    $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab" style="display: none" data-translate="' + md5(tab) + '"  href="#' + tab + '">' + tab + '</a>' +
+                if ($('[href="#' + cat_tab + '"]').length === 0) {
+                    $('<li class="tab_inserted nav-item " '+state+'>' +
+                        '<img class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">' +
                         '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                    $('<div id="' + tab + '" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
+                    $('<div id="' + cat_tab + '" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
                         // '<div class="row"><div>' +
                         '</div>').insertBefore(that.ovc.find('#add_tab_div'));
                 }
 
-
                 // $('#'+tab).niceScroll();
                 let last = 0;
-                for (let i in that.offer[tab]) {
+                for (let i in that.offer[cat_tab]) {
                     last = i;
                     let menu_item = $('#menu_item_tmplt').clone();
-                    $(menu_item).attr('id', tab + '_' + i);
+                    $(menu_item).attr('id', cat_tab + '_' + i);
 
                     $(menu_item).attr('class', 'menu_item');
                     $(menu_item).css('display', 'block');
@@ -206,37 +238,48 @@ class CustomerOrder{
                     // $(menu_item).find('.item_title').attr('contenteditable', 'false');
                     //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
-                    $(menu_item).find('.item_price').text(that.offer[tab][i].price);
+                    $(menu_item).find('.item_price').text(that.offer[cat_tab][i].price);
 
-                    $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
-                    $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + i);
+                    $(menu_item).find('.item_content').attr('id', 'content_' + cat_tab + '_' + i);
+                    $(menu_item).find('.item_title').attr('data-target', '#content_' + cat_tab + '_' + i);
+
+                    // $(menu_item).find('.item_title').longTap(function (el) {
+                    //     $(menu_item).find('.item_content').collapse('show');
+                    // });
+                    $(menu_item).find('.item_title').on('click',function (el) {
+                        $(menu_item).find('.item_content').collapse("toggle");
+                    });
 
                     $(menu_item).find('.amount').val(0);
                     $(menu_item).find('.amount').text(0);
 
-                    if (that.offer[tab][i].title) {
-                        $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
+                    if (that.offer[cat_tab][i].title) {
+                        $(menu_item).find('.item_title').attr('data-translate', that.offer[cat_tab][i].title);
                     }
 
                     $(menu_item).find('.content_text').attr('contenteditable', 'false');
-                    if (that.offer[tab][i].content_text)
-                        $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
-                    if (that.offer[tab][i].content_text)
+                    if (that.offer[cat_tab][i].content_text)
+                        $(menu_item).find('.content_text').attr('data-translate', that.offer[cat_tab][i].content_text.value);
+                    if (that.offer[cat_tab][i].content_text)
                         $(menu_item).find('.content_text').css('visibility', 'visible');
 
-                    if (that.offer[tab][i].img) {
+                    if (that.offer[cat_tab][i].img) {
+                        let src = '';
+                        if(!that.offer[cat_tab][i].img.src.includes('http'))
+                            src = that.path + "/images/" +  that.offer[cat_tab][i].img.src;
+                        else
+                            src = that.offer[cat_tab][i].img.src;
 
-                        let src = that.path + "/images/" + that.offer[tab][i].img.src;
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
                         $(menu_item).find('.img-fluid').parent().css('display', 'block');
                         $(menu_item).find('.img-fluid').attr('src', src);
                         let active = '';
                         if (!$('.carousel-inner').find('.active')[0])
                             active = 'active';
-                        if (!that.offer[tab][i].owner) {
-                            $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
+                        if (!that.offer[cat_tab][i].owner) {
+                            $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[cat_tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
                             let item = '<div class="carousel-item ' + active + '">' +
-                                '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
+                                '<h1 class="carousel_price" title="' + that.offer[cat_tab][i].title + '"></h1>' +
                                 '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
                             $('.carousel-inner').append(item);
                         } else {
@@ -244,13 +287,13 @@ class CustomerOrder{
                         }
                     }
 
-                    $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
+                    $(menu_item).find('.img-fluid').attr('id', 'img_' + cat_tab + '_' + i);
 
                     let setPrice = function (packlist, mi) {
                         if (mi) menu_item = mi;
                         $(menu_item).find('.pack_list').empty();
                         let pl = packlist;
-                        let ml = that.offer[tab][i].markuplist;
+                        let ml = that.offer[cat_tab][i].markuplist;
                         $(menu_item).find('.pack_btn').attr('packlist', JSON.stringify(pl));
                         for (let p in pl) {
                             if (!i)
@@ -263,11 +306,13 @@ class CustomerOrder{
                             let data = parseInt(pl[p]) + ml_val;
 
                             $(menu_item).find('.item_price').attr('base', pl[p]);
-                            if (!$('.carousel_price[title=' + that.offer[tab][i].title + ']').text())
-                                $('.carousel_price[title=' + that.offer[tab][i].title + ']').text(data + 'р/' + p);
+                            if (!$('.carousel_price[title=' + that.offer[cat_tab][i].title + ']').text())
+                                $('.carousel_price[title=' + that.offer[cat_tab][i].title + ']').text(data);
                             pl[p] = data;
-                            $('a[href="#' + tab + '"]').css('display', 'block');
+                            $('a[href="#' + cat_tab + '"]').css('display', 'block');
                             $(menu_item).find('.dropdown').css('visibility', 'visible');
+                            if(that.profile.type==='deliver' && !that.offer[cat_tab][i].markuplist[p])
+                                continue;
                             $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem'>" + p + "</a>");
                             $(menu_item).find('.pack_btn').text(p);
                             $(menu_item).find('.caret').css('visibility', 'visible');
@@ -277,14 +322,14 @@ class CustomerOrder{
                         }
                     }
 
-                    if (that.offer[tab][i].owner) {
-                        $(menu_item).find('.item_title').attr('owner', that.offer[tab][i].owner);
-                        window.parent.db.GetSupplier(new Date(window.parent.user.date), that.offer[tab][i].owner, function (offer) {
-                            let title = that.offer[tab][i].title;
-                            let incl = _.find(offer.data[tab], {title: title});
+                    if (that.offer[cat_tab][i].owner) {
+                        $(menu_item).find('.item_title').attr('owner', that.offer[cat_tab][i].owner);
+                        window.parent.db.GetSupplier(new Date(window.parent.user.date), that.offer[cat_tab][i].owner, function (offer) {
+                            let title = that.offer[cat_tab][i].title;
+                            let incl = _.find(offer.data[cat_tab], {title: title});
                             if (!incl)
                                 return;
-                            $('a[href="#' + tab + '"]').css('display', 'block');
+                            $('a[href="#' + cat_tab + '"]').css('display', 'block');
                             $(menu_item).find('.card-text').attr('contenteditable', 'false');
                             if (incl.content_text)
                                 $(menu_item).find('.card-text').attr('data-translate', incl.content_text.value);
@@ -293,14 +338,26 @@ class CustomerOrder{
 
                             if (incl.img) {
                                 $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                                $(menu_item).find('.img-fluid').attr('src', that.path + "/images/" + incl.img.src);
+                                let src = '';
+                                if(!that.offer[cat_tab][i].img.src.includes('http'))
+                                    src = that.path + "/images/" +  that.offer[cat_tab][i].img.src;
+                                else
+                                    src = that.offer[cat_tab][i].img.src;
+
+                                $(menu_item).find('.img-fluid').attr('src', src);
                                 // $(menu_item).find('.img-fluid').css('left',!incl.img.left?0:(incl.img.left/incl.width)*100+'%');
                                 // $(menu_item).find('.img-fluid').css('top', !incl.img.top?0:incl.img.top);
                             }
 
                             $.each(incl.cert, function (ind, data) {
                                 let img = new Image();
-                                img.src = that.path + "/images/" + data.src;
+                                let src = '';
+                                if(!data.src.includes('http'))
+                                    src = that.path + "/images/" + data.src;
+                                else
+                                    src = data.src;
+
+                                img.src = src;
                                 //$(img).offset(data.pos); TODO:
                                 // img.style.height = '90%';
                                 img.width = '90';
@@ -309,22 +366,31 @@ class CustomerOrder{
                                 $(img).on('click', menu_item, that.onClickImage);
                             });
 
-                            if (that.offer[tab][i].img && that.profile.type === 'deliver') {
-                                let src = that.path + "/images/" + that.offer[tab][i].img.src;
+                            if (that.offer[cat_tab][i].img && that.profile.type === 'deliver') {
+                                let src = '';
+                                if(!that.offer[cat_tab][i].img.src.includes('http'))
+                                    src = that.path + "/images/" + that.offer[cat_tab][i].img.src;
+                                else
+                                    src =  that.offer[cat_tab][i].img.src;
+
                                 $(menu_item).find('.img-fluid').css('visibility', 'visible');
                                 // $(menu_item).find('.img-fluid').css('display', 'none');
                                 $(menu_item).find('.img-fluid').attr('src', src);
                                 let active = '';
                                 if (!$('.carousel-inner').find('.active')[0])
                                     active = 'active';
-                                $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
+                                $('.carousel-indicators').append('<li class="' + active + '" data-slide-to="' + that.offer[cat_tab][i].title + '" data-target="#carouselExampleIndicators"></li>');
                                 let item = '<div class="carousel-item ' + active + '">' +
-                                    '<h1 class="carousel_price" title="' + that.offer[tab][i].title + '"></h1>' +
+                                    '<h1 class="carousel_price" title="' + that.offer[cat_tab][i].title + '"></h1>' +
                                     '<img class="d-block img-fluid img-responsive" src=' + src + ' alt="slide"  style="width: 900px;height: 250px;object-fit: contain ;"></div>';
                                 $('.carousel-inner').append(item);
                             }
 
-                            setPrice(incl.packlist, menu_item);
+                            if(isDelayed<0){
+                                setPrice(incl.packlist, menu_item);
+                            }else{
+                                $(menu_item).find('.order_container').css('display','none');
+                            }
 
                             $(menu_item).find('a[role=packitem]').on('click', {off: incl}, function (ev) {
                                 that.changed = true;
@@ -333,49 +399,62 @@ class CustomerOrder{
                                 $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
                             });
 
-                            that.ovc.find('#' + tab).append(menu_item);
+                            that.ovc.find('#' + cat_tab).append(menu_item);
                             that.dict.dict = Object.assign(offer.dict.dict, that.dict.dict);
                             that.dict.set_lang(window.parent.sets.lang, that.ovc[0]);
                         });
 
                     } else {
                         //deliver
-                        let title = that.offer[tab][i].title;
-                        let deliver = $('#deliver_but', window.parent.document).attr('supuid');
+                        let title = that.offer[cat_tab][i].title;
+                        let deliver = $('.deliver_but', window.parent.document).attr('supuid');
+
                         if (deliver)
-                            window.parent.db.GetSupplier(window.parent.user.date, deliver, function (obj) {
+                            window.parent.db.GetSupplier(window.parent.user.date, deliver, (obj)=> {
                                 let key = _.findKey(obj.data, function (o) {
                                     for (let i in o) {
-                                        if (o[i].title !== title)
+                                        if (o[i].title !== title || o[i].owner!=that.uid)
                                             continue;
                                         else
                                             return true;
                                     }
                                 });
-                                if (key) {
-                                    $(menu_item).find('.deliver_but').css('display', 'block');
-                                    $(menu_item).find('.deliver_but').attr('supuid', $('#deliver_but', window.parent.document).attr('supuid'));
-                                }
+                                // if (key) {
+                                //TODO: знак службы доставки
+                                //     $(menu_item).find('.deliver_but').css('display', 'block');
+                                //     $(menu_item).find('.deliver_but').attr('supuid', $('#deliver_but', window.parent.document).attr('supuid'));
+                                // }
                             });
-                        setPrice(that.offer[tab][i].packlist);
-                        that.ovc.find('#' + tab).append(menu_item);
-                        $(menu_item).find('a[role=packitem]').on('click', {off: that.offer[tab][i]}, function (ev) {
+
+                        if(isDelayed<0) {
+                            setPrice(that.offer[cat_tab][i].packlist);
+                        }else{
+                            $(menu_item).find('.order_container').css('display','none');
+                        }
+
+                        that.ovc.find('#' + cat_tab).append(menu_item);
+
+                        $(menu_item).find('a[role=packitem]').on('click', {off: that.offer[cat_tab][i]}, function (ev) {
                             that.changed = true;
                             $(this).closest('.menu_item').find('.pack_btn').text($(ev.target).text());
                             let pl = ev.data.off.packlist;
                             $(this).closest('.menu_item').find('.item_price').text(pl[$(ev.target).text()]);
                         });
 
-                        if (that.offer[tab][i].cert.length > 1)
+                        if (that.offer[cat_tab][i].cert.length > 1)
                             $(menu_item).find('.cert_container').css('display', 'block');
-                        for (let c in that.offer[tab][i].cert) {
+                        for (let c in that.offer[cat_tab][i].cert) {
                             let img = new Image();
-                            img.src = that.path + "/images/" + that.offer[tab][i].cert[c].src;
+                            if(!that.offer[cat_tab][i].cert[c].src.includes('http'))
+                                img.src = that.path + "/images/" + that.offer[cat_tab][i].cert[c].src;
+                            else
+                                img.src =  that.offer[cat_tab][i].cert[c].src;
                             //$(img).offset(data.pos); TODO:
                             img.width = '90';
                             // img.style.height = '100%';
 
                             $(menu_item).find('.cert_container').append(img);
+                            cb();
                             $(img).on('click', menu_item, that.onClickImage);
                         }
                     }
@@ -399,7 +478,7 @@ class CustomerOrder{
                     let empty = $('#menu_item_tmplt').clone();
                     // $(empty).addClass('menu_item');
                     $(empty).attr('id', 'menu_item_empty');
-                    $(empty).insertAfter($('#' + tab + '_' + last));
+                    $(empty).insertAfter($('#' + cat_tab + '_' + last));
 
                 }, 200)
 
@@ -416,7 +495,8 @@ class CustomerOrder{
             // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
 
             $('li.active a').tab('show');
-            $($('.tab_inserted a')[0]).tab('show');
+            $('.tab_inserted  img:first').tab('show');
+            $('.tab_inserted  img:first').addClass('active');
 
             window.parent.db.GetSupOrders(new Date(that.date), obj.uid, function (arObj) {
                 if (arObj.length > 0) {
@@ -454,7 +534,7 @@ class CustomerOrder{
         };
 
         setTimeout(function () {
-            initOffer();
+            initOrder();
         },1000);
 
     }
@@ -486,102 +566,99 @@ class CustomerOrder{
 
     InitSupplierReview(sup){
 
-       this.InitProfileSupplier({supplier:sup,user:'Supplier'},
+       this.InitProfileSupplier({supplier:sup,user:'Customer'},
             {   //comments settings
-                readOnly: (sup.appr && sup.appr.cusuid===window.parent.user.uid)?false:true,
+                readOnly: (this.appr && this.appr.cusuid===window.parent.user.uid)?false:true,
                 profilePictureURL: this.path+'/images/'+sup.profile.avatar,
                 enableEditing: true,
                 enableDeleting:false,
                 enableReplying: false,
-                textareaPlaceholderText: 'Оставить комментарий',
+                textareaPlaceholderText: 'Оставить отзыв',
                 newestText: 'Новые',
                 oldestText: 'Старые',
                 popularText: 'Популярные',
                 sendText: 'Послать',
+                // deleteText: 'Удалить',
                 replyText: 'Ответить',
                 editText: 'Изменить',
                 editedText: 'Измененный',
                 youText: 'Я',
                 saveText: 'Сохранить',
-                hideRepliesText: 'Скрыть'
+                hideRepliesText: 'Скрыть',
+                noCommentsText: 'Отзывы отсутствуют',
+                maxRepliesVisible: 3
             });
     }
 
     InitProfileSupplier(user, settings) {
 
-        this.profile_sup = new ProfileSupplier();
-        this.profile_sup.InitComments(user, settings);
-        this.profile_sup.InitRateSupplier();
-        this.profile_sup.InitSettingsSupplier();
+        this.InitComments(user, settings);
+        // this.profile_sup.InitRateSupplier();
 
-        if(user.user==='Supplier') {
-            if(!user.supplier.profile.avatar) {
-                utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
-                    $('.avatar').attr('src', src);
-                });
-            }else{
-                $('.avatar').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
-                $('#profile_img').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
-            }
-            // $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
-            // $('img.avatar').on('click',function (ev) {
-            //     $(this).siblings('.file-upload').trigger('click');
-            // });
-            var readURL = function (input) {
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
+        if(!user.supplier.profile.avatar) {
+            utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
+                $('.avatar').attr('src', src);
+            });
+        }else{
+            $('.avatar').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
+            $('#profile_img').attr('src', this.path+'/images/'+user.supplier.profile.avatar);
+        }
+        // $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
+        // $('img.avatar').on('click',function (ev) {
+        //     $(this).siblings('.file-upload').trigger('click');
+        // });
+        var readURL = function (input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
 
-                    reader.onload = function (e) {
-                        $('.avatar').attr('src', e.target.result);
-                        $('.avatar').on('load',function (ev) {
-                            ev.preventDefault();
-                            let k = 70/$(this).height();
-                            utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
-                                $('.avatar').attr('thmb', thmb.src);
-                            });
+                reader.onload = function (e) {
+                    $('.avatar').attr('src', e.target.result);
+                    $('.avatar').on('load',function (ev) {
+                        ev.preventDefault();
+                        let k = 70/$(this).height();
+                        utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
+                            $('.avatar').attr('thmb', thmb.src);
                         });
-                        // $('.avatar').on('load',function (ev) {
-                        //     let thmb = utils.createThumb_1($('.avatar')[0]);
-                        //     $('.avatar').attr('thmb',thmb);
-                        // })
-
-                        $('.avatar').siblings('input:file').attr('changed', true);
-                    }
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-
-
-            $(".file-upload").on('change', function () {
-                readURL(this);
-            });
-
-            $( "#period_list" ).selectable({
-                stop: function() {
-                    let result;
-                    $( ".ui-selected", this ).each(function(i) {
-                        let index = $( "#period_list li" ).index( this );
-                        if(i===0)
-                            result = $($( "#period_list li")[index]).text().split(' - ')[0];
-                        if($( ".ui-selected").length===i+1)
-                            result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
                     });
-                    $('.sel_period').val(result);
-                    $( ".sel_period ").dropdown("toggle");
+                    // $('.avatar').on('load',function (ev) {
+                    //     let thmb = utils.createThumb_1($('.avatar')[0]);
+                    //     $('.avatar').attr('thmb',thmb);
+                    // })
 
+                    $('.avatar').siblings('input:file').attr('changed', true);
                 }
-            });
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
 
-            $('input').prop( "readonly", false );
-        }
-        else if(user.user==='Customer'){
-            //$('input').prop( "readonly", true );
-        }
+
+        $(".file-upload").on('change', function () {
+            readURL(this);
+        });
+
+        $( "#period_list" ).selectable({
+            stop: function() {
+                let result;
+                $( ".ui-selected", this ).each(function(i) {
+                    let index = $( "#period_list li" ).index( this );
+                    if(i===0)
+                        result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    if($( ".ui-selected").length===i+1)
+                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                });
+                $('.sel_period').val(result);
+                $( ".sel_period ").dropdown("toggle");
+
+            }
+        });
+
+        $('input').prop( "readonly", false );
+
     }
 
 
     InitComments(obj, settings){
-
+        let this_obj = obj;
         $('img.avatar').attr('src', settings.profilePictureURL);
         settings.profilePictureURL = window.parent.user.profile.avatar;
         $('#comments-container').comments(Object.assign(settings,{
@@ -590,7 +667,7 @@ class CustomerOrder{
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'getcomments',
-                    supuid:obj.uid
+                    supuid:obj.supplier.uid
                 }
                 window.parent.network.postRequest(par, function (data) {
                     usersArray = [
@@ -600,7 +677,8 @@ class CustomerOrder{
                             email: "current.user@viima.com",
                             profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
                         }];
-                    success(data);
+                    if(!data.err)
+                        success(data);
                 })
             },
             postComment: function(data, success, error) {
@@ -608,16 +686,34 @@ class CustomerOrder{
                     data['fullname'] = window.parent.user.profile.name;
                 }else if(window.parent.user.email){
                     data['fullname'] = window.parent.user.email.split('@')[0];
-                }else
-                    data['fullname'] = 'Пользователь';
+                }else {
+                    data['fullname'] = 'Покупатель';
+                }
 
                 data['created_by_current_user'] = false;
                 let par = {
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'setcomments',
-                    supuid:obj.supuid,
-                    cusuid:obj.cusuid,
+                    supuid: this_obj.supplier.uid,
+                    cusuid:window.parent.user.uid,
+                    data:data
+                }
+                window.parent.network.postRequest(par, function (res) {
+                    if(!res.err) {
+                        data['created_by_current_user'] = true;
+                        success(saveComment(data));
+                    }
+                });
+            },
+            putComment: function(data, success, error) {
+                data['created_by_current_user'] = false;
+                let par = {
+                    proj:'d2d',
+                    user: window.parent.user.constructor.name.toLowerCase(),
+                    func:'setcomments',
+                    supuid:this_obj.supplier.supuid,
+                    cusuid:window.parent.user.uid,
                     data:data
                 }
                 window.parent.network.postRequest(par, function (res) {
@@ -625,18 +721,8 @@ class CustomerOrder{
                     success(saveComment(data));
                 });
             },
-            putComment: function(data, success, error) {
-                let par = {
-                    proj:'d2d',
-                    user: window.parent.user.constructor.name.toLowerCase(),
-                    func:'setcomments',
-                    supuid:obj.supuid,
-                    cusuid:obj.cusuid,
-                    data:data
-                }
-                window.parent.network.postRequest(par, function (res) {
-                    success(saveComment(data));
-                });
+            deleteComment: function(commentJSON, success, error) {
+
             }
 
         }));
@@ -655,20 +741,24 @@ class CustomerOrder{
     }
 
     InitRating() {
+        let that = this;
         let data_obj = {
             proj: "d2d",
             user:window.parent.user.constructor.name.toLowerCase(),
             func: "getrating",
-            psw: window.parent.user.psw,
-            supuid: window.parent.user.uid
+            supuid: this.uid
         }
         window.parent.network.postRequest(data_obj, function (data) {
             if (data.rating)
                 $('.rating').rating('rate', data.rating);
+            that.InitRateSupplier();
         });
+
+
     }
 
     InitRateSupplier(){
+        let that = this;
 
         $('input.rating').on('change', function (ev) {
             let data_obj ={
@@ -677,7 +767,7 @@ class CustomerOrder{
                 func:"ratesup",
                 cusuid: window.parent.user.uid,
                 psw: window.parent.user.psw,
-                supuid: window.parent.user.viewer.uid,
+                supuid: that.uid,
                 value: $('.rating').val()
             }
             window.parent.network.postRequest(data_obj, function (data) {

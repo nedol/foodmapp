@@ -3,9 +3,6 @@ import Geolocation from 'ol/geolocation';
 import proj from 'ol/proj';
 import {Utils} from "../../utils/utils";
 
-import {Feature} from "../events/feature.events";
-
-
 
 class Geo {
 
@@ -85,7 +82,6 @@ class Geo {
                 //            info.style.display = '';
             });
 
-            var accuracyFeature = new Feature(this.map);
             geolocation.on('change:accuracyGeometry', function (ev) {
                 //TODO: accuracyFeature.feature.setGeometry(geolocation.getAccuracyGeometry());
             });
@@ -114,7 +110,7 @@ class Geo {
 
             if (coords) {
                 that.ChangeGPSPosition(that,coords);
-
+                var latlon = proj.toLonLat(coords);
             }
         }
 
@@ -144,8 +140,8 @@ class Geo {
         //     });
         // }
 
-
-        this.SetCurPosition(that,window.sets.coords.gps);
+        if(window.sets.loc_mode)
+            this.SetCurPosition(that,window.sets.coords.gps);
 
         if(window.user.SendLocation)
             window.user.SendLocation(window.sets.coords.gps);
@@ -169,19 +165,20 @@ class Geo {
 
             $(that.map.ol_map).trigger('click', {'coordinate': coordinate, 'loc_mode': true});
 
-            var pixel = that.map.ol_map.getPixelFromCoordinate(coordinate);
-
-            var feature = that.map.ol_map.forEachFeatureAtPixel(pixel, function (feature, layer) {
-                return feature;
-            });
-            if (feature)
-                feature.OnClickFeature(feature);
+            // var pixel = that.map.ol_map.getPixelFromCoordinate(coordinate);
+            //
+            // var feature = that.map.ol_map.forEachFeatureAtPixel(pixel, function (feature, layer) {
+            //     return feature;
+            // });
+            // if (feature)
+            //     feature.OnClickFeature(feature);
 
         } catch (ex) {
             console.log(ex);
         }
 
-        $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
+        if(latlon)
+            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
 
     }
 
@@ -227,7 +224,7 @@ class Geo {
         let nominatim =
             "https://nominatim.openstreetmap.org/search?q="+fadr+"&format=json&polygon=1&addressdetails=1";///reverse";
         let query =
-            "https://nominatim.openstreetmap.org/reverse?format=json&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1";
+            "https://nominatim.openstreetmap.org/reverse?format=geojson&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1";
         let mapques =
             "https://open.mapquestapi.com/geocoding/v1/reverse?key=KEY&location=30.333472,-81.470448&includeRoadMetadata=true&includeNearestIntersection=true";
         let locationiq =
@@ -237,9 +234,10 @@ class Geo {
             "https://photon.komoot.de/api/?q=berlin&lat=52.3879&lon=13.0582";
 
         $.ajax({
-            url:nominatim, //locationiq,//
+            url:nominatim, //
+            //url:locationiq,//nominatim, //
             // data: {
-            //     //key: 'f6b910f0af894f1746b1',//locationiq
+            //     key: 'f6b910f0af894f1746b1',//locationiq
             //     format: "json",
             //     q: place,
             //     "accept-language": "en"

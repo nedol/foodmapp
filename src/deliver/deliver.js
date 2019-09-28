@@ -5,36 +5,40 @@ let utils = require('../utils/utils');
 
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
-require('bootstrap');
 
-import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
-import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
 import {OLMap} from '../map/map'
 import proj from 'ol/proj';
+import layerVector from 'ol/layer/vector';
 import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
+import Extent from 'ol/extent';
 import {Overlay} from "../map/overlay/overlay";
 import {Profile} from "../profile/profile";
-import {OrderViewer} from "../order/order.viewer";
-import {SupplierOffer} from "../supplier/supplier.offer.frame.js";
+import {OfferDeliver} from "./init.offer.deliver.js";
 
 import {Import} from "../import/import";
 import {OfferEditorDeliver} from "./offer.editor.deliver";
 
+let _ = require('lodash')
 let md5 = require('md5');
 
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-require('bootstrap');
-require('bootstrap-select');
+
 
 
 class Deliver{
 
     constructor(uObj) {
+
+        this.path  ="http://localhost:63342/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = host_port;
 
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
@@ -52,7 +56,7 @@ class Deliver{
 
         this.map = new OLMap();
 
-        this.viewer = new OrderViewer();
+        this.viewer = new OfferDeliver();
 
         this.import = new Import(this.map);
 
@@ -82,6 +86,10 @@ class Deliver{
             });
 
             //cb();
+        });
+
+        $('#offer_editor_div').load('./html/offer/offer.editor.html #offer_editor', function (response, status, xhr) {
+
         });
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
@@ -187,15 +195,12 @@ class Deliver{
                             if (feature.values_.type === 'supplier') {
                                 window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
                                     if (obj !== -1) {
-                                        if (window.user.constructor.name === 'Supplier') {
-                                            //window.user.viewer = new OfferViewer(obj.dict);
-                                            $("a[href=#profile]").text('Мой профиль')
-                                        }else if (window.user.constructor.name === 'Deliver') {
+                                        if (window.user.constructor.name === 'Deliver') {
 
-                                            window.user.viewer = new SupplierOffer(obj.dict);
-                                            window.user.profile.InitDeliverProfile(obj);
+                                            that.viewer.InitSupplierOffer(obj);
+                                            //window.user.profile.InitDeliverProfile(obj);
                                             //
-                                            window.user.viewer.OpenOffer(obj);
+                                            // that.viewer.OpenOffer(obj);
 
                                             // window.user.viewer = new OfferOrder();
                                             // window.user.viewer.InitCustomerOrder(obj);
@@ -213,9 +218,10 @@ class Deliver{
                         }
                     }
 
-                return true;
             });
         });
+
+        //this.GetOffersDeliver();
 
     }
 
@@ -287,12 +293,11 @@ class Deliver{
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
-
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
             that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-            $('.dt_val').val($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+            $('.dt_val').text($('#datetimepicker').data("DateTimePicker").date().format('LL'));
 
             $('.sel_period').find('option').css('visibility','visible');
 
@@ -312,13 +317,14 @@ class Deliver{
 
             $('.sel_period').text('06:00 - 24:00');
 
-            if(!window.user.email)
-                return;
 
             $('#my_truck').css('visibility','visible');
 
-            let source = that.map.layers.circleLayer.getSource();
-            source.clear();
+            let source;
+            if(that.map.layers.circleLayer) {
+                source = that.map.layers.circleLayer.getSource();
+                source.clear();
+            }
 
             if(that.my_truck_ovl) {
                 that.my_truck_ovl.RemoveOverlay();
@@ -357,8 +363,8 @@ class Deliver{
 
                     let my_truck_2 = $('#my_truck').clone()[0];
                     $(my_truck_2).attr('id', 'my_truck_2');
-                    if(window.user.profile.profile.thmb)
-                        $(my_truck_2).attr('src',window.user.profile.profile.thmb);
+                    if(window.user.profile.profile.avatar)
+                        $(my_truck_2).attr('src', that.path + '/images/' + window.user.profile.profile.avatar);
                     let status;
                     if (!that.offer.stobj.published)
                         status = 'unpublished';
@@ -387,8 +393,8 @@ class Deliver{
                     if(!that.my_truck_ovl) {
                         let my_truck_2 = $('#my_truck').clone()[0];
                         $(my_truck_2).attr('id', 'my_truck_2');
-                        if(window.user.profile.profile.thmb)
-                            $(my_truck_2).attr('src',window.user.profile.profile.thmb);
+                        if(window.user.profile.profile.avatar)
+                            $(my_truck_2).attr('src',that.path + '/images/' + window.user.profile.profile.avatar);
                         let status;
                         if (!that.offer.stobj.published)
                             status = 'unpublished';
@@ -490,38 +496,28 @@ class Deliver{
 
     UpdateOfferLocal(offer0,offer, dict){
 
-        if(!offer0) {
-            offer0 = {};
-            offer0.date = window.user.date;
-            offer0.supuid = window.user.uid;
-            offer0.data = {};
-        }
+        let uObj = Object.assign(this.offer.stobj);
 
-        for (let tab in offer) {
-            for (let i in offer[tab]) {
-                if (!offer0.data[tab]) {
-                    offer0.data[tab] = offer[tab];
-                }
-                if(!offer0.data[tab][i]){
-                    offer0.data[tab].push({img:{}});
-                }
-                if(offer[tab][i].img) {
-                    if (offer[tab] && offer[tab][i] && offer[tab][i].img.left)
-                        offer0.data[tab][i].img.left = offer[tab][i].img.left;
-                    if (offer[tab] && offer[tab][i] && offer[tab][i].img.top)
-                        offer0.data[tab][i].img.top = offer[tab][i].img.top;
+        if (uObj) {
+            for (let tab in offer) {
+                if(uObj.data) {
+                    uObj.data[tab] = _.unionBy(uObj.data[tab], offer[tab], 'title');
+                    uObj.date = new Date(window.user.date);
+                    uObj.period = $('.sel_period').text();
                 }
             }
-
+        }else {
+            uObj = {
+                date:window.user.date,
+                period: $('.sel_period').text(),
+                location: location,
+                data: offer
+            };
         }
 
-        offer0.data = offer;
-        offer0.location = this.offer.stobj.location;
-        offer0.period = $('.sel_period').text();
-        this.offer.stobj.data = offer0.data;
-
         try {
-            this.offer.SetOfferDB(offer0, dict);
+            this.offer.SetOfferDB(uObj, dict);
+            this.offer.stobj.data = uObj.data;
         }catch(ex){
 
         }
@@ -571,6 +567,8 @@ class Deliver{
             return;
         }
 
+        let offer = menu;
+
         let data_obj = {
             proj: 'd2d',
             user: window.user.constructor.name.toLowerCase(),
@@ -582,7 +580,7 @@ class Deliver{
             period: $('.sel_period').text(),
             location: proj.toLonLat(this.offer.stobj.location),
             radius: window.user.offer.stobj.radius,
-            offer: urlencode.encode(JSON.stringify(menu)),
+            offer: urlencode.encode(JSON.stringify(offer)),
             dict: JSON.stringify(window.dict)
         };
 
@@ -593,6 +591,7 @@ class Deliver{
             }else if(data.result.affectedRows===1){
                 that.offer.GetOfferDB(window.user.date, function (obj) {
                     obj[0].published = res.published;
+                    obj[0].data = offer;
                     that.offer.SetOfferDB(obj[0]);
                     cb(obj[0]);
                 })

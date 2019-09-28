@@ -1,21 +1,21 @@
 export {UtilsMap}
-import proj from 'ol/proj';
-import Sphere from 'ol/sphere';
+// import proj from 'ol/proj';
+// import Sphere from 'ol/sphere';
 class UtilsMap{
 
-    getCoordsDistance(map,firstPoint, secondPoint, projection) {
-        projection = projection || 'EPSG:4326';
-
-        length = 0;
-        var sourceProj = map.getView().getProjection();
-        var c1 = proj.transform(firstPoint, sourceProj, projection);
-        var c2 = proj.transform(secondPoint, sourceProj, projection);
-
-        var wgs84Sphere = new Sphere(6378137);
-        length += wgs84Sphere.haversineDistance(c1, c2);
-
-        return length;
-    }
+    // getCoordsDistance(map,firstPoint, secondPoint, projection) {
+    //     projection = projection || 'EPSG:4326';
+    //
+    //     length = 0;
+    //     var sourceProj = map.getView().getProjection();
+    //     var c1 = proj.transform(firstPoint, sourceProj, projection);
+    //     var c2 = proj.transform(secondPoint, sourceProj, projection);
+    //
+    //     var wgs84Sphere = new Sphere(6378137);
+    //     length += wgs84Sphere.haversineDistance(c1, c2);
+    //
+    //     return length;
+    // }
     getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2){
 
         function deg2rad(deg) {
@@ -33,24 +33,24 @@ class UtilsMap{
         var d = R * c; // Distance in km
         return d;
     }
-
-    mapFormatLength(projection, line) {
-        var length;
-        var coordinates = line.getCoordinates();
-        length = 0;
-        for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
-            var c1 = ol.proj.transform(coordinates[i], projection, 'EPSG:4326');
-            var c2 = ol.proj.transform(coordinates[i + 1], projection, 'EPSG:4326');
-            length += mapConst.wgs84Sphere.haversineDistance(c1, c2);
-        }
-        var output;
-        if (length > 1000) {
-            output = (Math.round(length / 1000 * 100) / 100) +
-                ' ' + 'km';
-        } else {
-            output = (Math.round(length * 100) / 100) +
-                ' ' + 'm';
-        }
-        return output;
-    }
+    //
+    // mapFormatLength(projection, line) {
+    //     var length;
+    //     var coordinates = line.getCoordinates();
+    //     length = 0;
+    //     for (var i = 0, ii = coordinates.length - 1; i < ii; ++i) {
+    //         var c1 = ol.proj.transform(coordinates[i], projection, 'EPSG:4326');
+    //         var c2 = ol.proj.transform(coordinates[i + 1], projection, 'EPSG:4326');
+    //         length += mapConst.wgs84Sphere.haversineDistance(c1, c2);
+    //     }
+    //     var output;
+    //     if (length > 1000) {
+    //         output = (Math.round(length / 1000 * 100) / 100) +
+    //             ' ' + 'km';
+    //     } else {
+    //         output = (Math.round(length * 100) / 100) +
+    //             ' ' + 'm';
+    //     }
+    //     return output;
+    // }
 }

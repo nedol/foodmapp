@@ -4,7 +4,7 @@ export {OfferEditorDeliver}
 require('webpack-jquery-ui/draggable');
 require('jquery-ui-touch-punch');
 
-require('bootstrap');
+
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
@@ -29,7 +29,6 @@ class OfferEditorDeliver{
 
         this.arCat = [];
 
-
         this.path  = window.location.origin +"/d2d/";
         if(host_port.includes('nedol.ru'))
             this.path = host_port;
@@ -37,6 +36,7 @@ class OfferEditorDeliver{
     }
 
     OpenOffer() {
+
         let date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
         let offAr =[], supAr = [];
         window.db.GetOffer(date,(of)=> {
@@ -59,13 +59,15 @@ class OfferEditorDeliver{
         var md5 = require('md5');
         let that = this;
 
-        $(".category[state='1']").each(function (i, cat) {
-            let tab = cat.title;
-            if(!$('#'+tab)[0]) {
-                $('<li class="tab_inserted"><a cat="' + cat.id + '" data-toggle="tab" data-translate="' + md5(tab) + '"  href="#' + tab + '"' +
-                    ' style="color:grey;margin:1px;">' + cat.title + '</a>' +
+        $(".category[state=\"1\"]",window.parent.document).each(function (i, cat) {
+            let cat_tab = $(cat).attr('cat');
+            let cat_img = $(cat).attr('src');
+            let state = $(cat).attr('state')==='0'?'style=\"display: none;\"':'';
+            if ($('[href="#' + cat_tab + '"]').length === 0) {
+                $('<li class="tab_inserted nav-item " '+state+'>' +
+                    '<img class="nav-link" data-toggle="tab" width="60px" contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">' +
                     '</li>').insertBefore($('#add_tab_li'));
-                $('<div id="' + tab + '" class="tab-pane fade div_tab_inserted" style="border: none">' +
+                $('<div id="' + cat_tab + '" class="div_tab_inserted tab-pane" '+state+'>' +
                     '</div>').insertBefore($('#add_tab_div'));
             }
         });
@@ -81,13 +83,13 @@ class OfferEditorDeliver{
         this.ovc .resizable();
 
         this.ovc.find('.packing_header').css('display','inline-block');
-        this.ovc.find('.markup_header').css('display','none');
+        this.ovc.find('.markup_header').css('display','inline-block');
         this.ovc.find('.price_header').css('display','inline-block');
         this.ovc.find('.total_header').css('display','inline-block');
         this.ovc.find('.orders_header').css('display','inline-block');
         this.ovc.find('.packing_div').css('display','inline-block');
         this.ovc.find('.price_div').css('display','inline-block');
-        this.ovc.find('.markup_div').css('display','none');
+        this.ovc.find('.markup_div').css('display','inline-block');
         this.ovc.find('.total_div').css('display','inline-block');
         this.ovc.find('.orders_div').css('display','inline-block');
 
@@ -115,10 +117,8 @@ class OfferEditorDeliver{
         window.sysdict.set_lang(window.sets.lang,$("#menu_item_tmplt"));
         window.sysdict.set_lang(window.sets.lang,$("#offer_editor"));
 
-        $('#add_item').css('display', 'block');
+        // $('#add_item').css('display', 'block');
         $('#add_tab_li').css('display','block');
-
-        let markup ="0";
 
         for(let of in ar) {
             let offer = ar[of];
@@ -129,40 +129,40 @@ class OfferEditorDeliver{
                     continue;
 
                 for (let i in offer.data[tab]) {
+
                     let menu_item = $('#menu_item_tmplt').clone();
 
-                    if(offer.data[tab][i].owner){
+                    if (offer.data[tab][i].owner) {
                         $(menu_item).attr("owner", offer.data[tab][i].owner);
-                    }else{
+                    } else {
                         offer.data[tab][i].supuid = offer.supuid;
                         $(menu_item).attr("owner", offer.supuid);
                     }
-                    let t = tab;
+
                     window.db.GetSupplier(new Date(window.user.date), $(menu_item).attr("owner"), function (sup) {
+
+                        let markuplist = offer.data[tab][i].markuplist?offer.data[tab][i].markuplist:{};
+
                         $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
-                        var base = _.find(sup.data[t], { title:offer.data[tab][i].title });
-                        let pack = $(menu_item).find('.item_pack').text();
-                        $(menu_item).find('.item_total').val(parseInt(base.packlist[pack])+parseInt(offer.data[tab][i].markuplist[pack]));
-                        $(menu_item).find('.item_price').val(parseInt(base.packlist[pack]));
+                        // var base = _.find(sup.data[t], {title: sup.data[tab][i].title});
+                        // let pack = $(menu_item).find('.item_pack').text();
+                        // $(menu_item).find('.item_total').val(parseInt(base.packlist[pack]) + parseInt(sup.data[tab][i].markuplist[pack]));
+                        // $(menu_item).find('.item_price').val(parseInt(base.packlist[pack]));
                         window.dict.dict = Object.assign(sup.dict.dict, window.dict.dict);
                         that.lang = window.sets.lang;
-                        window.dict.set_lang(window.sets.lang,$(menu_item));
+                        window.dict.set_lang(window.sets.lang, $(menu_item));
 
-                    });
 
-                    $(menu_item).attr('id', tab +'_'+ of +'_' + i);
-                    $(menu_item).attr("class", 'menu_item');
+                        $(menu_item).attr('id', tab + '_' + of + '_' + i);
+                        $(menu_item).attr("class", 'menu_item');
 
-                    $(menu_item).find(':checkbox').attr('id', 'item_cb_' + i);
-                    $(menu_item).find(':checkbox').attr('pos', i);
-                    $(menu_item).find(':checkbox').attr('tab', tab);
+                        $(menu_item).find(':checkbox').attr('id', 'item_cb_' + i);
+                        $(menu_item).find(':checkbox').attr('pos', i);
+                        $(menu_item).find(':checkbox').attr('tab', tab);
 
-                    $(menu_item).find('.item_cb').css('visibility', 'visible');
+                        $(menu_item).find('.item_cb').css('visibility', 'visible');
 
-                    if(offer.supuid!==window.user.uid) {
-                        $(menu_item).find(':checkbox').prop('checked', false);
 
-                    }else {
                         if (offer.data[tab][i].checked == 'true') {
                             $(menu_item).find(':checkbox').prop('checked', true);
                             if (that.published)
@@ -170,155 +170,191 @@ class OfferEditorDeliver{
                         } else {
                             isEditable = true;
                         }
-                    }
 
-                    $(menu_item).find(':checkbox').on('change', this, function (ev) {
-                        ev.data.changed = true;
-                    });
 
-                    $(menu_item).find('.item_title').attr('contenteditable', isEditable);
-
-                    let items = $('.item_title[data-translate='+ offer.data[tab][i].title+']');
-                    if(items.length>0) {//check duplicated items
-                        let item = _.find(items, function(item) {
-                            let mi = $(item).closest('.row').parent();
-                            return $(mi).attr('owner')===offer.data[tab][i].supuid;
+                        $(menu_item).find(':checkbox').on('change', this, function (ev) {
+                            ev.data.changed = true;
                         });
 
-                        if(item)
-                            continue;
-                    }
+                        $(menu_item).find('.item_title').attr('contenteditable', isEditable);
 
-                    if (offer.data[tab][i].title) {
-                        $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
-                    }
+                        let items = $('.item_title[data-translate=' + offer.data[tab][i].title + ']');
+                        if (items.length > 0) {//check duplicated items
+                            let item = _.find(items, function (item) {
+                                let mi = $(item).closest('.row').parent();
+                                return $(mi).attr('owner') === offer.data[tab][i].supuid;
+                            });
 
-                    $(menu_item).find('.item_content').attr('id', 'content_' + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.item_title').attr('data-target', '#content_' + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.item_title').attr('contenteditable', 'true');
+                            if (item)
+                                return;
+                        }
 
-                    $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                    if (offer.data[tab][i].content_text)
-                        $(menu_item).find('.content_text').attr('data-translate', offer.data[tab][i].content_text.value);
-                    if (offer.data[tab][i].content_text)
-                        $(menu_item).find('.content_text').css('visibility', 'visible');
+                        if (offer.data[tab][i].title) {
+                            $(menu_item).find('.item_title').attr('data-translate', offer.data[tab][i].title);
+                        }
 
-                    if (offer.data[tab][i].img) {
-                        $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                        $(menu_item).find('.img-fluid').attr('hash',offer.data[tab][i].img.src);
-                        $(menu_item).find('.img-fluid').attr('src', that.path+'/images/'+offer.data[tab][i].img.src);
-                    }
+                        $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.item_title').attr('contenteditable', 'true');
 
-                    $(menu_item).find('.img-fluid').attr('id', 'img_' + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.pack_list').empty();
-                    let pl = offer.data[tab][i].markuplist;
-                    $(menu_item).find('.item_pack').attr('markuplist', JSON.stringify(pl));
-                    for (let p in pl) {
-                        if (!p)
-                            continue;
-                        let data = parseInt(pl[p]);
-                        $(menu_item).find('.item_price').attr('base',data);
+                        $(menu_item).find('.content_text').attr('contenteditable', 'true');
+                        if (offer.data[tab][i].content_text)
+                            $(menu_item).find('.content_text').attr('data-translate', offer.data[tab][i].content_text.value);
+                        if (offer.data[tab][i].content_text)
+                            $(menu_item).find('.content_text').css('visibility', 'visible');
 
+                        if (offer.data[tab][i].img) {
+                            $(menu_item).find('.img-fluid').css('visibility', 'visible');
+                            $(menu_item).find('.img-fluid').attr('hash', offer.data[tab][i].img.src);
+                            $(menu_item).find('.img-fluid').attr('src', that.path + '/images/' + offer.data[tab][i].img.src);
+                        }
 
-                        pl[p] = data;
-                        $(menu_item).find('.dropdown').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + p + "</a></li>");
-                        $(menu_item).find('.item_pack').text(p);
-                        $(menu_item).find('.caret').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').addClass('dropdown-menu');
-                        $(menu_item).find('.item_pack').attr('data-toggle', 'dropdown');
-                        //$(menu_item).find('.item_pack').addClass('dropdown-toggle');
-                        $(menu_item).find('.item_pack').attr('pack', i);
+                        $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.pack_list').empty();
+                        let pl = offer.data[tab][i].packlist;
+                        let ml = markuplist;
+                        $(menu_item).find('.item_pack').attr('markuplist', JSON.stringify(ml));
+                        $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
+                        for (let p in pl) {
+                            if (!p)
+                                continue;
+                            let data = pl[p];
+                            // $(menu_item).find('.item_price').attr('base',data);
+                            $(menu_item).find('.item_price').val(data);
 
+                            $(menu_item).find('.dropdown').css('visibility', 'visible');
+                            $(menu_item).find('.pack_list').append("<li href='#'><a role='packitem' >" + p + "</a></li>");
+                            $(menu_item).find('.item_pack').text(p);
+                            $(menu_item).find('.caret').css('visibility', 'visible');
+                            $(menu_item).find('.pack_list').addClass('dropdown-menu');
+                            $(menu_item).find('.item_pack').attr('data-toggle', 'dropdown');
+                            //$(menu_item).find('.item_pack').addClass('dropdown-toggle');
+                            $(menu_item).find('.item_pack').attr('pack', i);
+                            if(ml && ml[p]){
 
-                        $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
-                            let that = ev.data;
-                            let pack = $(menu_item).find('.item_pack').attr('pack');
-                            if ($(this).text() === '') {
-                                $(menu_item).find('a:contains(' + pack + ')').remove();
-                                let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
-                                delete pl[pack];
-                                $(this).attr('packlist', JSON.stringify(pl));
+                                $(menu_item).find('.item_markup').val(ml[p]);
+                                let total = String(parseInt(ml[p])+ parseInt(data));
+                                $(menu_item).find('.item_total').val(total);
+                            }else{
+                                $(menu_item).find('.item_markup').val('');
+                                $(menu_item).find('.item_total').val('');
                             }
-                            //$(menu_item).find('.add_pack').css('visibility', 'hidden');
+
+                            $(menu_item).find('.dropdown').on('hidden.bs.dropdown', pl, function (ev) {
+                                var p = $(ev.relatedTarget).text();
+                                $(menu_item).find('.item_price').val(ev.data[p]);
+                                if(ml && ml[p]){
+                                    $(menu_item).find('.item_markup').val(ml[p]);
+                                    let total = String(parseInt(ml[p])+ parseInt(pl[p]));
+                                    $(menu_item).find('.item_total').val(total);
+                                }else{
+                                    $(menu_item).find('.item_markup').val('');
+                                    $(menu_item).find('.item_total').val('');
+                                }
+
+                            });
+
+                            $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
+                                let that = ev.data;
+                                let pack = $(menu_item).find('.item_pack').attr('pack');
+                                if ($(this).text() === '') {
+                                    $(menu_item).find('a:contains(' + pack + ')').remove();
+                                    let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
+                                    delete pl[pack];
+                                    $(this).attr('packlist', JSON.stringify(pl));
+                                }
+                            });
+
+                        }
+
+                        $(menu_item).find('.item_markup').on('focusout', [pl,ml], function (ev) {
+                            let price = parseInt($(menu_item).find('.item_price').val());
+                            let total = String(parseInt($(this).val()) + price);
+                            $(menu_item).find('.item_total').val(total);
+                            let pack = $(menu_item).find('.item_pack').text();
+                            if(ev.data[1]) {
+                                ev.data[1][pack] = $(this).val();
+                                $(menu_item).find('.item_pack').attr('markuplist', JSON.stringify(ev.data[1]));
+                            }
                         });
 
-                    }
+
+                        $(menu_item).find('.gallery').attr('id', 'gallery_' + tab + '_' + of + '_' + i);
+
+                        $.each(offer.data[tab][i].cert, function (i, data) {
+                            let img = new Image();
+                            img.src = data.src;
+                            //$(img).offset(data.pos);TODO:
+                            img.height = '100';
+                            $(menu_item).find('.gallery').append(img);
+                            $(img).on('click', that.onClickCert);
+                            that.MakeDraggable(img);
+                        });
 
 
-                    $(menu_item).find('.gallery').attr('id', 'gallery_' + tab +'_'+of+ '_' + i);
+                        $(menu_item).css('display', 'block');
+                        $('#' + tab).append(menu_item);//добавить продукт в закладку
 
-                    $.each(offer.data[tab][i].cert, function (i, data) {
-                        let img = new Image();
-                        img.src = data.src;
-                        //$(img).offset(data.pos);TODO:
-                        img.height = '100';
-                        $(menu_item).find('.gallery').append(img);
-                        $(img).on('click', that.onClickCert);
-                        that.MakeDraggable(img);
-                    });
+                        //$(tmplt).insertAfter('#offer_editor');
+
+                        if ($(menu_item).find('.item_content').css('display') == 'block'
+                            && $(menu_item).find('.img-fluid').attr('src') === ''
+                            && $(menu_item).find('.content_text').text() === "") {
+                            $(menu_item).find('.item_content').slideToggle("fast");
+                        }
 
 
-                    $(menu_item).css('display', 'block');
-                    $('#' + tab).append(menu_item);//добавить продукт в закладку
+                        $(menu_item).find('.add_picture').attr('id', 'ap_' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.add_picture').on('click', this, function (ev) {
+                            let menu_item = $(this).closest('.menu_item');
+                            let vis = $(menu_item).find('.img-fluid').css('visibility');
+                            if (vis === 'visible') {
+                                $(menu_item).find('.img-fluid').css('visibility', 'hidden');
+                            } else {
+                                ev.target = $(menu_item).find('.img-fluid')[0];
+                                that.OnClickImport(ev);
+                                $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
+                            }
+                        });
 
-                    //$(tmplt).insertAfter('#offer_editor');
+                        $(menu_item).find('.add_content').on('click touchstart', menu_item, function (ev) {
+                            let menu_item = $(ev.data);
+                            $(menu_item).find('.item_content').slideDown("slow");
+                            let vis = $(this).closest('.menu_item').find('.content_text').css('visibility');
+                            if (vis === 'visible') {
+                                vis = 'hidden';
+                            } else {
+                                vis = 'visible';
+                            }
 
-                    if ($(menu_item).find('.item_content').css('display') == 'block'
-                        && $(menu_item).find('.img-fluid').attr('src') === ''
-                        && $(menu_item).find('.content_text').text() === "") {
-                        $(menu_item).find('.item_content').slideToggle("fast");
-                    }
+                            $(menu_item).find('.content_text').css('visibility', vis);
+                            $(menu_item).find('.content_text').focus();
+                        });
 
-                    $(menu_item).find('.add_picture').attr('id', 'ap_'  + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.add_picture').on('click', this, function (ev) {
-                        let menu_item = $(this).closest('.menu_item');
-                        let vis = $(menu_item).find('.img-fluid').css('visibility');
-                        if (vis === 'visible') {
-                            $(menu_item).find('.img-fluid').css('visibility', 'hidden');
-                        } else {
-                            ev.target = $(menu_item).find('.img-fluid')[0];
-                            that.OnClickImport(ev);
+                        $(menu_item).find('.add_cert').attr('id', 'ac_' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.add_cert').on('click', this, function (ev) {
+                            let menu_item = $(this).closest('.menu_item');
+                            ev.target = $(menu_item).find('.gallery')[0];
+                            that.OnClickAddCert(ev);
                             $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
-                        }
+                        });
+
+                        $(menu_item).find('.toolbar').css('display', 'block');
+
+                        $(menu_item).find('.orders').attr('id', 'orders' + tab + '_' + of + '_' + i);
+                        $(menu_item).find('.order_ctrl').attr('data-toggle', 'collapse');
+                        $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + of + '_' + i)
+
+                        $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + offer.data[tab][i].title);
+
+                        $(menu_item).find('li>a[role=packitem]').on('click', {
+                            that: that,
+                            mi: $(menu_item)
+                        }, that.OnClickPack);
+
+                        $('a[href="#' + tab + '"]').css('color', 'blue');
+
                     });
-
-                    $(menu_item).find('.add_content').on('click touchstart', menu_item, function (ev) {
-                        let menu_item = $(ev.data);
-                        $(menu_item).find('.item_content').slideDown("slow");
-                        let vis = $(this).closest('.menu_item').find('.content_text').css('visibility');
-                        if (vis === 'visible') {
-                            vis = 'hidden';
-                        } else {
-                            vis = 'visible';
-                        }
-
-                        $(menu_item).find('.content_text').css('visibility', vis);
-                        $(menu_item).find('.content_text').focus();
-                    });
-
-                    $(menu_item).find('.add_cert').attr('id', 'ac_' + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.add_cert').on('click', this, function (ev) {
-                        let menu_item = $(this).closest('.menu_item');
-                        ev.target = $(menu_item).find('.gallery')[0];
-                        that.OnClickAddCert(ev);
-                        $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
-                    });
-
-                    $(menu_item).find('.toolbar').css('display', 'block');
-
-                    $(menu_item).find('.orders').attr('id', 'orders'  + tab +'_'+of+ '_' + i);
-                    $(menu_item).find('.order_ctrl').attr('data-toggle', 'collapse');
-                    $(menu_item).find('.order_ctrl').attr('data-target', '#orders'  + tab +'_'+of+ '_' + i)
-
-                    $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + offer.data[tab][i].title);
-
-                    $(menu_item).find('li>a[role=packitem]').on('click', {
-                        that: that,
-                        mi: $(menu_item)
-                    }, that.OnClickPack);
-
-                    $('a[href="#' + tab + '"]').css('color', 'blue');
                 }
 
                 $('#' + tab).sortable({
@@ -339,13 +375,15 @@ class OfferEditorDeliver{
                         //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
                     }
                 });
+
             }
 
             $($('.tab_inserted a')[0]).tab('show');
 
-            if(new Date(window.user.date).getDate()=== new Date().getDate()){
+            if (new Date(window.user.date).getDate() === new Date().getDate()) {
                 $('.notoday').removeClass('notoday');
             }
+
 
         }//for offer array
 
@@ -670,7 +708,7 @@ class OfferEditorDeliver{
 
         ev.data.changed = true;
 
-        let tab = $('#menu_tabs').find('li.active').find('a').attr('href');
+        let tab = $('.tab_inserted img.nav-link.active').attr('title');
         if(!tab)
             return;
 
@@ -839,10 +877,10 @@ class OfferEditorDeliver{
 
             $(val).addClass('active');
             let tab = $(val).attr('id');
-            let value = $('a[href="#'+tab+'"]')[0].value;
+            let value = tab;//$('img[href="#'+tab+'"]')[0].value;
             let cat;
             if(value) {
-                cat = $('.category[title="'+value+'"]').attr('id');
+                cat = $('.category[cat="'+value+'"]').attr('id');
                 if(!cat)
                     cat='1000';
                 that.arCat.push(parseInt(cat));
@@ -890,10 +928,6 @@ class OfferEditorDeliver{
 
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
-                    let w = $(cont_text).width();
-                    let h = $(cont_text).height();
-                    let l = $(cont_text).css('left');
-                    let ofs = $(cont_text).offset();
                     key = $(cont_text).attr('data-translate');
                     text = $(cont_text).text().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
                     if(!window.dict.dict[key]) {
@@ -908,15 +942,11 @@ class OfferEditorDeliver{
                         $(cont_text).attr('data-translate',key);
                     }
                     item.content_text = {value:key};
-                    item.content_text.width = w;
-                    item.content_text.height = h;
-                    item.content_text.left = l;
 
                 }else{
                     if(item.content)
                         delete item.content;
                 }
-                item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
 
@@ -930,9 +960,13 @@ class OfferEditorDeliver{
                 if(item.markuplist)
                     item.markuplist = JSON.parse(item.markuplist);
 
-                item.price = parseInt($(miAr[i]).find('.item_price').attr('base'));
-                if(!item.price)
-                    continue;
+                item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
+                if(item.packlist)
+                    item.packlist = JSON.parse(item.packlist);
+
+                // item.price = parseInt($(miAr[i]).find('.item_price').attr('base'));
+                // if(!item.price)
+                //     continue;
 
                 item.cert = [];
                 $.each($(miAr[i]).find('.gallery').children(), function (i, el) {
@@ -977,7 +1011,7 @@ class OfferEditorDeliver{
         let that = ev.data;
         //if(ev.data.changed)
         let items = that.SaveOffer(ev,window.sets.lang);
-
+        //
         if(that.changed) {
             if ($('.menu_item').find('input:checked').length > 0 && window.user.ValidateOffer(items['remote'])) {
                 window.user.PublishOffer(items['remote'], window.user.date, ev.data, function (obj) {

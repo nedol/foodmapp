@@ -54,13 +54,21 @@ class DOMEvents {
             let text = "Input location name";
             let hint = "London, Trafalgar Square";
             if (window.window.sets.lang === 'ru') {
-                text = "Введите название местоположения";
-                hint = "Москва, ФудСити";
+
+                if ($('#search_but').attr('hint')) {
+                    hint = $('#search_but').attr('hint');
+                } else {
+
+                    text = "Введите название местоположения";
+                    hint = "Москва,  улица Адмирала Корнилова, 10";
+                }
             }
             let place = prompt(text, hint);
+            $('#search_but').attr('hint', place);
             if(place) {
                 window.user.map.geo.SearchLocation(place, function (bound) {
-                    window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+                    if(bound)
+                        window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
                 });
             }
         });

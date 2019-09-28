@@ -4,6 +4,8 @@ var https = require('https');
 //const vr_server= require('./vreport/server')
 var mysql = require('mysql');
 
+let http = require("http");
+
 let globaljs = require('./global');
 let utils = require('./utils.js');
 
@@ -18,12 +20,14 @@ let email = new Email();
 
 var md5 = require('md5.js');
 
-// var isJSON = require('is-json');
 
 const translate = require('google-translate-api');//ISO 639-1
 
 let con_param = globaljs.con_param;//change every 8 min
-global.con_obj;
+
+let con_obj;
+
+
 
 let bing_api_token
 
@@ -32,7 +36,9 @@ String.prototype.replaceAll = function(search, replace){
 }
 
 module.exports = {
-
+    GetConnection(){
+        return con_obj;
+    },
     GetTokenLoop(server) {
 
         return;
@@ -65,92 +71,98 @@ module.exports = {
 
     },
 
-    startConnection () {
-        StartConnection();
-    },
-
     HandleRequest(req, q, res) {
 
-        switch(q.proj) {
-            case'rtc':
-                let RTC = require('./rtc/rtc');
-                try {
-                    let rtc = new RTC();
-                    rtc.dispatch(req, q, res);
-                }catch(ex){
-                    res.end(JSON.stringify({error:'ServerError'}));
-                    return;
-                }
-                break;
-            case'vr':
-                let VReport = require('./vreport/vreport.js');
-                try{
-                    let vr = new VReport();
-                    vr.dispatch(req, q, res);
-                }catch(ex)
-                {
-                    //res.writeHead(200, {'Content-Type': 'application/json'});
-                    res.end('end');
-                    return;
-                }
-                break;
-            case'bm':
-                let BonMenu = require('./bonmenu/bonmenu');
-                let bm = new BonMenu();
-                bm.dispatch(q,res);
-                break;
-            case'id':
-                let Infodesk = require('./infodesk/infodesk');
-                let id = new Infodesk();
-                id.dispatch(req, q,res);
-                break;
+        StartConnection(function (mysql_con) {
 
-            case'd2d':
-                let D2D = require('./d2d/d2d');
-                let Supplier = require('./d2d/supplier');
-                let Deliver = require('./d2d/deliver');
-                let Customer = require('./d2d/customer');
-                let d2d = '';
-                if(q.user && q.user.toLowerCase() === 'supplier')
-                    d2d = new Supplier();
-                else if(q.user && q.user.toLowerCase() === 'deliver')
-                    d2d = new Deliver();
-                else if(q.user && q.user.toLowerCase() === 'customer')
-                    d2d = new Customer();
-                else
-                    d2d = new D2D();
-                d2d.dispatch(q,res,req);
-                break;
-            default:
-                console.log();
-                break;
-        }
+            switch(q.proj) {
+                case'rtc':
+                    let RTC = require('./rtc/rtc');
+                    try {
+                        let rtc = new RTC();
+                        rtc.dispatch(req, q, res);
+                    }catch(ex){
+                        res.end(JSON.stringify({error:'ServerError'}));
+                        return;
+                    }
+                    break;
+                case'vr':
+                    let VReport = require('./vreport/vreport.js');
+                    try{
+                        let vr = new VReport();
+                        vr.dispatch(req, q, res);
+                    }catch(ex)
+                    {
+                        //res.writeHead(200, {'Content-Type': 'application/json'});
+                        res.end('end');
+                        return;
+                    }
+                    break;
+                case'bm':
+                    let BonMenu = require('./bonmenu/bonmenu');
+                    let bm = new BonMenu();
+                    bm.dispatch(q,res);
+                    break;
+                case'id':
 
+                    let Infodesk = require('./infodesk/infodesk');
+                    let id = new Infodesk();
+                    id.dispatch(req, q,res);
+                    break;
+
+                case'd2d':
+
+                    let D2D = require('./d2d/d2d');
+                    let Supplier = require('./d2d/supplier');
+                    let Deliver = require('./d2d/deliver');
+                    let Customer = require('./d2d/customer');
+                    let d2d = '';
+
+                    if(q.user && q.user.toLowerCase() === 'supplier')
+                        d2d = new Supplier();
+                    else if(q.user && q.user.toLowerCase() === 'deliver')
+                        d2d = new Deliver();
+                    else if(q.user && q.user.toLowerCase() === 'customer') {
+                        d2d = new Customer();
+
+                    }
+                    else
+                        d2d = new D2D();
+                    d2d.dispatch(q,res,req,mysql_con);
+                    break;
+                default:
+                    console.log();
+                    break;
+            }
+        });
 
     }
 }
 
-function StartConnection() {
+
+function StartConnection(cb) {
 
     console.error('CONNECTING');
-    if(!global.con_obj) {
-
-        global.con_obj = mysql.createConnection(con_param);
-        global.con_obj.connect(function (err) {
-            if (err) {
-                console.error('CONNECT FAILED', err.code);
-                StartConnection();
-            }
-            else
-                console.error('CONNECTED');
-        });
-        global.con_obj.on('error', function (err) {
-            if (err.fatal)
-                StartConnection();
-        });
+    if(!global.mysql_pool) {
+        global.mysql_pool = mysql.createPool(con_param);
     }
-}
+    global.mysql_pool.getConnection(function (err, connection) {
+        if (err) {
+            console.error('CONNECT FAILED', err.code);
+            con_obj.destroy();
+            throw err;
+        }
+        else {
+            con_obj = connection;
+            console.error('CONNECTED');
+            cb(con_obj);
+        }
+    });
+    global.mysql_pool.on('error', function (err) {
+        con_obj = '';
+    });
 
+}
 
 function InitDict(q, cb) {
 
@@ -158,7 +170,7 @@ function InitDict(q, cb) {
         " FROM  objects as obj"+
         " WHERE obj.latitude="+q.lat+" AND obj.longitude="+q.lon;
 
-    global.con_obj.query(sql, function (err, result) {
+    con_obj.query(sql, function (err, result) {
         if (err)
             throw err;
         if (result.length > 0) {
@@ -178,7 +190,7 @@ function InitUser(q, res) {
         " WHERE obj.latitude="+q.lat+" AND obj.longitude="+q.lon+
         " AND obj.id=o.obj_id AND (o.data IS NOT NULL OR o.data='') ORDER BY o.date DESC";
 
-    global.con_obj.query(sql, function (err, result) {
+    con_obj.query(sql, function (err, result) {
         if (err)
             throw err;
 
@@ -189,7 +201,7 @@ function InitUser(q, res) {
             res.end(JSON.stringify({
                 data: result[0].obj_data,
                 ddd: result[0].ddd,
-                offer: result[0].order_data,
+                menu: result[0].order_data,
                 maxdate:result[0].date
             }));
 
@@ -209,7 +221,7 @@ function InitAdmin(q, res) {
         " AND obj.id=o.obj_id AND o.data<>''  AND o.data IS NOT NULL"+
         " ORDER BY o.date DESC LIMIT 1";
 
-    global.con_obj.query(sql, function (err, result) {
+    con_obj.query(sql, function (err, result) {
         if (err) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({err:err}));
@@ -224,12 +236,12 @@ function InitAdmin(q, res) {
                 res.end('Wrong data format');
                 return;
             }
-            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"offer\":[\"tab_1\"]}";
+            let menu_data = (result[0].menu_data);//?result[0].menu_data:"{\"menu\":[\"tab_1\"]}";
 
 
             if (owner.uid == q.uid) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, offer: menu_data}));
+                res.end(JSON.stringify({auth: 'OK', data: result[0].obj_data, menu: menu_data}));
                 return;
             }
             if (!owner.uid) {
@@ -237,7 +249,7 @@ function InitAdmin(q, res) {
                 sql = "UPDATE objects SET owner='" + JSON.stringify(owner) + "'" +
                     " WHERE id=" + result["0"].id;
 
-                global.con_obj.query(sql, function (err, result) {
+                con_obj.query(sql, function (err, result) {
                     if (err)
                         throw err;
                     if (result) {
@@ -246,12 +258,12 @@ function InitAdmin(q, res) {
                 });
             }else{
                 res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, offer: menu_data}));
+                res.end(JSON.stringify({msg:'Demo Mode',auth: 'ERROR',data: result[0].obj_data, menu: menu_data}));
             }
 
         }else{
             res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"data": result[0].obj_data,"offer": "[tab_1]"}));
+            res.end(JSON.stringify({"data": result[0].obj_data,"menu": "[tab_1]"}));
         }
     });
 }
@@ -267,7 +279,7 @@ function select_query(q, res) {
 
     //console.log(sql);
 
-    global.con_obj.query(sql, function (err, result) {
+    con_obj.query(sql, function (err, result) {
         if (err) {
             res.writeHead(200, {'Content-Type': 'application/json'});
             res.end(JSON.stringify({err: err}));
@@ -277,7 +289,7 @@ function select_query(q, res) {
 
         }else{
             //res.writeHead(200, {'Content-Type': 'application/json'});
-            res.end(JSON.stringify({"offer":'undefined'}))
+            res.end(JSON.stringify({"menu":'undefined'}))
         }
     });
 }

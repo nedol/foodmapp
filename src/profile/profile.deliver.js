@@ -3,7 +3,6 @@
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
-require('bootstrap');
 
 // global.jQuery = require('jquery');
 
@@ -24,7 +23,7 @@ window.InitProfileDeliver = function (user, settings) {
                 $('.avatar').attr('src', src);
             });
         }else{
-            $('.avatar').attr('src', user.profile.profile.avatar);
+            $('.avatar').attr('src', user.path+'/images/'+user.profile.profile.avatar);
         }
         $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
         $('img.avatar').on('click',function (ev) {
@@ -38,15 +37,7 @@ window.InitProfileDeliver = function (user, settings) {
                     $('.avatar').attr('src', e.target.result);
                     $('.avatar').on('load',function (ev) {
                         ev.preventDefault();
-                        let k = 50/$(this).height();
-                        utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
-                            $('.avatar').attr('thmb', thmb.src);
-                        });
                     });
-                    // $('.avatar').on('load',function (ev) {
-                    //     let thmb = utils.createThumb_1($('.avatar')[0]);
-                    //     $('.avatar').attr('thmb',thmb);
-                    // })
 
                     $('.avatar').siblings('input:file').attr('changed', true);
                 }
@@ -175,10 +166,10 @@ class ProfileDeliver{
     }
 
     InitSettingsSupplier(){
-        window.parent.db.GetSettings(function (obj) {
-            if(obj[0].settings)
-                $('#settings').find(':input.prolong').bootstrapToggle(obj[0].settings.prolong?'on':'off')
-        });
+        // window.parent.db.GetSettings(function (obj) {
+        //     if(obj[0].settings)
+        //         $('#settings').find(':input.prolong').bootstrapToggle(obj[0].settings.prolong?'on':'off')
+        // });
     }
 
     SetRating(val){
@@ -188,44 +179,56 @@ class ProfileDeliver{
         $('.rating').attr('data-readonly', 'true');
     }
 
-    SaveProfile(uid, psw){
-        let that = this;
-        let data_post='';
-        let k = 50/ $('.avatar').height();
-        if(!$('.avatar').attr('src').includes('https://'))
-        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+    SaveProfile(cb){
 
-            data_post ={
-                proj:'d2d',
-                user:window.parent.user.constructor.name,
-                func:'updprofile',
-                uid: uid,
-                psw: psw,
+        let that = this;
+        // if(!this.changed)//TODO:test uncomment
+        //     return;
+        if($('.avatar')[0].src.includes('base64')){
+
+            let k = 200/  $('.avatar').height();
+            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+                uploadProfile(that,avatar.src,cb);
+            });
+        }else{
+            uploadProfile(that,window.parent.user.profile.profile.avatar,cb);
+        }
+
+
+        function uploadProfile(that,avatar,cb) {
+
+            let data_post = '';
+            data_post = {
+                proj: 'd2d',
+                user: window.parent.user.constructor.name,
+                func: 'updprofile',
+                uid: window.parent.user.uid,
+                psw: window.parent.user.psw,
                 profile: {
-                    type:'deliver',
-                    host:location.origin,
-                    email: $('#email').val(),
-                    avatar: $('.avatar').attr('src'),
-                    thmb: thmb.src,
-                    lang: $('html').attr('lang'),
+                    type: window.parent.user.profile.profile.type,
+                    email: $('#email').val().toLowerCase(),
+                    avatar: avatar,
+                    lang: window.parent.user.profile.profile.lang,
                     name: $('#name').val(),
-                    address: $('#address').val(),
+                    worktime: $('#worktime').val(),
                     mobile: $('#mobile').val(),
-                    place: $('#place').val(),
-                }
+                    place: $('#place').val()
+                },
+                promo: $('#promo').val()
             }
 
             window.parent.network.postRequest(data_post, function (res) {
                 if(res.values) {
+                    let profile = JSON.parse(res.values[0]);
                     window.parent.db.GetSettings(function (obj) {
-                        obj[0].profile = data_post.profile;
+                        obj[0].profile = profile;
                         window.parent.db.SetObject('setStore', obj[0], function (res) {
 
                         });
                     });
                 }
             });
-        });
+    }
     }
 
 

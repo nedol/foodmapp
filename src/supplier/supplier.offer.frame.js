@@ -12,9 +12,11 @@ require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
+require('tablesorter/dist/js/widgets/widget-scroller.min.js');
+
 import {Dict} from '../dict/dict.js';
 import {ProfileSupplier} from "../profile/profile.supplier";
-import 'tablesorter/dist/css/theme.default.min.css';
+
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -34,6 +36,46 @@ $(document).on('readystatechange', function () {
     if (document.readyState !== 'complete') {
         return;
     }
+
+
+    (function($) {
+        $.fn.longTap = function(longTapCallback) {
+            return this.each(function(){
+                var elm = this;
+                var pressTimer;
+                $(elm).on('touchend mouseup', function (e) {
+                    clearTimeout(pressTimer);
+                });
+                $(elm).on('touchstart mousedown', function (e) {
+                    // Set timeout
+                    pressTimer = window.setTimeout(function () {
+                        longTapCallback.call(elm);
+                    }, 500)
+                });
+            });
+        }
+    })(jQuery);
+
+    (function($) {
+        $.fn.doubleTap = function(doubleTapCallback) {
+            return this.each(function(){
+                var elm = this;
+                var lastTap = 0;
+                $(elm).on('touchstart', function (e) {
+                    var now = (new Date()).valueOf();
+                    var diff = (now - lastTap);
+                    lastTap = now ;
+                    if (diff < 250) {
+                        if($.isFunction( doubleTapCallback ))
+                        {
+                            doubleTapCallback.call(elm);
+                        }
+                    }
+                });
+            });
+        }
+    })(jQuery);
+
     window.InitSupplierOffer = function (data) {
         if(!window.sup_off )
             window.sup_off = new SupplierOffer();
@@ -49,29 +91,29 @@ $(document).on('readystatechange', function () {
 
 
     $(".file-upload").on('change', function(e){
-        loadImage(
-            e.target.files[0],
-            function (img, data) {
-                if(img.type === "error") {
-                    console.error("Error loading image ");
-                } else {
-                    $('.avatar').attr('src', img.toDataURL());
-
-                    $('.avatar').siblings('input:file').attr('changed',true);
-                    console.log("Original image width: ", data.originalWidth);
-                    console.log("Original image height: ", data.originalHeight);
+        setTimeout(function () {
+            loadImage(
+                e.target.files[0],
+                function (img, data) {
+                    e.target = null;
+                    if (img.type === "error") {
+                        alert("Error loading image ");
+                    } else {
+                        $('.avatar').attr('src', img.toDataURL());
+                        img = null;
+                        //$('.avatar').siblings('input:file').attr('changed',true);
+                    }
+                },
+                {
+                    orientation: true,
+                    maxWidth: 600,
+                    maxHeight: 300,
+                    minWidth: 100,
+                    minHeight: 50,
+                    canvas: false
                 }
-            },
-            {
-                orientation:true,
-                maxWidth: 600,
-                maxHeight: 300,
-                minWidth: 100,
-                minHeight: 50,
-                canvas: true
-            }
-        );
-
+            );
+        },100);
     });
 
 });
@@ -95,25 +137,24 @@ class SupplierOffer{
             if(confirm) {
                 if ($(window.parent.document).find(".category[state='1']").length > 0) {
 
-                    let items = that.SaveOffer(window.parent.sets.lang);
+                    let items  = that.GetOfferItems(window.parent.sets.lang);
                     if (!items)
                         return false;
-
                     if (that.changed) {
-
-                        //if ($('.menu_item').find('input:checked[tab]').length > 0) {
-
-                            window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
-                                window.parent.user.offer.stobj = obj;
-                            });
-                        //}
+                        that.SaveOffer(items);
+                        window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
+                            window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+                            window.parent.user.offer.stobj.published = obj.published;
+                        });
                     }
-                }
 
-                if (that.profile_tab_changed) {
-                    that.SaveProfile(function () {
-                        that.SaveSettings();
-                    });
+                    if (that.profile_tab_changed) {
+                        that.SaveProfile(function () {
+                            that.SaveSettings();
+                        });
+                    }
+
+
                 }
 
                 setTimeout(function () {
@@ -148,14 +189,15 @@ class SupplierOffer{
         this.uid = obj.uid;
         this.profile = obj.profile;
         this.offer = obj.data;
+        this.promo = obj.promo;
         obj.supuid = obj.uid;
         this.rating = obj.rating;
         let latlon = [obj.latitude,obj.longitude];
 
         let date = window.parent.user.date;
 
-
-        $('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
+        if(obj.profile.name || obj.profile.email)
+            $('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
         window.parent.db.GetSupApproved(obj.uid, function (res) {
             that.appr = res;
         });
@@ -185,12 +227,15 @@ class SupplierOffer{
 
         function initOrder() {
 
-            $(window.parent.document).find(".category[state='1']").each(function (i, cat) {
-            let cat_tab = $(cat).text();
+            $(".category[state=\"1\"]",window.parent.document).each(function (i, cat) {
+            let cat_tab = $(cat).attr('cat');
+            let cat_img = $(cat).attr('src');
+            let state = $(cat).attr('state')==='0'?'style=\"display: none;\"':'';
             if ($('[href="#' + cat_tab + '"]').length === 0) {
-                $('<li class="tab_inserted nav-item"><a class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '">' + cat_tab + '</a>' +
+                $('<li class="tab_inserted nav-item " '+state+'>' +
+                    '<img class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">' +
                     '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                $('<div id="' + cat_tab + '" class="div_tab_inserted tab-pane" style="border: none">' +
+                $('<div id="' + cat_tab + '" class="div_tab_inserted tab-pane" '+state+'>' +
                     '</div>').insertBefore($('#add_tab_div'));
             }
 
@@ -214,6 +259,7 @@ class SupplierOffer{
 
             $('#add_tab_li').css('display', 'block');
 
+            $('#promo').val(that.promo);
 
             for (let tab in that.offer) {
                 if (cat_tab !== tab) continue;
@@ -256,12 +302,9 @@ class SupplierOffer{
                     $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + i);
                     $(menu_item).find('.item_title').attr('contenteditable', 'true');
 
-                    $(menu_item).find('.item_title').on('dblclick', function () {
-                        $(menu_item).find('.item_content').collapse('show');
-                    })
 
-                    $(menu_item).find('.item_title').on('focus', function () {
-                        $(menu_item).find('.item_content').collapse('hide');
+                    $(menu_item).find('.item_title').longTap(function (el) {
+                        $(menu_item).find('.item_content').collapse("toggle");
                     });
 
                     $(menu_item).find('.content_text').attr('contenteditable', 'true');
@@ -270,7 +313,14 @@ class SupplierOffer{
 
                     if (that.offer[tab][i].img) {
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
-                        let src = that.offer[tab][i].img.src.replace('https://nedol.ru', '..');
+                        let src = '';
+                        if(that.offer[tab][i].img.src.includes('http') || that.offer[tab][i].img.src.includes('base64'))
+                            src = that.offer[tab][i].img.src;
+                        else {
+                            src = that.path+'/images/' + that.offer[tab][i].img.src;
+
+                        }
+
                         src = src.replace('http://localhost:63342', '..');
                         $(menu_item).find('.img-fluid').attr('src', src);
                         //$(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
@@ -280,22 +330,24 @@ class SupplierOffer{
 
                     let pl = that.offer[tab][i].packlist;
                     $(menu_item).find('.pack_list').empty();
-                    for (let i in pl) {
-                        if (!i)
+                    for (let l in pl) {
+                        if (!l) {
+                            delete that.offer[tab][i].packlist[l];
                             continue;
-                        let data = pl[i];
+                        }
+                        let data = pl[l];
                         $(menu_item).find('.pack_container').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + i + "</a>");
-                        $(menu_item).find('.item_pack').text(i);
-                        $(menu_item).find('.item_pack').attr('pack', i);
+                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + l + "</a>");
+                        $(menu_item).find('.item_pack').text(l);
+                        $(menu_item).find('.item_pack').attr('pack', l);
                         $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
                             let that = ev.data;
                             let pack = $(menu_item).find('.item_pack').attr('pack');
-                            if ($(that).val() === '') {
+                            if ($(this).val() === '') {
                                 $(menu_item).find('a:contains(' + pack + ')').remove();
                                 let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
                                 delete pl[pack];
-                                $(that).attr('packlist', JSON.stringify(pl));
+                                $(this).attr('packlist', JSON.stringify(pl));
                             }
                         });
 
@@ -315,7 +367,11 @@ class SupplierOffer{
 
                     $.each(that.offer[tab][i].cert, function (i, data) {
                         let img = new Image();
-                        img.src = data.src;
+                        if(data.src.includes('http') || data.src.includes('base64'))
+                            img.src = data.src;
+                        else
+                            img.src =  that.path+'/images/' + data.src;
+
                         img.class = 'image';
                         //$(img).offset(data.pos);TODO:
                         img.width = '90';
@@ -325,7 +381,15 @@ class SupplierOffer{
                         $(img).on('click', {id: $(menu_item).attr('id')}, that.onClickImage);
                         $(img).on('dblclick', function () {
                             $(img).remove();
-                        })
+                        });
+                        var timer = 0;
+                        $(img).on("click", function() {
+                            if(timer == 0) {
+                                timer = 1;
+                                timer = setTimeout(function(){ timer = 0; }, 600);
+                            }
+                            else { $(img).remove(); timer = 0; }
+                        });
                         // let img_top = $(img).offset().top;
                         // $(img).draggable({ axis: "y"} ,{
                         //     start: function (ev) {
@@ -414,157 +478,169 @@ class SupplierOffer{
             }
         });
 
-            $($('.tab_inserted a')[0]).tab('show');
-            $($('.tab_inserted')[0]).addClass('active');
 
-            $('.tab_inserted').on('click', function (ev) {
-                $('.tab_inserted').removeClass('active');
-                $(this).addClass('active');
-            });
-
-            if (window.parent.user.date.getDate() === new Date().getDate()) {
-                $('.notoday').removeClass('notoday');
+        $('li.active a').on('show.bs.tab', function (ev) {
+            if (ev.relatedTarget) {
+                //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
             }
-
-            window.parent.db.GetSupOrders(new Date(date), window.parent.user.uid, function (res) {
-
-            $.each(res, function (i, item) {
-
-                let data = res[i].data;
-                let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
-                if (res[i].period !== that.offer.period) {
-                    inv_period = "style='color:red'";
-                }
-                let kAr = Object.keys(data);
-                let calcDistance = new Promise(
-                    function (resolve, reject) {
-                        if (!that.location)
-                            resolve('undefined');
-                        window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
-                            resolve(res);
-                        });
-                    }
-                );
-                //calcDistance.then(function (dist) {
-
-                for (let k in kAr) {
-
-                    $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
-                    $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').css('visibility', 'visible');
-                    $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').text(data[kAr[k]].qnty);
-                    if (data[kAr[k]].status === 'deleted') {//deleted
-                        inv_qnty = "title='deleted' style='color:red'";
-                        tr_style = "color:red";
-                        tr_disabled = "disabled";
-                    }
-
-                    let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.item_price').val();
-                    if (data[kAr[k]].price !== price) {
-                        tr_class += " inv_price";
-                    }
-
-                    //if published:
-                    // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
-                    // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
-                    // $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
-                    $("<tr style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
-                        "<td class='tablesorter-no-sort'>" +
-                        "<label  class='btn'>" +
-                        "<input type='checkbox' class='checkbox-inline approve' title='" + kAr[k] + "' orderdate='" + res[i].date + "' cusuid=" + res[i].cusuid + " style='display: none'>" +
-                        "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                        "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                        "</label>" +
-                        "</td>" +
-
-                        "<td " + inv_qnty + ">" + data[kAr[k]].qnty + "</td>" +
-                        "<td>" + data[kAr[k]].pack + "</td>" +
-                        "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
-                        "<td>" + (res[i].profile ? res[i].profile.name : '') + "</td>" +
-                        "<td></td>" +
-                        "<td " + inv_period + ">" + res[i].period + "</td>" +
-                        "<td class='tablesorter-no-sort'>" +
-                        (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
-                        "</td>" +
-                        "<td  class='marketer'>" +
-                        //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
-                        //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
-                        //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
-                        //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
-                        "</td>" +
-                        "<td>" + "0" + "</td>" +
-
-                        "<td class='tablesorter-no-sort'>" +
-                        "<label  class=\"btn\">" +
-                        "<input type=\"checkbox\" disabled class=\"notoday checkbox-inline complete\">" +
-                        "<i class=\"fa fa-square-o fa-2x\"></i>" +
-                        "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
-                        "</label>" +
-                        "</td>" +
-
-                        "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').children('.orders').css('visibility', 'visible').find('tbody'));
-
-                    if (window.parent.user.profile.profile.type === 'marketer') {
-                        $('.marketer').css('display', 'none');
-                        $('.complete').attr('disabled', 'true');
-                    }
-                    window.parent.db.GetApproved(new Date(date), window.parent.user.uid, res[i].cusuid, kAr[k], function (appr) {
-                        if (appr && appr.data.qnty === res[i].data[kAr[k]].qnty &&
-                            appr.data.price === res[i].data[kAr[k]].price) {
-                            $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
-                            $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
-                        }
-                    });
-
-                    setTimeout(function () {
-                        let pagerOptions = {
-                            // target the pager markup - see the HTML block below
-                            container: $(".pager"),
-                            ajaxUrl: null,
-                            customAjaxUrl: function (table, url) {
-                                return url;
-                            },
-                            ajaxError: null,
-                            ajaxObject: {dataType: 'json'},
-                            ajaxProcessing: null,
-                            processAjaxOnInit: true,
-                            output: '{startRow:input} – {endRow} / {totalRows} rows',
-                            updateArrows: true,
-                            page: 0,
-                            size: 10,
-                            savePages: true,
-                            storageKey: 'tablesorter-pager',
-                            pageReset: 0,
-                            fixedHeight: true,
-                            removeRows: false,
-                            countChildRows: false,
-                            cssNext: '.next', // next page arrow
-                            cssPrev: '.prev', // previous page arrow
-                            cssFirst: '.first', // go to first page arrow
-                            cssLast: '.last', // go to last page arrow
-                            cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-                            cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-                            cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-                            // class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-                            cssDisabled: 'disabled', // Note there is no period "." in front of this class name
-                            cssErrorRow: 'tablesorter-errorRow' // ajax error information row
-                        };
-                        $('#ordtable_' + kAr[k]).tablesorter({
-                            theme: 'blue',
-                            widgets: ['zebra', 'column'],
-                            usNumberFormat: false,
-                            sortReset: true,
-                            sortRestart: true,
-                            sortInitialOrder: 'desc',
-                            widthFixed: true
-                        })
-                        //.tablesorterPager(pagerOptions);
-                    }, 1000);
-                }
-            });
-
-            that.orders = res;
+            // $('.tab_inserted  img:first').tab('show');
+            // $('.tab_inserted img:first').addClass('active');
 
         });
+
+        $('li.active a').tab('show');
+
+        $('.tab_inserted  img:first').trigger('click');
+
+        // $('.tab_inserted').on('click', function (ev) {
+        //     $('.tab_inserted').removeClass('active');
+        //     $(this).addClass('active');
+        // });
+
+
+        if (window.parent.user.date.getDate() === new Date().getDate()) {
+            $('.notoday').removeClass('notoday');
+        }
+
+        window.parent.db.GetSupOrders(new Date(date), window.parent.user.uid, function (res) {
+
+        $.each(res, function (i, item) {
+
+            let data = res[i].data;
+            let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
+            if (res[i].period !== that.offer.period) {
+                inv_period = "style='color:red'";
+            }
+            let kAr = Object.keys(data);
+            let calcDistance = new Promise(
+                function (resolve, reject) {
+                    if (!that.location)
+                        resolve('undefined');
+                    window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
+                        resolve(res);
+                    });
+                }
+            );
+            //calcDistance.then(function (dist) {
+
+            for (let k in kAr) {
+
+                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
+                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').css('visibility', 'visible');
+                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').text(data[kAr[k]].qnty);
+                if (data[kAr[k]].status === 'deleted') {//deleted
+                    inv_qnty = "title='deleted' style='color:red'";
+                    tr_style = "color:red";
+                    tr_disabled = "disabled";
+                }
+
+                let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.item_price').val();
+                if (data[kAr[k]].price !== price) {
+                    tr_class += " inv_price";
+                }
+
+                //if published:
+                // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
+                // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
+                // $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
+                $("<tr style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
+                    "<td class='tablesorter-no-sort'>" +
+                    "<label  class='btn'>" +
+                    "<input type='checkbox' class='checkbox-inline approve' title='" + kAr[k] + "' orderdate='" + res[i].date + "' cusuid=" + res[i].cusuid + " style='display: none'>" +
+                    "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                    "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                    "</label>" +
+                    "</td>" +
+
+                    "<td " + inv_qnty + ">" + data[kAr[k]].qnty + "</td>" +
+                    "<td>" + data[kAr[k]].pack + "</td>" +
+                    "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
+                    "<td>" + (res[i].cus_profile.name ? res[i].cus_profile.name : '') + "</td>" +
+                    "<td " + inv_period + ">" + res[i].period + "</td>" +
+                    "<td class='tablesorter-no-sort'>" +
+                    (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
+                    "</td>" +
+                    "<td  class='marketer'>" +
+                    //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
+                    //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
+                    //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
+                    //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
+                    "</td>" +
+                    "<td>" + "0" + "</td>" +
+
+                    "<td class='tablesorter-no-sort'>" +
+                    "<label  class=\"btn\">" +
+                    "<input type=\"checkbox\" disabled class=\"notoday checkbox-inline complete\">" +
+                    "<i class=\"fa fa-square-o fa-2x\"></i>" +
+                    "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
+                    "</label>" +
+                    "</td>" +
+
+                    "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').children('.orders').css('visibility', 'visible').find('tbody'));
+
+                if (window.parent.user.profile.profile.type === 'marketer') {
+                    $('.marketer').css('display', 'none');
+                    $('.complete').attr('disabled', 'true');
+                }
+                window.parent.db.GetApproved(new Date(date), window.parent.user.uid, res[i].cusuid, kAr[k], function (appr) {
+                    if (appr && appr.data.qnty === res[i].data[kAr[k]].qnty &&
+                        appr.data.price === res[i].data[kAr[k]].price) {
+                        $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
+                        $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
+                    }
+                });
+
+                setTimeout(function () {
+                    let pagerOptions = {
+                        // target the pager markup - see the HTML block below
+                        container: $(".pager"),
+                        ajaxUrl: null,
+                        customAjaxUrl: function (table, url) {
+                            return url;
+                        },
+                        ajaxError: null,
+                        ajaxObject: {dataType: 'json'},
+                        ajaxProcessing: null,
+                        processAjaxOnInit: true,
+                        output: '{startRow:input} – {endRow} / {totalRows} rows',
+                        updateArrows: true,
+                        page: 0,
+                        size: 10,
+                        savePages: true,
+                        storageKey: 'tablesorter-pager',
+                        pageReset: 0,
+                        fixedHeight: true,
+                        removeRows: false,
+                        countChildRows: false,
+                        cssNext: '.next', // next page arrow
+                        cssPrev: '.prev', // previous page arrow
+                        cssFirst: '.first', // go to first page arrow
+                        cssLast: '.last', // go to last page arrow
+                        cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+                        cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+                        cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+                        // class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+                        cssDisabled: 'disabled', // Note there is no period "." in front of this class name
+                        cssErrorRow: 'tablesorter-errorRow' // ajax error information row
+                    };
+                    $('#ordtable_' + kAr[k]).tablesorter({
+                        theme: 'blue',
+                        widgets: ['zebra', 'column'],
+                        usNumberFormat: false,
+                        sortReset: true,
+                        sortRestart: true,
+                        sortInitialOrder: 'desc',
+                        widthFixed: true
+                    })
+                    //.tablesorterPager(pagerOptions);
+                }, 1000);
+            }
+        });
+
+        that.orders = res;
+
+    });
 
             //
             that.lang = window.parent.sets.lang;
@@ -580,7 +656,7 @@ class SupplierOffer{
             });
 
             $('#add_item').off();
-            $('#add_item').on('click', that, that.AddOfferItem);
+            $('#add_item').on('click touchstart', that, that.AddOfferItem);
 
 
             $('.input').click(function (ev) {
@@ -608,7 +684,10 @@ class SupplierOffer{
     FillProfile(profile){
         // $('input').prop('readonly', true);
         // $('input').attr('placeholder', '');
-        $('.avatar').attr('src',this.path+'/images/'+profile.avatar);
+        if(profile.avatar)
+            $('.avatar').attr('src',this.path+'/images/'+profile.avatar);
+        else
+             $('.avatar').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
         $('input').attr('title', '');
         $('#name').val(profile.name);
         $('#email').val(profile.email);
@@ -619,16 +698,14 @@ class SupplierOffer{
 
     InitProfileSupplier(user, settings) {
 
-        this.profile_sup = new ProfileSupplier();
+        this.profile_sup = new ProfileSupplier(user);
         this.profile_sup.InitComments(user, settings);
-        this.profile_sup.InitRateSupplier();
+        this.profile_sup.InitRating();
         this.profile_sup.InitSettingsSupplier();
 
         if(user.constructor.name==='Supplier') {
             if(!user.profile.profile.avatar) {
-                utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
-                    $('.avatar').attr('src', src);
-                });
+                $('.avatar').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
             }else{
                 $('.avatar').attr('src', user.profile.profile.avatar);
             }
@@ -693,7 +770,7 @@ class SupplierOffer{
        this.InitProfileSupplier({supuid:sup.uid,user:window.parent.user.constructor.name},
             {   //comments settings
                 readOnly: (sup.appr && sup.appr.cusuid===window.parent.user.uid)?false:true,
-                profilePictureURL: this.path+'/images/'+ sup.profile.avatar,
+                profilePictureURL:sup.profile.avatar? this.path+'/images/'+ sup.profile.avatar:'https:///nedol.ru/d2d/dist/images/user.png',
                 enableEditing: true,
                 enableDeleting:false,
                 enableReplying: false,
@@ -781,8 +858,8 @@ class SupplierOffer{
 
         ev.data.changed = true;
 
-        let tab = $('.tab_inserted.active').text();
-        //alert('tab:'+tab);
+        let tab = $('.tab_inserted img.nav-link.active').attr('title');
+        // alert('tab:'+tab+$('.tab_inserted img.nav-link.active').length);
         if(!tab)
             return;
 
@@ -919,58 +996,80 @@ class SupplierOffer{
     }
 
     OnImportImage(ev){
-        let that = ev.data;
-        let  files = $(this)[0].files;
+
         let el = JSON.parse($(this).attr('func_el'));
-        utils.HandleFileSelect(ev, files, function (data, smt) {
-            if(data) {
-                if(el.func==='load_img') {
-                    let img  = new Image();//'<img src="'+data+'" height="50" >';
-                    img.class = 'image';
-                    img.src = data;
-                    // img.height = '100';
-                    img.width = '90';
-                    img.style='padding:10px';
-                    img.id = md5(data);
+        setTimeout(function () {
+            loadImage(
+                ev.target.files[0],
+                function (canvas, data) {
+                    ev.target = '';
+                    if(canvas.type === "error") {
+                        console.error("Error loading image ");
+                    } else {
 
-                    $("#" + el.id).attr('src', data);
+                        let data_url = canvas.toDataURL();
+                        canvas = null;
 
-                    $("#" + el.id).css('visibility', 'visible');
-                    // $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
-                    $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
-                    $(img).draggable({
-                        start: function (ev) {
-                            console.log("drag start");
-                        },
-                        drag: function (ev) {
-                            //$(el).attr('drag', true);
-                        },
-                        stop: function (ev) {
-                            console.log("drag stop");
-                            if($(img).position().left>$(img).width()-20)
-                                $(img).remove();
-                        }
-                    });
-                    $(img).on('click touchstart',{id:$("#" + el.id).closest('.menu_item').attr('id')},window.sup_off.onClickImage);
-                    let thumb = false;
-                    $("#" + el.id).on('load', function (ev) {
+                        $("#" + el.id).attr('src', data_url);
 
-                        if (!thumb) {
-                            // let k = 200/$("#" + el.id).height();
-                            // utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
-                            //     thumb = true;
-                            //     $("#" + el.id).attr('src', thmb.src);
-                            // });
+                        $("#" + el.id).css('visibility', 'visible');
+                        // $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
 
-                            //$("#" + el.id).attr('thmb', utils.createThumb($("#" + el.id)[0]));
-                        }
+                        let thumb = false;
 
-                    });
+                        $("#" + el.id).on('load', function (ev) {
+
+                            let img  = new Image();//'<img src="'+data+'" height="50" >';
+                            img.class = 'image';
+                            img.src = data_url;
+                            // img.height = '100';
+                            img.width = '90';
+                            img.style='padding:10px';
+                            img.id = md5(data_url);
+
+
+                            $(img).on('click touchstart',{id:$("#" + el.id).closest('.menu_item').attr('id')},window.sup_off.onClickImage);
+
+                            $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
+                            data_url = '';
+
+                            $(img).draggable({
+                                start: function (ev) {
+                                    console.log("drag start");
+                                },
+                                drag: function (ev) {
+                                    //$(el).attr('drag', true);
+                                },
+                                stop: function (ev) {
+                                    console.log("drag stop");
+                                    if($(img).position().left>$(img).width()-20)
+                                        $(img).remove();
+                                }
+                            });
+
+                            if (!thumb) {
+                                // let k = 200/$("#" + el.id).height();
+                                // utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
+                                //     thumb = true;
+                                //     $("#" + el.id).attr('src', thmb.src);
+                                // });
+
+                                //$("#" + el.id).attr('thmb', utils.createThumb($("#" + el.id)[0]));
+                            }
+
+                        });
+                    }
+                },
+                {
+                    orientation:true,
+                    maxWidth: 500,
+                    maxHeight: 500,
+                    minWidth: 100,
+                    minHeight: 50,
+                    canvas: false
                 }
-
-            }
-        });
-
+            );
+        },100);
     }
 
     InitComments(obj, settings){
@@ -1101,7 +1200,7 @@ class SupplierOffer{
 
             $(val).addClass('active');
             let tab = $(val).attr('id');
-            let value = $('a[href="#'+tab+'"]').text();
+            let value = tab;//$('img[href="#'+tab+'"]').attr('title');
             let cat;
             if(value) {
                 if(!window.parent.dict.dict[md5(value)]){
@@ -1165,21 +1264,21 @@ class SupplierOffer{
                         $(cont_text).attr('data-translate',key);
                     }
                     item.content_text = {value:key};
-                    item.content_text.width = w;
-                    item.content_text.height = h;
-                    item.content_text.left = l;
+                    // item.content_text.width = w;
+                    // item.content_text.height = h;
+                    // item.content_text.left = l;
 
                 }else{
                     if(item.content)
                         delete item.content;
                 }
-                item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
+                // item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                     item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-                    let left =$(miAr[i]).find('.img-fluid').css('left');
-                    item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
-                    item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
+                    // let left =$(miAr[i]).find('.img-fluid').css('left');
+                    // item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
+                    // item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
 
                 }else {
                     delete item.img;
@@ -1197,7 +1296,7 @@ class SupplierOffer{
 
                 item.cert = [];
                 $.each($(miAr[i]).find('.cert_container').children(), function (i, el) {
-                    if(el.src.includes('http://placehold.it/400x700'))
+                    if(el.src.includes('http://placehold.it/400x700') || el.src.includes('http://localhost'))
                         return;
                     item.cert.push({src:el.src,pos:$(el).position()});
                 });
@@ -1208,7 +1307,7 @@ class SupplierOffer{
                     });
                 });
 
-                cat = $(window.parent.document).find('.category[title="'+value+'"]').attr('id');
+                cat = $(window.parent.document).find('.category[cat="'+value+'"]').attr('id');
                 if(!cat)
                     cat='1000';
                 if(!_.includes(that.arCat,parseInt(cat)))
@@ -1229,16 +1328,15 @@ class SupplierOffer{
         return offerObj;
     }
 
-    SaveOffer(lang) {
+    SaveOffer(items) {
 
         let ind = $("li.tab_inserted.active").val();
-        let active = $($("li.active").find('a')[ind]).text();
-        let items  = this.GetOfferItems(lang,ind);
+        let active = $($("li.active").find('img')[ind]).text();
+
         // if(active) {
         //     items = this.getTabItems(active, lang);
         // }
         window.parent.user.UpdateOfferLocal(this.offer,items['local'], window.parent.user.offer.stobj.location , window.parent.dict.dict);
-        return items;
     }
 
     SaveProfile(cb){
@@ -1246,7 +1344,7 @@ class SupplierOffer{
         let that = this;
         // if(!this.changed)//TODO:test uncomment
         //     return;
-        if($('.avatar')[0].src.includes('data:image')){
+        if($('.avatar')[0].src.includes('base64')){
 
             let k = 200/  $('.avatar').height();
             utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
@@ -1278,48 +1376,32 @@ class SupplierOffer{
                     name: $('#name').val(),
                     worktime: $('#worktime').val(),
                     mobile: $('#mobile').val(),
-                    place: $('#place').val(),
-                }
+                    place: $('#place').val()
+                },
+                promo: $('#promo').val()
             }
 
             window.parent.network.postRequest(data_post, function (res) {
-                if(res.err){
-                    if(confirm(res.err)){
-                        if(window.location.hostname==='localhost') {
-                            window.parent.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
-                        }
-
-                        else if(window.location.hostname==='nedol.ru') {
-                            window.parent.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
-                        }
-                    }
-                    window.close();
-                    return;
-                }
 
                 let res_ = res;
 
-                let obj = window.parent.user.settings;
-                if(obj){
+                window.parent.db.GetSettings(function (obj) {
 
                     let set = _.find(obj, {uid: window.parent.user.uid});
-                    if(set) {
-                        set.profile = data_post.profile;
+                    set.profile = data_post.profile;
+                    set.promo = data_post.promo;
 
-                        if (res_.profile) {
-                            set.profile.avatar = res_.profile.avatar;
-                            set.profile.thmb = res_.profile.thmb;
-                        }
-                        window.parent.db.SetObject('setStore', set, function (res) {
-                            $('#user_2', window.parent.document).find('img').attr('src', that.path + '/images/' + set.profile.avatar);
-                            that.profile = set.profile;
-                            window.parent.user.profile.profile = set.profile;
-                            cb();
-                        });
-                    }else{
-                        cb();
+                    if (res_.profile) {
+                        set.profile.avatar = res_.profile.avatar;
+                        set.profile.thmb = res_.profile.thmb;
                     }
-                }
+                    window.parent.db.SetObject('setStore', set, function (res) {
+                        $('#user_2', window.parent.document).find('img').attr('src', that.path + '/images/' + set.profile.avatar);
+                        that.profile = set.profile;
+                        window.parent.user.profile.profile = set.profile;
+                        cb();
+                    });
+                });
             });
         }
     }

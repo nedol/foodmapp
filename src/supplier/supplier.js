@@ -1,14 +1,18 @@
 'use strict'
 
 
-require('webpack-jquery-ui');
-require('webpack-jquery-ui/css');
+require('webpack-jquery-ui/draggable');
+
 require('jquery-ui-touch-punch');
+
+require('popper.js');
+require('bootstrap');
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
 import 'tablesorter/dist/css/theme.default.min.css';
 
@@ -23,7 +27,7 @@ import {Overlay} from "../map/overlay/overlay";
 import {Profile} from "../profile/profile";
 
 import {Import} from "../import/import";
-import {OfferEditor} from "./offer.editor";
+import {OfferEditor} from "./init.offer.frame";
 
 var urlencode = require('urlencode');
 
@@ -53,6 +57,23 @@ const MSG_NO_REG = 0x0001;
     }
 })(jQuery);
 
+(function($) {
+    $.fn.dblTap = function(dblTapCallback) {
+        var timer = 0;
+        return this.each(function(){
+            if(timer == 0) {
+                timer = 1;
+                timer = setTimeout(function(){ timer = 0; }, 600);
+            }
+            else { alert("double tap"); timer = 0; }
+        });
+    }
+})(jQuery);
+
+$(document).on("click" , "#target" , function() {
+
+});
+
 
 export class Supplier{
 
@@ -67,10 +88,14 @@ export class Supplier{
 
         if(uObj) {
             this.offer = new Offer(this.date, uObj);
+            this.offer.GetOfferDB(this.date,function () {
+                
+            });
             this.editor = new OfferEditor();//offer editor
 
             this.uid = uObj.set.uid;
             this.psw = uObj.set.psw;
+            this.promo = uObj.set.promo;
             this.email = uObj.set.profile.email;
 
             this.profile = new Profile(uObj.set.profile);
@@ -109,10 +134,12 @@ export class Supplier{
 
         if(this.settings && this.settings.prolong==='1') {
             window.db.GetOfferTmplt(function (obj) {
-                obj.date =  that.date;
-                window.db.SetObject('offerStore', obj, function (res) {
+                if(obj) {
+                    obj.date = that.date;
+                    window.db.SetObject('offerStore', obj, function (res) {
 
-                });
+                    });
+                }
             });
         }
 
@@ -126,7 +153,6 @@ export class Supplier{
 
         this.DateTimePickerEvents();
 
-
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
                 that.map.geo.StopLocation();
@@ -137,8 +163,6 @@ export class Supplier{
             // $('#client_frame_container').css('display','none');
             // $('.carousel-indicators', $('.client_frame').contents()).empty();
             // $('.carousel-inner', $('.client_frame').contents()).empty();
-
-            var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
 
             var latlon = proj.toLonLat(event.coordinate);
             $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
@@ -200,18 +224,8 @@ export class Supplier{
                                 window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
                                     if (obj !== -1) {
                                         if (window.user.constructor.name === 'Supplier') {
-                                            //window.user.viewer = new OfferViewer(obj.dict);
+                                            //window.user.viewer = new OfferDeliver(obj.dict);
                                             $("a[href=#profile]").text('Мой профиль')
-                                        }else if (window.user.constructor.name === 'Deliver') {
-
-                                            // window.user.viewer = new SupplierOffer(obj.dict);
-                                            // window.user.profile.InitDeliverProfile(obj);
-                                            //
-                                            // window.user.viewer.OpenOffer(obj);
-
-                                            // window.user.viewer = new OfferOrder();
-                                            // window.user.viewer.InitCustomerOrder(obj);
-
                                         }else if (window.user.constructor.name === 'Customer') {
                                             if (!window.user.viewer) {
                                                 window.user.viewer = new OfferOrder();
@@ -233,7 +247,6 @@ export class Supplier{
                 return true;
             });
         });
-
 
     }
 
@@ -312,25 +325,12 @@ export class Supplier{
                 }
             });
 
-            let source = that.map.layers.circleLayer.getSource();
-            source.clear();
+            if(that.map.layers.circleLayer) {
+                let source = that.map.layers.circleLayer.getSource();
+                source.clear();
+            }
 
             $('.sel_period').text('06:00 - 24:00');
-
-            if(!window.user.email){
-                if(confirm('Пройдите регистрацию. Ссылка для входа в приложение будет выслана вам по почте')) {
-                    if(window.location.hostname==='localhost') {
-                        window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
-                    }
-
-                    else if(window.location.hostname==='nedol.ru') {
-                        window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
-                    }
-                    return;
-                }else{
-                    return;
-                }
-            }
 
 
             $('#user').css('visibility','visible');
@@ -346,10 +346,14 @@ export class Supplier{
 
             if(that.settings && that.settings.prolong==='1') {
                 window.db.GetOfferTmplt(function (obj) {
-                    obj.date =  that.date;
-                    window.db.SetObject('offerStore', obj, function (res) {
+                    if(obj) {
+                        obj.date = that.date;
+                        window.db.SetObject('offerStore', obj, function (res) {
+                            getOfferData();
+                        });
+                    }else{
                         getOfferData();
-                    });
+                    }
                 });
             }else{
                 getOfferData();
@@ -360,8 +364,8 @@ export class Supplier{
                     let not_empty = $.grep(off, function (el,i) {
                         return (el && !_.isEmpty(el.data));
                     });
-                    if(!off[0] || not_empty.length===0) {
-                        window.db.GetLastOffer(function (res) {
+                    if(!off[0]) {
+                        window.db.GetOfferTmplt(function (res) {
                             if(!res){
                                 that.offer.stobj = {date:that.date}
                             }else{
@@ -376,13 +380,13 @@ export class Supplier{
 
                     if(that.offer.stobj && that.offer.stobj.location) {
 
-                        let user_2 = $('#user_container').clone()[0];
-                        $(user_2).attr('id', 'user_2');
-                        $(user_2).longTap(function (el) {
-                            $(user_2).removeClass('non_draggable');
+                        let user_cont = $('#user_container').clone()[0];
+                        $(user_cont).find('img').attr('id', 'user_2');
+                        $(user_cont).find('img').longTap(function (el) {
+                            $(user_cont).removeClass('non_draggable');
                         });
                         if(false)
-                            $(user_2).draggable({
+                            $(user_cont).draggable({
                                 //cancel: ".non_draggable",
                                 start: function (ev) {
                                     console.log("drag start");
@@ -412,11 +416,15 @@ export class Supplier{
                         else
                             status = 'published';
 
-                        $(user_2).find('img').addClass(status);
-                        if(that.profile.profile.type==='marketer')
-                            $(user_2).find('img').attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
-                        that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
-                        $('#user').on('click touchstart', (ev)=> {
+                        $(user_cont).find('img').addClass(status);
+                        if(that.profile.profile.type==='marketer') {
+                            if(that.profile.profile.avatar)
+                                $(user_cont).find('img').attr('src', that.path + '/images/' + (that.profile.profile.avatar));
+                            else
+                                $(user_cont).find('img').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
+                        }
+                        that.user_ovl = new Overlay(that.map, user_cont, that.offer.stobj);
+                        $('#user_2').on('click touchstart', (ev)=> {
                             // if(that.offer.stobj.location)
                             //     that.map.MoveToLocation(that.offer.stobj.location);
                         });
@@ -437,17 +445,21 @@ export class Supplier{
                         }
                         window.user.offer.stobj.location = coor;
                         if(!that.user_ovl) {
-                            let user_2 = $('#user_container').clone()[0];
-                            $(user_2).attr('id', 'user_2');
-                            if(that.profile.profile.type==='marketer')
-                                $(user_2).attr('src',that.path+'/images/'+ (that.profile.profile.avatar));
+                            let user_cont = $('#user_container').clone()[0];
+                            $(user_cont).find('img').attr('id', 'user_2');
+                            if(that.profile.profile.type==='marketer') {
+                                if (that.profile.profile.avatar)
+                                    $(user_cont).find('img').attr('src', that.path + '/images/' + that.profile.profile.avatar);
+                                else
+                                    $(user_cont).find('img').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
+                            }
                             let status;
                             if (!that.offer.stobj.published)
                                 status = 'unpublished';
                             else
                                 status = 'published';
-                            $(user_2).addClass(status);
-                            that.user_ovl = new Overlay(that.map, user_2, that.offer.stobj);
+                            $(user_cont).addClass(status);
+                            that.user_ovl = new Overlay(that.map, user_cont, that.offer.stobj);
                             //$('#user').css('visibility', 'hidden');
                         }
 
@@ -588,30 +600,26 @@ export class Supplier{
             categories: data.arCat,
             date:  date,
             location: proj.toLonLat(this.offer.stobj.location),
-            radius: data.offer.radius,
+            radius: data.offer?data.offer.radius:'',
             offer: urlencode.encode(JSON.stringify(menu)),
             dict: JSON.stringify(window.dict)
         };
 
         window.network.postRequest(data_obj, function (res) {
             let data = res;
-            if(data && data.err){
+            if(data && data.result.affectedRows>0){
+                alert("Опубликовано: "+res.published,null,3000);
+
+                $("#user_2").removeClass('unpublished');
+                $("#user_2").addClass('published');
+                cb(data);
+
+            }
+            if(data && data.err.includes('регистрацию')){
                 if(confirm(data.err)) {
                     //alert({text:data.err,link:data.link},'alert-warning');
                     window.location.replace(data.link);
                 }
-            }else if(data.result.affectedRows>0){
-                window.db.GetOffer(new Date(window.user.date), function (obj) {
-                    obj[0].published = res.published;
-                    window.db.SetObject('offerStore',obj[0],function (res) {
-                        if(res)
-                            cb(obj[0]);
-                    });
-                    alert("Опубликовано: "+obj[0].published,null,3000);
-                    $("#user_2").removeClass('unpublished');
-                    $("#user_2").addClass('published');
-                });
-
             }
         });
     }

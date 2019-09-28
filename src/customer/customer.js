@@ -9,6 +9,7 @@ require('jquery-ui-touch-punch');
 
 import {OrderViewer} from "../order/order.viewer";
 
+
 require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
 
 import {Dict} from '../dict/dict.js';
@@ -23,8 +24,8 @@ var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
-import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferOrder} from "./init.frame";
@@ -113,12 +114,9 @@ class Customer{
         // });
         this.DateTimePickerEvents();
 
-        window.user.map.geo.SearchLocation("Москва, ФудСити",function (bound) {
-            window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
 
-            $('#datetimepicker').trigger("dp.change");
+        $('#datetimepicker').trigger("dp.change");
 
-        });
 
         this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
@@ -209,9 +207,9 @@ class Customer{
                         }
                     }
 
-                return true;
             });
         });
+
 
     }
 
@@ -274,22 +272,16 @@ class Customer{
 
             that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-            $('.dt_val').val($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+            $('.dt_val').text($('#datetimepicker').data("DateTimePicker").date().format('LL'));
 
             $('.sel_period').find('option').css('visibility','visible');
             $('.sel_period').text('06:00 - 24:00');
 
             $(this).data("DateTimePicker").toggle();
 
-            $('#deliver_but').css('display','none');
-
-            if (ev) {
-                window.user.import.ImportDataByLocation(ev);
-            }
-
             setTimeout(()=>{
-                //TODO: that.map.MoveToLocation(that.offer.stobj.location);
-            },300);
+
+            },1000);
 
             let layers = that.map.ol_map.getLayers();
             layers.forEach(function (layer, i, layers) {
@@ -305,12 +297,10 @@ class Customer{
             $("#items_carousel").carousel('dispose');
             $('.carousel-item').remove();
 
-            let source = that.map.layers.circleLayer.getSource();
+            //let source = that.map.layers.circleLayer.getSource();
             //source.clear();
 
-             that.import.GetApprovedCustomer(function () {
-
-            });
+             that.import.GetApprovedCustomer(that.uid);
 
             //that.map.GetObjectsFromStorage();
         });
@@ -408,6 +398,7 @@ class Customer{
     };
     //layers
     OnClickDeliver(el){
+
         window.db.GetSupplier(new Date(window.user.date), el.attributes.supuid.value, function (obj) {
             if (obj !== -1) {
                 if (!window.user.viewer) {
@@ -431,13 +422,11 @@ class Customer{
                     $('#my_profile_container').css('display', 'none');
             });
         });
-        $('#my_profile_container iframe').attr('src',"./profile.customer.html");
+        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=2");
 
 
         // this.MakeDraggable($( "#my_profile_container" ));
         // $( "#my_profile_container" ).resizable({});
-
-
 
         //this.MakeDraggable($('body', $('#my_profile_container iframe').contents()));
 

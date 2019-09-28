@@ -63,5 +63,3 @@ var node = http.createServer(function(req, res) {
 });
 
 node.listen(3000);
-
-server.startConnection();

@@ -13,10 +13,7 @@ import _ol_style_Icon_ from 'ol/style/icon';
 import _ol_style_Fill_ from 'ol/style/fill';
 import Text from 'ol/style/text';
 import _ol_style_Stroke_ from 'ol/style/stroke';
-import RegularShape from 'ol/style/regularshape';
 
-import {Utils} from "../../utils/utils";
-import source from 'ol/source/source';
 import Observable from 'ol/observable';
 
 import {UtilsMap} from "../../utils/utils.map.js";
@@ -53,40 +50,58 @@ class Layers {
             map.ol_map.getLayers().push(bingMapsRoad, true);
             map.ol_map.getLayers().set("Bing", bingMapsRoad, true);
 
-            if(!that.circleLayer) {
-                that.circleLayer = new layerVector({
-                    source: new srcVector(),
-                    style: new _ol_style_Style_({
-                        fill: new _ol_style_Fill_({
-                            color: 'rgba(255, 255, 255, 0)'
-                        }),
-                        stroke: new _ol_style_Stroke_({
-                            color: 'rgba(255, 0, 0, 0.5)',
-                            width: 1
-                        })
-                    })
-                });
-            }
-            that.map.ol_map.getLayers().push(that.circleLayer);
-            that.map.ol_map.getLayers().set('radius', that.circleLayer, true);
+            // if(!that.circleLayer && window.user.profile.profile.type!=='deliver') {
+            //     this.CreateCircleLayer();
+            // }
+
+
 
             that.map.ol_map.on('moveend', function (event) {
-                let source = that.circleLayer.getSource();
+
+                that.map.GetObjectsFromStorage();
+
+                let source;
+                if(that.circleLayer) {
+                    source = that.circleLayer.getSource();
+                }else {
+                    return;
+                }
+
                 let features = source.getFeatures();
                 let utils = new UtilsMap();
+
                 for(let f in features){
                     let radius = features[f].values_.geometry.getRadius();
                     let center = features[f].values_.geometry.getCenter();
                     let map_center = that.map.ol_map.getView().getCenter();
                     let dist = //utils.getCoordsDistance( that.map.ol_map,center,event.coordinate);
                         utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
-                    if(dist*1800<=radius && features[f].values_.obj && features[f].values_.obj.uid){
-                        $('#deliver_but').css('display','block');
-                        $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar)
-                        $('#deliver_but').attr('supuid',features[f].values_.obj.uid);
-                        that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)'
+                    if(features[f].values_.obj && features[f].values_.obj.uid)
+                    if(dist*1800<=radius){
+                        if($('.deliver_but[supuid='+features[f].values_.obj.uid+']').length===0) {
+                            let incl =
+                                '<div><input type="image" class="deliver_but" ' +
+                                'src="'+that.path +"/server/images/"+features[f].values_.obj.profile.avatar+'"' +
+                                ' supuid=' +features[f].values_.obj.uid+
+                                ' style="display:block;position:relative;width:40px;"' +
+                                ' onclick="window.user.OnClickDeliver(this)"/></div>';
+                            $('#deliver_container').append(incl);
+                            // $('#deliver_but').css('display','block');
+                            // $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar);
+                        }
+
+                        if(that.circleLayer.style_.fill_)
+                            that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)';
+
+                        // if($('#deliver_but').attr('tooltip')!=='dispose')
+                        //     $('#deliver_but').tooltip('show',{title: features[f].values_.obj.profile.name, animation: true});
+
+                        setTimeout(function () {
+                            $('.deliver_but').tooltip('dispose');
+                            $('.deliver_but').attr('tooltip','dispose');
+                        }, 5000)
                     }else{
-                        $('#deliver_but').css('display','none');
+                        $('.deliver_but[supuid='+features[f].values_.obj.uid+']').parent().remove();
                         // that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
                     }
                 }
@@ -96,6 +111,16 @@ class Layers {
         } catch (ex) {
             console.log("InitLayers");
         }
+    }
+
+    CreateCircleLayer(style){
+
+        this.circleLayer = new layerVector({
+            source: new srcVector(),
+            style: style
+        });
+        this.map.ol_map.getLayers().push(this.circleLayer);
+        this.map.ol_map.getLayers().set('radius', this.circleLayer, true);
     }
 
     SetMapVisible(map) {
@@ -133,7 +158,7 @@ class Layers {
 
 
         let clusterSource = new Cluster({
-            distance: 100,//parseInt(50, 10),
+            distance: 50,//parseInt(50, 10),
             source: vectorSource
         });
         let id_str='';
@@ -181,22 +206,41 @@ class Layers {
 
                     if (!obj || parseInt(obj.status) === 0)
                         return null;
-                    let source = that.circleLayer.getSource();
+                    function stringDivider(str, width, spaceReplacer) {
+                        if (str.length > width) {
+                            var p = width;
+                            while (p > 0 && (str[p] != ' ' && str[p] != '-')) {
+                                p--;
+                            }
+                            if (p > 0) {
+                                var left;
+                                if (str.substring(p, p + 1) == '-') {
+                                    left = str.substring(0, p + 1);
+                                } else {
+                                    left = str.substring(0, p);
+                                }
+                                var right = str.substring(p + 1);
+                                return left + spaceReplacer + stringDivider(right, width, spaceReplacer);
+                            }
+                        }
+                        return str;
+                    }
+
                     let ic_clust = "./images/truck.png";
                     let scale = 1;
                     let opacity;
                     if ( obj.apprs<1)
                         opacity = 0.9;
                     else
-                        opacity = 1.0;
+                        opacity = 0.5;
                     let logo = obj.logo;
                     let zoom = that.map.ol_map.getView().getZoom();
                     scale = Math.pow(zoom,3)/30000;
                     if(obj.profile.type==='marketer'){
-                        if(zoom<15 && features.length===1)//non cluster
+                        if(zoom<12 && features.length===1)//non cluster
                             return;
                         ic_clust = obj.img;
-                        scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/30000;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),4)/600000;
                     }else if(obj.profile.type==='deliver'){
                         // if(that.map.ol_map.getView().getZoom()<15)
                         //     return;
@@ -233,24 +277,26 @@ class Layers {
                             //img: image,
                             //imgSize:
                             crossOrigin: 'anonymous',
-                            scale: scale*2, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                            anchor: [40*scale*10*2, 40*scale*10*2],
-                            anchorOrigin: 'bottom-left',
+                            scale: scale*1.5, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                            anchor: [40, 40],
+                            anchorOrigin: 'top-right',
                             offset: [0, 0],
                             anchorXUnits: 'pixel',
                             anchorYUnits: 'pixel',
                             color: [255, 255, 255, 1],
-                            opacity: opacity,
+                            opacity: 0.5,
                             src: ic_clust
                         }));
+
+                        let label  = cluster_feature.values_.features.length.toString();
                         iconStyle = new _ol_style_Style_({
                             text: new Text({
-                                text: cluster_feature.values_.features.length.toString(),
-                                font: (140*scale).toFixed(0)+'px serif',
-                                align: 'right',
+                                text: label,
+                                font: (90*scale).toFixed(0)+'px serif',
+                                textAlign: 'end',
                                 //scale: .1,
-                                offsetX: scale*10,
-                                offsetY: scale*100,
+                                offsetX:0,
+                                offsetY: -5,
                                 fill: new _ol_style_Fill_({
                                     color: 'blue'
                                 }),
@@ -265,30 +311,39 @@ class Layers {
 
                         //source.clear();
                     } else {
-
-                        iconStyle = new _ol_style_Style_({
-                            text: new Text({
-                                text: zoom>=17?obj.profile.name:'',
-                                font: (100*scale).toFixed(0)+'px serif',
-                                align: 'left',
-                                //scale: 1.5,
-                                offsetX: 0,
-                                offsetY: 0,
-                                baseline: 'bottom',
-                                fill: new _ol_style_Fill_({
-                                    color: 'gray'
-                                }),
-                                stroke: new _ol_style_Stroke_({
-                                    color: 'white',
-                                    width: 2
-                                })
-                            }),
+                        let nameAr = obj.profile.name.split(" ");
+                        let label  = nameAr.join('\n');
+                        let canvas = document.createElement('canvas');
+                        let context = canvas.getContext('2d');
+                        let width = context.measureText(label).width;
+                        iconStyle = new _ol_style_Style_(
+                            {
+                            // text: new Text({
+                            //     text: zoom>=18?label:'',
+                            //     font: (80*scale).toFixed(0)+'px serif',
+                            //     placement: 'point',
+                            //     align: 'center',
+                            //     //scale: 1.5,
+                            //     offsetX: 0,//width/2,
+                            //     offsetY: 25,
+                            //     baseline: 'bottom',
+                            //     fill: new _ol_style_Fill_({
+                            //         color: 'gray'
+                            //     }),
+                            //     stroke: new _ol_style_Stroke_({
+                            //         color: 'white',
+                            //         width: 2
+                            //     })
+                            // }),
                             image: iconItem,
                             zIndex: 20
                         });
                         try {
-                            if (obj.radius_feature)
-                                source.addFeature(obj.radius_feature);
+                            if(that.circleLayer) {
+                                let source = that.circleLayer.getSource();
+                                if (obj.radius_feature)
+                                    source.addFeature(obj.radius_feature);
+                            }
                         }catch (ex){
 
                         }

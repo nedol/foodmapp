@@ -86,7 +86,8 @@ window.InitProfileSupplier = function (user, settings) {
 
 
 export class ProfileSupplier{
-    constructor(){
+    constructor(user){
+        this.user = user;
         $('#prolong').on('input', function (ev) {
             
         });
@@ -188,7 +189,7 @@ export class ProfileSupplier{
     }
 
     InitRateSupplier(){
-
+        let that = this;
         $('input.rating').on('change', function (ev) {
             let data_obj ={
                 proj:"d2d",
@@ -196,7 +197,7 @@ export class ProfileSupplier{
                 func:"ratesup",
                 cusuid: window.parent.user.uid,
                 psw: window.parent.user.psw,
-                supuid: window.parent.user.viewer.uid,
+                supuid: that.user.supplier.uid,
                 value: $('.rating').val()
             }
             window.parent.network.postRequest(data_obj, function (data) {

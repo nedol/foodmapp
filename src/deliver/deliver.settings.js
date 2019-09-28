@@ -2,107 +2,119 @@
 
 export {DeliverSettings}
 
-require('jquery-ui')
-import {DB} from "../map/storage/db"
 
-import 'bootstrap'
-import {Network} from "../../network";
+import {DB} from "../map/storage/db";
+
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
+
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.');
+        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
         return;
     }
 
     if (document.readyState !== 'complete') {
         return;
     }
-    // parent
 
-    window.db = new DB('Deliver', function () {
-        window.ds = new DeliverSettings(window.db);
-    });
-
-    var readURL = function(input) {
-        if (input.files && input.files[0]) {
-            var reader = new FileReader();
-
-            reader.onload = function (e) {
-                $('.avatar').attr('src', e.target.result);
-                $('.avatar').siblings('input:file').attr('changed',true);
-            }
-            reader.readAsDataURL(input.files[0]);
-        }
-    }
-
-
-    $(".file-upload").on('change', function(){
-        readURL(this);
-    });
 });
 
 class DeliverSettings {
-    constructor(db){
-        this.db = db;
-        this.network = new Network(host_port);
-        this.fillForm();
-        $('.submit').on('click', this, function (ev) {
+    constructor(){
+
+        // this.network = new Network(host_port);
+        //this.fillForm();
+        $('input[type="submit"]').on('click', this, function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
             let form = $('form');
             ev.data.OnSubmit(form);
         });
+        // $('.avatar').attr('src',location.origin+'/door2door/dist/images/avatar_2x.png');
     }
 
     Open() {
         let that = this;
 
         $('input').on('change', function (ev) {
-           $(this).attr('changed', true);
+            $(this).attr('changed', true);
         });
     }
 
     OnSubmit(form){
+        var urlencode = require('urlencode');
         let that = this;
-        let k = 50/  $(form).find('.avatar').height();
-        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+        if(!$(form).find('#email').val()) {
+            $(form).find('#email').focus();
+            return;
+        }
 
-            var data_post ={
-                proj:'d2d',
-                user:"Deliver",
-                func:'confirmem',
-                host:location.origin,
-                profile: {
-                    type:'deliver',
-                    avatar:$(form).find('.avatar').attr('src'),
-                    thmb: thmb.src,
-                    lang: $('html').attr('lang'),
-                    email: urlencode.encode($(form).find('#email').val().toLowerCase()),
-                    name: $(form).find('#name').val(),
-                    address: $(form).find('#address').val(),
-                    mobile: $(form).find('#mobile').val(),
-                    promo: $(form).find('#promo').val()
+        let k = 200/  $(form).find('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+            k = 50/  $(form).find('.avatar').height();
+            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+                var data_post = {
+                    proj: 'd2d',
+                    user: "Deliver",
+                    func: 'confirmem',
+                    host: location.origin,
+                    promo: $(form).find('#promo').val(),
+                    profile: {
+                        type: 'deliver',
+                        avatar:avatar.src,
+                        thmb: thmb.src,
+                        email: $(form).find('#email').val().toLowerCase(),
+                        name: $(form).find('#name').val(),
+                        place: $(form).find('#place').val(),
+                        mobile: $(form).find('#mobile').val(),
+                        lang: $('html').attr('lang')
+                    }
                 }
-            }
 
-            this.network.postRequest(data_post, function (obj) {
-                if(obj.err || obj.code){
-                    //alert(obj.err+obj.code);
-                    return;
-                }
-                delete data_post.proj; delete data_post.func; delete data_post.email;
-                that.db.SetObject('setStore',{uid:obj.uid,psw:obj.psw,profile: data_post}, function (res) {
-                    alert('На указанный email-адрес была выслана ссылка для входа в программу');
-                    window.location.replace("../dist/deliver.html?lang="+data_post.lang);
+                $('.loader').css('display','block');
+
+                $.ajax({
+                    url: host_port,
+                    type: "POST",
+                    // contentType: 'application/x-www-form-urlencoded',
+                    crossDomain: true,
+                    data: JSON.stringify(data_post),
+                    dataType: "json",
+                    success: function (obj) {
+                        $('.loader').css('display','none');
+                        if (obj.err) {
+                            alert(obj.err);
+                            return true;
+                        }
+                        delete data_post.proj;
+                        delete data_post.func;
+                        delete data_post.profile.email;
+                        delete data_post.host;
+                        data_post.profile.avatar = obj.avatar;
+                        data_post.profile.thmb = obj.thmb;
+                        window.db = new DB('Deliver', function () {
+                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
+                                alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                            });
+                        });
+                    },
+                    error: function (xhr, status) {
+                        setTimeout(function () {
+                            that.OnSubmit(form)
+                        },1000);
+                    }
                 });
+
             });
         });
     }
 
     fillForm(){
-        this.db.GetSettings(function (data) {
+        window.db.GetSettings(function (data) {
             if(data[0])
                 for(let i in data[0].profile){
                     if(i==='avatar'){
@@ -135,7 +147,7 @@ class DeliverSettings {
                     });
                     data[0]['profile'] = profile;
                     that.db.SetObject('setStore', data[0], function (res) {
-                        
+
                     });
                 });
 
@@ -144,4 +156,54 @@ class DeliverSettings {
     }
 
 }
+
+$(document).on('readystatechange', function () {
+
+    if (!window.EventSource) {
+        alert('В этом браузере нет поддержки EventSource.');
+        return;
+    }
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+    // parent
+
+    window.cs = new DeliverSettings();
+
+
+
+    var readURL = function(input) {
+        if (input.files && input.files[0]) {
+
+        }
+    }
+
+
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
+
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
+                }
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
+            }
+        );
+
+    });
+});
 

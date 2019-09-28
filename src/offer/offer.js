@@ -1,6 +1,5 @@
 'use strict'
 export {Offer}
-import {OfferEditor} from '../supplier/offer.editor';
 import {OrderViewer} from "../order/order.viewer";
 class Offer{
 

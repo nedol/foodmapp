@@ -66,7 +66,7 @@ class Network{
         let that = this;
         let post_par = JSON.stringify(par);
         let cb_this = cb;
-
+        this.repeat = true;
         axios.post(this.host, post_par,
             {
                 crossDomain: true
@@ -74,10 +74,16 @@ class Network{
         )
             .then(function (response) {
                 cb_this(response.data);
+                that.repeat = false;
             })
             .catch(function (error) {//waiting for rem_client
                 setTimeout(function () {
-                    that.postRequest(par, cb)
+                    if(that.repeat) {
+                        that.postRequest(par, cb);
+                        that.repeat = false;
+                    }else{
+                        cb_this();
+                    }
                 },500);
                 //cb_this({err:error});
             });

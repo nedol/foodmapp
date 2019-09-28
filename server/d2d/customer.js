@@ -34,7 +34,7 @@ module.exports = class Customer extends D2D{
         // res.writeHead(200, {'Content-Type': 'application/json'});
         // res.end(JSON.stringify(sql));
         // return;
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err)
                 throw err;
             res.writeHead(200, {'Content-Type': 'application/json'});
@@ -43,7 +43,7 @@ module.exports = class Customer extends D2D{
                     let em = new Email();
                     let html = "<a href=" + q.host + "/d2d/dist/" + q.user.toLowerCase() + ".html?uid=" + q.uid + "&email=" + q.profile.email + "&lang=ru><h1>Перейдите в приложение</h1></a><p>That was easy!</p>";
 
-                    em.SendMail("nedol.infodesk@gmail.com", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
+                    em.SendMail("admin@дотудо.рф", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
 
                     });
                 }
@@ -54,7 +54,7 @@ module.exports = class Customer extends D2D{
                 let psw = shortid.generate();
 
                 sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid='"+q.uid+"', psw='"+psw+"',profile='"+JSON.stringify({email:q.profile.email})+"'";
-                global.con_obj.query(sql, function (err, result) {
+                this.mysql_con.query(sql, function (err, result) {
                     if (err) {
                         throw err;
                     }
@@ -82,7 +82,7 @@ module.exports = class Customer extends D2D{
             " FROM  customer as cus"+
             " WHERE cus.uid='"+q.uid+"' AND cus.psw='"+q.psw+"'";
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err)
                 throw err;
 
@@ -99,7 +99,7 @@ module.exports = class Customer extends D2D{
                             values = [JSON.stringify(q.profile), q.uid, q.psw];
                             sql = "UPDATE customer SET   profile=? WHERE uid=? AND psw=?";
                             setTimeout(function () {
-                                global.con_obj.query(sql, values, function (err, result) {
+                                this.mysql_con.query(sql, values, function (err, result) {
                                     if (err) {
                                         throw err;
                                     }
@@ -127,7 +127,7 @@ module.exports = class Customer extends D2D{
             " WHERE  uid='"+q.uid+"' AND psw='"+q.psw+"'";
 
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
@@ -150,7 +150,7 @@ module.exports = class Customer extends D2D{
                                 q.profile.thmb = thmb;
                                 values = [q.profile.email, JSON.stringify(q.profile), result[0].id];
                                 sql = "UPDATE  " + q.user.toLowerCase() + "  SET  email=?, profile=? WHERE id=?";
-                                global.con_obj.query(sql, values, function (err, res_upd) {
+                                this.mysql_con.query(sql, values, function (err, res_upd) {
 
                                     if (err) {
                                         res.end(JSON.stringify({err: err}));
@@ -179,7 +179,7 @@ module.exports = class Customer extends D2D{
             " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
             " ORDER BY ord.id DESC";
 
-        global.con_obj.query(sql, function (err, sel) {
+        this.mysql_con.query(sql, function (err, sel) {
             if (err) {
                 throw err;
             }
@@ -192,7 +192,7 @@ module.exports = class Customer extends D2D{
                 values = [q.cusuid, q.supuid, JSON.stringify(q.data), q.comment,q.address, q.date, q.period,now];
                 sql = 'INSERT INTO orders SET cusuid=?, supuid=?, data=?, comment=?, address=?, date=?, period=?, published=?';
             }
-            global.con_obj.query(sql, values, function (err, result) {
+            this.mysql_con.query(sql, values, function (err, result) {
                 if (err) {
                     res.end(JSON.stringify({err: err}));
                     return;
@@ -218,7 +218,7 @@ module.exports = class Customer extends D2D{
             " AND ord.date='"+q.date+"'"+
             " ORDER BY of.id DESC";
 
-        global.con_obj.query(sql, function (err, sel) {
+        this.mysql_con.query(sql, function (err, sel) {
             if (err) {
                 throw err;
             }
@@ -233,7 +233,7 @@ module.exports = class Customer extends D2D{
 
                 sql = "UPDATE orders SET status=? WHERE id=?";
             }
-            global.con_obj.query(sql, values, function (err, result) {
+            this.mysql_con.query(sql, values, function (err, result) {
                 if (err) {
                     throw err;
                 }
@@ -249,92 +249,92 @@ module.exports = class Customer extends D2D{
     }
 
 
-    GetSuppliers(q, res){
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT " +
-            " '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
-            " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
-            " of.published as published, of.deleted as deleted,"+
-            " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
-            " apprs.totals as apprs"+//общее кол-во подтверждений
-            " FROM  supplier as sup, promo, offers as of," +
-            " (" +
-            " SELECT COUNT(*) as  totals" +
-            " FROM supplier as sup, approved as appr" +
-            " WHERE appr.supuid=sup.uid" +
-            " AND appr.date='"+q.date.split('T')[0]+"'" +
-            " ) AS apprs"+
-            " WHERE sup.uid = of.supuid"+
-            " AND LCASE(sup.promo)=LCASE(promo.code)"+
-            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
-            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND (of.date='"+q.date.split('T')[0]+"' OR " +
-            " (sup.prolong=1 AND (SELECT id  FROM offers WHERE supuid LIKE sup.uid ORDER BY date DESC LIMIT 1)= of.id))" +
-            " AND of.published IS NOT NULL AND of.deleted IS NULL " +
-            " UNION" +
-            " SELECT '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
-            " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
-            " of.published as published, of.deleted as deleted,"+
-            " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
-            " apprs.totals as apprs"+//общее кол-во подтверждений" +
-            " FROM  deliver as del, offers as of," +
-            " (" +
-            " SELECT COUNT(*) as  totals" +
-            " FROM deliver as del, approved as appr" +
-            " WHERE appr.supuid=del.uid" +
-            " AND appr.date='"+q.date.split('T')[0]+"'" +
-            " ) AS apprs"+
-            " WHERE del.uid = of.supuid"+
-            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
-            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND (of.date='"+q.date.split('T')[0]+"' OR del.prolong=1)" +
-            " AND of.published IS NOT NULL AND of.deleted IS NULL";
-
-
-        // if (!res._header)
-        //     res.writeHead(200, {'Content-Type': 'application/json'});
-        // res.end(JSON.stringify(sql));
-        // return;
-        global.con_obj.query(sql, function (err, result) {
-            if (err) {
-                throw err;
-            }
-            res.writeHead(200, {'Content-Type': 'application/json'});
-
-            let now = moment().format('YYYY-MM-DD');
-            sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date='"+now+"' WHERE uid='"+q.uid+"'";
-
-            global.con_obj.query(sql, function (err, result) {
-                if (err) {
-                    throw err;
-                }
-            });
-
-            if(result.length>0) {
-                for(let i in result) {
-                    let cats = JSON.parse(result[i].cats);
-
-                    if (intersection(cats, q.categories).length > 0) {
-
-                    }else{
-                        delete result[i];
-                    }
-                }
-
-                res.write(urlencode.encode(JSON.stringify(result)));
-            }
-
-            res.end();
-        });
-    }
+//     GetSuppliers(q, res){
+//
+// //////////////////////////////////////////////////////////////////////////////////////////////////////
+//         let sql = " SELECT " +
+//             " '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
+//             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+//             " of.published as published, of.deleted as deleted,"+
+//             " sup.uid as uid, sup.dict as dict, sup.profile as profile, sup.rating as rating, " +
+//             " apprs.totals as apprs"+//общее кол-во подтверждений
+//             " FROM  supplier as sup, promo, offers as of," +
+//             " (" +
+//             " SELECT COUNT(*) as  totals" +
+//             " FROM supplier as sup, approved as appr" +
+//             " WHERE appr.supuid=sup.uid" +
+//             " AND appr.date='"+q.date.split('T')[0]+"'" +
+//             " ) AS apprs"+
+//             " WHERE sup.uid = of.supuid"+
+//             " AND LCASE(sup.promo)=LCASE(promo.code)"+
+//             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+//             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
+//             " AND (of.date='"+q.date.split('T')[0]+"' OR " +
+//             " (sup.prolong=1 AND (SELECT id  FROM offers WHERE supuid LIKE sup.uid ORDER BY date DESC LIMIT 1)= of.id))" +
+//             " AND of.published IS NOT NULL AND of.deleted IS NULL " +
+//             " UNION" +
+//             " SELECT '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
+//             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
+//             " of.published as published, of.deleted as deleted,"+
+//             " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
+//             " apprs.totals as apprs"+//общее кол-во подтверждений" +
+//             " FROM  deliver as del, offers as of," +
+//             " (" +
+//             " SELECT COUNT(*) as  totals" +
+//             " FROM deliver as del, approved as appr" +
+//             " WHERE appr.supuid=del.uid" +
+//             " AND appr.date='"+q.date.split('T')[0]+"'" +
+//             " ) AS apprs"+
+//             " WHERE del.uid = of.supuid"+
+//             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+//             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
+//             " AND (of.date='"+q.date.split('T')[0]+"' OR del.prolong=1)" +
+//             " AND of.published IS NOT NULL AND of.deleted IS NULL";
+//
+//
+//         // if (!res._header)
+//         //     res.writeHead(200, {'Content-Type': 'application/json'});
+//         // res.end(JSON.stringify(sql));
+//         // return;
+//         this.mysql_con.query(sql, function (err, result) {
+//             if (err) {
+//                 throw err;
+//             }
+//             res.writeHead(200, {'Content-Type': 'application/json'});
+//
+//             let now = moment().format('YYYY-MM-DD');
+//             sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date='"+now+"' WHERE uid='"+q.uid+"'";
+//
+//             that.mysql_con.query(sql, function (err, result) {
+//                 if (err) {
+//                     throw err;
+//                 }
+//             });
+//
+//             if(result.length>0) {
+//                 for(let i in result) {
+//                     let cats = JSON.parse(result[i].cats);
+//
+//                     if (intersection(cats, q.categories).length > 0) {
+//
+//                     }else{
+//                         delete result[i];
+//                     }
+//                 }
+//
+//                 res.write(urlencode.encode(JSON.stringify(result)));
+//             }
+//
+//             res.end();
+//         });
+//     }
 
     GetRating(q, res, cb){
         let sql = " SELECT sup.rating as rating"+
             " FROM  supplier as sup"+
             " WHERE sup.uid = '"+ q.supuid+"'";
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
@@ -355,7 +355,7 @@ module.exports = class Customer extends D2D{
             " FROM  supplier as sup"+
             " WHERE sup.uid = '"+ q.supuid+"'";
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
@@ -382,7 +382,7 @@ module.exports = class Customer extends D2D{
 
                 sql = " UPDATE   supplier  SET rating='" + JSON.stringify(rating) +"'"+
                     " WHERE supplier.uid = '" + q.supuid+"'";
-                global.con_obj.query(sql, function (err, result) {
+                this.mysql_con.query(sql, function (err, result) {
                     if (err) {
                         throw err;
                     }
@@ -409,7 +409,7 @@ module.exports = class Customer extends D2D{
             " SPLIT_STR(cus.region,',',1)<'"+q.location[1]+ "' AND SPLIT_STR(cus.region,',',2)>'"+q.location[1]+"'"+
             " AND SPLIT_STR(cus.region,',',3)<'"+q.location[0]+ "' AND SPLIT_STR(cus.region,',',4)>'"+q.location[0]+"'";
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
@@ -440,7 +440,7 @@ module.exports = class Customer extends D2D{
             " WHERE cus.uid='"+q.uid +"' AND appr.cusuid=cus.uid"+
             " AND appr.date='"+q.date+"'";
 
-        global.con_obj.query(sql, function (err, result) {
+        this.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }

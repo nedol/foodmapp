@@ -2,19 +2,19 @@
 
 import("../../lib/glyphicons/glyphicons.css");
 
-
-
 require("../../global");
 
-import 'eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
-import 'eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
+import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
+import  proj from 'ol/proj';
 
 import {Utils} from "../utils/utils";
 
 import {Network} from "../../network";
 import {DB} from "../map/storage/db";
 import {Supplier} from './supplier';
+
 
 let utils = new Utils();
 window.sets.lang = utils.getParameterByName('lang');
@@ -46,85 +46,143 @@ $(document).on('readystatechange', function () {
     initDP();
 
     window.db = new DB('Supplier', function () {
-        let uid = utils.getParameterByName('uid');
+
         window.db.GetSettings(function (set) {
             var _ = require('lodash');
-            let res = _.findKey(set, function(k) {
-                return k.uid === uid;
-            });
-            if(!res && set[0]) {
-                GoToReg();
-                return;
-            }
-            if (set[res]){
-                let uObj = {};
+            let uObj = {};
 
-                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-                uObj['set'] = set[res];
-
+            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+            if(utils.getParameterByName('psw_hash') || !set[0]){
+                toReg(function (uid, psw, data) {
+                    window.location.replace(window.location.href.split('&')[0]+'&uid='+uid);
+                })
+            }else if(set[0]) {
+                uObj['set'] = set[0];
                 // window.db.DeleteObject('setStore',uObj['set'].uid);
                 // return;
                 window.network = new Network(host_port);
 
-                if(set[res]['profile'] && !set[res]['profile'].email) {
+                window.user = new Supplier(uObj);
+                window.user.IsAuth_test(function () {
 
-                    if (utils.getParameterByName('email') &&
-                        utils.getParameterByName('uid') &&
-                        utils.getParameterByName('uid') === uObj['set'].uid) {
-                            uObj['set']['profile'].user = 'Supplier';
-                            uObj['set']['profile'].email = utils.getParameterByName('email').toLowerCase();
+                });
 
-                            window.network.RegUser(uObj['set'], function (reg) {
-                                if (!reg || reg.err) {
-                                    alert(reg.err.message);
-                                    return;
-                                }
-                                uObj.set.id = reg.id;
-                                //if(false)
-                                window.db.SetObject('setStore', uObj.set, function (res) {
-                                    window.user = new Supplier(uObj);
-                                    window.user.IsAuth_test(function (data) {//TODO:
-                                    });
-                                });
-                            });
-
-
-                    }else{
-                        window.user = new Supplier(uObj);
-                        window.user.IsAuth_test(function (data) {//TODO:
-                        });
-                    }
-
-
-                    }else {
-                        var md5 = require('md5');
-                        if(!uObj['set']['profile'].email || md5(uObj['set']['profile'].email)!==uObj['set'].uid) {
-                            window.db.DeleteObject('setStore',uObj['set'].uid);
-                            return;
-                        }
-
-                        window.user = new Supplier(uObj);
-                        window.user.IsAuth_test(function (data) {//TODO:
-
-                        })
-                }
-
-            } else {
-                GoToReg();
             }
-
         });
     });
 
-    function GoToReg() {
-        if(window.location.hostname==='localhost') {
-            window.location.replace("http://localhost:63342/d2d/dist/settings.supplier.html");
+    function toReg(cb){
+
+        let that = this;
+        let psw_hash = utils.getParameterByName('psw_hash');
+
+        var data_post = {
+            proj: 'd2d',
+            user: "Supplier",
+            func: 'reguser',
+            host: location.origin,
+            psw_hash:psw_hash,
+            profile: {
+                type: 'marketer',
+                lang: $('html').attr('lang')
+            }
         }
 
-        else if(window.location.hostname==='nedol.ru') {
-            window.location.replace("https://nedol.ru/d2d/dist/settings.supplier.html");
-        }
+
+        $.ajax({
+            url: host_port,
+            type: "POST",
+            // contentType: 'application/x-www-form-urlencoded',
+            crossDomain: true,
+            data: JSON.stringify(data_post),
+            dataType: "json",
+            success: function (obj) {
+
+                if (obj.err) {
+                    // alert('Mysql problem');
+                    setTimeout(function () {
+                        //toReg(cb)
+                    },1000);
+                    return true;
+                }
+                delete data_post.proj;
+                delete data_post.func;
+                delete data_post.host;
+                localStorage.clear();
+                let set = '';
+                if(obj.supplier && obj.supplier[0].profile){
+                    set =  {uid: obj.supplier[0].uid, psw: obj.supplier[0].psw, promo:obj.supplier[0].promo,settings:{prolong:obj.supplier[0].prolong},profile: JSON.parse(obj.supplier[0].profile)};
+
+                }else{
+                    set = {uid: obj.uid, psw: obj.psw, profile: data_post.profile};
+                }
+
+                window.db.ClearStore('setStore', function () {
+                    window.db.SetObject('setStore',set, function (res) {
+                        if(obj.supplier) {
+                            window.db.ClearStore('offerStore', function () {
+                                if (obj.supplier[0].data) {
+                                    let offer = {
+                                        date: 'tmplt',
+                                        data: JSON.parse(obj.supplier[0].data)
+
+                                    };
+
+                                    window.db.SetObject('offerStore', offer, function () {
+
+                                    });
+
+                                    offer = {
+                                        date: new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD')),
+                                        data: JSON.parse(obj.supplier[0].data),
+                                        location: proj.fromLonLat([obj.supplier[0].lon, obj.supplier[0].lat]),
+                                    };
+                                    window.db.SetObject('offerStore', offer, function () {
+
+                                    });
+                                }
+                            });
+                            window.db.ClearStore('dictStore', function () {
+                                if(obj.supplier[0].dict) {
+                                    let dict = JSON.parse(obj.supplier[0].dict).dict;
+                                    if (dict) {
+                                        recursDict(dict, Object.keys(dict), 0, set, cb);
+                                    }
+                                }else{
+                                    cb(set.uid,set.psw);
+                                }
+                            });
+                        }
+                        else {
+                            cb(set.uid);
+                        }
+                    });
+                });
+
+                function recursDict(dict, keys,i, set, cb) {
+
+                    try {
+                        window.db.SetObject('dictStore', {hash: keys[i], obj: dict[keys[i]]}, function (res) {
+                            if(dict[keys[i+1]])
+                                recursDict(dict,Object.keys(dict), i+1,set, cb);
+                            else{
+                                cb(set.uid,set.psw);
+                            }
+                        });
+                    } catch (ex) {
+                        console.log();
+                    }
+                };
+
+            },
+            error: function (xhr, status) {
+                setTimeout(function () {
+                    //toReg(cb)
+                },1000);
+            }
+        });
     }
+
 
     function initDP() {
 
@@ -147,7 +205,7 @@ $(document).on('readystatechange', function () {
             ]
         });
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-        $('.dt_val').val(date);
+        $('.dt_val').text(date);
 
         // let dt_w = $('#dtp_container').css('width');
         // let dt_h = $('#dtp_container').css('height');
@@ -179,7 +237,7 @@ $(document).on('readystatechange', function () {
 
         setTimeout(function () {
             $('#datetimepicker').trigger("dp.change");
-            $('#datetimepicker').data("DateTimePicker").toggle();
+            // $('#datetimepicker').data("DateTimePicker").toggle();
         }, 2000);
     }
 });

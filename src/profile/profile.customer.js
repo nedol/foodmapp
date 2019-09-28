@@ -90,7 +90,6 @@ class ProfileCustomer{
                 }
             }
         });
-
     }
 
     Close() {
@@ -141,7 +140,7 @@ class ProfileCustomer{
                 uid: window.parent.user.uid,
                 psw: window.parent.user.psw,
                 profile: {
-                    email: urlencode.encode($('#email').val().toLowerCase()),
+                    email: $('#email').val(),
                     avatar: $('.avatar').attr('src'),
                     thmb: thmb.src,
                     lang: $('html').attr('lang'),
@@ -151,40 +150,39 @@ class ProfileCustomer{
                 }
             }
 
+            window.parent.network.postRequest(data_post, function (res) {
 
-                window.parent.network.postRequest(data_post, function (res) {
+                delete data_post.proj;
+                delete data_post.func;
+                delete data_post.uid;
+                delete data_post.host;
+                if (!res.err) {
+                    window.parent.db.GetSettings(function (obj) {
+                        if (!obj[0])
+                            obj[0] = {};
+                        else {
+                            if ((!obj[0].profile || !obj[0].profile.email) && data_post.profile.email) {
 
-                    delete data_post.proj;
-                    delete data_post.func;
-                    delete data_post.uid;
-                    delete data_post.host;
-                    if (!res.err) {
-                        window.parent.db.GetSettings(function (obj) {
-                            if (!obj[0])
-                                obj[0] = {};
-                            else {
-                                if ((!obj[0].profile || !obj[0].profile.email) && data_post.profile.email) {
-
-                                    delete data_post.profile.email;
-                                    alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
-                                }
+                                delete data_post.profile.email;
+                                alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
                             }
+                        }
 
-                            if (res.psw)
-                                obj[0].psw = res.psw;
-                            obj[0].profile = data_post.profile;
+                        if (res.psw)
+                            obj[0].psw = res.psw;
+                        obj[0].profile = data_post.profile;
 
-                            window.parent.db.SetObject('setStore', obj[0], function (res) {
+                        window.parent.db.SetObject('setStore', obj[0], function (res) {
 
-                            });
-
-                            return true;
                         });
-                    } else {
-                        alert(res.err);
-                    }
 
-                });
+                        return true;
+                    });
+                } else {
+                    alert(res.err);
+                }
+
+            });
 
         });
 
@@ -207,39 +205,35 @@ class ProfileCustomer{
                 that.path = host_port;
             for(let i in res){
                 let order = res[i];
+                let dict;
                 $('#menu_item_tmplt').load('./customer/customer.frame.html #menu_item_tmplt', function (response, status, xhr) {
-                    let element = $(this).find('td.title');
+                    let element = $(that).find('td.title');
                     let inv_period = '', inv_qnty = '', tr_class='', tr_disabled='',tr_style = '';
                     for(let item in order.data) {
-                        let title = new Promise(function (resolve, reject) {
-                            if (res[i].supuid) {
-                                window.parent.db.GetSupplier(new Date(window.parent.user.date), res[i].supuid, function (sup) {
-                                    if (res != -1) {
-                                        let dict = new Dict(sup.dict.dict);
-                                        resolve(element,dict.getValByKey(window.parent.sets.lang,item));
-                                    }else{
-                                        resolve(element,'undefined');
-                                    }
-                                });
-                            } else {
-                                resolve(element,'undefined');
-                            }
-                        });
 
+                        if (res[i].supuid) {
+                            window.parent.db.GetSupplier(new Date(window.parent.user.date), res[i].supuid, function (sup) {
+                                if (res != -1) {
+                                    dict = new Dict(sup.dict.dict);
+                                    $('td[data-translate="'+item+'"]').text(dict.getValByKey(window.parent.sets.lang,item));
+                                    $('td.address').text(sup.profile.place);
+                                }
+                            });
+                        }
 
                         $("<tr style='text-align: center;"+tr_style+"' "+tr_disabled+">" +
                             "<td class='tablesorter-no-sort'>"+
-                            "<label  class='item_cb btn'  style='width: 4%;margin-right:20px;visibility:visible'>" +
-                            "<input type='checkbox' class='checkbox-inline approve' title='"+item+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " style='display: none'>" +
-                            "<i class='fa fa-square-o fa-2x'></i>" +
-                            "<i class='fa fa-check-square-o fa-2x'></i>" +
-                            "</label>" +
+                                "<label  class='item_cb btn'  style='width: 4%;margin-right:20px;visibility:visible'>" +
+                                "<input type='checkbox' class='checkbox-inline approve' editable='false' title='"+item+"' orderdate='"+res[i].date +"' cusuid=" + res[i].cusuid + " style='display: none'>" +
+                                "<i class='fa fa-square-o fa-2x'></i>" +
+                                "<i class='fa fa-check-square-o fa-2x'></i>" +
+                                "</label>" +
                             "</td>" +
-                            "<td class='title'></td>" +
+                            "<td class='title' data-translate="+item+"></td>" +
                             "<td "+ inv_qnty+">"  + order.data[item].qnty + "</td>" +
                             "<td>" + order.data[item].pack + "</td>" +
                             "<td class='marketer'>" + order.data[item].price + "</td>" +
-                            "<td>"+order.address+"</td>" +
+                            "<td class='address'>"+order.address+"</td>" +
                             "<td "+inv_period+">" + order.period + "</td>" +
                             "<td class='tablesorter-no-sort'>"+
                             (order.comment?"<span class='tacomment'>" + order.comment + "</span>":'') +
@@ -252,9 +246,6 @@ class ProfileCustomer{
                             "</td>" +
                             "</tr>").appendTo($('tbody'));
 
-                        title.then(function(el,value) {
-                            $(el).text(value);
-                        });
 
                         window.parent.db.GetApproved(new Date(date), window.parent.user.uid,res[i].cusuid, item,function (appr) {
                             if(appr && appr.data.qnty===res[i].data[item].qnty &&
@@ -263,12 +254,12 @@ class ProfileCustomer{
                                 $(".approve[title='" + item + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
                             }
                         });
-
-
-
                     }
                 });
             }
+
+
+
         });
     }
 
@@ -291,3 +282,10 @@ class ProfileCustomer{
 
 
 }
+
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/profile/profile.customer.js
+// module id = 774
+// module chunks = 9

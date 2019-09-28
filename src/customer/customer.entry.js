@@ -1,10 +1,9 @@
 'use strict'
 
-require('webpack-jquery-ui');
-require('webpack-jquery-ui/css');
+// require('webpack-jquery-ui');
+// require('webpack-jquery-ui/css');
 // require('jquery-ui-touch-punch');
 
-require('dialog-polyfill');
 
 require("../../global");
 
@@ -14,7 +13,7 @@ import {Network} from "../../network";
 import {DB} from "../map/storage/db"
 
 const langs = require("../dict/languages");
-var countries = require("i18n-iso-countries");
+
 
 require('bootstrap');
 require('bootstrap-select');
@@ -40,7 +39,7 @@ $(document).on('readystatechange', function () {
         options.async = true;
     });
 
-    $.fn.modal.Constructor.prototype.enforceFocus = function() {};
+    // $.fn.modal.Constructor.prototype.enforceFocus = function() {};
 
     window.sets.lang = utils.getParameterByName('lang');
 
@@ -67,10 +66,10 @@ $(document).on('readystatechange', function () {
                 "2019-02-01"
             ]
         });
-        date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-        $('.dt_val').val(date);
+        date = $('#datetimepicker').data("DateTimePicker").date().format('LL');
+        $('.dt_val').text(date);
 
-        $('#datetimepicker').data("DateTimePicker").toggle();
+        //$('#datetimepicker').data("DateTimePicker").toggle();
 
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");

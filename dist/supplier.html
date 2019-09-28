@@ -6,25 +6,26 @@
 
     <!--<meta name="description" content="360&deg; Image - A-Frame">-->
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Продавец</title>
 </head>
 
 <!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <link rel="stylesheet" href="../lib/style.css">
 <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
+
 <script src="../lib/DragDropTouch.js"></script>
 
+<script type="text/javascript" src="./supplier.js"></script>
 <script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 
@@ -132,7 +133,6 @@
         right: 0px;
         padding: 0px;
         overflow-y: scroll;
-        overflow-x: hidden;
         z-index:10;
     }
 
@@ -161,6 +161,15 @@
         visibility: hidden;
         width: 40px;
         height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #user_2{
+        display: block;
+        visibility: hidden;
+        width: 60px;
+        height: 60px;
         border-radius: 5px;
         background-color: rgba(200,200,200,0.7);
     }
@@ -268,56 +277,36 @@
 </style>
 
 <div id="main_window" class="container">
-    <div class="row">
-        <div class="col-xm-4 col-sm-4"></div>
-        <div class="form-group  col-xm-8 col-sm-8" style="position:absolute;width:200px;right:0px;z-index: 10;">
-            <div class='input-group date'   style="width:auto;" >
-                <input type='text' readonly onfocus="return false;" class="dt_val form-control" value="Дата"/>
-            </div>
+    <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
+
+        <div class="d-inline-block">
+            <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: medium"></div>
         </div>
     </div>
-
+    <style>
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:65%;
+            top:15%;
+            z-index: 11;
+        }
+    </style>
     <div id="dtp_container" class="center-block scaled">
         <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
     </div>
 
 </div>
 
-<div id="category_include" style="">
-    <style>
-        .category{
-            margin-left: 50px;
-            margin-right: 50px;
-            /*padding-left: 10px;*/
-            /*padding-right: 10px;*/
-            height: 40px;
-            /*width: 120px;*/
-        }
-
-        .category:hover{
-            /*height: 50px;*/
-            /*width: 50px;*/
-        }
-
-        #categories{
-            position: absolute;
-            overflow-x: scroll;
-            -webkit-overflow-scrolling: touch;
-            bottom:0px;
-            width:100%;
-            height: auto;
-            padding-top: 5px;
-            background-color: rgba(0, 140, 201, 1.0);
-            white-space: nowrap;
-            z-index:100;
-        }
-    </style>
+<div id="category_include">
 
     <div id="category_container">
 
     </div>
 
 </div>
+
 <div>
     <div id="supplier_frame_container"
          style="display:none;
@@ -336,7 +325,7 @@
     </div>
 
     <iframe id="supplier_frame"
-            src="./supplier/supplier.frame.html"
+            src="./supplier/supplier.frame.html?v=8"
             style="
                 display: none;
                 position:absolute;
@@ -456,15 +445,29 @@
         #supplier_frame_container{
             max-width: 30%;
         }
+        #user_2{
+            display: block;
+            visibility: hidden;
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            background-color: rgba(200,200,200,0.7);
+        }
     }
     @media screen and (min-width: 1600px) {
         #supplier_frame_container{
             max-width: 20%;
         }
+        #user_2{
+            display: block;
+            visibility: hidden;
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            background-color: rgba(200,200,200,0.7);
+        }
     }
 </style>
 </body>
-
-<script type="text/javascript" src="./supplier.js"></script>
 
 </html>

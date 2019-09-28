@@ -60,7 +60,8 @@ class MapEvents{
             if (event) {
                 if (window.user.constructor.name === 'Supplier')
                     return;
-                window.user.import.ImportDataByLocation(event);
+                if(window.sets.coords.cur[0]!==0 && window.sets.coords.cur[1]!==0)
+                    window.user.import.ImportDataByLocation(event);
             }
 
         });

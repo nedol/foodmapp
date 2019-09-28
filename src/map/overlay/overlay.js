@@ -4,7 +4,8 @@ import {Utils} from "../../utils/utils";
 
 //import {User} from "../menu/user";
 import _ol_Overlay_  from "ol/overlay";
-import proj from 'ol/proj';
+import layerVector from 'ol/layer/vector';
+import srcVector from 'ol/source/vector';
 import Collection from 'ol/collection';
 
 import Feature from 'ol/feature';
@@ -13,6 +14,10 @@ import Modify from 'ol/interaction/modify';
 import Draw from 'ol/interaction/draw';
 import Snap from 'ol/interaction/snap';
 import Circle from 'ol/geom/circle';
+
+import _ol_style_Style_ from 'ol/style/style';
+import _ol_style_Fill_ from 'ol/style/fill';
+import _ol_style_Stroke_ from 'ol/style/stroke';
 
 let utils = new Utils();
 
@@ -57,8 +62,9 @@ class Overlay {
             positioning: 'center-center',//'bottom-right',//'top-left',//'bottom-left',
             offset: [0,0]
         });
+
         if(window.user.profile.profile.type==='deliver')
-            this.CreateCircle(offer);
+           this.CreateCircle(offer);
 
         element.ovl = this.overlay;
 
@@ -95,12 +101,18 @@ class Overlay {
 
         });
 
+        setTimeout(function () {
+            //$(element).trigger('dblclick');
+        },1500);
+
+
         $(element).doubleTap(function (el) {
             if(window.user.profile.profile.type==='deliver')
                 window.user.editor.OpenOffer();
             else
                 window.user.editor.InitSupplierOffer();
-        })
+        });
+
 
         this.map.ol_map.getView().on('change:resolution', function (ev) {
 
@@ -159,7 +171,24 @@ class Overlay {
 
     CreateCircle(offer) {
         let that = this;
-        let layer = window.user.map.layers.circleLayer;
+        let layer;
+        if(window.user.map.layers.circleLayer) {
+            layer = window.user.map.layers.circleLayer;
+        }else{
+            let style =  new _ol_style_Style_({
+                fill: new _ol_style_Fill_({
+                    color: 'rgba(255, 255, 255, .5)'
+                }),
+                stroke: new _ol_style_Stroke_({
+                    color: 'rgba(255, 0, 0, 1)',
+                    width: 1
+                })
+            });
+
+            window.user.map.layers.CreateCircleLayer(style);
+            layer = window.user.map.layers.circleLayer;
+        }
+
         var source = layer.getSource();
 
         var radiusFeature = new Feature({

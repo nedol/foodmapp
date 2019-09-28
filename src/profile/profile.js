@@ -4,7 +4,7 @@ export {Profile};
 require('jquery-ui')
 // require('jquery-ui-touch-punch');
 require('jquery.ui.touch');
-require('bootstrap');
+
 
 class Profile{
 
@@ -19,7 +19,6 @@ class Profile{
         let browser =  $('#profile_container').find('.browser');
         $('#profile_container').css('display','block');
         browser.draggable();
-        browser.attr('src', './profile.supplier.html');
 
         browser.off();
         browser.on('load', function () {
@@ -77,6 +76,7 @@ class Profile{
                 $('#profile_container').css('display','none');
             });
         });
+        browser.attr('src', './profile.supplier.html');
     }
     //Deliver
     InitDeliverProfile(){
@@ -85,8 +85,6 @@ class Profile{
         let browser =  $('#profile_container').find('.browser');
         $('#profile_container').css('display','block');
         browser.draggable();
-
-        browser.attr('src', './profile.deliver.html');
 
         browser.off();
         browser.on('load', function () {
@@ -134,6 +132,9 @@ class Profile{
                 browser.css('display', 'none');
             });
         });
+
+        browser.attr('src', './profile.deliver.html');
+
     }
     //Customer
     LoadSupplierProfile(that, ovc, rating){

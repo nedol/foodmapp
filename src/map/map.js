@@ -1,6 +1,9 @@
 'use strict'
 export {OLMap};
 
+import {Utils} from "../utils/utils";
+let utils = new Utils();
+
 import map from 'ol/map';
 import View from 'ol/view';
 import TileLayer from 'ol/layer/tile';
@@ -14,10 +17,10 @@ import DeviceOrientation from 'ol/deviceorientation';
 
 import proj from 'ol/proj';
 import Draw from 'ol/interaction/draw';
-import Style from 'ol/style/style';
-import styleFill from 'ol/style/fill';
-import Text from 'ol/style/text';
-import styleStroke from 'ol/style/stroke';
+import _ol_style_Style_ from 'ol/style/style';
+import _ol_style_Fill_ from 'ol/style/fill';
+import _ol_style_Stroke_ from 'ol/style/stroke';
+
 import Circle from 'ol/geom/circle';
 import Collection from 'ol/collection';
 import Feature from 'ol/feature';
@@ -29,7 +32,7 @@ import {DB} from './storage/db';
 import {Layers} from './layers/layers';
 import {Events} from './events/events';
 
-
+import {OfferOrder} from "../customer/init.frame";
 import {Marker} from "./marker/marker";
 import {Dict} from '../dict/dict.js';
 
@@ -45,8 +48,8 @@ class OLMap {
         if(host_port.includes('nedol.ru'))
             this.path = host_port;
 
-        this.lat_param = '55.739';//getParameterByName('lat');
-        this.lon_param = '37.687';//getParameterByName('lon');
+        this.lat_param = '55.6';//getParameterByName('lat');
+        this.lon_param = '37.47';//getParameterByName('lon');
         this.zoom_param = '15';//getParameterByName('zoom');
 
         var projection = new Projection({
@@ -63,6 +66,7 @@ class OLMap {
         });
 
         this.osm = new OSM();
+        
         if (!this.ol_map) {
             this.ol_map = new map({
                 layers: [
@@ -94,8 +98,10 @@ class OLMap {
 
         this.animate = new Animate(this);
 
-        $('#category_container').load('./html/categories/food.html?v=1 #cat_incl',()=> {
+        $('#category_container').load('./html/categories/food.html?v=4 #cat_incl',()=> {
             this.categories = new Categories(this);
+            if($('.category[state="1"]').length===0)
+                $('[data-toggle="tooltip"]').tooltip("show");
         });
         this.layers = new Layers(this);
         this.feature = new Feature(this);
@@ -162,7 +168,7 @@ class OLMap {
 
             if (!localStorage.getItem("cur_loc")) {
 
-                let coor = proj.fromLonLat([parseFloat('37.460546'), parseFloat('55.669308')])
+                let coor = proj.fromLonLat([parseFloat('37.47'), parseFloat('55.6')])
 
                 localStorage.setItem("cur_loc", "{\"lon\":" + coor[0] + "," +
                     "\"lat\":" + coor[1] + ", \"time\":" + time + "}");
@@ -176,6 +182,12 @@ class OLMap {
                 window.sets.coords.cur = [parseFloat(c.lon), parseFloat(c.lat)];
             else
                 return;
+
+            if(utils.getParameterByName('lat')){
+                let lat = utils.getParameterByName('lat');
+                let lon = utils.getParameterByName('lon');
+                window.sets.coords.cur = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+            }
 
             that.ol_map.getView().animate({
                 center: window.sets.coords.cur,
@@ -196,8 +208,11 @@ class OLMap {
     GetObjectsFromStorage(area) {
         let that = this;
         let period = $('.sel_period').text().split(' - ');
+
         function setFeatures(objs) {
+
             for (let o in objs) {
+                //alert(JSON.stringify(objs[o]));
                 if(objs[o].deleted)
                     continue;
                 var markerFeature = new Feature({
@@ -212,12 +227,15 @@ class OLMap {
                 markerFeature.setId(objs[o].uid);
 
                 let c = 0;
+
                 for(let tab in objs[o].data) {
 
-                    let cat = $(".category[title=" +tab + "][state=1]").attr('id');//features[f].values_.categories[c++];
+                    let cat = $(".category[cat=" +tab + "][state=1]").attr('id');//features[f].values_.categories[c++];
 
-                    if (!cat || !objs[o].profile)
+                    if (!cat || !objs[o].profile) {
+
                         continue;
+                    }
 
                     let layer = that.ol_map.getLayers().get(cat + "_" + objs[o].profile.type);
                     if (!layer) {
@@ -226,14 +244,16 @@ class OLMap {
 
                     let source = layer.values_.vector;
 
-                    if (objs[o].uid === window.user.uid)
+                    if (objs[o].uid === window.user.uid) {
+
                         continue;
+                    }
+
                     if (!source.getFeatureById(markerFeature.getId())) {
 
                         source.addFeature(markerFeature);
 
-
-                        if (objs[o].profile.type === 'marketer') {
+                        if (objs[o].profile.type.toLowerCase() === 'marketer') {
                             objs[o].img = "./images/ic_" + cat + ".png";
                             let clusterSource = new Cluster({
                                 distance: 150,
@@ -244,47 +264,14 @@ class OLMap {
 
                             $("#items_carousel").on('slide.bs.carousel', function (ev) {
                                 let tab = $(ev.relatedTarget).attr('tab');
-                                if($(".category[state='1'][title="+tab+"]").length===0) {
+                                if($(".category[state='1'][cat="+tab+"]").length===0) {
                                     $(ev.relatedTarget).remove();
                                     $(this).carousel('next');
                                 }
                             });
 
-                            window.db.GetSupplier(window.user.date,objs[o].uid, function (obj) {
-                                let supplier = obj;
-                                let dict = new Dict(supplier.dict.dict);
+                        }else if(objs[o].profile.type.toLowerCase() === 'deliver'){
 
-                                for (let tab in objs[o].data) {
-                                    if($(".category[state='1'][title="+tab+"]").length===0)
-                                        continue;
-                                    for (let i in objs[o].data[tab]) {
-                                        let item = objs[o].data[tab][i];
-                                        let src = that.path + "/images/" + item.img.src;
-
-                                        let active = '';
-                                        if (!$('.carousel-inner').find('.active')[0])
-                                            active = 'active';
-                                        let title = dict.getValByKey(window.sets.lang,item.title);
-                                        let html = '<div class="carousel-item ' + active + '" title="'+item.title+'" tab="'+tab+'" supuid="'+objs[o].uid+'" onclick="window.user.map.OnItemClick(this)">' +
-                                            '<h1 class="carousel_title carousel-caption d-md-block">'+title+'</h1>'+
-                                            '<img class="d-block w-100" src=' + src + ' alt="slide"  style="position:absolute;width:100%;height: 100%">' +
-                                            '<h1 class="carousel_price carousel-caption d-block">'+Object.values(item.packlist)[0]+'р'+'/'+Object.keys(item.packlist)[0]+'</h1>'+
-                                            '</div>';
-                                        $('.carousel-inner').append(html);
-                                    }
-
-                                    if (that.carousel_interval)
-                                        clearInterval(that.carousel_interval);
-                                    that.carousel_interval= setInterval(function () {
-                                        if($('.carousel-item').length>0) {
-                                            $("#items_carousel").carousel();
-                                            $('#items_carousel').carousel('next');
-                                        }
-                                    }, 3000);
-                                }
-                            });
-
-                        }else if(objs[o].profile.type === 'deliver'){
                             objs[o].img = objs[o].profile.thmb;
                             let clusterSource = new Cluster({
                                 distance: 150,
@@ -292,18 +279,35 @@ class OLMap {
                             });
                             layer.setSource(clusterSource);
 
+                            let style =  new _ol_style_Style_({
+                                // fill: new _ol_style_Fill_({
+                                //     color: 'rgba(255, 255, 255, 0)'
+                                // }),
+                                stroke: new _ol_style_Stroke_({
+                                    color: 'rgba(255, 0, 0, 1)',
+                                    width: 1
+                                })
+                            });
+
+                            if(!that.layers.circleLayer){
+                                that.layers.CreateCircleLayer(style);
+                            }
+
                             let circle_source = that.layers.circleLayer.getSource();
 
-                            let radiusFeature='';
-                            if(objs[o].radius_feature) {
+                            let radiusFeature = '';
+                            if (objs[o].radius_feature) {
                                 radiusFeature = objs[o].radius_feature;
-                            }else {
+                            } else {
+
                                 radiusFeature = new Feature({
                                     geometry: new Circle(proj.fromLonLat([objs[o].longitude, objs[o].latitude]), objs[o].radius),
                                     //name: cursor.value.title ? cursor.value.title : "",
                                     //tooltip: cursor.value.title ? cursor.value.title : "",
-                                    obj:objs[o]
+                                    obj: objs[o]
                                 });
+
+                                radiusFeature.setId(objs[o].uid);
 
                                 objs[o].radius_feature = radiusFeature;
 
@@ -313,40 +317,67 @@ class OLMap {
                                     geometryName: 'circle',
                                     source: source,
                                     type: 'Circle',
-                                    features: col
+                                    features: col,
+                                    style: style
                                 });
-                                circle_source.clear();
-                                circle_source.addFeature(radiusFeature);
+                                if (!circle_source.getFeatureById(objs[o].uid))
+                                    circle_source.addFeature(radiusFeature);
                             }
                         }
-
-                    }else{
-                        //source.getFeatureById(markerFeature.getId()).changed();
                     }
                 }
 
             }
         }
+
         if(area) {
-            window.db.GetRangeSupplier(window.user.date,
-                parseFloat(area[0]), parseFloat(area[2]), parseFloat(area[1]), parseFloat(area[3]), function (features) {
-                if(features.length===0){
-                    $("#items_carousel").carousel('dispose');
-                    $('.carousel-item').remove();
-                    let layers = that.ol_map.getLayers();
-                    for(let l in layers.array_) {
-                        let layer = layers.array_[l];
-                        if (layer.type === "VECTOR" && layer!==that.layers.circleLayer) {
-                            if (layer.getSource())
-                                layer.getSource().clear(true);
-                            if (layer.getSource().source) {
-                                layer.getSource().source.clear(true);
+            setTimeout(function () {
+                window.db.GetRangeSupplier(window.user.date,
+                    parseFloat(area[0]), parseFloat(area[2]), parseFloat(area[1]), parseFloat(area[3]), function (features) {
+                        if(features.length===0){
+                            let layers = that.ol_map.getLayers();
+                            for(let l in layers.array_) {
+                                let layer = layers.array_[l];
+                                if (layer.type === "VECTOR" && layer!==that.layers.circleLayer) {
+                                    if (layer.getSource())
+                                        layer.getSource().clear(true);
+                                    if (layer.getSource().source) {
+                                        layer.getSource().source.clear(true);
+                                    }
+                                }
+                            }
+                            $('.carousel-inner').empty();
+
+                        }else {
+                            setFeatures(features);
+
+                            $("#items_carousel").carousel('dispose');
+                            $('.carousel-item:not(.active)').remove();
+                            let active = $('.carousel-item.active');
+                            setTimeout(function () {
+                                active.remove();
+                            }, 3000);
+
+                            for (let f in features) {
+                                if (features[f].profile.type === 'deliver')
+                                    continue;
+                                that.Carousel(features[f],features.length);
                             }
                         }
-                    }
-                }else
-                    setFeatures(features);
+
+                    });
+            },100);
+
+
+            //delivers
+
+            window.db.GetAllSuppliers(window.user.date,function (features) {
+
+                var delivers = _.remove(features, function(f) {
+                    return f.profile.type==='deliver';
                 });
+                setFeatures(delivers);
+            })
         }else {
             window.db.GetAllSuppliers(window.user.date,function (features) {
                 setFeatures(features);
@@ -354,13 +385,94 @@ class OLMap {
         }
     }
 
+    Carousel(obj){
+        let that = this;
+        let diff =  new Date().getTime() - new Date(obj.published).getTime();
+        var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+        days =  days  - 7;
+        if(days>=0)//просрочен
+            return;
+
+        let supplier = obj;
+        let dict = new Dict(supplier.dict.dict);
+        $("#items_carousel").carousel();
+
+        let cat_cnt=0;
+        for (let tab in obj.data) {
+
+            if ($(".category[state='1'][cat=" + tab + "]").length === 0)
+                continue;
+            cat_cnt++;
+        }
+
+        for (let tab in obj.data) {
+
+            if($(".category[state='1'][cat="+tab+"]").length===0)
+                continue;
+
+            for (let i in obj.data[tab]) {
+
+                let item = obj.data[tab][i];
+                if($(".carousel-item[title="+item.title+"]").length>0)
+                    continue;
+
+                let car_numb = 1;
+                car_numb = Math.ceil(obj.data[tab].length/cat_cnt)>0?Math.ceil(obj.data[tab].length/cat_cnt):1;
+                //ограничение кол-ва позиций карусели в зав-ти от кол-ва выбранных элементов
+                // if($(".carousel-item[supuid="+obj.uid+"]").length>=car_numb)
+                //     continue;
+
+                let src = '';
+                if(!item.img.src.includes('http'))
+                    src = that.path + "/images/" + item.img.src
+                else
+                    src = item.img.src;
+
+                let active = '';
+                if (!$('.carousel-inner').find('.active')[0])
+                    active = 'active';
+                let title = dict.getValByKey(window.sets.lang,item.title);
+                let html = '<div class="carousel-item ' + active + '" title="'+item.title+'" tab="'+tab+'" supuid="'+obj.uid+'" onclick="window.user.map.OnItemClick(this)">' +
+                    '<h1 class="carousel_title carousel-caption d-md-block">'+title+'</h1>'+
+                    '<img class="d-block w-100" src=' + src + ' alt="slide"  style="position:absolute;width:100%;">' +
+                    '<h1 class="carousel_price carousel-caption d-block">'+Object.values(item.packlist)[0]+' &#x20bd;'+'</h1>'+
+                    '</div>';
+
+                    if($('.carousel-item').length===0)
+                        $('.carousel-inner').append(html);
+                    else
+                        $($('.carousel-item')[i-1]).after(html);
+
+            }
+
+            $('#items_carousel').carousel('next');
+
+            if (that.carousel_interval)
+                clearInterval(that.carousel_interval);
+            that.carousel_interval= setInterval(function () {
+                if($('.carousel-item').length>0) {
+
+                    $('#items_carousel').carousel('next');
+                }
+            }, 3000);
+        }
+    }
+
     OnItemClick(el){
         let that = this;
+        this.geo.StopLocation();
         window.db.GetSupplier(window.user.date,$(el).attr('supuid'), function (obj) {
             that.ol_map.getView().animate({
                 center: proj.fromLonLat([obj.longitude,obj.latitude]),
-                zoom: 19,
+                zoom: 20,
                 duration: window.sets.animate_duration * 2
+            },function (ev) {
+                if (window.user.constructor.name === 'Customer') {
+                    if (!window.user.viewer) {
+                        window.user.viewer = new OfferOrder();
+                    }
+                    window.user.viewer.InitCustomerOrder(obj);
+                }
             });
         });
     }
@@ -387,14 +499,13 @@ class OLMap {
         let that = this;
         that.ol_map.getView().animate({
             center: location,
-            zoom: that.zoom_param ? that.zoom_param : 15,
             duration: window.sets.animate_duration * 2,
 
         }, function () {
             //$("#marker").trigger("change:cur_pos", [window.sets.coords.cur, "Event"]);
             let latlon = proj.toLonLat(location);
             $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
-            $("#zoom_but").text(that.zoom_param ? that.zoom_param : 15);
+
         });
     }
 

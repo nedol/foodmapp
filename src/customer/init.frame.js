@@ -8,7 +8,6 @@ require('webpack-jquery-ui/draggable');
 require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
 
-require('bootstrap');
 
 // require('bootstrap/dist/css/bootstrap.css');
 // require('font-awesome/css/font-awesome.css');
@@ -38,7 +37,7 @@ class OfferOrder {
 
         this.ord_frame.addTouch();
 
-        this.ord_frame.find('.modal-title-date').text($('.dt_val')[0].value.split(' ')[0]);
+        this.ord_frame.find('.modal-title-date').text($('.dt_val').text());
 
         this.ord_frame.find('.publish_order').off('click touchstart');
         this.ord_frame.find('.publish_order').on('click touchstart',this,function (ev) {

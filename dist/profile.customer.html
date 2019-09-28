@@ -115,25 +115,21 @@
         </ul>
     </div>
     <div class="bootstrap snippet" style="padding: 5px">
-        <div class="row">
-            <div class="col-sm-10"><h1>Мой профиль</h1></div>
-            <div class="col-sm-2">
-            </div>
-            <div style="display: block; position:absolute; right: 10px; top:10px; font-size:xx-large">
-                <span class="close_browser  fa fa-share-square-o"></span>
-            </div>
+        <div style="display: block; position:absolute; right: 10px; top:10px; font-size:xx-large;z-index:100">
+            <span class="close_browser  fa fa-share-square-o"></span>
         </div>
 
 
         <div class="row">
             <div class="col-sm-12">
                 <ul class="nav nav-tabs">
-                    <li class="nav-item active"><a  class="nav-link" data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Общедоступная информация</a></li>
-                    <li class="nav-item"><a class="nav-link" data-toggle="tab" href="#orders" data-translate="1c4a264d42009a94b0a83aa4076810d9">Мои заказы</a></li>
+                    <li class="nav-item  active"><a class="nav-link" data-toggle="tab" href="#orders" data-translate="1c4a264d42009a94b0a83aa4076810d9">Моя корзина</a></li>
+                    <li class="nav-item"><a  class="nav-link" data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Мой профиль</a></li>
+
                 </ul>
 
                 <div class="tab-content">
-                    <div class="tab-pane active" id="profile">
+                    <div class="tab-pane fade" id="profile">
                         <div class="row">
                             <div class="col-sm-3 text-center">
                                 <img class="avatar img-circle img-thumbnail" src="https://nedol.ru/d2d/dist/images/avatar_2x.png" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
@@ -197,9 +193,9 @@
 
                     </style>
                     <!--Мои заказы-->
-                    <div class="tab-pane fade" id="orders">
+                    <div class="tab-pane active" id="orders">
                         <!--<div class="ord_container"></div>-->
-                        <div  class="orders  table-responsive">
+                        <div  class="orders  table-responsive" style="-webkit-overflow-scrolling: auto;">
                             <table class="table tablesorter">
                                 <thead style="color:#f3f3f3;background-color: #5a5a5a;">
                                 <tr>
@@ -207,10 +203,10 @@
                                         <span class="fa fa-handshake-o"   style="text-align: center" data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
                                     </th>
                                     <th>
-                                        <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                        <span class="fa fa-square-o"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
                                     </th>
                                     <th>
-                                        <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                                        <span class="fa fa-columns"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
                                     </th>
                                     <th>
                                         <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>

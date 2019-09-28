@@ -42,6 +42,11 @@ class Import {
                     let uid = window.user.uid;
                     that.LoadSupplierData(uid, cats, area, function (res) {
                         that.areasAr.push(date+"_"+cats +  "_" +  area);
+
+                        let extent = that.map.ol_map.getView().calculateExtent();
+                        let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                        that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
+
                     });
                 }
                 let extent = that.map.ol_map.getView().calculateExtent();
@@ -80,7 +85,7 @@ class Import {
             window.network.postRequest(data_obj, function (data) {
                 if(data) {
                     processResult(data);
-                    that.map.GetObjectsFromStorage(area);
+                    //that.map.GetObjectsFromStorage(area);
                 }
 
             });
@@ -92,6 +97,7 @@ class Import {
         function processResult(res) {
             try {
                 res = JSON.parse(urlencode.decode(res));
+
                 if (res) {
                     cb(true);
                     for (let i in res) {
@@ -99,6 +105,7 @@ class Import {
                         if(!obj || !obj.profile)
                             continue;
                         obj = formatObject(obj);
+
                         if(obj.uid ===window.user.uid && obj.date===window.user.date){
 
                             if(!Object.keys(window.user.offer.stobj.data)[0] && obj) {
@@ -164,7 +171,8 @@ class Import {
         };
 
         window.network.postRequest(data_obj, function (data) {
-            if(data) {
+
+            if(data){
                 processResult(data);
             }
 
@@ -181,6 +189,7 @@ class Import {
                         obj.date = new Date(obj.date);
                         obj.date.setHours(3);
                         obj.dict = obj.dict?JSON.parse(obj.dict):obj.dict;
+                        obj.cus_profile =  obj.cus_profile?JSON.parse(obj.cus_profile):obj.cus_profile;
                         obj.logo =  "../dist/images/user.png";
                         if(obj.data)
                             obj.data = JSON.parse(obj.data);
@@ -206,7 +215,7 @@ class Import {
             user: window.user.constructor.name.toLowerCase(),
             func: "getapproved",
             uid: window.user.uid,
-            supuid:supuid,
+            supuid:'0c69c928179e2eac917acfbe88ec1946',
             date: date
         };
 
