@@ -275,6 +275,23 @@ class DeliverOffer{
 
                     $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
 
+                    if (that.offer[tab][i].brand){
+                        $(menu_item).find('.brand').css('visibility', 'visible');
+                        let src = '';
+                        if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
+                            src = that.offer[tab][i].brand.logo;
+                        else {
+                            src = that.path+'/images/' + that.offer[tab][i].brand.logo;
+                        }
+
+                        $(menu_item).find('.brand').on('dragend', function () {
+                            $(this).remove();
+                        });
+
+                        src = src.replace('http://localhost:63342', '..');
+                        $(menu_item).find('.brand_img').attr('src', src);
+                    }
+
                     let pl = that.offer[tab][i].packlist;
                     $(menu_item).find('.pack_list').empty();
                     for (let l in pl) {
@@ -607,8 +624,8 @@ class DeliverOffer{
                 $(this).focus();
             });
 
-            $("#editor").find('.publish_offer_ctrl').off('click touchstart');
-            $("#editor").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
+            $("#editor_pane").find('.publish_offer_ctrl').off('click touchstart');
+            $("#editor_pane").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
                 window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], date, ev.data, function (obj) {
 
                 });
@@ -923,7 +940,7 @@ class DeliverOffer{
         if ($(menu_item).find('.item_content').css('display') == 'block')
             $(menu_item).find('.item_content').slideToggle("fast");
 
-        $(tmplt).insertAfter('#editor');
+        $(tmplt).insertAfter('#editor_pane');
 
         window.parent.dict.set_lang(window.parent.sets.lang, $(menu_item));
 
@@ -1127,7 +1144,7 @@ class DeliverOffer{
 
         $('.item_title').trigger('click');
 
-        $('#editor').find('.div_tab_inserted').each((index, val)=> {
+        $('#editor_pane').find('.div_tab_inserted').each((index, val)=> {
 
             $(val).addClass('active');
             let tab = $(val).attr('id');

@@ -76,12 +76,12 @@ module.exports = class Deliver extends D2D{
                 $('#profile_container').css('display', 'none');
             });
         });
-        this.MakeDraggable($( "#profile_container" ));
+        this.MakeDraggableCarousel($( "#profile_container" ));
         $( "#profile_container" ).resizable({});
 
 
 
-        //this.MakeDraggable($('body', $('#profile_container iframe').contents()));
+        //this.MakeDraggableCarousel($('body', $('#profile_container iframe').contents()));
 
     }
 

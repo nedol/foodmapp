@@ -22,7 +22,7 @@ import Extent from 'ol/extent';
 
 var urlencode = require('urlencode');
 
-var ColorHash = require('color-hash');
+// var ColorHash = require('color-hash');
 
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
@@ -38,7 +38,6 @@ window.TriggerEvent = function (el, ev) {
 
 
 
-
 class Customer{
 
     constructor(uObj) {
@@ -48,77 +47,63 @@ class Customer{
         this.uid = uObj.uid;
         this.psw = uObj.psw;
         this.email = '';//!!! no need to registrate
-        if(uObj['profile'] && uObj['profile'].email)
+        if (uObj['profile'] && uObj['profile'].email)
             this.email = uObj['profile'].email;
         this.profile = new Profile(uObj.profile);
-        this.map = new OLMap();
 
-        this.import = new Import(this.map);
+        this.orders = '';
 
     }
 
     IsAuth_test(cb){
         let that = this;
 
-        this.map.Init();
+        console.log(navigator.userAgent);
 
-        window.network.InitSSE(this,function () {
-
-        });
-
-        $.getJSON('../src/dict/sys.dict.json', function (data) {
-            window.sysdict = new Dict(data);
-            window.sysdict.set_lang(window.sets.lang, $('body'));
-            window.sysdict.set_lang(window.sets.lang, $('#categories'));
-
-            window.db.GetStorage('dictStore', function (rows) {
-                window.dict = new Dict(rows);
-            });
-            cb();
-        });
-
-        $( "#period_list" ).selectable({
-            stop: function() {
-                var result;
-                $( ".ui-selected", this ).each(function(i) {
-                    let index = $( "#period_list li" ).index( this );
-                    if(i===0)
-                    result = $($( "#period_list li")[index]).text().split(' - ')[0];
-                    if($( ".ui-selected").length===i+1)
-                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
-                });
-                $('.sel_period').text(result);
-
+        if(!this.profile.profile.email && !this.profile.profile.mobile) {
+            window.user.OnClickUserProfile('profile', () => {
+                this.map = new OLMap();
+                this.map.Init();
+                this.import = new Import(this.map);
+                that.import.GetApprovedCustomer(that.uid);
                 let layers = that.map.ol_map.getLayers();
                 layers.forEach(function (layer, i, layers) {
-                    if(layer.constructor.name==="_ol_layer_Vector_") {
-                        layer.getSource().refresh();
+                    if (layer.type === "VECTOR") {
+                        if (layer.getSource())
+                            layer.getSource().clear(true);
+                        if (layer.getSource().source) {
+                            layer.getSource().source.clear(true);
+                        }
                     }
                 });
-                //not offer but selected period store
-                window.db.SetObject('offerStore',{date:that.date,period:result},function (res) {
 
+                this.map.ol_map.on('click', function (event) {
+                    onMapClick(event);
                 });
-            }
-        });
+            });
 
-        //class_obj.menu.menuObj = JSON.parse(data.menu);
-        //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
-        // window.db.GetOffer(this.date,function (res) {
-        //     if(res){
-        //         $('.sel_period').text(res.period);
-        //     }else{
-        //         let time = $($('.period_list li')[0]).text();
-        //         $('.sel_period').text(time);
-        //     }
-        // });
-        this.DateTimePickerEvents();
+        }else{
+            this.map = new OLMap();
+            this.map.Init();
+            this.import = new Import(this.map);
+            let layers = that.map.ol_map.getLayers();
+            layers.forEach(function (layer, i, layers) {
+                if (layer.type === "VECTOR") {
+                    if (layer.getSource())
+                        layer.getSource().clear(true);
+                    if (layer.getSource().source) {
+                        layer.getSource().source.clear(true);
+                    }
+                }
+            });
+            this.import.GetApprovedCustomer(that.uid);
+            this.map.ol_map.on('click', function (event) {
+                onMapClick(event);
+            });
+        }
 
+        function onMapClick(event) {
 
-        $('#datetimepicker').trigger("dp.change");
-
-
-        this.map.ol_map.on('click', function (event) {
             if (!event.loc_mode) {
                 that.map.geo.StopLocation();
                 window.user.isShare_loc = false;
@@ -145,7 +130,7 @@ class Customer{
 
             if (!event.loc_mode && $('#categories').is(':visible'))
                 $('#categories').slideToggle('slow', function () {
-
+                    $('.dropdown-menu').removeClass('show');
                 });
             if (!event.loc_mode && $('.sup_menu').is(':visible')) {
                 $('.sup_menu').animate({'width': 'toggle'});
@@ -208,7 +193,62 @@ class Customer{
                     }
 
             });
+
+        }
+
+        this.MakeDraggableCarousel($('#items_carousel')[0]);
+
+        $('#items_carousel').on('click touchstart', function (ev) {
+            setTimeout(function () {
+                if($('.carousel-item.active').attr('drag')!=='true')
+                    that.map.OnItemClick($('.carousel-item.active')[0]);
+            },150);
         });
+
+        window.network.InitSSE(this,function () {
+
+        });
+
+        $.getJSON('../src/dict/sys.dict.json', function (data) {
+            window.sysdict = new Dict(data);
+            window.sysdict.set_lang(window.sets.lang, $('body'));
+            window.sysdict.set_lang(window.sets.lang, $('#categories'));
+
+            window.db.GetStorage('dictStore', function (rows) {
+                window.dict = new Dict(rows);
+            });
+            cb();
+        });
+
+        $( "#period_list" ).selectable({
+            stop: function() {
+                var result;
+                $( ".ui-selected", this ).each(function(i) {
+                    let index = $( "#period_list li" ).index( this );
+                    if(i===0)
+                    result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    if($( ".ui-selected").length===i+1)
+                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                });
+                $('.sel_period').text(result);
+
+                let layers = that.map.ol_map.getLayers();
+                layers.forEach(function (layer, i, layers) {
+                    if(layer.constructor.name==="_ol_layer_Vector_") {
+                        layer.getSource().refresh();
+                    }
+                });
+                //not offer but selected period store
+                window.db.SetObject('offerStore',{date:that.date,period:result},function (res) {
+
+                });
+            }
+        });
+
+        this.DateTimePickerEvents();
+
+
+        $('#datetimepicker').trigger("dp.change");
 
 
     }
@@ -279,30 +319,14 @@ class Customer{
 
             $(this).data("DateTimePicker").toggle();
 
-            setTimeout(()=>{
+            that.import.GetApprovedCustomer(that.uid);
 
-            },1000);
+            that.SetOrdCnt();
 
-            let layers = that.map.ol_map.getLayers();
-            layers.forEach(function (layer, i, layers) {
-                if (layer.type === "VECTOR") {
-                    if (layer.getSource())
-                        layer.getSource().clear(true);
-                    if (layer.getSource().source) {
-                        layer.getSource().source.clear(true);
-                    }
-                }
-            });
 
             $("#items_carousel").carousel('dispose');
             $('.carousel-item').remove();
 
-            //let source = that.map.layers.circleLayer.getSource();
-            //source.clear();
-
-             that.import.GetApprovedCustomer(that.uid);
-
-            //that.map.GetObjectsFromStorage();
         });
     }
 
@@ -325,14 +349,12 @@ class Customer{
         });
     }
 
-    PickRegion(){
-        // alert($('.input_address').text());
-    }
 
     UpdateOrderLocal(obj){
+        let that = this;
         obj.date = new Date(obj.date);
         window.db.SetObject('orderStore',obj,(res)=>{
-
+            that.SetOrdCnt();
         });
 
         this.viewer.order = obj.data;
@@ -378,24 +400,40 @@ class Customer{
         let that = this;
 
         obj.proj = "d2d";
-        obj.user = window.user.constructor.name.toLowerCase(),
-            obj.func = "updateorder";
+        obj.user = window.user.constructor.name.toLowerCase();
+        obj.func = "updateorder";
         obj.psw = that.psw;
         obj.cusuid = that.uid;
         obj.supuid = obj.supuid;
 
         window.network.postRequest(obj, function (data) {
-            if (data.published) {
-                if (data.published) {
-                    cb(data);
-                    obj.proj = '';
-                    obj.func = '';
-                    obj.published = data.published;
-                    that.UpdateOrderLocal(obj);
-                }
+            if (data && data.published) {
+                obj.proj = '';
+                obj.func = '';
+                obj.published = data.published;
+                cb(obj);
             }
         });
     };
+
+    DeleteOrder(date,title,cb){
+        let that = this;
+
+        let obj = {};
+        obj.proj = "d2d";
+        obj.user = window.user.constructor.name.toLowerCase();
+        obj.func = "deleteorder";
+        obj.psw = that.psw;
+        obj.cusuid = that.uid;
+        obj.date = moment(date).format('YYYY-MM-DD');
+        obj.order = title;
+
+        window.network.postRequest(obj, function (data) {
+            if (data.result.affectedRows>0) {
+                cb(data);
+            }
+        });
+    }
     //layers
     OnClickDeliver(el){
 
@@ -410,47 +448,59 @@ class Customer{
     }
 
 
-    OnClickUserProfile(li){
+    OnClickUserProfile(tab, cb){
 
         $('#my_profile_container').css('display','block');
         $('#my_profile_container iframe').on('load',function () {
             $('#my_profile_container iframe').off();
             $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
 
+            $('.tab-pane', $('#my_profile_container iframe').contents()).removeClass('active');
+            $('.tab-pane', $('#my_profile_container iframe').contents()).addClass('fade');
+
+            $('#' + tab, $('#my_profile_container iframe').contents()).addClass('active');
+            $('#' + tab, $('#my_profile_container iframe').contents()).removeClass('fade');
+
+            $('#' + tab, $('#my_profile_container iframe').contents()).trigger('click touchstart');
+
             $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
                 if($('#my_profile_container iframe')[0].contentWindow.profile_cus.Close())
                     $('#my_profile_container').css('display', 'none');
+                if(cb)
+                    cb();
             });
         });
-        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=2");
-
-
-        // this.MakeDraggable($( "#my_profile_container" ));
-        // $( "#my_profile_container" ).resizable({});
-
-        //this.MakeDraggable($('body', $('#my_profile_container iframe').contents()));
+        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=6");
 
     }
 
-    // MakeDraggable(el){
-    //     $(el).draggable({
-    //         start: function (ev) {
-    //             console.log("drag start");
-    //
-    //         },
-    //         drag: function (ev) {
-    //             //$(el).attr('drag', true);
-    //
-    //         },
-    //         stop: function (ev) {
-    //
-    //             // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
-    //             // $(el).css('right', rel_x + '%');
-    //             // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
-    //             // $(el).css('bottom', rel_y + '%');
-    //         }
-    //     });
-    // }
+    MakeDraggableCarousel(el){
+        let that = this;
+
+        $(el).draggable(
+            //{ distance: 40},
+            { delay: 100},
+            {start: function (ev) {
+                console.log("drag start");
+                $('.carousel-item.active').attr('drag','true');
+            },
+            drag: function (ev) {
+
+            },
+            stop: function (ev) {
+
+                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
+                // $(el).css('right', rel_x + '%');
+                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
+                // $(el).css('bottom', rel_y + '%');
+                $('.carousel-item.active').attr('drag','false');
+
+            }
+        });
+        $( ".ui-draggable" ).disableSelection();
+    }
 
     OnMessage(data){
         let that = this;
@@ -525,6 +575,24 @@ class Customer{
             });
         }
     }
+
+    SetOrdCnt() {
+        window.db.GetCusOrders(window.user.date,(res)=> {
+            this.orders = res;
+            let cnt = 0;
+            $('.ord_cnt').text(cnt);
+            for(let i in res){
+                let order = res[i];
+                for(let item in order.data) {
+                    if(order.data[item]) {
+                        $('.ord_cnt').text(++cnt);
+                    }
+                }
+            }
+        });
+    }
+
+
 }
 
 

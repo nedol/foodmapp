@@ -58,7 +58,12 @@ class Layers {
 
             that.map.ol_map.on('moveend', function (event) {
 
-                that.map.GetObjectsFromStorage();
+
+                let extent = that.map.ol_map.getView().calculateExtent();
+                let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                if(isNaN(tr_ext[1]) || isNaN(tr_ext[3]) || isNaN(tr_ext[0]) || isNaN(tr_ext[2]))
+                    return;
+                that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
 
                 let source;
                 if(that.circleLayer) {
@@ -176,8 +181,8 @@ class Layers {
                 if (cluster_feature.values_ || (features && features.length > 0)){
 
                     $.each(features,  (key, feature)=> {
-                        if(feature.getId()===id_str)
-                            return;
+                        // if(feature.getId()===id_str)
+                        //     return;
                         id_str = feature.getId();
                         setTimeout(function () {
                             id_str = '';
@@ -228,12 +233,19 @@ class Layers {
 
                     let ic_clust = "./images/truck.png";
                     let scale = 1;
-                    let opacity;
-                    if ( obj.apprs<1)
-                        opacity = 0.9;
-                    else
-                        opacity = 0.5;
+                    let opacity = 1;
+                    // if ( obj.apprs<1)
+                    //     opacity = 0.9;
+                    // else
+                    //     opacity = 0.5;
                     let logo = obj.logo;
+
+                    let diff = new Date().getTime() - new Date(obj.published).getTime();
+                    var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+                    if (days >= 7)//просрочен
+                        obj.delayed = true;
+
                     let zoom = that.map.ol_map.getView().getZoom();
                     scale = Math.pow(zoom,3)/30000;
                     if(obj.profile.type==='marketer'){
@@ -241,6 +253,7 @@ class Layers {
                             return;
                         ic_clust = obj.img;
                         scale = Math.pow(that.map.ol_map.getView().getZoom(),4)/600000;
+
                     }else if(obj.profile.type==='deliver'){
                         // if(that.map.ol_map.getView().getZoom()<15)
                         //     return;
@@ -249,21 +262,29 @@ class Layers {
                         opacity = 0;
                     }
 
-                    let thmb = window.location.origin +"/d2d/server/images/"+obj.profile.avatar;
-                    if(host_port.includes('nedol.ru/server'))
-                        thmb = host_port +"/images/"+obj.profile.avatar;
+                    if(days>=7) {
+                        opacity /= days-7;
+                    }
+                    if(days>30){
+                        opacity = 0.3;
+                    }
+
+                        let thmb = window.location.origin +"/d2d/server/images/"+obj.profile.avatar;
+                        if(host_port.includes('nedol.ru/server'))
+                            thmb = host_port +"/images/"+obj.profile.avatar;
+
 
                         let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
                         //size: [100,100],
                         //img: image,
                         //imgSize:
-                        scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [70, 70],
+                        scale: obj.delayed?scale/1.5:scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                        anchor: [100, 100],
                         anchorOrigin: 'bottom-left',
                         offset: [0, 0],
                         anchorXUnits: 'pixel',
                         anchorYUnits: 'pixel',
-                        color: [255, 255, 255, 1],
+                        color: obj.delayed?[200, 200, 200]:[255, 255, 255],
                         opacity: opacity,
                         src: obj.profile.avatar?thmb: "./images/user.png",
                         crossOrigin: 'anonymous'
@@ -277,7 +298,7 @@ class Layers {
                             //img: image,
                             //imgSize:
                             crossOrigin: 'anonymous',
-                            scale: scale*1.5, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                            scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
                             anchor: [40, 40],
                             anchorOrigin: 'top-right',
                             offset: [0, 0],

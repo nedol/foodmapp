@@ -42,27 +42,28 @@ class OLMap {
     constructor() {
         //let full_screen = new ol.control.FullScreen();
         //full_screen.setTarget('full_screen');
-        window.sets.app_mode = 'd2d'
+        window.sets.app_mode = 'd2d';
 
         this.path  ="http://localhost:63342/d2d/server";
         if(host_port.includes('nedol.ru'))
             this.path = host_port;
 
-        this.lat_param = '55.6';//getParameterByName('lat');
-        this.lon_param = '37.47';//getParameterByName('lon');
-        this.zoom_param = '15';//getParameterByName('zoom');
+        this.lat_param = utils.getParameterByName('lat');
+        this.lon_param = utils.getParameterByName('lon');
+        this.zoom_param = utils.getParameterByName('zoom');
 
         var projection = new Projection({
             code: 'EPSG:3857',//'EPSG:4326', //
             units: 'm'
         });
 
+
         let view =new View({
             center: proj.fromLonLat([this.lon_param, this.lat_param]),
             //rotation: Math.PI / 5,
             // extent: proj.get("EPSG:3857").getExtent(),
-            //projection:projection,
-            zoom: 15
+            projection:projection,
+            zoom: 17
         });
 
         this.osm = new OSM();
@@ -92,18 +93,22 @@ class OLMap {
 
         }
 
+        this.mapEvents();
 
         this.marker = new Marker( this, document.getElementById('marker'));
         this.geo = new Geo(this);
 
         this.animate = new Animate(this);
 
-        $('#category_container').load('./html/categories/food.html?v=4 #cat_incl',()=> {
+        $('#category_container').load('./html/categories/food.html?v=12 #cat_incl',()=> {
             this.categories = new Categories(this);
-            if($('.category[state="1"]').length===0)
-                $('[data-toggle="tooltip"]').tooltip("show");
+
         });
-        this.layers = new Layers(this);
+
+        setTimeout(()=> {
+            this.layers = new Layers(this);
+        },100);
+
         this.feature = new Feature(this);
 
         var rotateMap = false;
@@ -132,7 +137,6 @@ class OLMap {
             // // }));
         });
         deviceOrientation.setTracking(true);
-
     }
 
     Init() {
@@ -204,10 +208,10 @@ class OLMap {
         }, 300);
     }
 
-
     GetObjectsFromStorage(area) {
         let that = this;
         let period = $('.sel_period').text().split(' - ');
+        $('.cat_cnt').text('0');
 
         function setFeatures(objs) {
 
@@ -256,7 +260,7 @@ class OLMap {
                         if (objs[o].profile.type.toLowerCase() === 'marketer') {
                             objs[o].img = "./images/ic_" + cat + ".png";
                             let clusterSource = new Cluster({
-                                distance: 150,
+                                distance: 20,
                                 source: source
                             });
 
@@ -279,16 +283,22 @@ class OLMap {
                             });
                             layer.setSource(clusterSource);
 
+                            let ColorHash = require('color-hash');
+                            var colorHash = new ColorHash();
+                            let clr = colorHash.rgb(objs[o].uid);
+
                             let style =  new _ol_style_Style_({
                                 // fill: new _ol_style_Fill_({
                                 //     color: 'rgba(255, 255, 255, 0)'
                                 // }),
                                 stroke: new _ol_style_Stroke_({
-                                    color: 'rgba(255, 0, 0, 1)',
+                                    color: clr,
                                     width: 1
                                 })
                             });
 
+                            if(window.user.constructor.name==="Deliver")
+                                return;
                             if(!that.layers.circleLayer){
                                 that.layers.CreateCircleLayer(style);
                             }
@@ -331,6 +341,7 @@ class OLMap {
         }
 
         if(area) {
+
             setTimeout(function () {
                 window.db.GetRangeSupplier(window.user.date,
                     parseFloat(area[0]), parseFloat(area[2]), parseFloat(area[1]), parseFloat(area[3]), function (features) {
@@ -350,19 +361,7 @@ class OLMap {
 
                         }else {
                             setFeatures(features);
-
-                            $("#items_carousel").carousel('dispose');
-                            $('.carousel-item:not(.active)').remove();
-                            let active = $('.carousel-item.active');
-                            setTimeout(function () {
-                                active.remove();
-                            }, 3000);
-
-                            for (let f in features) {
-                                if (features[f].profile.type === 'deliver')
-                                    continue;
-                                that.Carousel(features[f],features.length);
-                            }
+                            that.Carousel(features);
                         }
 
                     });
@@ -385,77 +384,106 @@ class OLMap {
         }
     }
 
-    Carousel(obj){
+    Carousel(features){
+
         let that = this;
-        let diff =  new Date().getTime() - new Date(obj.published).getTime();
-        var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        days =  days  - 7;
-        if(days>=0)//просрочен
-            return;
 
-        let supplier = obj;
-        let dict = new Dict(supplier.dict.dict);
-        $("#items_carousel").carousel();
+        $('#items_carousel').carousel('dispose');
+        $('.carousel-item').remove();
 
-        let cat_cnt=0;
-        for (let tab in obj.data) {
 
-            if ($(".category[state='1'][cat=" + tab + "]").length === 0)
+        for (let f in features) {
+
+            if (!features[f] || features[f].profile.type === 'deliver') {
+                delete features[f];
                 continue;
-            cat_cnt++;
-        }
-
-        for (let tab in obj.data) {
-
-            if($(".category[state='1'][cat="+tab+"]").length===0)
-                continue;
-
-            for (let i in obj.data[tab]) {
-
-                let item = obj.data[tab][i];
-                if($(".carousel-item[title="+item.title+"]").length>0)
-                    continue;
-
-                let car_numb = 1;
-                car_numb = Math.ceil(obj.data[tab].length/cat_cnt)>0?Math.ceil(obj.data[tab].length/cat_cnt):1;
-                //ограничение кол-ва позиций карусели в зав-ти от кол-ва выбранных элементов
-                // if($(".carousel-item[supuid="+obj.uid+"]").length>=car_numb)
-                //     continue;
-
-                let src = '';
-                if(!item.img.src.includes('http'))
-                    src = that.path + "/images/" + item.img.src
-                else
-                    src = item.img.src;
-
-                let active = '';
-                if (!$('.carousel-inner').find('.active')[0])
-                    active = 'active';
-                let title = dict.getValByKey(window.sets.lang,item.title);
-                let html = '<div class="carousel-item ' + active + '" title="'+item.title+'" tab="'+tab+'" supuid="'+obj.uid+'" onclick="window.user.map.OnItemClick(this)">' +
-                    '<h1 class="carousel_title carousel-caption d-md-block">'+title+'</h1>'+
-                    '<img class="d-block w-100" src=' + src + ' alt="slide"  style="position:absolute;width:100%;">' +
-                    '<h1 class="carousel_price carousel-caption d-block">'+Object.values(item.packlist)[0]+' &#x20bd;'+'</h1>'+
-                    '</div>';
-
-                    if($('.carousel-item').length===0)
-                        $('.carousel-inner').append(html);
-                    else
-                        $($('.carousel-item')[i-1]).after(html);
-
             }
 
-            $('#items_carousel').carousel('next');
-
-            if (that.carousel_interval)
-                clearInterval(that.carousel_interval);
-            that.carousel_interval= setInterval(function () {
-                if($('.carousel-item').length>0) {
-
-                    $('#items_carousel').carousel('next');
-                }
-            }, 3000);
+            let diff = new Date().getTime() - new Date(features[f].published).getTime();
+            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
+            days = days - 7;
+            if (days >= 0)//просрочен
+                features[f].delayed = true;
         }
+
+        let cat_cnt_1 = 0, main_cnt = 0;
+        for (let f in features) {
+
+            for (let tab in features[f].data) {
+                if ($(".category[cat=" + tab + "]").length > 0) {
+
+                    let cat_cnt = $('input[cat="'+tab+'"]').parent().find('.cat_cnt').text()
+                    $('input[cat="'+tab+'"]').parent().find('.cat_cnt').text(parseInt(cat_cnt)+1)
+
+                    main_cnt  = parseInt($($('input[cat="'+tab+'"]').closest('.dropdown-menu').siblings().find('.cat_cnt')[0]).text());
+                    $($('input[cat="'+tab+'"]').closest('.dropdown-menu').siblings().find('.cat_cnt')[0]).text(main_cnt+1);
+                }
+                if ($(".category[state='1'][cat=" + tab + "]").length === 0)
+                    continue;
+
+                cat_cnt_1++;
+            }
+
+            if(features[f].delayed === true)
+                continue;
+
+            let supplier = features[f];
+            let dict = new Dict(supplier.dict.dict);
+
+            for (let tab in features[f].data) {
+
+                if ($(".category[state='1'][cat=" + tab + "]").length === 0)
+                    continue;
+
+                for (let i in features[f].data[tab]) {
+                    i = parseInt(i);
+                    let item = features[f].data[tab][i];
+                    if ($(".carousel-item[title=" + item.title + "]").length > 0)
+                        continue;
+
+                    let car_numb = 1;
+                    car_numb = Math.ceil(features[f].data[tab].length / cat_cnt_1) > 0 ? Math.ceil(features[f].data[tab].length / cat_cnt_1) : 1;
+                    //ограничение кол-ва позиций карусели в зав-ти от кол-ва выбранных элементов
+                    // if($(".carousel-item[supuid="+obj.uid+"]").length>=car_numb)
+                    //     continue;
+
+                    let src = '';
+                    if (!item.img.src.includes('http'))
+                        src = that.path + "/images/" + item.img.src
+                    else
+                        src = item.img.src;
+
+                    let active = '';
+                    if (!$('.carousel-inner').find('.active')[0])
+                        active = 'active';
+                    let title = dict.getValByKey(window.sets.lang, item.title);
+                    let html = '<div class="carousel-item ' + active + ' " title="' + item.title + '" tab="' + tab + '" supuid="' + features[f].uid + '">' +
+                        '<h1 class="carousel_title carousel-caption">' + title + '</h1>' +
+                        '<img class="carousel_img" src=' + src + ' alt="slide">' +
+                        '<h1 class="carousel_price carousel-caption">' + Object.values(item.packlist)[0] + ' &#x20bd;' + '</h1>' +
+                        '</div>';
+
+                    if (i == 0 && $('.carousel-item').length > 0)
+                        $($('.carousel-item')[0]).after(html);
+                    else
+                        $('.carousel-inner').append(html);
+
+                }
+            }
+        }
+
+
+        if (that.carousel_interval)
+            clearInterval(that.carousel_interval);
+
+        let dir = Math.floor(Math.random() * 10)>5?'next':'prev';
+
+        that.carousel_interval= setInterval(function () {
+            if($('.carousel-item').length>0) {
+                $('#items_carousel').carousel(dir);
+            }
+        }, 3000);
+
     }
 
     OnItemClick(el){
@@ -471,10 +499,11 @@ class OLMap {
                     if (!window.user.viewer) {
                         window.user.viewer = new OfferOrder();
                     }
-                    window.user.viewer.InitCustomerOrder(obj);
+                    window.user.viewer.InitCustomerOrder(obj, $(el).attr('title'));
                 }
             });
         });
+
     }
 
     SetMarkersArExt(cat, jsAr) {
@@ -503,8 +532,15 @@ class OLMap {
 
         }, function () {
             //$("#marker").trigger("change:cur_pos", [window.sets.coords.cur, "Event"]);
-            let latlon = proj.toLonLat(location);
-            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
+            if(location) {
+                let latlon = proj.toLonLat(location);
+                $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
+            }
+
+            if(!window.sets.loc_mode && window.user.constructor==='Supplier')
+                window.user.editor.InitSupplierOffer();
+
+            $('#loc_ctrl[data-toggle="tooltip"]').tooltip("dispose");
 
         });
     }
@@ -526,6 +562,50 @@ class OLMap {
 
     SetFeatureGeometry(feature, loc){
         feature.setGeometry( new Point(loc));
+    }
+
+    mapEvents(){
+
+        let that= this;
+        this.ol_map.on('movestart', function (event) {
+            //this.dispatchEvent('click');
+
+        });
+
+        this.ol_map.on('moveend', function (event) {
+
+            if (event) {
+                if (window.user.constructor.name === 'Supplier')
+                    return;
+                if(window.sets.coords.cur[0]!==0 && window.sets.coords.cur[1]!==0) {
+                    if(window.user.import)
+                        window.user.import.ImportDataByLocation(event);
+
+                }
+            }
+        });
+
+        this.ol_map.getView().on('change:resolution', function (event) {
+
+            var zoom = parseInt(that.ol_map.getView().getZoom()).toString();
+
+            $("#zoom_but").text(zoom);
+            if (zoom >= 14)
+                $("#zoom_but").css('color', 'blue');
+            else
+                $("#zoom_but").css('color', 'black');
+
+            var bounce = that.ol_map.getView().calculateExtent(that.ol_map.getSize());
+        });
+
+        this.ol_map.on('pointerdrag', function (event) {
+            $("#marker").trigger("change:cur_pos", ["Custom", event]);
+            try {
+                that.coord.cur = event.target.focus_;
+            } catch (ex) {
+
+            }
+        });
     }
 
 }

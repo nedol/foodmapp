@@ -29,6 +29,7 @@ import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferEditor} from "./init.offer.frame";
 
+
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
@@ -89,7 +90,7 @@ export class Supplier{
         if(uObj) {
             this.offer = new Offer(this.date, uObj);
             this.offer.GetOfferDB(this.date,function () {
-                
+
             });
             this.editor = new OfferEditor();//offer editor
 
@@ -111,6 +112,7 @@ export class Supplier{
         }
 
     }
+
 
     IsAuth_test(cb){
         let that = this;
@@ -142,9 +144,6 @@ export class Supplier{
                 }
             });
         }
-
-
-        //this.GetWeekOffers();
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
@@ -178,7 +177,7 @@ export class Supplier{
 
             if (!event.loc_mode && $('#categories').is(':visible'))
                 $('#categories').slideToggle('slow', function () {
-
+                    $('.dropdown-menu').removeClass('show');
                 });
             if (!event.loc_mode && $('.sup_menu').is(':visible')) {
                 $('.sup_menu').animate({'width': 'toggle'});
@@ -187,7 +186,6 @@ export class Supplier{
             if (!event.loc_mode && $('#menu_items').is(':visible'))
                 $('#menu_items').slideToggle('slow', function () {
                 });
-
 
 
             that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
@@ -308,7 +306,7 @@ export class Supplier{
 
             that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-            $('.dt_val').val($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+            $('.dt_val').text($('#datetimepicker').data("DateTimePicker").date().format('LL'));
 
             $('.sel_period').find('option').css('visibility','visible');
 
@@ -385,8 +383,10 @@ export class Supplier{
                         $(user_cont).find('img').longTap(function (el) {
                             $(user_cont).removeClass('non_draggable');
                         });
-                        if(false)
-                            $(user_cont).draggable({
+                        if(true)
+                            $(user_cont).draggable(
+                                {delay:100},
+                                {
                                 //cancel: ".non_draggable",
                                 start: function (ev) {
                                     console.log("drag start");
@@ -429,8 +429,13 @@ export class Supplier{
                             //     that.map.MoveToLocation(that.offer.stobj.location);
                         });
 
+                        $('#user').on('click touchstart', (ev)=> {
+                            // that.OnClickSupplierOrders();
+                        });
+
                         setTimeout(()=>{
-                            that.map.MoveToLocation(that.offer.stobj.location);
+                            if(that.offer.stobj.location)
+                                that.map.MoveToLocation(that.offer.stobj.location);
                         },300);
                     }
 
@@ -533,6 +538,22 @@ export class Supplier{
 
     }
 
+    OnClickSupplierOrders(li){
+
+        $('#my_profile_container').css('display','block');
+        $('#my_profile_container iframe').on('load',function () {
+            $('#my_profile_container iframe').off();
+            $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
+
+            $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
+                if($('#my_profile_container iframe')[0].contentWindow.profile_cus.Close())
+                    $('#my_profile_container').css('display', 'none');
+            });
+        });
+        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=2");
+
+    }
+
     UpdateOfferLocal(offer0,offer, location, dict){
 
         let uObj = Object.assign(this.offer.stobj);
@@ -585,43 +606,48 @@ export class Supplier{
     PublishOffer(menu, date, data, cb){
 
         let that = this;
-        if(!this.offer.stobj.location || location.length===0){
+        if(window.user.constructor.name==="Customer" && (!this.offer.stobj.location || location.length===0)){
             this.PickRegion();
             return;
         }
+        try {
+            let data_obj = {
+                proj: 'd2d',
+                user: window.user.constructor.name.toLowerCase(),
+                func: 'updateoffer',
+                host: window.location.origin,
+                uid: that.uid,
+                psw: that.psw,
+                categories: data.arCat,
+                date: date,
+                location: proj.toLonLat(this.offer.stobj.location),
+                radius: data.offer ? data.offer.radius : '',
+                offer: urlencode.encode(JSON.stringify(menu)),
+                dict: JSON.stringify(window.dict)
+            };
 
-        let data_obj = {
-            proj: 'd2d',
-            user: window.user.constructor.name.toLowerCase(),
-            func: 'updateoffer',
-            host:window.location.origin,
-            uid: that.uid,
-            psw: that.psw,
-            categories: data.arCat,
-            date:  date,
-            location: proj.toLonLat(this.offer.stobj.location),
-            radius: data.offer?data.offer.radius:'',
-            offer: urlencode.encode(JSON.stringify(menu)),
-            dict: JSON.stringify(window.dict)
-        };
+            window.network.postRequest(data_obj, function (res) {
+                let data = res;
+                if (data && data.result.affectedRows > 0) {
+                    alert("Опубликовано: " + res.published, null, 3000);
 
-        window.network.postRequest(data_obj, function (res) {
-            let data = res;
-            if(data && data.result.affectedRows>0){
-                alert("Опубликовано: "+res.published,null,3000);
+                    $("#user_2").removeClass('unpublished');
+                    $("#user_2").addClass('published');
+                    cb(data);
 
-                $("#user_2").removeClass('unpublished');
-                $("#user_2").addClass('published');
-                cb(data);
-
-            }
-            if(data && data.err.includes('регистрацию')){
-                if(confirm(data.err)) {
-                    //alert({text:data.err,link:data.link},'alert-warning');
-                    window.location.replace(data.link);
                 }
-            }
-        });
+                if (data && data.err.includes('регистрацию')) {
+                    if (confirm(data.err)) {
+                        //alert({text:data.err,link:data.link},'alert-warning');
+                        window.location.replace(data.link);
+                    }
+                }
+                return;
+            });
+
+        }catch(ex){
+            cb();
+        }
     }
 
     PickRegion(){
@@ -668,7 +694,6 @@ export class Supplier{
         });
     }
 
-
     SendLocation(loc){
 
         if (this.isShare_loc) {
@@ -694,6 +719,8 @@ export class Supplier{
             }
         }
     }
+
+
 
     OnMessage(data){
         if(data.func ==='ordered'){//TODO:

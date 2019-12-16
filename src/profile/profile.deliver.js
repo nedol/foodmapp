@@ -71,14 +71,16 @@ class ProfileDeliver{
                     supuid:obj.uid
                 }
                 window.parent.network.postRequest(par, function (data) {
-                    usersArray = [
-                        {
-                            id: 1,
-                            fullname: "Current User",
-                            email: "current.user@viima.com",
-                            profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
-                        }];
-                    success(data);
+                    if(data && data.length >0) {
+                        usersArray = [
+                            {
+                                id: 1,
+                                fullname: "Current User",
+                                email: "current.user@viima.com",
+                                profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
+                            }];
+                        success(data);
+                    }
                 })
             },
             postComment: function(data, success, error) {
@@ -196,6 +198,8 @@ class ProfileDeliver{
 
 
         function uploadProfile(that,avatar,cb) {
+
+            return;
 
             let data_post = '';
             data_post = {

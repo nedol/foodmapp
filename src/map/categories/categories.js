@@ -1,6 +1,8 @@
 export {Categories};
 
 import {Utils} from "../../utils/utils";
+import proj from 'ol/proj';
+import Extent from 'ol/extent';
 
 let utils = new Utils();
 
@@ -32,15 +34,23 @@ class Categories {
         let inputs = $(".main_category");
 
         $(inputs).attr('state', 0);
-        $(inputs).css('opacity',0.4);
+        $(inputs).css('opacity',0.3);
 
         let catAr = [];
         let state_cat = localStorage.getItem("state_category");
+
+        let arCatPar = [];
+        try {
+            arCatPar = JSON.parse(utils.getParameterByName('cat'));
+        }catch(ex){
+
+        }
+
         inputs = $(".category");
         if (state_cat) {
             catAr = JSON.parse(state_cat);
             $(inputs).attr('state', 0);
-            $(inputs).css('opacity', 0.4);
+            $(inputs).css('opacity', 0.3);
         } else {
             localStorage.setItem("state_category", JSON.stringify(catAr));
         }
@@ -49,10 +59,16 @@ class Categories {
             if(obj[0])
                 for(let item in obj[0].data){
                     $('[cat="'+item+'"]').attr('state','1').css('opacity', '1');
+                    $('[cat="'+item+'"]').parents('.dropup').find('.main_category').attr('state', 1);
+                    $('[cat="'+item+'"]').parents('.dropup').find('.main_category').css('opacity', 1);
                 }
+
+            if($('.category[state="1"]').length===0)
+                $('#categories[data-toggle="tooltip"]').tooltip("show");
+
+            $('#loc_ctrl[data-toggle="tooltip"]').tooltip("show");
         });
 
-        //console.log("InitCategories:"+inputs.length);//possible problem (inputs.length===0), need to delay sript load
         if (inputs.length > 0) {
             try {
                 let arr = inputs.toArray();
@@ -64,7 +80,7 @@ class Categories {
                     let cat = _.find( catAr, {id:id});
                     if(!cat) {
                         catAr.push( {id: id, state: $(inputs[c]).attr('state')});
-                        $(inputs[c]).css('opacity', $(inputs[c]).attr('state') === '1' ? 1 : 0.4);
+                        $(inputs[c]).css('opacity', $(inputs[c]).attr('state') === '1' ? 1 : 0.3);
                         if($(inputs[c]).attr('state')==='1'){
                             $(inputs[c]).parents('.dropup').find('.main_category').attr('state', 1);
                             $(inputs[c]).parents('.dropup').find('.main_category').css('opacity', 1);
@@ -73,7 +89,7 @@ class Categories {
                         continue;
                     }
                     $(inputs[c]).attr('state', cat.state);
-                    $(inputs[c]).css('opacity', cat.state === '1' ? 1 : 0.4);
+                    $(inputs[c]).css('opacity', cat.state === '1' ? 1 : 0.3);
 
                     if($(inputs[c]).attr('state')==='1'){
                         $(inputs[c]).parents('.dropup').find('.main_category').attr('state', 1);
@@ -111,13 +127,20 @@ class Categories {
 
             //window.user.import.ImportDataByLocation(null);
         }
-        $('[data-toggle="popover"]').popover({
-        });
+
+        for(let c in arCatPar) {
+            let id  = arCatPar[c];
+            $('.category[id="'+id+'"]').attr('state','1');
+            $('.category[id="'+id+'"]').css('opacity','1');
+            $('.category[id="'+id+'"]').parents('.dropup').find('.main_category').attr('state', 1);
+            $('.category[id="'+id+'"]').parents('.dropup').find('.main_category').css('opacity', 1);
+        }
+
 
         $(".dropup").on("hide.bs.dropdown", function(event){
             // $('#categories').css('overflow','hidden');
             // $('#categories').css('overflow-x','auto');
-            // return false;
+            return false;
         });
 
         $(".dropup").on("show.bs.dropdown", function(event){
@@ -128,6 +151,8 @@ class Categories {
             // return false;
         });
 
+
+
         $('.category').on('click', this,this.OnClickCategory);
 
         $('#category_container').on('click', function () {
@@ -136,23 +161,71 @@ class Categories {
 
                 });
         });
+
+        $('.main_category').on('click touchstart', function (ev) {
+            ev.stopPropagation();
+            ev.preventDefault();
+        });
+
         $('.main_category').off();
         $('.main_category').longTap( function (ev) {
+
             if($(this).attr('visible')==='true')
                 $(this).parent().find('.category[state="0"]').trigger('click');
             else
                 $(this).parent().find('.category[state="1"]').trigger('click');
-            $(this).css('opacity', $(this).attr('visible')==='true' ? '1' : '0.4');
+            $(this).css('opacity', $(this).attr('visible')==='true' ? '1' : '0.3');
             $(this).attr('visible',$(this).attr('visible')==='true'?'false':'true');
             return true;
         });
 
-        this.map.ol_map.on('moveend', function (event) {
-            if ($('#categories').is(':visible') && $('.category[state="1"]').length>0)
-                $('#categories').slideToggle('slow', function () {
+        let isDown = false, isScroll = false ;
+        let startX;
+        let scrollLeft;
 
-                });
+        $('.dropdown-menu').on("mousedown", function(e) {
+            isDown = true;
+            this.classList.add("active");
+            startX = e.pageX - this.offsetLeft;
+            scrollLeft = this.scrollLeft;
         });
+        $('.dropdown-menu').on("mouseleave", function() {
+
+            isDown = false;
+            this.classList.remove("active");
+        });
+        $('.dropdown-menu').on("mouseup", function() {
+
+            setTimeout(function () {
+                isScroll = false;
+            },100);
+            isDown = false;
+            this.classList.remove("active");
+            return false;
+        });
+        $('.dropdown-menu').on("mousemove", function(e) {
+
+            if (!isDown) return;
+            isScroll = true;
+            e.preventDefault();
+            const x = e.pageX - this.offsetLeft;
+            const walk = x - startX;
+            this.scrollLeft = scrollLeft - walk;
+        });
+        $("#categories").on('click', function (e) {
+            if(!isScroll)
+                $('.dropdown-menu').removeClass('show');
+        });
+
+        setTimeout(function () {
+            map.ol_map.on('moveend', function (event) {
+                //if ($('#categories').is(':visible') && $('.category[state="1"]').length>0)
+                    // $('#categories').slideToggle('slow', function () {
+                    //
+                    // });
+            });
+        },1000*5)
+
     }
 
 
@@ -165,7 +238,7 @@ class Categories {
         let that = ev.data;
         let el = ev.target;
         $(el).attr('state', $(el).attr('state') === '1' ? '0' : '1');
-        $(el).css('opacity', $(el).attr('state') === '1' ? 1 : 0.4);
+        $(el).css('opacity', $(el).attr('state') === '1' ? 1 : 0.3);
 
         let layers = that.map.ol_map.getLayers().values_;
         let id = $(el).attr('id');
@@ -189,10 +262,16 @@ class Categories {
             $(el).parents('.dropup').find('.main_category').css('opacity', 1);
         }else {
             $(el).parents('.dropup').find('.main_category').attr('state', 0);
-            $(el).parents('.dropup').find('.main_category').css('opacity', 0.4);
+            $(el).parents('.dropup').find('.main_category').css('opacity', 0.3);
         }
 
         if(window.user.constructor.name!=='Supplier')
             window.user.import.ImportDataByLocation(ev);
+
+        setTimeout(function (ev) {
+            that.map.ol_map.dispatchEvent('moveend');
+        },100)
+
     }
+
 }

@@ -1,4 +1,4 @@
-export {Utils}
+
 let http = require('http');
 let https = require('https');
 
@@ -43,7 +43,7 @@ window.alert_ = function(msg,type,fadeout){
     });
 }
 
-class Utils{
+export class Utils{
 
     JSONParse(result) {
         try {
@@ -184,17 +184,21 @@ class Utils{
     }
 
     createThumb_1(base, w, h, callback) {
-        var c = document.createElement("canvas"),    // create a canvas
-            ctx = c.getContext("2d"),                // get context
-            img = new Image();                       // final image
-            img.crossOrigin="anonymous";
-        c.width = w;                                 // set size = thumb
-        c.height = h;
-        ctx.drawImage(base, 0, 0, w, h);             // draw in frame
-        img.onload = function() {                   // handle async loading
-            callback(this);                // provide image to callback
-        };
-        img.src = c.toDataURL();             // convert canvas to URL
+        if(base.src.includes('base64')) {
+            var c = document.createElement("canvas"),    // create a canvas
+                ctx = c.getContext("2d"),                // get context
+                img = new Image();                       // final image
+            img.crossOrigin = "anonymous";
+            c.width = w;                                 // set size = thumb
+            c.height = h;
+            ctx.drawImage(base, 0, 0, w, h);             // draw in frame
+            img.onload = function () {                   // handle async loading
+                callback(this);                // provide image to callback
+            };
+            img.src = c.toDataURL();             // convert canvas to URL
+        }else{
+            callback(base);
+        }
     }
 
     resetOrientation(srcBase64, srcOrientation, callback) {
@@ -425,6 +429,16 @@ class Utils{
             },
             options
         );
+    }
+
+    ReverseObject(Obj){
+        let _ = require('lodash');
+        var NewObj = {};
+        let keys = _.reverse(Object.keys(Obj));
+        for (let i in keys){
+            NewObj[keys[i]] = Obj[keys[i]];
+        }
+        return NewObj;
     }
 
 }

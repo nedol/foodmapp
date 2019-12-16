@@ -20,15 +20,6 @@ class Marker{
 
         let that = this;
 
-        this.map.ol_map.on('click', function (event) {
-            var zoom = this.getView().getZoom();
-            var latlon = proj.toLonLat(event.coordinate);
-            var center = proj.toLonLat(this.getView().getCenter());
-
-            // var x = distanceBetweenPoints(center, latlon, 'x') * Math.sign(latlon[0] - center[0]);
-            // var y = distanceBetweenPoints(center, latlon, 'y') * Math.sign(center[1] - latlon[1]);
-            // $('#kolobot').attr('position', x / zoom + ' ' + 0 + ' ' + y / zoom);
-        });
 
         $('#marker').on('touchstart click', function (ev) {
             //$('#browser_container').css('display','inline-block');

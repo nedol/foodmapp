@@ -16,17 +16,14 @@ global.resObj = {};
 
 var requrl = '';
 
-const server = require('../server')
-
-let con_obj;
-
 module.exports = class D2D {
 
     constructor(){
         this.mysql_con;
     }
-    dispatch(q, res, req,mysql_con) {
+    dispatch(q, res, req, mysql_con) {
         this.mysql_con = mysql_con;
+
         requrl = req.headers.origin;
 
         if (q.sse) {
@@ -114,13 +111,12 @@ module.exports = class D2D {
         }
     }
 
-
     ConfirmEmail(q, res) {
 
         let that = this;
         let sql = "SELECT user.*" +
             " FROM "+q.user.toLowerCase()+" as user" +
-            " WHERE (user.email='"+q.profile.email+"')";
+            " WHERE (user.email='"+q.profile.email+"') AND user.email<>''";
 
         this.mysql_con.query(sql, function (err, result) {
             if (err)
@@ -153,9 +149,9 @@ module.exports = class D2D {
                                 }else {
 
                                     let em = new Email();
-                                    let html = "<a href=" + q.host + "/d2d/dist/?psw_hash="+md5(psw)+"&lang=ru><h1>Перейдите в приложение</h1></a><p>Удачных покупок!</p>";
+                                    let html = "<a href=" + q.host + "/d2d/dist/"+q.user.toLowerCase()+".html?lang=ru&psw_hash="+md5(psw)+"><h1>Перейдите в приложение</h1></a><p>Удачной торговли!</p>";
 
-                                    em.SendMail("admin@дотудо.рф", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
+                                    em.SendMail("d2d@nedol.ru", q.profile.email, "Подтверждение регистрации пользователя", html, function (result) {
                                         res.end(JSON.stringify({
                                             result: result,
                                             uid: uid,
@@ -164,7 +160,18 @@ module.exports = class D2D {
                                             avatar: q.profile.avatar,
                                             thmb:q.profile.thmb
                                         }));
+
+                                        let values = [uid, q.profile.email, 'https://nedol.ru/d2d/dist/supplier.html?lang=ru&psw_hash='+md5(psw)];
+
+                                        let sql = "INSERT INTO psw_hash SET  uid=?, email=?, url=?";
+                                        that.mysql_con.query(sql, values, function (err, result) {
+
+                                        });
                                     });
+
+                                    if(q.profile.phone) {
+
+                                    }
                                 }
                             });
                         });
@@ -184,23 +191,30 @@ module.exports = class D2D {
         if(q.psw_hash){
 
             let sql = "SELECT user.uid as uid, user.*," +
-                " (SELECT data FROM offers WHERE supuid=uid ORDER BY date DESC LIMIT 1) as offer " +
+                " (SELECT data FROM offers WHERE supuid=uid ORDER BY date DESC LIMIT 1) as data, " +
+                " (SELECT latitude FROM offers WHERE supuid=uid ORDER BY date DESC LIMIT 1) as lat, " +
+                " (SELECT longitude FROM offers WHERE supuid=uid ORDER BY date DESC LIMIT 1) as lon " +
                 " FROM "+q.user.toLowerCase()+" as user" +
                 " WHERE MD5(user.psw)='"+q.psw_hash+"'";
 
-                this.mysql_con.query(sql, function (err, result) {
-                    if (err)
-                        throw err;
+            // if(!res._header)
+            //     res.writeHead(200, {'Content-Type': 'application/json'});
+            // res.end(JSON.stringify(sql));
+            // return;
 
-                    if (result.length > 0) {
-                        res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end(JSON.stringify({
-                            user: result
-                        }));
-                    }else{
-                        newAcnt(that.mysql_con,q, res);
-                    }
-                });
+            this.mysql_con.query(sql, function (err, result) {
+                if (err)
+                    throw err;
+
+                if (result.length > 0) {
+                    res.writeHead(200, {'Content-Type': 'application/json'});
+                    res.end(JSON.stringify({
+                        [q.user.toLowerCase()]: result
+                    }));
+                }else{
+                    newAcnt(that.mysql_con,q, res);
+                }
+            });
 
         }else {
             newAcnt(this.mysql_con,q, res);
@@ -209,7 +223,7 @@ module.exports = class D2D {
         function newAcnt(mysql_con,q, res) {
 
             let psw = shortid.generate();
-            uid = md5(new Date());
+            uid = md5(new Date()+psw);
 
             values = [uid, psw];
             sql = "INSERT INTO " + q.user.toLowerCase() + " SET  uid=?, psw=?";
@@ -221,48 +235,21 @@ module.exports = class D2D {
                     that.mysql_con.release();
                     return true;
                 } else {
-
                     res.end(JSON.stringify({
                         result: result,
                         uid: uid,
                         psw: psw
                     }));
-
+                    // let values = [uid, 'email', 'https://nedol.ru/d2d/dist/supplier.html?lang=ru&psw_hash='+md5(psw)];
+                    //
+                    // let sql = "INSERT INTO psw_hash SET  uid=?, email=?, url=?";
+                    // mysql_con.query(sql, values, function (err, result) {
+                    //
+                    // });
                 }
             });
         }
     }
-
-    Auth(q, res, req) {
-        let values, sql, uid;
-        let psw = shortid.generate();
-        if(q.user==='Customer'){
-            uid = md5(new Date())
-            values = [uid, psw,'tariff'];
-            sql = "REPLACE INTO customer SET  uid=?, psw=?, tariff=?";
-        }else if(q.user==='Supplier'){
-            uid = md5(q.email);
-            values = [uid, psw, q.email,'tariff'];
-            sql = "REPLACE INTO supplier SET uid=?, psw=?, email=?, tariff=?";
-        }
-        this.mysql_con.query(sql, values, function (err, result) {
-            if (err) {
-                throw err;
-            }
-            res.writeHead(200, {'Content-Type': 'application/json'});
-            try{
-                if (err) {
-                    res.end(JSON.stringify({err: err}));
-                }else{
-                    res.end(JSON.stringify({uid: uid,psw:psw}));
-                }
-            }catch(ex) {
-                res.end(JSON.stringify({err: ex}));
-            }
-        });
-
-    }
-
 
     updateOfferDB(q, res, sql, values,now){
         let that = this;
@@ -298,6 +285,15 @@ module.exports = class D2D {
                     });
                     offer = offer.replace(ofobj[tab][item].img.src,hash);
                 }
+                if(ofobj[tab][item].brand && ofobj[tab][item].brand.logo && ofobj[tab][item].brand.logo.includes('base64')) {
+
+                    const base64Data = ofobj[tab][item].brand.logo.replace(/^data:([A-Za-z-+/]+);base64,/, '');
+                    const hash = md5(base64Data);
+                    fs.writeFile('../server/images/' + hash, base64Data, 'base64', (err) => {
+
+                    });
+                    offer = offer.replace(ofobj[tab][item].brand.logo,'https://nedol.ru/server/images/'+hash);
+                }
                 for(let c in ofobj[tab][item].cert){
                     if(!ofobj[tab][item].cert[c].src.includes('base64'))
                         continue;
@@ -313,7 +309,7 @@ module.exports = class D2D {
         cb(offer);
     }
 
-    replaceImg_2(src, cb) {
+    replaceImg_2(src, cb, res) {
 
         try {
             if (!src || src.includes('http')) {
@@ -328,10 +324,7 @@ module.exports = class D2D {
         const base64Data = src.replace(/^data:([A-Za-z-+/]+);base64,/, '');
         const hash = md5(base64Data);
         let hn  = os.hostname();
-        // if(!res._header)
-        //     res.writeHead(200, {'Content-Type': 'application/json'});
-        // res.end(JSON.stringify(requrl));
-        // return;
+
         fs.writeFile('../server/images/'+hash, base64Data, 'base64', (err) => {
             cb(hash);
         });
@@ -401,20 +394,30 @@ module.exports = class D2D {
         let status;
         let now = moment().format('YYYY-MM-DD h:mm:ss');
         let sql =
-            "SELECT ord.*"+ //, tar.options as tariff"+ // cus.email as cusuid,  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
-            " FROM  supplier as sup, customer as cus, orders as ord" +
+            "SELECT ord.*, sup.email as email, sup.dict as dict, ord.date as date"+//  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            " FROM  supplier as sup, orders as ord" +
             //", tariff as tar"+
             " WHERE sup.uid=ord.supuid  AND ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
-            " AND cus.psw=\""+q.psw+"\"" +
-            //" AND cus.tariff=tar.id AND tar.applicant=\"c\"" +
-            " AND cus.uid=ord.cusuid AND ord.date=\""+q.date+"\"" +
-            " ORDER BY ord.id DESC";
+            " AND ord.date=\'"+q.date+"\'"+
+            " UNION "+
+            "            SELECT ord.*, del.email as email, del.dict as dict, ord.date as date"+//  DATE_FORMAT(of.date,'%Y-%m-%d') as date" +
+            "             FROM  deliver as del, orders as ord" +
+            "             WHERE del.uid=ord.supuid  AND ord.supuid=\'"+q.supuid+"\'  AND ord.cusuid=\'"+q.cusuid+"\'" +
+            "             AND ord.date=\'"+q.date+"\'";
+
+        // if (!res._header)
+        //     res.writeHead(200, {'Content-Type': 'application/json'});
+        //
+        // res.end(JSON.stringify(sql));
+        // return;
 
         this.mysql_con.query(sql, function (err, sel) {
+
             if (err) {
                 throw err;
             }
             res.writeHead(200, {'Content-Type': 'application/json'});
+
 
             let values, sql;
             if(sel.length>0) {
@@ -424,7 +427,9 @@ module.exports = class D2D {
                 values = [q.cusuid, q.supuid, JSON.stringify(q.data), q.comment,q.address, q.date, q.period,now];
                 sql = 'INSERT INTO orders SET cusuid=?, supuid=?, data=?, comment=?, address=?, date=?, period=?, published=?';
             }
-            this.mysql_con.query(sql, values, function (err, result) {
+
+
+            that.mysql_con.query(sql, values, function (err, result) {
                 if (err) {
                     res.end(JSON.stringify({err: err}));
                     return;
@@ -436,6 +441,28 @@ module.exports = class D2D {
                     delete q.proj;
                     resObj[q.supuid].write(utils.formatSSE({func: 'ordered', order: q}));
                 }
+
+
+                // if (!res._header)
+                //     res.writeHead(200, {'Content-Type': 'application/json'});
+                // res.end(JSON.stringify(sel[0].email));
+                // return;
+                let order="";
+                let cnt = 0;
+                if(sel[0].email) {
+
+                    for(let i in q.data){
+                        order+=(++cnt)+". "+JSON.parse(sel[0].dict).dict[i]['ru']+" "+q.data[i].pack+" Кол-во:"+ q.data[i].qnty +" Цена:"+q.data[i].price+"<br>";
+                    }
+                    let em = new Email();
+                    let html = "По вашему предложению был сформирован заказ:<br> " +order+
+                        "<p>Для подтверждения заказа перейдите  <a href='https://nedol.ru/d2d/dist/supplier.html?lang=ru&order_date="+sel[0].date+"'>по ссылке</a>";
+
+                    em.SendMail("d2d@nedol.ru", sel[0].email, "ДоТуДо. Оповещение о новом заказе", html, function (result) {
+
+                    });
+                }
+                res.write(JSON.stringify(order));
                 res.end(JSON.stringify({result: result, published:now}));
 
             });
@@ -534,7 +561,8 @@ module.exports = class D2D {
     GetSuppliers(q, res){
         let that = this;
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-        let sql = " SELECT " +
+        let sql =
+            " SELECT " +
             " '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
             " of.published as published, of.deleted as deleted,"+
@@ -552,10 +580,10 @@ module.exports = class D2D {
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
             " AND (of.date='"+q.date.split('T')[0]+"' OR " +
-            " (sup.prolong=1 AND (SELECT id  FROM offers WHERE supuid LIKE sup.uid ORDER BY date DESC LIMIT 1)= of.id))" +
+            " (sup.prolong=1 AND (SELECT id  FROM offers WHERE supuid LIKE sup.uid ORDER BY published DESC LIMIT 1)= of.id))" +
             " AND of.published IS NOT NULL AND of.deleted IS NULL " +
             " UNION" +
-            " SELECT '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
+            " (SELECT '"+q.date.split('T')[0]+"' as date, of.categories as cats, " +
             " of.latitude as lat, of.longitude as lon, of.radius, of.data as data, " +
             " of.published as published, of.deleted as deleted,"+
             " del.uid as uid, del.dict as dict, del.profile as profile, del.rating as rating, " +
@@ -567,22 +595,30 @@ module.exports = class D2D {
             " WHERE appr.supuid=del.uid" +
             " AND appr.date='"+q.date.split('T')[0]+"'" +
             " ) AS apprs"+
-            " WHERE del.uid = of.supuid"+
-            " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
-            " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
+            " WHERE " +
+            " of.date in (SELECT MAX(offers.date) FROM offers WHERE supuid=del.uid)" +
+            " AND del.uid = of.supuid"+
+            // " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
+            // " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
             " AND (of.date='"+q.date.split('T')[0]+"' OR del.prolong=1)" +
-            " AND of.published IS NOT NULL AND of.deleted IS NULL";
+            " AND of.published IS NOT NULL AND of.deleted IS NULL)";
 
-
+        //
         // if (!res._header)
         //     res.writeHead(200, {'Content-Type': 'application/json'});
         // res.end(JSON.stringify(sql));
         // return;
+
         that.mysql_con.query(sql, function (err, result) {
             if (err) {
                 throw err;
             }
             res.writeHead(200, {'Content-Type': 'application/json'});
+
+            // if (!res._header)
+            //     res.writeHead(200, {'Content-Type': 'application/json'});
+            // res.end(JSON.stringify(result));
+            // return;
 
             let now = moment().format('YYYY-MM-DD');
             sql = "UPDATE "+ q.user+" SET region='"+q.areas.toString()+"', date='"+now+"' WHERE uid='"+q.uid+"'";
@@ -655,13 +691,13 @@ module.exports = class D2D {
     }
 
     SetComments(q,res){
-
+        let that = this;
         this.replaceImg_2(q.data.profile_picture_url, (path)=> {
             try{
                 q.data.profile_picture_url = path;
                 let values = [q.supuid, JSON.stringify(q.data)];
                 let sql = "REPLACE INTO comm SET supuid=?, data=?";
-                this.mysql_con.query(sql, values, function (err, result) {
+                that.mysql_con.query(sql, values, function (err, result) {
 
                     if (err) {
                         throw err;
@@ -679,3 +715,7 @@ module.exports = class D2D {
     }
 
 }
+// if (!res._header)
+//     res.writeHead(200, {'Content-Type': 'application/json'});
+// res.end(JSON.stringify(html));
+// return;

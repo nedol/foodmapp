@@ -6,7 +6,9 @@ require('jquery-ui-touch-punch');
 require('bootstrap');
 require('bootstrap-select');
 require("../../lib/bootstrap-rating/bootstrap-rating.js")
-require("../../lib/jquery-comments-master/js/jquery-comments.js")
+require("../../lib/jquery-comments-master/js/jquery-comments.js");
+
+
 
 import {Dict} from '../dict/dict.js';
 
@@ -19,6 +21,15 @@ import proj from 'ol/proj';
 let _ = require('lodash')
 
 var md5 = require('md5');
+
+$(window).on('load', () => {
+    let iOSdevice = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)
+    if (iOSdevice)
+        $('[role="tablist"] .nav-link').each((i,e) => {
+            if (!$(e).attr('href'))
+                $(e).attr('href', $(e).data('target'))
+        })
+})
 
 $(document).on('readystatechange', function () {
 
@@ -50,10 +61,10 @@ $(document).on('readystatechange', function () {
     })(jQuery);
 
 
-    window.InitCustomerOrder = function (data) {
+    window.InitCustomerOrder = function (data, targ_title) {
         window.cus_oder = new CustomerOrder();
-        window.cus_oder.openFrame(data, function () {
-            return;
+        window.cus_oder.openFrame(data,targ_title, function () {
+
         });
 
         window.cus_oder.InitRating();
@@ -62,7 +73,7 @@ $(document).on('readystatechange', function () {
 
 });
 
-class CustomerOrder{
+export class CustomerOrder{
     constructor(){
 
         this.path  ="http://localhost:63342/d2d/server";
@@ -71,7 +82,7 @@ class CustomerOrder{
 
         this.ovc = $('body');
 
-        this.ovc.find('.nav-link').on('click', function (ev) {
+        this.ovc.find('.nav-link').on('click touchstart', function (ev) {
             // $('#sup_profile_container').css('display','block');
             let href = $(this).attr('href');
             $(href).css('display','block');
@@ -83,7 +94,7 @@ class CustomerOrder{
 
     }
 
-    openFrame(obj, cb) {
+    openFrame(obj, targ_title, cb) {
 
         let that = this;
         this.uid = obj.uid;
@@ -96,6 +107,7 @@ class CustomerOrder{
         let days = Math.floor(diff / (1000 * 60 * 60 * 24));
         let isDelayed =  days  - 7;//week after publication
         this.ovc.css('display','block');
+        this.last = 0;
 
         this.ovc.find('#shop_name').text(obj.profile.name);
 
@@ -132,7 +144,8 @@ class CustomerOrder{
             }
         });
 
-        $('a[data-toggle="tab"]').on('click',(ev)=> {
+
+        $('a[data-toggle="tab"]').on('click touchstart',(ev)=> {
             $('#client_frame_container',window.parent.document).css('height','100%');
             $(window.parent.user.map.ol_map).off('moveend');
             if($('#address').val().includes(';'))
@@ -142,27 +155,32 @@ class CustomerOrder{
         });
 
         this.ovc.find('#close_frame').off();
-        this.ovc.find('#close_frame').on('click', this, function (ev) {
+        this.ovc.find('#close_frame').on('click touchstart', this, function (ev) {
             let that = ev.data;
 
-            let confirm = window.confirm("Сохранить заказ?");
-            if(confirm) {
-                let items = that.SaveOrder(that.cus_oder, window.parent.sets.lang, function (res) {
+            ev.preventDefault();
+            ev.stopPropagation();
 
-                });
+            if(that.changed){
+                let confirm = window.confirm("Сохранить заказ?");
+                if(confirm) {
+                    let items = that.SaveOrder(that.cus_oder, window.parent.sets.lang, function (res) {
 
-                let q =  _.findKey(items.data, function(o) { return o.qnty >0; });
-                if(q)
-                    if(that.profile.type==='deliver' && !$('#address').val()){
-                        alert($('#address').attr('placeholder'));
-                        $('#address').focus();
-                        return false;
-                    }else {
+                    });
+
+                    let q =  _.findKey(items.data, function(o) { return o.qnty >0; });
+                    if(q)
+                        if(that.profile.type==='deliver' && !$('#address').val()){
+                            alert($('#address').attr('placeholder'));
+                            $('#address').focus();
+                            return false;
+                        }else {
 
 
-                    }
-
+                        }
+                }
             }
+
             $(frameElement).css('display','none');
             $('#client_frame_container',window.parent.document).css('display','none');
             setTimeout(function () {
@@ -203,37 +221,97 @@ class CustomerOrder{
             var y = $(event.relatedTarget).text();  // previous tab
         });
 
-
         window.parent.db.GetSettings(function (obj) {
             if(obj[0].profile && obj[0].profile.address)
                 that.ovc.find('#address').val(obj[0].profile.address);
         });
 
-        function initOrder(){
-            $(".category[state=\"1\"]",window.parent.document).each(function (i, cat) {
+
+        function initOrder(targ_title){
+            $(".category[state='1']",window.parent.document).each(function (i, cat) {
+
+                if(i==0)
+                    openTab(cat, 'active');
+                else{
+                    setTimeout(function (cat) {
+                        openTab(cat);
+                    },0, cat);
+                }
+
+                setTimeout(function () {
+                    let empty = $('#menu_item_tmplt').clone();
+                    // $(empty).addClass('menu_item');
+                    $(empty).attr('id', 'menu_item_empty');
+                    $(empty).insertAfter($('#' + $(cat).attr('cat') + '_' + String($(".menu_item[id^='"+$(cat).attr('cat')+"']").length-1)));
+
+                }, 200);
+
+
+                setTimeout(function () {
+                    if(targ_title){
+                        let dict_val = that.dict.getValByKey(window.parent.sets.lang,targ_title);
+                        let tab = $(".item_title:contains('"+dict_val+"')").closest('.tab-pane').attr('id');
+                        $('.nav-link[href="#'+tab+'"]').trigger('click');
+                        $('#'+tab).find('.card-link').trigger('click');
+                    }else{
+                        $($('.nav-link')[0]).trigger('click');
+                        // $('.card-link').trigger('click');
+                    }
+                }, 500);
+
+            });
+
+            function openTab(cat, active) {
                 let cat_tab = $(cat).attr('cat');
                 let cat_img = $(cat).attr('src');
-                let state = $(cat).attr('state')==='0'?'style=\"display: none;\"':'';
+                let state = $(cat).attr('state')==='0'?'style="display: none;"':'';
                 if (!cat_tab || !that.offer[cat_tab])
                     return;
                 if ($('[href="#' + cat_tab + '"]').length === 0) {
-                    $('<li class="tab_inserted nav-item " '+state+'>' +
+                    $('<li class="'+active+'" tab_inserted nav-item " '+state+'>' +
                         '<img class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">' +
                         '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                    $('<div id="' + cat_tab + '" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
-                        // '<div class="row"><div>' +
+                    $(
+                        '<div id="' + cat_tab + '" class="tab-pane div_tab_inserted" style="border: border: 1px solid grey;">' +
+                            '<div id="accordion">'+
+                            '</div>'+
                         '</div>').insertBefore(that.ovc.find('#add_tab_div'));
                 }
 
                 // $('#'+tab).niceScroll();
-                let last = 0;
+
                 for (let i in that.offer[cat_tab]) {
-                    last = i;
+                    openItem(cat_tab,i);
+                }
+
+            }
+
+            function openItem(cat_tab,i) {
+
                     let menu_item = $('#menu_item_tmplt').clone();
                     $(menu_item).attr('id', cat_tab + '_' + i);
 
                     $(menu_item).attr('class', 'menu_item');
                     $(menu_item).css('display', 'block');
+
+                    if(that.offer[cat_tab][i].brand){
+
+                        if($('#' + cat_tab).find('img[src="'+that.offer[cat_tab][i].brand.logo+'"]').length===0) {
+
+                            $('#' + cat_tab).find('#accordion').append
+                            ('<div class="card">' +
+                                '<div class="card-header sticky">' +
+                                    '<a class="card-link" data-toggle="collapse" href="#'+cat_tab+ that.offer[cat_tab][i].brand.logo.split('/')[5] + '">' +
+                                    '<img src="' + that.offer[cat_tab][i].brand.logo + '"  height="40px"/>' +
+                                '</div>' +
+                                '<div id="'+cat_tab+that.offer[cat_tab][i].brand.logo.split('/')[5]+'" class="collapse" data-parent="#accordion">'+
+                                    '<div class="card-body">'+
+                                    '</div>'+
+                                '</div>'+
+                                '<p class="item_cnt">0</p>'+
+                            '</div>');
+                        }
+                    }
 
                     // $(menu_item).find('.item_title').attr('contenteditable', 'false');
                     //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
@@ -257,11 +335,14 @@ class CustomerOrder{
                         $(menu_item).find('.item_title').attr('data-translate', that.offer[cat_tab][i].title);
                     }
 
-                    $(menu_item).find('.content_text').attr('contenteditable', 'false');
-                    if (that.offer[cat_tab][i].content_text)
+                    if(!that.offer[cat_tab][i].packlist)
+                        return;
+
+
+                    if (that.offer[cat_tab][i].content_text) {
+                        $(menu_item).find('.content_text').attr('contenteditable', 'false');
                         $(menu_item).find('.content_text').attr('data-translate', that.offer[cat_tab][i].content_text.value);
-                    if (that.offer[cat_tab][i].content_text)
-                        $(menu_item).find('.content_text').css('visibility', 'visible');
+                    }
 
                     if (that.offer[cat_tab][i].img) {
                         let src = '';
@@ -292,7 +373,8 @@ class CustomerOrder{
                     let setPrice = function (packlist, mi) {
                         if (mi) menu_item = mi;
                         $(menu_item).find('.pack_list').empty();
-                        let pl = packlist;
+
+                        let pl = utils.ReverseObject(packlist);
                         let ml = that.offer[cat_tab][i].markuplist;
                         $(menu_item).find('.pack_btn').attr('packlist', JSON.stringify(pl));
                         for (let p in pl) {
@@ -304,25 +386,35 @@ class CustomerOrder{
                             else
                                 ml_val = parseInt(ml[p]);
                             let data = parseInt(pl[p]) + ml_val;
+                            if(!data) {
+                                $(menu_item).find('.order_container').css('visibility','hidden');
+                                continue;
+                            }
 
                             $(menu_item).find('.item_price').attr('base', pl[p]);
                             if (!$('.carousel_price[title=' + that.offer[cat_tab][i].title + ']').text())
                                 $('.carousel_price[title=' + that.offer[cat_tab][i].title + ']').text(data);
-                            pl[p] = data;
+                            if(data)
+                                pl[p] = data;
                             $('a[href="#' + cat_tab + '"]').css('display', 'block');
                             $(menu_item).find('.dropdown').css('visibility', 'visible');
-                            if(that.profile.type==='deliver' && !that.offer[cat_tab][i].markuplist[p])
-                                continue;
+                            // if(that.profile.type==='deliver' && (!that.offer[cat_tab][i].markuplist || !that.offer[cat_tab][i].markuplist[p]))
+                            //     continue;
                             $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem'>" + p + "</a>");
                             $(menu_item).find('.pack_btn').text(p);
-                            $(menu_item).find('.caret').css('visibility', 'visible');
                             $(menu_item).find('.pack_btn').attr('pack', p);
 
-                            $(menu_item).find('.item_price').text(data);
+                            $(menu_item).find('.item_price').text(data?data:'');
+                            if($(menu_item).find('a.dropdown-item').length>1) {
+                                $(menu_item).find('.pack_btn').addClass('dropdown-toggle');
+                                $(menu_item).find('.pack_btn').attr('data-toggle','dropdown');
+                            }
                         }
                     }
 
-                    if (that.offer[cat_tab][i].owner) {
+                    if (that.profile.type==='deliver') {
+                        if(!that.offer[cat_tab][i].owner)
+                            that.offer[cat_tab][i].owner = that.uid;
                         $(menu_item).find('.item_title').attr('owner', that.offer[cat_tab][i].owner);
                         window.parent.db.GetSupplier(new Date(window.parent.user.date), that.offer[cat_tab][i].owner, function (offer) {
                             let title = that.offer[cat_tab][i].title;
@@ -366,7 +458,7 @@ class CustomerOrder{
                                 $(img).on('click', menu_item, that.onClickImage);
                             });
 
-                            if (that.offer[cat_tab][i].img && that.profile.type === 'deliver') {
+                            if (that.offer[cat_tab][i].img && that.profile.type === 'marketer') {
                                 let src = '';
                                 if(!that.offer[cat_tab][i].img.src.includes('http'))
                                     src = that.path + "/images/" + that.offer[cat_tab][i].img.src;
@@ -386,7 +478,7 @@ class CustomerOrder{
                                 $('.carousel-inner').append(item);
                             }
 
-                            if(isDelayed<0){
+                            if(isDelayed<0 || that.profile.type === 'deliver'){
                                 setPrice(incl.packlist, menu_item);
                             }else{
                                 $(menu_item).find('.order_container').css('display','none');
@@ -399,13 +491,25 @@ class CustomerOrder{
                                 $(menu_item).find('.item_price').text(pl[$(ev.target).text()]);
                             });
 
-                            that.ovc.find('#' + cat_tab).append(menu_item);
+                            if(that.offer[cat_tab][i].brand){
+                                if(targ_title===that.offer[cat_tab][i].title)
+                                    $('#'+cat_tab+that.offer[cat_tab][i].brand.logo.split('/')[5]).find('.card-body').prepend(menu_item);
+                                else
+                                    $('#'+cat_tab+that.offer[cat_tab][i].brand.logo.split('/')[5]).find('.card-body').append(menu_item);
+                            }else{
+                                if(targ_title===that.offer[cat_tab][i].title)
+                                    that.ovc.find('#' + cat_tab).prepend(menu_item);
+                                else
+                                    that.ovc.find('#' + cat_tab).append(menu_item);
+                            }
+
                             that.dict.dict = Object.assign(offer.dict.dict, that.dict.dict);
-                            that.dict.set_lang(window.parent.sets.lang, that.ovc[0]);
+                            that.dict.set_lang(window.parent.sets.lang, $('#'+$(menu_item).attr('id')));
                         });
 
-                    } else {
-                        //deliver
+                    }
+                    else {
+
                         let title = that.offer[cat_tab][i].title;
                         let deliver = $('.deliver_but', window.parent.document).attr('supuid');
 
@@ -432,7 +536,23 @@ class CustomerOrder{
                             $(menu_item).find('.order_container').css('display','none');
                         }
 
-                        that.ovc.find('#' + cat_tab).append(menu_item);
+                        if(that.offer[cat_tab][i].brand){
+                            if(targ_title===that.offer[cat_tab][i].title)
+                                $('#'+cat_tab+that.offer[cat_tab][i].brand.logo.split('/')[5]).find('.card-body').prepend(menu_item);
+                            else
+                                $('#'+cat_tab+that.offer[cat_tab][i].brand.logo.split('/')[5]).find('.card-body').append(menu_item);
+                        }else{
+                            if(targ_title===that.offer[cat_tab][i].title)
+                                that.ovc.find('#' + cat_tab).prepend(menu_item);
+                            else
+                                that.ovc.find('#' + cat_tab).append(menu_item);
+                        }
+
+                        that.dict.set_lang(window.parent.sets.lang, $('#'+$(menu_item).attr('id')));
+
+                        let item_cnt = parseInt($(menu_item).closest('.card').find('.item_cnt').text().replace('(','').replace(')',''));
+                        ++item_cnt;
+                        $(menu_item).closest('.card').find('.item_cnt').text('('+item_cnt+')');
 
                         $(menu_item).find('a[role=packitem]').on('click', {off: that.offer[cat_tab][i]}, function (ev) {
                             that.changed = true;
@@ -472,27 +592,34 @@ class CustomerOrder{
                             $(this).height(0).height(h - 50);//this.scrollHeight);
                         }).find('textarea').change();
                     });
-                }
 
-                setTimeout(function () {
-                    let empty = $('#menu_item_tmplt').clone();
-                    // $(empty).addClass('menu_item');
-                    $(empty).attr('id', 'menu_item_empty');
-                    $(empty).insertAfter($('#' + cat_tab + '_' + last));
+                    $(menu_item).find('.increase').on('click',function (ev) {
+                        $(this).siblings('.amount').text(parseInt($(this).siblings('.amount').text())+1);
+                        that.changed = true;
+                    });
+                    $(menu_item).find('.reduce').on('click',function (ev) {
+                        if(parseInt($(this).siblings('.amount').text())>0){
+                            $(this).siblings('.amount').text(parseInt($(this).siblings('.amount').text())-1);
+                            if(parseInt($(this).siblings('.amount').text())===0) {
+                                $(this).closest('.menu_item').attr('deleted', true);
+                                return false;
+                            }
+                        }
+                        that.changed = true;
+                    });
 
-                }, 200)
 
+            }
 
-                //
-                // if($('.carousel-inner').children().length<=1)
-                //    $(".carousel_collapse").css('display','none');
-
-
-            });
             that.RedrawOrder(obj);
-            that.dict.set_lang(window.parent.sets.lang, that.ovc[0]);
 
             // $($(sp).find('[lang='+window.sets.lang+']')[0]).prop("selected", true).trigger('change');
+            $(".collapse").on('shown.bs.collapse', function(ev){
+                $(ev.delegateTarget).closest('.card').find('.item_cnt').css('display','none');
+            });
+            $(".collapse").on('hide.bs.collapse', function(ev){
+                $(ev.delegateTarget).closest('.card').find('.item_cnt').css('display','block');
+            });
 
             $('li.active a').tab('show');
             $('.tab_inserted  img:first').tab('show');
@@ -530,11 +657,25 @@ class CustomerOrder{
                     if ($('.menu_item[ordered]')[0])
                         $('li.publish_order.disabled').removeClass('disabled');
                 }
+
             });
         };
 
+        setTimeout(function (targ_title) {
+            initOrder(targ_title);
+
+            // $('#menu_tabs')[0].scrollIntoView();
+
+        },200,targ_title);
+
         setTimeout(function () {
-            initOrder();
+            $('.summernote').summernote({
+                // airMode: true,
+                // focus: true,
+                placeholder: 'ДоТуДо',
+                tabsize: 1,
+                height: 200
+            });
         },1000);
 
     }
@@ -561,6 +702,7 @@ class CustomerOrder{
         $('#mobile').val(profile.mobile);
         $('#address').val(profile.address);
         $('#place').val(profile.place);
+        $('#worktime').val(profile.worktime);
     }
 
 
@@ -568,7 +710,7 @@ class CustomerOrder{
 
        this.InitProfileSupplier({supplier:sup,user:'Customer'},
             {   //comments settings
-                readOnly: (this.appr && this.appr.cusuid===window.parent.user.uid)?false:true,
+                readOnly: false,
                 profilePictureURL: this.path+'/images/'+sup.profile.avatar,
                 enableEditing: true,
                 enableDeleting:false,
@@ -660,7 +802,7 @@ class CustomerOrder{
     InitComments(obj, settings){
         let this_obj = obj;
         $('img.avatar').attr('src', settings.profilePictureURL);
-        settings.profilePictureURL = window.parent.user.profile.avatar;
+        //settings.profilePictureURL = this.path+'/images/'+this.profile.avatar;
         $('#comments-container').comments(Object.assign(settings,{
             getComments: function(success, error) {
                 let par = {
@@ -670,15 +812,18 @@ class CustomerOrder{
                     supuid:obj.supplier.uid
                 }
                 window.parent.network.postRequest(par, function (data) {
+
                     usersArray = [
                         {
                             id: 1,
-                            fullname: "Current User",
+                            fullname: "Покупатель",
                             email: "current.user@viima.com",
                             profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
                         }];
-                    if(!data.err)
-                        success(data);
+
+                    if(data)
+                    success(data);
+
                 })
             },
             postComment: function(data, success, error) {
@@ -840,7 +985,9 @@ class CustomerOrder{
                 qnty: parseInt($(val).find('button.amount').text()),
                 price: $(val).find('.item_price').text(),
                 pack: $(val).find('.pack_btn').text().trim(),
-                status:$(val).attr('deleted')?'deleted':'published'
+                status:$(val).attr('deleted')?'deleted':'published',
+                email: window.parent.user.profile.profile.email,
+                mobile: window.parent.user.profile.profile.mobile
             }
 
             if($('#order_pane').find('.comment')[0])
@@ -870,16 +1017,16 @@ class CustomerOrder{
         }
         let items = this.GetOrderItems();
         if(Object.keys(items.data).length>0) {
-            window.parent.user.UpdateOrderLocal(items);
 
             window.parent.user.PublishOrder(items, (data) => {
+                window.parent.user.UpdateOrderLocal(data, function (res) {
+                    
+                });
                 let status = window.parent.dict.getDictValue(window.parent.sets.lang, Object.keys(data)[1]);
                 //$(that.ovc).find('.ord_status').css('color', 'white');
                 $(that.ovc).find('.ord_status').text(status + "\r\n" + data.published);
                 that.status = Object.keys(data)[1];
-                window.parent.db.GetSettings(function (obj) {
-                    ;
-                });
+
             });
         }
 

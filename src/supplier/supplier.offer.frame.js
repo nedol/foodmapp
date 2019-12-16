@@ -1,11 +1,11 @@
 'use strict'
-export {SupplierOffer};
+
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 
-require('jquery-ui-touch-punch');
 require('bootstrap');
 require('bootstrap-select');
+
 
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
@@ -14,6 +14,7 @@ require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
 require('tablesorter/dist/js/widgets/widget-scroller.min.js');
 
+import 'tablesorter/dist/css/theme.default.min.css';
 import {Dict} from '../dict/dict.js';
 import {ProfileSupplier} from "../profile/profile.supplier";
 
@@ -21,8 +22,7 @@ import {ProfileSupplier} from "../profile/profile.supplier";
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-let _ = require('lodash')
-
+let _ = require('lodash');
 let md5 = require('md5');
 
 
@@ -37,6 +37,17 @@ $(document).on('readystatechange', function () {
         return;
     }
 
+    (function($) {
+        $.fn.isInViewport = function() {
+            var elementTop = $(this).offset().top;
+            var elementBottom = elementTop + $(this).outerHeight();
+
+            var viewportTop = $(window).scrollTop();
+            var viewportBottom = viewportTop + $(window).height();
+
+            return elementBottom > viewportTop && elementTop < viewportBottom;
+        }
+    })(jQuery);
 
     (function($) {
         $.fn.longTap = function(longTapCallback) {
@@ -118,12 +129,12 @@ $(document).on('readystatechange', function () {
 
 });
 
-class SupplierOffer{
+export class SupplierOffer{
     constructor(){
-
+        let that = this;
         this.ovc = $('body');
         this.ovc.find('.close').off();
-        this.ovc.find('.close').on('click', this, function (ev) {
+        this.ovc.find('.close').on('click touchstart', this, function (ev) {
             ev.preventDefault();
             ev.stopPropagation();
             let that = ev.data;
@@ -135,16 +146,40 @@ class SupplierOffer{
 
             let confirm = window.confirm("Сохранить и опубликовать?");
             if(confirm) {
+
+                $.each($('input:checkbox:checked.approve'), function (i, el) {
+                    window.parent.db.GetOrder(window.parent.user.date, window.parent.user.uid, $(el).attr('cusuid'),function (obj) {
+                        window.parent.user.ApproveOrder(obj,$(el).attr('title'));
+                    });
+                });
+
                 if ($(window.parent.document).find(".category[state='1']").length > 0) {
 
                     let items  = that.GetOfferItems(window.parent.sets.lang);
                     if (!items)
                         return false;
+
                     if (that.changed) {
-                        that.SaveOffer(items);
+
                         window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
-                            window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
-                            window.parent.user.offer.stobj.published = obj.published;
+                            try {
+                                window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+                                window.parent.user.offer.stobj.published = obj.published;
+                            }catch(ex){
+
+                            }
+
+                            for(let i in items['local']) {
+                                for(let o in items['local'][i]) {
+                                    if(window.parent.user.offer.stobj.data[i] && window.parent.user.offer.stobj.data[i][o]) {
+                                        items['local'][i][o] = window.parent.user.offer.stobj.data[i][o];
+                                    }
+                                }
+                            }
+
+                            that.SaveOffer(items);
+
+                            closeWindow();
                         });
                     }
 
@@ -153,24 +188,22 @@ class SupplierOffer{
                             that.SaveSettings();
                         });
                     }
-
-
                 }
-
-                setTimeout(function () {
-                    closeWindow();
-                }, 300);
             }else{
                 closeWindow();
             }
 
-            this.profile_tab_changed = false;
+            that.profile_tab_changed = false;
         });
 
-        $('.nav-tabs a').on('shown.bs.tab', (event)=>{
+        $('.nav-tabs a').on('shown.bs.tab', function(event){
             var x = $(event.target).text();         // active tab
-            this.profile_tab_changed =true;
-            var y = $(event.relatedTarget).text();  // previous tab
+            that.profile_tab_changed =true;
+            // var y = $(event.relatedTarget).text();  // previous tab
+            // if($(event.currentTarget).attr('href')==='#editor_pane' || $(event.currentTarget).attr('href')==='#profile')
+            //     $('#add_item').css('display','block');
+            // else
+            //     $('#add_item').css('display','none')  ;
         });
 
     }
@@ -192,7 +225,6 @@ class SupplierOffer{
         this.promo = obj.promo;
         obj.supuid = obj.uid;
         this.rating = obj.rating;
-        let latlon = [obj.latitude,obj.longitude];
 
         let date = window.parent.user.date;
 
@@ -209,6 +241,17 @@ class SupplierOffer{
         this.FillProfile(this.profile);
 
         this.InitSupplierReview(this);
+
+        let cats= [];
+        for (let tab in that.offer) {
+            cats.push($('.category[cat="'+tab+'"]', window.parent.document).attr('id'));
+        }
+
+        if(cats.length>0 && window.parent.user.offer.stobj.location) {
+            let lonlat = window.parent.user.offer.GetOfferLonLat(window.parent.user.offer.stobj.location);
+            $('#map_link').attr('href',"https://nedol.ru/d2d/dist/customer.html?lang=ru&lat=" + lonlat[1] + "&lon=" + lonlat[0] + "&zoom=25&cat=" + JSON.stringify(cats));
+
+        }
 
         if(obj.profile.type==='marketer')
             this.ovc.find('.address').css('display','block');
@@ -239,6 +282,7 @@ class SupplierOffer{
                     '</div>').insertBefore($('#add_tab_div'));
             }
 
+
             $('.dropdown').css('visibility', 'visible');
             $('#order_menu_button').css('visibility', 'visible');
 
@@ -255,17 +299,43 @@ class SupplierOffer{
 
             this.lang = window.parent.sets.lang;
             window.parent.sysdict.set_lang(window.parent.sets.lang, $("#menu_item_tmplt"));
-            window.parent.sysdict.set_lang(window.parent.sets.lang, $("#editor"));
+            window.parent.sysdict.set_lang(window.parent.sets.lang, $("#editor_pane"));
 
             $('#add_tab_li').css('display', 'block');
 
             $('#promo').val(that.promo);
-
             for (let tab in that.offer) {
                 if (cat_tab !== tab) continue;
-                let last = 0;
+
+                openTab(tab);
+
+            }
+
+            function openTab(tab) {
+
                 for (let i in that.offer[tab]) {
-                    last = i;
+                     openOffer(tab,i)
+                }
+
+
+                $('#' + tab).disableSelection();
+
+                $('[href="#' + tab + '"]').on('show.bs.tab', function (ev) {
+                    if (ev.relatedTarget) {
+                        //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                        //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
+                    }
+                });
+
+                $('[href="#' + tab + '"]').on('hide.bs.tab', function (ev) {
+                    if (event.target) {
+                        //let items = that.getTabItems($(ev.target).text(), window.sets.lang);
+                        //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
+                    }
+                });
+            }
+            function openOffer(tab, i) {
+
                     let menu_item = $('#menu_item_tmplt').clone();
                     $(menu_item).attr('id', tab + '_' + i);
                     $(menu_item).attr("class", 'menu_item');
@@ -289,8 +359,6 @@ class SupplierOffer{
                         ev.data.changed = true;
                     });
 
-                    $(menu_item).find('.item_title').attr('contenteditable', isEditable);
-
                     if (that.offer[tab][i].title) {
                         $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
                     }
@@ -301,15 +369,42 @@ class SupplierOffer{
                     $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
                     $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + i);
                     $(menu_item).find('.item_title').attr('contenteditable', 'true');
+                    $(menu_item).find('.item_title').attr('contenteditable', isEditable);
 
 
                     $(menu_item).find('.item_title').longTap(function (el) {
                         $(menu_item).find('.item_content').collapse("toggle");
                     });
 
-                    $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                    if (that.offer[tab][i].content_text)
-                        $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
+                    // $(menu_item).find('.content_text').attr('contenteditable', 'false');
+                    // $(menu_item).find('.content_text').attr('contenteditable', 'true');
+                    if (that.offer[tab][i].content_text) {
+                        // $(menu_item).find('.summernote').summernote({
+                        //     // airMode: true,
+                        //     focus: false,
+                        //     tabsize: 1,
+                        //     height: 300
+                        // });
+                        $(menu_item).find('.content_text').text(window.parent.dict.set_lang(window.parent.sets.lang,that.offer[tab][i].content_text.value));
+
+                    }
+
+                    if (that.offer[tab][i].brand){
+                        $(menu_item).find('.brand').css('visibility', 'visible');
+                        let src = '';
+                        if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
+                            src = that.offer[tab][i].brand.logo;
+                        else {
+                            src = that.path+'/images/' + that.offer[tab][i].brand.logo;
+                        }
+
+                        $(menu_item).find('.brand').on('dragend', function () {
+                            $(this).remove();
+                        });
+
+                        src = src.replace('http://localhost:63342', '..');
+                        $(menu_item).find('.brand').attr('src', src);
+                    }
 
                     if (that.offer[tab][i].img) {
                         $(menu_item).find('.img-fluid').css('visibility', 'visible');
@@ -318,7 +413,6 @@ class SupplierOffer{
                             src = that.offer[tab][i].img.src;
                         else {
                             src = that.path+'/images/' + that.offer[tab][i].img.src;
-
                         }
 
                         src = src.replace('http://localhost:63342', '..');
@@ -326,9 +420,11 @@ class SupplierOffer{
                         //$(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
                     }
 
-                    $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + i);
+                    let pl = '';
+                        if(that.offer[tab][i].packlist)
+                            pl = utils.ReverseObject(that.offer[tab][i].packlist);
+                        else return;
 
-                    let pl = that.offer[tab][i].packlist;
                     $(menu_item).find('.pack_list').empty();
                     for (let l in pl) {
                         if (!l) {
@@ -337,7 +433,7 @@ class SupplierOffer{
                         }
                         let data = pl[l];
                         $(menu_item).find('.pack_container').css('visibility', 'visible');
-                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + l + "</a>");
+                        $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem'>" + l + "</a>");
                         $(menu_item).find('.item_pack').text(l);
                         $(menu_item).find('.item_pack').attr('pack', l);
                         $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
@@ -360,11 +456,6 @@ class SupplierOffer{
                         that.OnClickAddPack(ev);
                     });
 
-                    $(menu_item).find('.item_price').on('click touchstart', that, function (ev) {
-                        //$(menu_item).find('.add_pack').css('visibility', 'visible');
-                        //$(this).focus();
-                    });
-
                     $.each(that.offer[tab][i].cert, function (i, data) {
                         let img = new Image();
                         if(data.src.includes('http') || data.src.includes('base64'))
@@ -379,42 +470,29 @@ class SupplierOffer{
 
                         $(menu_item).find('.cert_container').append(img);
                         $(img).on('click', {id: $(menu_item).attr('id')}, that.onClickImage);
-                        $(img).on('dblclick', function () {
+                        $(img).on('dragend', function () {
                             $(img).remove();
                         });
-                        var timer = 0;
-                        $(img).on("click", function() {
-                            if(timer == 0) {
-                                timer = 1;
-                                timer = setTimeout(function(){ timer = 0; }, 600);
-                            }
-                            else { $(img).remove(); timer = 0; }
-                        });
-                        // let img_top = $(img).offset().top;
-                        // $(img).draggable({ axis: "y"} ,{
-                        //     start: function (ev) {
-                        //         img_top = $(img).offset().top;
-                        //     },
-                        //     drag: function (ev) {
-                        //         //$(el).attr('drag', true);
-                        //     },
-                        //     stop: function (ev) {
-                        //         console.log("drag stop");
-                        //         if($(img).offset().top-img_top >$(img).height()/2)
-                        //             $(img).remove();
-                        //         else{
-                        //             $(img).offset().top = img_top;
-                        //         }
+                        // var timer = 0;
+                        // $(img).on("click", function() {
+                        //     if(timer == 0) {
+                        //         timer = 1;
+                        //         timer = setTimeout(function(){ timer = 0; }, 600);
                         //     }
+                        //     else { $(img).remove(); timer = 0; }
                         // });
                     });
 
                     $('#' + tab).append(menu_item);//добавить продукт в закладку
 
+
+                    that.lang = window.parent.sets.lang;
+                    window.parent.dict.set_lang(window.parent.sets.lang, $("#"+menu_item.attr('id')));
+
                     $(menu_item).find('input:file').on('change', this, that.OnImportImage);
 
                     $(menu_item).find('.img-fluid').attr('id', 'ap_' + tab + '_' + i);
-                    $(menu_item).find('.img-fluid').on('click', menu_item, function (ev) {
+                    $(menu_item).find('.img-fluid').on('click touchstart', menu_item, function (ev) {
                         let menu_item = $(this).closest('.menu_item');
                         //let vis = $(menu_item).find('.img-fluid').css('visibility');
                         ev.target = $(menu_item).find('.img-fluid')[0];
@@ -422,6 +500,33 @@ class SupplierOffer{
                         that.OnClickImport(ev);
                         $(menu_item).find('.toolbar').insertAfter($(menu_item).find('.item_content'));
 
+                    });
+
+                    if (that.offer[tab][i].brand) {
+                        $(menu_item).find('.brand_img').css('visibility', 'visible');
+                        let src = '';
+                        if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
+                            src = that.offer[tab][i].brand.logo;
+                        else {
+                            src = that.path+'/images/' + that.offer[tab][i].brand.logo;
+                        }
+
+                        src = src.replace('http://localhost:63342', '..');
+                        $(menu_item).find('.brand_img').attr('src', src);
+                        //$(menu_item).find('.img-fluid').draggable({ containment: '#content_' + tab + '_' + i, scroll: false });
+                    }
+
+                    $(menu_item).find('.brand_img').attr('id', 'brand_' + tab + '_' + i);
+                    $(menu_item).find('.brand').on('click touchstart', menu_item, function (ev) {
+                        let menu_item = $(this).closest('.menu_item');
+                        //let vis = $(menu_item).find('.img-fluid').css('visibility');
+                        ev.target = $(menu_item).find('.brand_img')[0];
+                        ev.mi = $(menu_item).attr('id');
+                        that.OnClickImport(ev);
+                    });
+
+                    $(menu_item).find('.brand').on('dragend', function () {
+                        $(this).remove();
                     });
 
 
@@ -439,9 +544,9 @@ class SupplierOffer{
                     $(menu_item).find('.order_ctrl').attr('data-toggle', 'collapse');
                     $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
 
-                    $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + that.offer[tab][i].title);
+                    $(menu_item).find('#orders_collapsed').attr('id', 'ordtable_' + that.offer[tab][i].title);
 
-                    $(menu_item).find('a[role=packitem]').on('click', {
+                    $(menu_item).find('a[role=packitem]').on('click touchstart', {
                         that: that,
                         mi: $(menu_item)
                     }, that.OnClickPack);
@@ -460,22 +565,16 @@ class SupplierOffer{
                     // });
                 }
 
-                $('#' + tab).disableSelection();
+        });
 
-                $('[href="#' + tab + '"]').on('show.bs.tab', function (ev) {
-                    if (ev.relatedTarget) {
-                        //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
-                        //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
-                    }
-                });
-
-                $('[href="#' + tab + '"]').on('hide.bs.tab', function (ev) {
-                    if (event.target) {
-                        //let items = that.getTabItems($(ev.target).text(), window.sets.lang);
-                        //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
-                    }
-                });
-            }
+        $('#ordtable').tablesorter({
+            theme: 'blue',
+            widgets: ['zebra', 'column'],
+            usNumberFormat: false,
+            sortReset: true,
+            sortRestart: true,
+            sortInitialOrder: 'desc',
+            widthFixed: true
         });
 
 
@@ -493,11 +592,6 @@ class SupplierOffer{
 
         $('.tab_inserted  img:first').trigger('click');
 
-        // $('.tab_inserted').on('click', function (ev) {
-        //     $('.tab_inserted').removeClass('active');
-        //     $(this).addClass('active');
-        // });
-
 
         if (window.parent.user.date.getDate() === new Date().getDate()) {
             $('.notoday').removeClass('notoday');
@@ -505,171 +599,176 @@ class SupplierOffer{
 
         window.parent.db.GetSupOrders(new Date(date), window.parent.user.uid, function (res) {
 
-        $.each(res, function (i, item) {
+            $.each(res, function (i, item) {
 
-            let data = res[i].data;
-            let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
-            if (res[i].period !== that.offer.period) {
-                inv_period = "style='color:red'";
-            }
-            let kAr = Object.keys(data);
-            let calcDistance = new Promise(
-                function (resolve, reject) {
-                    if (!that.location)
-                        resolve('undefined');
-                    window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
-                        resolve(res);
-                    });
+                let data = res[i].data;
+                let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
+                if (res[i].period !== that.offer.period) {
+                    inv_period = "style='color:red'";
                 }
-            );
-            //calcDistance.then(function (dist) {
-
-            for (let k in kAr) {
-
-                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
-                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').css('visibility', 'visible');
-                $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_amnt').text(data[kAr[k]].qnty);
-                if (data[kAr[k]].status === 'deleted') {//deleted
-                    inv_qnty = "title='deleted' style='color:red'";
-                    tr_style = "color:red";
-                    tr_disabled = "disabled";
-                }
-
-                let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.item_price').val();
-                if (data[kAr[k]].price !== price) {
-                    tr_class += " inv_price";
-                }
-
-                //if published:
-                // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
-                // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
-                // $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
-                $("<tr style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
-                    "<td class='tablesorter-no-sort'>" +
-                    "<label  class='btn'>" +
-                    "<input type='checkbox' class='checkbox-inline approve' title='" + kAr[k] + "' orderdate='" + res[i].date + "' cusuid=" + res[i].cusuid + " style='display: none'>" +
-                    "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                    "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                    "</label>" +
-                    "</td>" +
-
-                    "<td " + inv_qnty + ">" + data[kAr[k]].qnty + "</td>" +
-                    "<td>" + data[kAr[k]].pack + "</td>" +
-                    "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
-                    "<td>" + (res[i].cus_profile.name ? res[i].cus_profile.name : '') + "</td>" +
-                    "<td " + inv_period + ">" + res[i].period + "</td>" +
-                    "<td class='tablesorter-no-sort'>" +
-                    (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
-                    "</td>" +
-                    "<td  class='marketer'>" +
-                    //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
-                    //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
-                    //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
-                    //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
-                    "</td>" +
-                    "<td>" + "0" + "</td>" +
-
-                    "<td class='tablesorter-no-sort'>" +
-                    "<label  class=\"btn\">" +
-                    "<input type=\"checkbox\" disabled class=\"notoday checkbox-inline complete\">" +
-                    "<i class=\"fa fa-square-o fa-2x\"></i>" +
-                    "<i class=\"fa fa-check-square-o fa-2x\"></i>" +
-                    "</label>" +
-                    "</td>" +
-
-                    "</tr>").appendTo($('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').children('.orders').css('visibility', 'visible').find('tbody'));
-
-                if (window.parent.user.profile.profile.type === 'marketer') {
-                    $('.marketer').css('display', 'none');
-                    $('.complete').attr('disabled', 'true');
-                }
-                window.parent.db.GetApproved(new Date(date), window.parent.user.uid, res[i].cusuid, kAr[k], function (appr) {
-                    if (appr && appr.data.qnty === res[i].data[kAr[k]].qnty &&
-                        appr.data.price === res[i].data[kAr[k]].price) {
-                        $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
-                        $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
+                let kAr = Object.keys(data);
+                let calcDistance = new Promise(
+                    function (resolve, reject) {
+                        if (!that.location)
+                            resolve('undefined');
+                        window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
+                            resolve(res);
+                        });
                     }
-                });
+                );
+                //calcDistance.then(function (dist) {
 
-                setTimeout(function () {
-                    let pagerOptions = {
-                        // target the pager markup - see the HTML block below
-                        container: $(".pager"),
-                        ajaxUrl: null,
-                        customAjaxUrl: function (table, url) {
-                            return url;
-                        },
-                        ajaxError: null,
-                        ajaxObject: {dataType: 'json'},
-                        ajaxProcessing: null,
-                        processAjaxOnInit: true,
-                        output: '{startRow:input} – {endRow} / {totalRows} rows',
-                        updateArrows: true,
-                        page: 0,
-                        size: 10,
-                        savePages: true,
-                        storageKey: 'tablesorter-pager',
-                        pageReset: 0,
-                        fixedHeight: true,
-                        removeRows: false,
-                        countChildRows: false,
-                        cssNext: '.next', // next page arrow
-                        cssPrev: '.prev', // previous page arrow
-                        cssFirst: '.first', // go to first page arrow
-                        cssLast: '.last', // go to last page arrow
-                        cssGoto: '.gotoPage', // select dropdown to allow choosing a page
-                        cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
-                        cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
-                        // class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
-                        cssDisabled: 'disabled', // Note there is no period "." in front of this class name
-                        cssErrorRow: 'tablesorter-errorRow' // ajax error information row
-                    };
-                    $('#ordtable_' + kAr[k]).tablesorter({
-                        theme: 'blue',
-                        widgets: ['zebra', 'column'],
-                        usNumberFormat: false,
-                        sortReset: true,
-                        sortRestart: true,
-                        sortInitialOrder: 'desc',
-                        widthFixed: true
-                    })
-                    //.tablesorterPager(pagerOptions);
-                }, 1000);
-            }
-        });
+                let ord_amnt = 0;
 
-        that.orders = res;
+                for (let k in kAr) {
 
+                    $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
+
+                    if (data[kAr[k]].deleted) {//deleted
+                        inv_qnty = "title='deleted' style='color:red'";
+                        tr_style = "color:red;text-decoration:line-through";
+                        tr_disabled = "disabled";
+
+                    }
+
+                    let price = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.item_price').val();
+                    if (data[kAr[k]].price !== price) {
+                        tr_class += " inv_price";
+                    }
+
+                    ord_amnt++;
+
+                    //if published:
+                    // $('.item_title[data-translate=' + kAr[k] + ']').attr('contenteditable','false');
+                    // $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.input').attr('contenteditable','false');
+                    // $('.item_title[data-translate=' + kAr[k] + ']').closest('.row').find(':checkbox').attr('disabled','');
+                    let tr = "<tr style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
+                        "<td class='tablesorter-no-sort'>" +
+                        "<label  class='btn'>" +
+                            "<input type='checkbox' class='checkbox-inline approve' title='" + kAr[k] + "' orderdate='" + res[i].date + "' cusuid=" + res[i].cusuid + " style='display: none'>" +
+                                "<i class='fa fa-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                                "<i class='fa fa-check-square-o fa-2x' style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                        "</label>" +
+                        "</td>" +
+                        "<td>" + data[kAr[k]].cat + "</td>" +
+                        "<td>" + that.dict.getValByKey(that.lang, kAr[k]) + "</td>" +
+                        "<td>" + data[kAr[k]].pack + "</td>" +
+                        "<td " + inv_qnty + ">" + data[kAr[k]].qnty + "</td>" +
+                        "<td class='marketer'>" + data[kAr[k]].price + "</td>" +
+                        "<td>" + (data[kAr[k]].email ? data[kAr[k]].email : '') + "<br>"+(data[kAr[k]].mobile ? data[kAr[k]].mobile : '')+"</td>" +
+                        "<td " + inv_period + ">" + res[i].period + "</td>" +
+                        "<td class='tablesorter-no-sort'>" +
+                        (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
+                        "</td>" +
+                        "<td  class='marketer'>" +
+                        //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
+                        //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
+                        //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
+                        //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
+                        "</td>" +
+                        "<td>" + "0" + "</td>" +
+
+                        // "<td class='tablesorter-no-sort'>" +
+                        // "<label  class=\"btn\">" +
+                        // "<input type='checkbox' disabled class='notoday checkbox-inline complete'>" +
+                        // "<i class='fa fa-square-o fa-2x'  style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                        // "<i class='fa fa-check-square-o fa-2x'  style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
+                        // "</label>" +
+                        // "</td>" +
+
+                        "</tr>";
+
+                    $(tr).appendTo($('tbody'));
+
+                    if (window.parent.user.profile.profile.type === 'marketer') {
+                        $('.marketer').css('display', 'none');
+                        $('.complete').attr('disabled', 'true');
+                    }
+                    window.parent.db.GetApproved(new Date(date), window.parent.user.uid, res[i].cusuid, kAr[k], function (appr) {
+                        if (appr && appr.data.qnty === res[i].data[kAr[k]].qnty &&
+                            appr.data.price === res[i].data[kAr[k]].price) {
+                            $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
+                            $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
+                        }
+                    });
+
+                    setTimeout(function () {
+                        let pagerOptions = {
+                            // target the pager markup - see the HTML block below
+                            container: $(".pager"),
+                            ajaxUrl: null,
+                            customAjaxUrl: function (table, url) {
+                                return url;
+                            },
+                            ajaxError: null,
+                            ajaxObject: {dataType: 'json'},
+                            ajaxProcessing: null,
+                            processAjaxOnInit: true,
+                            output: '{startRow:input} – {endRow} / {totalRows} rows',
+                            updateArrows: true,
+                            page: 0,
+                            size: 10,
+                            savePages: true,
+                            storageKey: 'tablesorter-pager',
+                            pageReset: 0,
+                            fixedHeight: true,
+                            removeRows: false,
+                            countChildRows: false,
+                            cssNext: '.next', // next page arrow
+                            cssPrev: '.prev', // previous page arrow
+                            cssFirst: '.first', // go to first page arrow
+                            cssLast: '.last', // go to last page arrow
+                            cssGoto: '.gotoPage', // select dropdown to allow choosing a page
+                            cssPageDisplay: '.pagedisplay', // location of where the "output" is displayed
+                            cssPageSize: '.pagesize', // page size selector - select dropdown that sets the "size" option
+                            // class added to arrows when at the extremes (i.e. prev/first arrows are "disabled" when on the first page)
+                            cssDisabled: 'disabled', // Note there is no period "." in front of this class name
+                            cssErrorRow: 'tablesorter-errorRow' // ajax error information row
+                        };
+                        // $('#ordtable_' + kAr[k]).tablesorter({
+                        //     theme: 'blue',
+                        //     widgets: ['zebra', 'column'],
+                        //     usNumberFormat: false,
+                        //     sortReset: true,
+                        //     sortRestart: true,
+                        //     sortInitialOrder: 'desc',
+                        //     widthFixed: true
+                        // });
+
+                        $('.order_amnt').text(ord_amnt);
+                        //.tablesorterPager(pagerOptions);
+                    }, 1000);
+                }
+            });
+
+            that.orders = res;
     });
 
-            //
-            that.lang = window.parent.sets.lang;
-            window.parent.dict.set_lang(window.parent.sets.lang, $("#editor"));
 
-            $('.item_content').on('shown.bs.collapse', function (e) {
-                let h = $(this).closest('.content_div')[0].scrollHeight;
-                $(this).find('.content').off();
-                $(this).find('.content').on('change keyup keydown paste cut', 'textarea', function () {
-                    $(this).height(0).height(h);//this.scrollHeight);
-                }).find('textarea').change();
-                $(this).find('.content_text').focus();
+
+        $('.item_content').on('shown.bs.collapse', function (e) {
+            let h = $(this).closest('.content_div')[0].scrollHeight;
+            $(this).find('.content').off();
+            $(this).find('.content').on('change keyup keydown paste cut', 'textarea', function () {
+                $(this).height(0).height(h);//this.scrollHeight);
+            }).find('textarea').change();
+            $(this).find('.content_text').focus();
+        });
+
+        $('#add_item').off();
+        $('#add_item').on('click touchstart', that, that.AddOfferItem);
+
+        $('.input').click(function (ev) {
+            that.changed = true;
+            $(this).focus();
+        });
+
+        $("#editor_pane").find('.publish_offer_ctrl').off('click touchstart');
+        $("#editor_pane").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
+            window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], date, ev.data, function (obj) {
+
             });
-
-            $('#add_item').off();
-            $('#add_item').on('click touchstart', that, that.AddOfferItem);
-
-
-            $('.input').click(function (ev) {
-                that.changed = true;
-                $(this).focus();
-            });
-
-            $("#editor").find('.publish_offer_ctrl').off('click touchstart');
-            $("#editor").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
-                window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], date, ev.data, function (obj) {
-
-                });
-            });
+        });
 
             //$("#offer_pane").draggable();
     }
@@ -677,7 +776,46 @@ class SupplierOffer{
         setTimeout(function () {
             initOrder();
             $('#supplier_frame_container',window.parent.document).css('height','100%');
+
+            let isDown = false, isScroll = false ;
+            let startX;
+            let scrollLeft;
+
+            $('.table-responsive').on("mousedown", function(e) {
+                isDown = true;
+                this.classList.add("active");
+                startX = e.pageX - this.offsetLeft;
+                scrollLeft = this.scrollLeft;
+            });
+            $('.table-responsive').on("mouseleave", function() {
+
+                isDown = false;
+                this.classList.remove("active");
+            });
+            $('.table-responsive').on("mouseup", function() {
+
+                setTimeout(function () {
+                    isScroll = false;
+                },100);
+                isDown = false;
+                this.classList.remove("active");
+                return false;
+            });
+            $('.table-responsive').on("mousemove", function(e) {
+
+                if (!isDown) return;
+                isScroll = true;
+                e.preventDefault();
+                const x = e.pageX - this.offsetLeft;
+                const walk = x - startX;
+                this.scrollLeft = scrollLeft - walk;
+            });
+            //
         },500);
+
+        setTimeout(function () {
+
+        },1000);
 
     }
 
@@ -694,6 +832,17 @@ class SupplierOffer{
         $('#mobile').val(profile.mobile);
         $('#address').val(profile.address);
         $('#place').val(profile.place);
+        $('#worktime').val(profile.worktime);
+        if(profile.delivery)
+            $('#delivery').val(profile.delivery);
+
+        $('#delivery').summernote({
+            airMode: true,
+            focus: true,
+            tabsize: 0,
+            height: 200
+        });
+
     }
 
     InitProfileSupplier(user, settings) {
@@ -710,7 +859,7 @@ class SupplierOffer{
                 $('.avatar').attr('src', user.profile.profile.avatar);
             }
             $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
-            $('img.avatar').on('click',function (ev) {
+            $('img.avatar').on('click touchstart',function (ev) {
                 $(this).siblings('.file-upload').trigger('click');
             });
             var readURL = function (input) {
@@ -813,7 +962,7 @@ class SupplierOffer{
         // $(menu_item).find('.pack_list').append("<li><a role='packitem' style='color: red'>добавить</a></li>");
         for (let i in pl) {
             if (i) {
-                $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem'>" + i + "</a>");
+                $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + i + "</a>");
             }
         }
 
@@ -822,7 +971,7 @@ class SupplierOffer{
         $(menu_item).find('.pack_list').addClass('dropdown-menu');
         $(menu_item).find('.caret').css('visibility', 'visible');
 
-        $(menu_item).find('a[role=packitem]').on('click', {
+        $(menu_item).find('a[role=packitem]').on('click touchstart', {
             that: that,
             mi: $(menu_item)
         }, that.OnClickPack);
@@ -877,6 +1026,8 @@ class SupplierOffer{
         $(menu_item).find(':checkbox').attr('tab', tab);
         $('.btn').css('visibility','visible');
 
+
+
         $(menu_item).find('.content_text').attr('contenteditable', 'true');
         $(menu_item).find('.item_title').attr('contenteditable', 'true');
         $(menu_item).find('.item_price').attr('contenteditable', 'true');
@@ -888,6 +1039,10 @@ class SupplierOffer{
 
         $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
         $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
+
+        $(menu_item).find('.item_title').longTap(function (el) {
+            $(menu_item).find('.item_content').collapse("toggle");
+        });
 
         $(menu_item).find('.item_title').on('dblclick', function () {
             $(menu_item).find('.item_content').collapse('show');
@@ -938,30 +1093,43 @@ class SupplierOffer{
             $(this).closest('.menu_item').find('.content_text').focus();
         });
 
-        $(menu_item).find('.align_center_bottom').click(function (ev) {
-            let pos = $(menu_item).find('.img-fluid').parent().width()/2 -
-                $(menu_item).find('.img-fluid').width()/2;
-            $(menu_item).find('.img-fluid').css('left', pos);
-        });
-        $(menu_item).find('.align_left').click(function (ev) {
-            $(menu_item).find('.img-fluid').css('right','');
-            $(menu_item).find('.img-fluid').css('left','5px');
-        });
-        $(menu_item).find('.align_right').click(function (ev) {
-            $(menu_item).find('.img-fluid').css('left','')
-            $(menu_item).find('.img-fluid').css('right','5px');
-        });
 
         $(menu_item).find('.input').click(function (ev) {
             that.changed = true;
         });
 
+        $(menu_item).find('.brand_img').attr('id', 'brand_' + tab + '_' + $('.brand_img').length);
+        $(menu_item).find('.brand').on('click', menu_item, function (ev) {
+            let menu_item = $(this).closest('.menu_item');
+            //let vis = $(menu_item).find('.img-fluid').css('visibility');
+            ev.target = $(menu_item).find('.brand_img')[0];
+            ev.mi = $(menu_item).attr('id');
+            that.OnClickImport(ev);
+        });
+
+        $(menu_item).find('.brand').on('dragend', function () {
+            $(this).remove();
+        });
+
         $(menu_item).find('.cert_container').attr('id', 'gallery_' + tab.replace('#','') + '_' + pos);
 
         $(menu_item).find('.add_pack').attr('id', 'pack_' + tab.replace('#','') );
-        $(menu_item).find('.add_pack').on('click', {mi:$(menu_item),that:that},that.OnClickAddPack);
+        $(menu_item).find('.add_pack').on('click touchstart', {mi:$(menu_item),that:that},that.OnClickAddPack);
 
-        $('#'+tab).append(menu_item[0]);
+        // let insert ='';
+        // for(let m in $(".menu_item")){
+        //     if($($(".menu_item")[m]).isInViewport()) {
+        //         if($('#'+tab).find(".menu_item").length>0)
+        //             $(menu_item).insertAfter($(".menu_item")[m]);
+        //         else
+        //             $('#'+tab).append(menu_item[0]);
+        //         insert = true;
+        //         break;
+        //     }
+        // }
+        // if(insert!==true)
+            $('#'+tab).append(menu_item[0]);
+
 
         $(menu_item).find('.item_title').focus();
 
@@ -970,7 +1138,7 @@ class SupplierOffer{
         if ($(menu_item).find('.item_content').css('display') == 'block')
             $(menu_item).find('.item_content').slideToggle("fast");
 
-        $(tmplt).insertAfter('#editor');
+        $(tmplt).insertAfter('#editor_pane');
 
         window.parent.dict.set_lang(window.parent.sets.lang, $(menu_item));
 
@@ -988,7 +1156,7 @@ class SupplierOffer{
 
     OnClickImport(ev){
         let menu_item = $('#'+ev.mi);
-        $(menu_item).find('input:file').attr('func_el', JSON.stringify({func:'load_img',id:$(ev.target).attr('id')}));
+        $(menu_item).find('input:file').attr('func_el', JSON.stringify({func:'load_img',class:$(ev.target).attr('class'),id:$(ev.target).attr('id')}));
         $(menu_item).find('input:file').focus();
         $(menu_item).find('input:file').trigger(ev);
 
@@ -1014,50 +1182,40 @@ class SupplierOffer{
 
                         $("#" + el.id).css('visibility', 'visible');
                         // $("#" + el.id).closest('.menu_item').find('.item_content').slideDown("slow");
-
-                        let thumb = false;
-
-                        $("#" + el.id).on('load', function (ev) {
-
-                            let img  = new Image();//'<img src="'+data+'" height="50" >';
-                            img.class = 'image';
-                            img.src = data_url;
-                            // img.height = '100';
-                            img.width = '90';
-                            img.style='padding:10px';
-                            img.id = md5(data_url);
-
-
-                            $(img).on('click touchstart',{id:$("#" + el.id).closest('.menu_item').attr('id')},window.sup_off.onClickImage);
-
-                            $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
-                            data_url = '';
-
-                            $(img).draggable({
-                                start: function (ev) {
-                                    console.log("drag start");
-                                },
-                                drag: function (ev) {
-                                    //$(el).attr('drag', true);
-                                },
-                                stop: function (ev) {
-                                    console.log("drag stop");
-                                    if($(img).position().left>$(img).width()-20)
-                                        $(img).remove();
-                                }
-                            });
-
-                            if (!thumb) {
-                                // let k = 200/$("#" + el.id).height();
-                                // utils.createThumb($("#" + el.id)[0], $("#" + el.id).width()*k, $("#" + el.id).height()*k, function (thmb) {
-                                //     thumb = true;
-                                //     $("#" + el.id).attr('src', thmb.src);
-                                // });
-
-                                //$("#" + el.id).attr('thmb', utils.createThumb($("#" + el.id)[0]));
-                            }
-
+                        $("#" + el.id).on('dragend',function (ev) {
+                            $(this).remove();
                         });
+
+                        if(el.class === 'img-fluid') {
+
+                                let img = new Image();//'<img src="'+data+'" height="50" >';
+                                img.class = 'image';
+                                img.src = data_url;
+                                // img.height = '100';
+                                img.width = '90';
+                                img.style = 'padding:10px';
+                                img.id = md5(data_url);
+
+                                $(img).on('click touchstart', {id: $("#" + el.id).closest('.menu_item').attr('id')}, window.sup_off.onClickImage);
+
+                                $("#" + el.id).closest('.menu_item').find('.cert_container').append(img);
+
+                                data_url = '';
+
+                                $(img).draggable({
+                                    start: function (ev) {
+                                        console.log("drag start");
+                                    },
+                                    drag: function (ev) {
+                                        //$(el).attr('drag', true);
+                                    },
+                                    stop: function (ev) {
+                                        console.log("drag stop");
+                                        if ($(img).position().left > $(img).width() - 20)
+                                            $(img).remove();
+                                    }
+                                });
+                        }
                     }
                 },
                 {
@@ -1082,7 +1240,7 @@ class SupplierOffer{
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'getcomments',
-                    supuid:obj.uid
+                    supuid:obj.supuid
                 }
                 window.parent.network.postRequest(par, function (data) {
                     usersArray = [
@@ -1196,7 +1354,7 @@ class SupplierOffer{
 
         $('.item_title').trigger('click');
 
-        $('#editor').find('.div_tab_inserted').each((index, val)=> {
+        $('#editor_pane').find('.div_tab_inserted').each((index, val)=> {
 
             $(val).addClass('active');
             let tab = $(val).attr('id');
@@ -1225,7 +1383,7 @@ class SupplierOffer{
 
                 let title = $(miAr[i]).find('.item_title');
                 let key = $(title).attr('data-translate');
-                let text = $(miAr[i]).find('.item_title').val();
+                let text = $(miAr[i]).find('.item_title').text();
 
                 if (text.length === 0 || !text.trim()) {
                     continue;
@@ -1246,12 +1404,10 @@ class SupplierOffer{
 
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
-                    let w = $(cont_text).width();
-                    let h = $(cont_text).height();
-                    let l = $(cont_text).css('left');
-                    let ofs = $(cont_text).offset();
+                    let markup = $(cont_text).summernote('code');
+                    $(cont_text).summernote('destroy');
                     key = $(cont_text).attr('data-translate');
-                    text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
+                    text = $(cont_text).val();//.replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
                     if(!window.parent.dict.dict[key]) {
                         window.parent.dict.dict[key] = {};
                     }
@@ -1264,9 +1420,6 @@ class SupplierOffer{
                         $(cont_text).attr('data-translate',key);
                     }
                     item.content_text = {value:key};
-                    // item.content_text.width = w;
-                    // item.content_text.height = h;
-                    // item.content_text.left = l;
 
                 }else{
                     if(item.content)
@@ -1276,14 +1429,17 @@ class SupplierOffer{
 
                 if($(miAr[i]).find('.img-fluid').css('visibility')==='visible') {
                     item.img = {src:$(miAr[i]).find('.img-fluid').attr('src')};
-                    // let left =$(miAr[i]).find('.img-fluid').css('left');
-                    // item.img.left  = String(left).includes('%')?(parseInt(left)/100)*item.width: parseInt(left);
-                    // item.img.top = parseInt($(miAr[i]).find('.img-fluid').css('top'));
 
                 }else {
                     delete item.img;
                 }
 
+                if($(miAr[i]).find('.brand_img').attr('src')) {
+                    item.brand = {logo:$(miAr[i]).find('.brand_img').attr('src')};
+
+                }else {
+                    delete item.brand;
+                }
 
                 item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
                 if(item.packlist) {
@@ -1301,11 +1457,6 @@ class SupplierOffer{
                     item.cert.push({src:el.src,pos:$(el).position()});
                 });
 
-                $.each($(miAr[i]).find('.orders').find('input:checkbox:checked'), function (i, el) {
-                    window.parent.db.GetOrder(window.parent.user.date, window.parent.user.uid, $(el).attr('cusuid'),function (obj) {
-                        window.parent.user.ApproveOrder(obj,$(el).attr('title'));
-                    });
-                });
 
                 cat = $(window.parent.document).find('.category[cat="'+value+'"]').attr('id');
                 if(!cat)
@@ -1376,7 +1527,8 @@ class SupplierOffer{
                     name: $('#name').val(),
                     worktime: $('#worktime').val(),
                     mobile: $('#mobile').val(),
-                    place: $('#place').val()
+                    place: $('#place').val(),
+                    delivery: $('#delivery').val()
                 },
                 promo: $('#promo').val()
             }

@@ -59,8 +59,9 @@ class Overlay {
         this.overlay = new _ol_Overlay_({
             element: element,
             position: offer.location,
-            positioning: 'center-center',//'bottom-right',//'top-left',//'bottom-left',
-            offset: [0,0]
+            positioning: 'bottom-right',//'center-center',//'bottom-right',//'top-left',//'bottom-left',
+            offset: [0,0],//,
+            anchor: [0, 0]
         });
 
         if(window.user.profile.profile.type==='deliver')
@@ -93,24 +94,12 @@ class Overlay {
         //     // $(element).css('transition', 'transform 100ms');
         // }, 5);
 
-        $(element).on('dblclick', window.user, function (ev) {
-            if(window.user.profile.profile.type==='deliver')
+        $(element).on('click touchstart', window.user, function (ev) {
+            if(window.user.constructor.name==='Deliver')
                 window.user.editor.OpenOffer();
             else
                 window.user.editor.InitSupplierOffer();
 
-        });
-
-        setTimeout(function () {
-            //$(element).trigger('dblclick');
-        },1500);
-
-
-        $(element).doubleTap(function (el) {
-            if(window.user.profile.profile.type==='deliver')
-                window.user.editor.OpenOffer();
-            else
-                window.user.editor.InitSupplierOffer();
         });
 
 
@@ -177,7 +166,7 @@ class Overlay {
         }else{
             let style =  new _ol_style_Style_({
                 fill: new _ol_style_Fill_({
-                    color: 'rgba(255, 255, 255, .5)'
+                    color: 'rgba(255, 255, 255, .2)'
                 }),
                 stroke: new _ol_style_Stroke_({
                     color: 'rgba(255, 0, 0, 1)',

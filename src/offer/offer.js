@@ -1,6 +1,9 @@
 'use strict'
 export {Offer}
 import {OrderViewer} from "../order/order.viewer";
+
+import proj from 'ol/proj';
+
 class Offer{
 
     constructor(date,uObj){
@@ -89,7 +92,9 @@ class Offer{
         //TODO:
     }
 
-
+    GetOfferLonLat(loc){
+        return proj.toLonLat(loc);
+    }
 
 
 }

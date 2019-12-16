@@ -15,7 +15,7 @@ let utils = new Utils();
 window.InitProfileSupplier = function (user, settings) {
 
     window.profile_sup = new ProfileSupplier();
-    //window.profile_sup.InitComments(user, settings);
+    window.profile_sup.InitComments(user, settings);
     window.profile_sup.InitRateSupplier();
     //window.profile_sup.InitSettingsSupplier();
 
@@ -110,17 +110,19 @@ export class ProfileSupplier{
                     proj:'d2d',
                     user:window.parent.user.constructor.name.toLowerCase(),
                     func:'getcomments',
-                    supuid:obj.uid
+                    supuid:obj.supuid
                 }
                 window.parent.network.postRequest(par, function (data) {
-                    usersArray = [
-                        {
-                            id: 1,
-                            fullname: "Current User",
-                            email: "current.user@viima.com",
-                            profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
-                        }];
-                    success(data);
+
+                        usersArray = [
+                            {
+                                id: 1,
+                                fullname: "Current User",
+                                email: "current.user@viima.com",
+                                profile_picture_url: "https://viima-app.s3.amazonaws.com/media/public/defaults/user-icon.png"
+                            }];
+                        success(data);
+
                 })
             },
             postComment: function(data, success, error) {

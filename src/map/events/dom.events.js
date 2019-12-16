@@ -5,6 +5,7 @@ import {Overlay} from "../overlay/overlay";
 var moment = require('moment/moment');
 
 import Extent from 'ol/extent';
+import {Dict} from '../../dict/dict.js';
 
 class DOMEvents {
     constructor(map) {
@@ -59,16 +60,31 @@ class DOMEvents {
                     hint = $('#search_but').attr('hint');
                 } else {
 
-                    text = "Введите название местоположения";
-                    hint = "Москва,  улица Адмирала Корнилова, 10";
+                    text = "Введите наименование товара или адрес";
+                    hint = "Москва,  улица Адмирала Корнилова, 10";//"кофе";//
                 }
             }
-            let place = prompt(text, hint);
-            $('#search_but').attr('hint', place);
-            if(place) {
-                window.user.map.geo.SearchLocation(place, function (bound) {
+            let search = prompt(text, hint);
+            $('#search_but').attr('hint', search);
+
+            if (search.split(',').length>2) {
+                window.user.map.geo.SearchLocation(search, function (bound) {
                     if(bound)
                         window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+                });
+            }else{
+                window.db.GetAllSuppliers(window.user.date,function (features) {
+                    for(let f in features){
+                        for(let a in features[f].data){
+                            let dict = new Dict(features[f].dict.dict);
+                            for(let i in features[f].data[a]) {
+                                let val  = dict.getValByKey(window.sets.lang, features[f].data[a][i].title);
+                                if(val.toLowerCase().includes(search.toLowerCase())){
+                                    ;
+                                }
+                            }
+                        }
+                    }
                 });
             }
         });

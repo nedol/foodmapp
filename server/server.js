@@ -27,18 +27,16 @@ let con_param = globaljs.con_param;//change every 8 min
 
 let con_obj;
 
-
-
 let bing_api_token
 
 String.prototype.replaceAll = function(search, replace){
     return this.split(search).join(replace);
 }
 
+
+
 module.exports = {
-    GetConnection(){
-        return con_obj;
-    },
+
     GetTokenLoop(server) {
 
         return;
@@ -76,39 +74,39 @@ module.exports = {
         StartConnection(function (mysql_con) {
 
             switch(q.proj) {
-                case'rtc':
-                    let RTC = require('./rtc/rtc');
-                    try {
-                        let rtc = new RTC();
-                        rtc.dispatch(req, q, res);
-                    }catch(ex){
-                        res.end(JSON.stringify({error:'ServerError'}));
-                        return;
-                    }
-                    break;
-                case'vr':
-                    let VReport = require('./vreport/vreport.js');
-                    try{
-                        let vr = new VReport();
-                        vr.dispatch(req, q, res);
-                    }catch(ex)
-                    {
-                        //res.writeHead(200, {'Content-Type': 'application/json'});
-                        res.end('end');
-                        return;
-                    }
-                    break;
-                case'bm':
-                    let BonMenu = require('./bonmenu/bonmenu');
-                    let bm = new BonMenu();
-                    bm.dispatch(q,res);
-                    break;
-                case'id':
-
-                    let Infodesk = require('./infodesk/infodesk');
-                    let id = new Infodesk();
-                    id.dispatch(req, q,res);
-                    break;
+                // case'rtc':
+                //     let RTC = require('./rtc/rtc');
+                //     try {
+                //         let rtc = new RTC();
+                //         rtc.dispatch(req, q, res);
+                //     }catch(ex){
+                //         res.end(JSON.stringify({error:'ServerError'}));
+                //         return;
+                //     }
+                //     break;
+                // case'vr':
+                //     let VReport = require('./vreport/vreport.js');
+                //     try{
+                //         let vr = new VReport();
+                //         vr.dispatch(req, q, res);
+                //     }catch(ex)
+                //     {
+                //         //res.writeHead(200, {'Content-Type': 'application/json'});
+                //         res.end('end');
+                //         return;
+                //     }
+                //     break;
+                // case'bm':
+                //     let BonMenu = require('./bonmenu/bonmenu');
+                //     let bm = new BonMenu();
+                //     bm.dispatch(q,res);
+                //     break;
+                // case'id':
+                //
+                //     let Infodesk = require('./infodesk/infodesk');
+                //     let id = new Infodesk();
+                //     id.dispatch(req, q,res);
+                //     break;
 
                 case'd2d':
 
@@ -118,16 +116,16 @@ module.exports = {
                     let Customer = require('./d2d/customer');
                     let d2d = '';
 
-                    if(q.user && q.user.toLowerCase() === 'supplier')
+                    if (q.user && q.user.toLowerCase() === 'supplier') {
                         d2d = new Supplier();
-                    else if(q.user && q.user.toLowerCase() === 'deliver')
+                    } else if (q.user && q.user.toLowerCase() === 'deliver') {
                         d2d = new Deliver();
-                    else if(q.user && q.user.toLowerCase() === 'customer') {
+                    } else if (q.user && q.user.toLowerCase() === 'customer') {
                         d2d = new Customer();
-
-                    }
-                    else
+                    } else{
                         d2d = new D2D();
+                    }
+
                     d2d.dispatch(q,res,req,mysql_con);
                     break;
                 default:
@@ -138,6 +136,7 @@ module.exports = {
 
     }
 }
+
 
 
 function StartConnection(cb) {
@@ -266,6 +265,7 @@ function InitAdmin(q, res) {
             res.end(JSON.stringify({"data": result[0].obj_data,"menu": "[tab_1]"}));
         }
     });
+
 }
 
 function select_query(q, res) {

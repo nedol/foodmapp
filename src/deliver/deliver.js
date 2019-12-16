@@ -88,15 +88,15 @@ class Deliver{
             //cb();
         });
 
-        $('#offer_editor_div').load('./html/offer/offer.editor.html #offer_editor', function (response, status, xhr) {
+        $('#offer_editor_div').load('./deliver/offer.editor.html #offer_editor', function (response, status, xhr) {
 
         });
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
 
-        $('.open_off_editor').on('click touch', this, this.offer.OpenOfferEditor);
-        $('.open_my_profile').on('click touch', this, this.profile.OpenMyProfile);
+        // $('.open_off_editor').on('click touch', this, this.offer.OpenOfferEditor);
+        // $('.open_my_profile').on('click touch', this, this.profile.OpenMyProfile);
 
         this.DateTimePickerEvents();
 
@@ -347,9 +347,9 @@ class Deliver{
                             }
                             that.offer.stobj.date = that.date;
                             delete that.offer.stobj.published;
-                            window.db.SetObject('offerStore',that.offer.stobj,function (res) {
-
-                            });
+                            // window.db.SetObject('offerStore',that.offer.stobj,function (res) {
+                            //
+                            // });
                         }
                     });
                 }else{
@@ -562,7 +562,7 @@ class Deliver{
     PublishOffer(menu, date, data, cb){
 
         let that = this;
-        if(!this.offer.stobj.location || location.length===0){
+        if(!this.offer.stobj && !this.offer.stobj.location || location.length===0){
             this.PickRegion();
             return;
         }
@@ -586,9 +586,9 @@ class Deliver{
 
         window.network.postRequest(data_obj, function (res) {
             let data = res;
-            if(data.err){
+            if(data && data['err']){
                 console.log(data.err.code);
-            }else if(data.result.affectedRows===1){
+            }else if(data && data.result && data.result.affectedRows===1){
                 that.offer.GetOfferDB(window.user.date, function (obj) {
                     obj[0].published = res.published;
                     obj[0].data = offer;
@@ -598,6 +598,8 @@ class Deliver{
 
                 $("#my_truck_2").removeClass('unpublished');
                 $("#my_truck_2").addClass('published');
+            }else if(data){
+                cb();
             }
         });
     }

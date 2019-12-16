@@ -125,19 +125,23 @@ $(document).on('readystatechange', function () {
                         if(obj.deliver) {
                             window.db.ClearStore('offerStore', function () {
                                 if (obj.deliver[0].data) {
-                                    let offer = {
+                                    let offer_tmplt = {
                                         date: 'tmplt',
                                         data: JSON.parse(obj.deliver[0].data)
 
                                     };
-                                    window.db.SetObject('offerStore', offer, function () {
+                                    setTimeout(function () {
+                                        window.db.SetObject('offerStore', offer_tmplt, function () {
 
-                                    });
+                                        });
+                                    },100);
 
-                                    offer = {
+
+                                    let offer = {
                                         date: new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD')),
                                         data: JSON.parse(obj.deliver[0].data),
                                         location: proj.fromLonLat([obj.deliver[0].lon, obj.deliver[0].lat]),
+                                        radius: obj.deliver[0].radius
                                     };
                                     window.db.SetObject('offerStore', offer, function () {
 
@@ -145,9 +149,14 @@ $(document).on('readystatechange', function () {
                                 }
                             });
                             window.db.ClearStore('dictStore', function () {
-                                let dict = JSON.parse(obj.deliver[0].dict).dict;
-                                if (dict) {
-                                    recursDict(dict, Object.keys(dict), 0, set, cb);
+                                if(obj.deliver[0].dict && obj.deliver[0].dict.dict)
+                                {
+                                    let dict = JSON.parse(obj.deliver[0].dict).dict;
+                                    if (dict) {
+                                        recursDict(dict, Object.keys(dict), 0, set, cb);
+                                    }
+                                }else{
+                                    cb(set.uid,set.psw);
                                 }
                             });
                         }
@@ -205,19 +214,6 @@ $(document).on('readystatechange', function () {
         let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
         $('.dt_val').text(date);
 
-        // let dt_w = $('#dtp_container').css('width');
-        // let dt_h = $('#dtp_container').css('height');
-        // let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-        // let w = document.documentElement.clientWidth;
-        // $(window).on("resize", function (event) {
-        //     let dt_w = $('#dtp_container').css('width');
-        //     let dt_h = $('#dtp_container').css('height');
-        //     scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / parseFloat(dt_h) : (window.innerWidth) / parseFloat(dt_w);
-        //     $('#dtp_container').css('transform', 'scale(' + (scale - 1) + ',' + (scale - 1) + ')');
-        // });
-
-        // $('#debug').text(scale);
-
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
@@ -235,7 +231,6 @@ $(document).on('readystatechange', function () {
 
         setTimeout(function () {
             $('#datetimepicker').trigger("dp.change");
-            $('#datetimepicker').data("DateTimePicker").toggle();
         }, 2000);
     }
 });

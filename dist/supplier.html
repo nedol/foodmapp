@@ -1,14 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
 
-    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <meta name="description" content="Продуктовый маркетплейс">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
+    <meta http-equiv="Expires" content="0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Продавец</title>
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript" >
+        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
+        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
+
+        ym(54717073, "init", {
+            clickmap:true,
+            trackLinks:true,
+            accurateTrackBounce:true
+        });
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/54717073" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
+    <script type='application/javascript'>
+        document.addEventListener("touchstart", function() {}, false);
+    </script>
 </head>
 
 <!-- for datetimepicker-->
@@ -25,7 +43,7 @@
 
 <script src="../lib/DragDropTouch.js"></script>
 
-<script type="text/javascript" src="./supplier.js"></script>
+<script type="text/javascript" src="./supplier.js?v=29"></script>
 <script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 
@@ -133,27 +151,15 @@
         right: 0px;
         padding: 0px;
         overflow-y: scroll;
+        overflow-x: hidden;
         z-index:10;
     }
 
-    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
-
-    @-webkit-keyframes bounce {
-        0%       { -webkit-transform:  scale(1, 1);}
-        25%      { -webkit-transform:  scale(1.2, 1.2);}
-        50%      { -webkit-transform:  scale(0.7, 0.7);}
-        75%      { -webkit-transform:  scale(1.1, 1.1);}
-        100%     { -webkit-transform:  scale(1, 1);}
-    }
-    .grow { transition: all .2s ease-in-out; }
-    .grow:hover { transform: scale(1.75); }
 
     #user_container{
         position:absolute;
-        bottom:75%;
-        right: 10px;
+        bottom:85%;
+        right: 1%;
     }
 
     #user{
@@ -185,18 +191,17 @@
 
     #zoom_but{
         display:block;
-        position: absolute;
+        position: fixed;
         /*z-index:30;*/
         color: #1b1b1b;
         top: 50%;
-        right: 10px;
+        right: .6%;
         width: 40px;
-        height: 40px;
+        height: 28px;
         /*line-height: auto;*/
         border: solid 1px grey;
         text-align:center;
-        vertical-align:middle;
-        font-size: 170%;
+        font-size: 200%;
         font-weight: bold;
         border-radius: 5px;
         background-color: whitesmoke;
@@ -205,9 +210,9 @@
 
     #search_but{
         display: block;
-        position: absolute;
-        right: 10px;
-        bottom: 15%;
+        position: fixed;
+        right: 1%;
+        bottom: 20%;
         width: 40px;
         height: 40px;
         border-radius: 5px;
@@ -217,8 +222,8 @@
     #loc_ctrl {
         display: block;
         position: absolute;
-        right: 10px;
-        bottom:55%;
+        right: 1%;
+        top: 30%;
         width: 40px;
         height: 40px;
         /*-webkit-animation:bounce 1s infinite;*/
@@ -263,18 +268,10 @@
 <body>
 <div id="map" class="map"></div>
 
-<section id="marker" title="kolobot">
-    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>
-</section>
+<!--<section id="marker" title="kolobot">-->
+<!--<img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--</section>-->
 
-
-<style>
-    #feedback { font-size: 1.4em; }
-    #period_list .ui-selecting { background: #FECA40; }
-    #period_list .ui-selected { background: #F39814; color: white; }
-    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
-</style>
 
 <div id="main_window" class="container">
     <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
@@ -325,7 +322,7 @@
     </div>
 
     <iframe id="supplier_frame"
-            src="./supplier/supplier.frame.html?v=8"
+            src="./supplier/supplier.frame.html?v=14"
             style="
                 display: none;
                 position:absolute;
@@ -346,7 +343,7 @@
 <data class="tariff" id="items_limit" value="5" style="display: none"></data>
 
 <div id="offer_viewer" class="order_container"
-       style="display:none;
+     style="display:none;
        position: fixed;
        overflow-x: hidden;
        overflow-y: hidden;
@@ -391,22 +388,36 @@
 <div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
 
 <!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
-    <!--visibility: visible" align="center"/>-->
+<!--visibility: visible" align="center"/>-->
 
 
 
 
-<div id="user_container">
+<div id="user_container" style="visibility: hidden">
     <!--<i class='far fa-user' style='font-size:48px;color:red'></i>-->
     <img id="user"  src="https://nedol.ru/d2d/dist/images/user.png"
          title="Продавец" draggable="true" style="image-orientation: from-image;width: auto">
 </div>
 
+<div class="browser_container" id="my_profile_container"
+     style="display:none;
+         overflow: visible; z-index:2000;
+         position: absolute;
+         -webkit-overflow-scrolling: auto;
+         height: 90%;
+         max-height: 90% !important;
+         min-height: 50% !important;
+         width:90%; left: 5%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+</div>
+
 <img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
 
-<section id="loc_ctrl"  title="Location">
-    <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
-    <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
+<section id="loc_ctrl"  title="Моё местоположение">
+    <img id="location_img"  draggable="true" src="https://дотудо.рф/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://дотудо.рф/d2d/dist/images/ic_pin.png">
 </section>
 
 <h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
@@ -427,21 +438,65 @@
 </div>
 <style>
     @media screen and (min-width: 320px) {
+        #datetimepicker{
+            transform: scale(1.1);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:25%;
+            right:75%;
+            top:7%;
+            z-index: 11;
+        }
         #supplier_frame_container{
             max-width: 100%;
         }
     }
     @media screen and (min-width: 480px) {
+        #datetimepicker{
+            transform: scale(1.0);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:35%;
+            right:65%;
+            top:7%;
+            z-index: 11;
+        }
         #supplier_frame_container{
             max-width: 60%;
         }
     }
     @media screen and (min-width: 960px) {
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:40%;
+            right:60%;
+            top:7%;
+            z-index: 11;
+        }
         #supplier_frame_container{
-            max-width: 40%;
+            max-width: 30%;
         }
     }
     @media screen and (min-width: 1200px) {
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:50%;
+            right:50%;
+            top:7%;
+            z-index: 11;
+        }
         #supplier_frame_container{
             max-width: 30%;
         }
@@ -455,8 +510,19 @@
         }
     }
     @media screen and (min-width: 1600px) {
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:50%;
+            right:50%;
+            top:7%;
+            z-index: 11;
+        }
         #supplier_frame_container{
-            max-width: 20%;
+            max-width:25%;
         }
         #user_2{
             display: block;

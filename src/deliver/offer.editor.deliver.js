@@ -107,7 +107,7 @@ class OfferEditorDeliver{
         $(".content_text").dblclick(function () {
             selectText($(this));
         });
-        let str = " \r\n"+$('.dt_val')[0].value.split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
+        let str = " \r\n"+$('.dt_val').text().split(' ')[0]+" \r\n("+$('.sel_period').text()+")";
         this.ovc .find('.modal-title').text(str);
         // if(that.offer.published)
         //     $("#offer_editor").find('.offer_status').text($('#published').text()+'\r\n'+that.offer.published);
@@ -198,15 +198,15 @@ class OfferEditorDeliver{
                         $(menu_item).find('.item_title').attr('contenteditable', 'true');
 
                         $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                        if (offer.data[tab][i].content_text)
+                        if (offer.data[tab][i].content_text && offer.data[tab][i].content_text.value) {
                             $(menu_item).find('.content_text').attr('data-translate', offer.data[tab][i].content_text.value);
-                        if (offer.data[tab][i].content_text)
                             $(menu_item).find('.content_text').css('visibility', 'visible');
+                        }
 
                         if (offer.data[tab][i].img) {
                             $(menu_item).find('.img-fluid').css('visibility', 'visible');
                             $(menu_item).find('.img-fluid').attr('hash', offer.data[tab][i].img.src);
-                            $(menu_item).find('.img-fluid').attr('src', that.path + '/images/' + offer.data[tab][i].img.src);
+                            $(menu_item).find('.img-fluid').attr('src', offer.data[tab][i].img.src);
                         }
 
                         $(menu_item).find('.img-fluid').attr('id', 'img_' + tab + '_' + of + '_' + i);
@@ -651,7 +651,7 @@ class OfferEditorDeliver{
                             //$("#" + el.id).attr('thmb', utils.createThumb($("#" + el.id)[0]));
                         }
 
-                        that.MakeDraggable(this);
+                        that.MakeDraggableCarousel(this);
                     });
                 }else if(el.func==='add_cert') {
                     let img  = new Image();//'<img src="'+data+'" height="50" >';
@@ -660,7 +660,7 @@ class OfferEditorDeliver{
                     img.height = '50';
                     $("#" + el.id).append(img);
                     $(img).on('click',that.onClickImage);
-                    that.MakeDraggable(img);
+                    that.MakeDraggableCarousel(img);
                 }
 
             }
@@ -828,20 +828,7 @@ class OfferEditorDeliver{
         return true;
     }
 
-    OnDeleteItem(ev){
-        if (confirm("Delete the item")) {
-            let menu_item = $(ev.target).closest('.menu_item');
-            let hash = $(menu_item).find('.content_text').attr('data-translate');
-            if($('[data-translate='+hash+']').length<=1)
-                delete window.dict.dict[$(menu_item).find('.item_title').attr('data-translate')];
-            hash = $(menu_item).find('.content_text').attr('data-translate');
-            if($('[data-translate='+hash+']').length<=1)
-                delete window.dict.dict[$(menu_item).find('.content_text').attr('data-translate')];
-            $(menu_item).remove();
 
-            this.changed = true;
-        }
-    }
 
     CancelMenu(ev){
         ev.stopPropagation();
@@ -1003,48 +990,72 @@ class OfferEditorDeliver{
         let active = $($("li.active").find('a')[ind]).text();
         let items  = this.GetOfferItems(lang,ind);
 
-        window.user.UpdateOfferLocal(this.offer, items['local'], window.dict.dict);
+        //window.user.UpdateDeliverOfferLocal(this.offer, items['local'], window.dict.dict);
         return items;
     }
 
     CloseMenu(ev) {
         let that = ev.data;
-        //if(ev.data.changed)
-        let items = that.SaveOffer(ev,window.sets.lang);
-        //
-        if(that.changed) {
-            if ($('.menu_item').find('input:checked').length > 0 && window.user.ValidateOffer(items['remote'])) {
+        let confirm = window.confirm("Сохранить и опубликовать?");
+        if(confirm) {
+
+            window.user.profile.SaveProfile();
+            //if(ev.data.changed)
+            let items = that.SaveOffer(ev,window.sets.lang);
+            //
+            if(that.changed) {
                 window.user.PublishOffer(items['remote'], window.user.date, ev.data, function (obj) {
+                    if (!obj)
+                        return false;
+
                     window.user.offer.stobj = obj;
+
+                    let orders = that.orders;
+
+                    $("#offer_editor").css('display', 'none');
+
+                    $("#offer_editor").off('hide.bs.modal');
+                    $('.item_title').off('click');
+                    //$('#add_item').off('click',this.AddOfferItem);
+                    //$('.modal-body').find('.add_tab').off('click', this.AddTab);
+                    $('.div_tab_inserted').remove();
+
+                    //$('.sp_dlg').off('changed.bs.select');
+                    $("#offer_editor").find('.toolbar').css('display', 'none');
+                    $('input:file').off('change');
+
+
+                    $('.menu_item').remove();
+                    $('.tab_inserted').remove();
                 });
             }
+        }else{
+            $("#offer_editor").css('display', 'none');
+
+            $("#offer_editor").off('hide.bs.modal');
+            $('.item_title').off('click');
+            //$('#add_item').off('click',this.AddOfferItem);
+            //$('.modal-body').find('.add_tab').off('click', this.AddTab);
+            $('.div_tab_inserted').remove();
+
+            //$('.sp_dlg').off('changed.bs.select');
+            $("#offer_editor").find('.toolbar').css('display', 'none');
+            $('input:file').off('change');
+
+
+            $('.menu_item').remove();
+            $('.tab_inserted').remove();
         }
 
-        window.user.profile.SaveProfile();
 
-        let orders = that.orders;
+
+
         // $('.approve:checked').each(function (i,item) {
         //     if(!orders[i])
         //         return;
         //     let obj = orders[i];
         //     window.user.ApproveOrder(obj, $(item).attr('title'));
         // })
-
-        $("#offer_editor").css('display','none');
-
-        $("#offer_editor").off('hide.bs.modal');
-        $('.item_title').off('click');
-        //$('#add_item').off('click',this.AddOfferItem);
-        //$('.modal-body').find('.add_tab').off('click', this.AddTab);
-        $('.div_tab_inserted').remove();
-
-        //$('.sp_dlg').off('changed.bs.select');
-        $("#offer_editor").find('.toolbar').css('display', 'none');
-        $('input:file').off('change');
-
-
-        $('.menu_item').remove();
-        $('.tab_inserted').remove();
 
     }
 

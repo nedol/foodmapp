@@ -59,7 +59,7 @@ class OfferOrder {
         });
     }
 
-    InitCustomerOrder(obj){
+    InitCustomerOrder(obj, targ_title){
         let that = this;
         let client_frame = $('.client_frame_tmplt').clone();
         $(client_frame).removeClass('client_frame_tmplt');
@@ -67,7 +67,7 @@ class OfferOrder {
 
 
         $(client_frame).on('load', function () {
-            client_frame[0].contentWindow.InitCustomerOrder(obj);
+            client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
         });
 
         $(client_frame).css('display', 'inline-block');

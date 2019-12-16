@@ -56,7 +56,7 @@ class DeliverSettings {
         let k = 200/  $(form).find('.avatar').height();
         utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
             k = 50/  $(form).find('.avatar').height();
-            utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (thmb) {
+
                 var data_post = {
                     proj: 'd2d',
                     user: "Deliver",
@@ -66,7 +66,6 @@ class DeliverSettings {
                     profile: {
                         type: 'deliver',
                         avatar:avatar.src,
-                        thmb: thmb.src,
                         email: $(form).find('#email').val().toLowerCase(),
                         name: $(form).find('#name').val(),
                         place: $(form).find('#place').val(),
@@ -110,7 +109,7 @@ class DeliverSettings {
                 });
 
             });
-        });
+
     }
 
     fillForm(){

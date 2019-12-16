@@ -73,18 +73,19 @@ class Network{
             }
         )
             .then(function (response) {
-                cb_this(response.data);
                 that.repeat = false;
+                cb_this(response.data);
             })
             .catch(function (error) {//waiting for rem_client
+
                 setTimeout(function () {
                     if(that.repeat) {
-                        that.postRequest(par, cb);
                         that.repeat = false;
+                        that.postRequest(par, cb);
                     }else{
                         cb_this();
                     }
-                },500);
+                },300);
                 //cb_this({err:error});
             });
 

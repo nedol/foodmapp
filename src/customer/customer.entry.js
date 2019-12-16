@@ -14,6 +14,12 @@ import {DB} from "../map/storage/db"
 
 const langs = require("../dict/languages");
 
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+
+const EventSource = NativeEventSource || EventSourcePolyfill;
+// OR: may also need to set as global property
+global.EventSource =  NativeEventSource || EventSourcePolyfill;
+
 
 require('bootstrap');
 require('bootstrap-select');
@@ -106,6 +112,7 @@ $(document).on('readystatechange', function () {
     let uObj = {};
     window.db = new DB('Customer', function () {
         let uid = utils.getParameterByName('uid');
+
         window.db.GetSettings(function (set) {
             var _ = require('lodash');
             let res = _.findKey(set, function(k) {
@@ -114,8 +121,8 @@ $(document).on('readystatechange', function () {
             res=0;
             if (set[res]) {
                 uObj = set[res];
-                if (set[res]['profile'] && !set[res]['profile'].email &&
-                    utils.getParameterByName('email')) {
+                if (set[res]['profile'] && !set[res]['profile'].email && utils.getParameterByName('email')) {
+
                     if (utils.getParameterByName('uid') &&
                         uid === uObj.uid) {
                         uObj['profile'].email = utils.getParameterByName('email');

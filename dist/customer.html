@@ -11,6 +11,16 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <title>ДоТуДо Покупатель</title>
 
+    <meta name="yandex-verification" content="8a616a78ab4cacbd" />
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WDBR26D');</script>
+    <!-- End Google Tag Manager -->
+
     <!-- Yandex.Metrika counter -->
     <script type="text/javascript" >
         (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
@@ -23,8 +33,7 @@
             accurateTrackBounce:true
         });
     </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/54717046" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+
 </head>
 <!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -43,7 +52,7 @@
 <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>-->
 
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="customer.js?v=41"></script>
+<script type="text/javascript" src="customer.js?v=78"></script>
 
 
 <style>
@@ -68,6 +77,8 @@
         right: 0;
     }
 
+
+
     #marker {
         display:block;
         position:absolute;
@@ -83,11 +94,8 @@
 
     #profile_but{
         display: block;
-        position: fixed;
-        right: 1%;
-        bottom:80%;
-        width: 40px;
-        height: 40px;
+        width: 35px;
+        height: 35px;
         text-align: center;
         border-radius: 5px;
         background-color: rgba(200,200,200,0.7);
@@ -246,11 +254,16 @@
 </style>
 
 <body>
-
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WDBR26D"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<noscript><div><img src="https://mc.yandex.ru/watch/54717046" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+<!-- /Yandex.Metrika counter -->
 <div id="map" class="map"></div>
 
 <!--<section id="marker" title="kolobot">-->
-    <!--<img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--<img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
 <!--</section>-->
 
 <style>
@@ -260,20 +273,13 @@
     #period_list li { margin: 0px; padding: 0.2em; font-size: 1.4em; height: 20px; }
 </style>
 
-<div>
-    <button id="profile_but" class="btn btn-default" type="button" title="Мой профиль"
-            onclick="window.user.OnClickUserProfile()" style="display:inline-block;float:left">
-        <a href="#">
-            <span class="glyphicon glyphicon-shopping-cart" style="font-size:2em"></span>
-        </a>
-    </button>
-</div>
+
 
 
 <div>
-    <address style="display:inline-block;position: fixed;left: 1%;top: 0;padding: 5px">
-        <a href="mailto:1@xn--d1aa3absg.xn--p1ai">
-            <span class="mail glyphicon glyphicon-envelope" title="1@дотудо.рф" style="font-size:2em"></span>
+    <address style="display:inline-block;position: fixed;right: 1%;bottom: 0;padding: 5px">
+        <a href="mailto:d2d@nedol.ru">
+            <span class="mail glyphicon glyphicon-envelope" title="mail@дотудо.рф" style="font-size:2em"></span>
         </a>
         <br>
     </address>
@@ -281,13 +287,13 @@
 
 
 <div id="deliver_container" style="position:absolute;left:1%;top:15%;width:40px">
-
+    <span>Доставка</span>
 </div>
 
 
 
 <!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
-<span id="locText" style="font-family: serif">Lat Lon</span>
+<span id="locText" style="display:none;font-family: serif">Lat Lon</span>
 
 
 
@@ -304,28 +310,37 @@
 
     <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
 
-            <div class="d-inline-block">
-                <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: medium"></div>
+        <div class="d-inline-block">
+            <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: small"></div>
+        </div>
+        <div class="dropdown  d-inline-block">
+            <div
+                    class="sel_period btn btn-block dropdown-toggle" data-toggle="dropdown"
+                    style="float:left;background-color:white;font-size: small">
+                <span class="caret"></span>
             </div>
-            <div class="dropdown  d-inline-block">
-                <div
-                       class="sel_period btn btn-block dropdown-toggle" data-toggle="dropdown"
-                        style="float:right;background-color:white;font-size: medium">
-                    <span class="caret"></span>
-                </div>
-                    <ol id="period_list" class="dropdown-menu" role="menu">
-                        <li href="#">06:00 - 08:00</li>
-                        <li href="#">08:00 - 10:00</li>
-                        <li href="#">10:00 - 12:00</li>
-                        <li href="#">12:00 - 14:00</li>
-                        <li href="#">14:00 - 16:00</li>
-                        <li href="#">16:00 - 18:00</li>
-                        <li href="#">18:00 - 20:00</li>
-                        <li href="#">20:00 - 22:00</li>
-                        <li href="#">22:00 - 24:00</li>
-                    </ol>
+            <ol id="period_list" class="dropdown-menu" role="menu">
+                <li href="#">06:00 - 08:00</li>
+                <li href="#">08:00 - 10:00</li>
+                <li href="#">10:00 - 12:00</li>
+                <li href="#">12:00 - 14:00</li>
+                <li href="#">14:00 - 16:00</li>
+                <li href="#">16:00 - 18:00</li>
+                <li href="#">18:00 - 20:00</li>
+                <li href="#">20:00 - 22:00</li>
+                <li href="#">22:00 - 24:00</li>
+            </ol>
 
-            </div>
+        </div>
+        <div class="d-inline-block">
+            <button id="profile_but" class="btn btn-default" type="button" title="Мой профиль"
+                    onclick="window.user.OnClickUserProfile('orders')" style="display:inline-block;float:right">
+                <a href="#">
+                    <span class="glyphicon glyphicon-shopping-cart" style="font-size:1.5em"></span>
+                </a>
+            </button>
+            <h5><span class="ord_cnt badge badge-pill badge-secondary">0</span></h5>
+        </div>
 
     </div>
 
@@ -346,7 +361,7 @@
 
 <div id="category_include" style="display:none;">
 
-    <div id="category_container"  style="-webkit-overflow-scrolling: touch;">
+    <div id="category_container" >
 
     </div>
 
@@ -368,7 +383,7 @@
 
 
     <iframe class="client_frame_tmplt"
-            src="customer/customer.frame.html?v=9"
+            src="customer/customer.frame.html?v=17"
             style="
             display:none;
             position:absolute;
@@ -427,15 +442,25 @@
     }
     #items_carousel{
         position: absolute;
-        height:500px;
-        width:500px;
+        height:150px;
+        width:150px;
         left:1%;
         bottom:50px;
     }
     .carousel-item{
         background-color: rgba(255,255,255,0.7);
         position: relative;
-        height: 200px;
+        height: 150px;
+    }
+    .carousel_img{
+        width: 100%;
+        margin: 0;
+        position: absolute;
+        top:50%;
+        -ms-transform: translateY(-50%);
+        transform: translateY(-50%);
+        background-color: rgba(255,255,255,0.7);
+
     }
     .carousel_title{
         -webkit-text-stroke: 1px white;
@@ -450,21 +475,24 @@
         bottom:0;
         left:0;
     }
+    #datetimepicker{
+        transform: scale(1.0);
+    }
     @media screen and (min-width: 320px) {
         #items_carousel{
             position: absolute;
-            height:200px;
-            width:200px;
+            height:150px;
+            width:150px;
             left:1%;
             bottom:50px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            height: 200px;
+            height: 150px;
         }
         .carousel_title{
-            font-size: 2em;
+            font-size: 1.5em;
             -webkit-text-stroke: 1px white;
             color:red;
             top:-20px;
@@ -480,13 +508,13 @@
             max-width: 100%;
         }
         #datetimepicker{
-            transform: scale(1.4);
+            transform: scale(1.0);
         }
         #dtp_container {
             display: none;
             position: absolute;
-            /*left:50%;*/
-            right:78%;
+            left:20%;
+            right:80%;
             top:18%;
             z-index: 11;
         }
@@ -518,7 +546,7 @@
             float:left;
         }
         #client_frame_container{
-            max-width: 60%;
+            max-width: 50%;
         }
         #datetimepicker{
             transform: scale(1.4);
@@ -534,22 +562,22 @@
     }
     @media screen and (min-width: 960px) {
         #client_frame_container{
-            max-width: 40%;
+            max-width: 30%;
         }
         #datetimepicker{
             transform: scale(1.0);
         }
         #items_carousel{
             position: absolute;
-            height:350px;
-            width: 350px;
+            height:300px;
+            width: 300px;
             left:1%;
             bottom:70px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
             position: relative;
-            height: 350px;
+            height: 300px;
 
         }
         .carousel_title{
@@ -569,8 +597,8 @@
         #dtp_container {
             display: none;
             position: absolute;
-            /*left:50%;*/
-            right:15%;
+            left:50%;
+            right:50%;
             top:18%;
             z-index: 11;
         }
@@ -587,7 +615,7 @@
             height:300px;
             width: 300px;
             left:1%;
-            bottom:100px;
+            bottom:150px;
         }
         .carousel-item{
             background-color: rgba(255,255,255,0.7);
@@ -611,8 +639,8 @@
         #dtp_container {
             display: none;
             position: absolute;
-            /*left:50%;*/
-            right:15%;
+            left:50%;
+            right:50%;
             top:18%;
             z-index: 11;
         }
@@ -624,8 +652,8 @@
         #dtp_container {
             display: none;
             position: absolute;
-            /*left:50%;*/
-            right:15%;
+            left:50%;
+            right:50%;
             top:10%;
             z-index: 11;
         }

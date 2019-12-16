@@ -2,7 +2,6 @@
 let D2D = require('./d2d')
 
 let Email = require( "../email/email");
-let moment = require('moment');
 
 let utils = require('../utils');
 let fs = require('fs');
@@ -12,6 +11,8 @@ const shortid = require('shortid');
 var urlencode = require('urlencode');
 const translate = require('google-translate-api');//ISO 639-1
 var intersection = require('array-intersection');
+
+let moment = require('moment');
 
 var requrl = '';
 
@@ -23,7 +24,7 @@ module.exports = class Supplier extends D2D{
 
 
     constructor(){
-        super()
+        super();
     }
 
     isValidSupplier(q, res, cb){
@@ -59,8 +60,8 @@ module.exports = class Supplier extends D2D{
                 let profile,values, sql;
 
                 if(!q.profile.avatar || fs.existsSync("./images/"+q.profile.avatar)){
-                    values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
-                    sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
+                    values = [q.profile.email.toLowerCase(), JSON.stringify(q.profile), result[0].tariff, q.promo, q.uid, q.psw];
+                    sql = "UPDATE supplier SET email=?, profile=?, tariff=?, promo=? WHERE uid=? AND psw=?";
                     setTimeout(function () {
                         that.mysql_con.query(sql, values, function (err, result) {
                             if (err) {
@@ -76,10 +77,8 @@ module.exports = class Supplier extends D2D{
                         that.replaceImg_2(q.profile.thmb, function (thmb) {
                             q.profile.avatar = avatar;
                             q.profile.thmb = thmb;
-                            if(result[0].email)
-                                q.profile.email = result[0].email.toLowerCase();
-                            values = [JSON.stringify(q.profile), result[0].tariff, q.uid, q.psw];
-                            sql = "UPDATE supplier SET   profile=?, tariff=? WHERE uid=? AND psw=?";
+                            values = [q.profile.email.toLowerCase(), JSON.stringify(q.profile), result[0].tariff, q.promo, q.uid, q.psw];
+                            sql = "UPDATE supplier SET email=?, profile=?, tariff=?, promo=? WHERE uid=? AND psw=?";
                             setTimeout(function () {
                                 that.mysql_con.query(sql, values, function (err, result) {
                                     if (err) {
@@ -106,7 +105,12 @@ module.exports = class Supplier extends D2D{
     UpdateOffer(q, res){
         let that = this;
 
+        // res.writeHead(200, {'Content-Type': 'application/json'});
+        // res.end(JSON.stringify('UpdateOffer'));
+        // return;
+
         this.isValidSupplier(q,res, function (result) {
+
             if (result.length <=0) {
                 res.writeHead(200, {'Content-Type': 'application/json'});
                 res.end(JSON.stringify({err:'Пройдите регистрацию',link:'https://nedol.ru/d2d/dist/settings.supplier.html'}));
@@ -114,6 +118,7 @@ module.exports = class Supplier extends D2D{
             }
 
             let now = moment().format('YYYY-MM-DD h:mm:ss');
+
             let sql =
                 "SELECT of.*, sup.uid as supuid, sup.prolong as prolong" +
                 " FROM  supplier as sup, offers as of"+
@@ -122,14 +127,16 @@ module.exports = class Supplier extends D2D{
                 " AND of.published IS NOT NULL AND of.deleted IS NULL"+
                 " ORDER BY of.id DESC";
 
-            this.mysql_con.query(sql, function (err, sel) {
+            that.mysql_con.query(sql, function (err, sel) {
                 if (err) {
                     throw err;
                 }
+
                 let values;
 
                 if(sel.length>0) {
                     if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
+
                         let offer = urlencode.decode(q.offer);
                         that.replaceImg(offer,function (offer) {
                             values = [offer, q.location[1], q.location[0], JSON.stringify(q.categories), sel[0].id];
@@ -158,14 +165,14 @@ module.exports = class Supplier extends D2D{
     }
 
     updateOfferDeliver(q, res, deliver, offer){
-        let that = this;
+
         let sql =
             "SELECT of.*" +
             " FROM  deliver as del, offers as of"+
             " WHERE del.uid=of.supuid AND del.uid='"+deliver+"'"+
             " AND of.date='"+q.date+"'";
 
-        this.mysql_con.query(sql, function (err, sel) {
+        this.mysql_con.query(sql, (err, sel)=> {
             if (err) {
                 throw err;
             }
@@ -187,7 +194,7 @@ module.exports = class Supplier extends D2D{
                             del_obj[tab][of].packlist = pl;
                             let values = [JSON.stringify(del_obj), sel[0].id];
                             sql = "UPDATE offers SET data=? WHERE id=?";
-                            that.mysql_con.query(sql, values, function (err, sel) {
+                            this.mysql_con.query(sql, values, function (err, sel) {
                                 if (err) {
                                     res.write(JSON.stringify({err: err}));
                                     return;
@@ -202,14 +209,12 @@ module.exports = class Supplier extends D2D{
 
     updateOfferDB(q, res, sql, values,now){
         let that = this;
+
         this.mysql_con.query(sql, values, function (err, result) {
             if (err) {
                 throw err;
             }
 
-            // res.writeHead(200, {'Content-Type': 'application/json'});
-            // res.end(JSON.stringify(values[0]));
-            // return;
 
             res.writeHead(200, "OK", {'Content-Type': 'text/plain'});
             let offer = values[0];
@@ -486,20 +491,20 @@ module.exports = class Supplier extends D2D{
         //     " OR ord.data NOT LIKE CONCAT('%',appr.title, '%') " +
         //     " AND DAY(appr.date)=DAY(NOW()))";
 
-         let sql=
-             " SELECT ord.*, sup.dict, cus.profile as cus_profile " +
-             " FROM orders as ord, supplier as sup, customer as cus" +
-             " WHERE ord.supuid=sup.uid " +
-             " AND sup.uid='" + q.uid+"'"+
-             " AND sup.psw='"+q.psw +"'"+
-             " AND ord.date='"+q.date+"'" ;
-             // " UNION" +
-             // " SELECT ord.*,NULL,NULL " +
-             // " FROM  orders as ord,  approved as appr  " +
-             // " WHERE  " +
-             // " ord.date='"+q.date+"'" +
-             // " AND appr.date=ord.date"+
-             // " AND ord.data NOT LIKE CONCAT('%',appr.title, '%') "
+        let sql=
+            " SELECT ord.*, sup.dict, cus.profile as cus_profile " +
+            " FROM orders as ord, supplier as sup, customer as cus" +
+            " WHERE ord.supuid=sup.uid " +
+            " AND sup.uid='" + q.uid+"'"+
+            " AND sup.psw='"+q.psw +"'"+
+            " AND ord.date='"+q.date+"'" ;
+        // " UNION" +
+        // " SELECT ord.*,NULL,NULL " +
+        // " FROM  orders as ord,  approved as appr  " +
+        // " WHERE  " +
+        // " ord.date='"+q.date+"'" +
+        // " AND appr.date=ord.date"+
+        // " AND ord.data NOT LIKE CONCAT('%',appr.title, '%') "
 
         // res.writeHead(200, {'Content-Type': 'application/json'});
         // res.end(JSON.stringify(sql));

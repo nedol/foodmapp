@@ -11,6 +11,7 @@ class Import {
         this.areasAr = [];
         $('#datetimepicker').on("dp.change",this, (ev)=> {
             this.areasAr = [];
+
         });
     }
 
@@ -25,9 +26,14 @@ class Import {
             try {
 
                 let cats= [];
-                $(".category[state='1']").each(function (i, cat) {
-                    cats.push(parseInt(cat.id));
-                });
+                if($(".category[state='1']").length===0)//первый запуск
+                    $(".category").each(function (i, cat) {
+                        cats.push(parseInt(cat.id));
+                    });
+                else
+                    $(".category[state='1']").each(function (i, cat) {
+                        cats.push(parseInt(cat.id));
+                    });
 
                 let area = [
                     (parseFloat(LotLat[1].toFixed(1)) - 0.05).toFixed(2),
@@ -40,18 +46,23 @@ class Import {
 
                 if (!IsDownloadedArea(date+"_"+cats + "_" + area)) {
                     let uid = window.user.uid;
-                    that.LoadSupplierData(uid, cats, area, function (res) {
-                        that.areasAr.push(date+"_"+cats +  "_" +  area);
+                    //for(let c in cats) {
+                        that.LoadSupplierData(uid, cats, area, function (res) {
+                            that.areasAr.push(date + "_" + cats + "_" + area);
 
-                        let extent = that.map.ol_map.getView().calculateExtent();
-                        let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
-                        that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
+                            // let extent = that.map.ol_map.getView().calculateExtent();
+                            // let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                            // that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
 
-                    });
+                        });
+                    //}
                 }
-                let extent = that.map.ol_map.getView().calculateExtent();
-                let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
-                that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
+                setTimeout(function () {
+                    let extent = that.map.ol_map.getView().calculateExtent();
+                    let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                    //that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
+                }, 1000)
+
 
             } catch (ex) {
                 console.log(ex);
