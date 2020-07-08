@@ -54,10 +54,7 @@ class Layers {
             //     this.CreateCircleLayer();
             // }
 
-
-
             that.map.ol_map.on('moveend', function (event) {
-
 
                 let extent = that.map.ol_map.getView().calculateExtent();
                 let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
@@ -76,40 +73,59 @@ class Layers {
                 let utils = new UtilsMap();
 
                 for(let f in features){
-                    let radius = features[f].values_.geometry.getRadius();
-                    let center = features[f].values_.geometry.getCenter();
-                    let map_center = that.map.ol_map.getView().getCenter();
-                    let dist = //utils.getCoordsDistance( that.map.ol_map,center,event.coordinate);
-                        utils.getDistanceFromLatLonInKm(proj.toLonLat(center)[1],proj.toLonLat(center)[0],proj.toLonLat(map_center)[1],proj.toLonLat(map_center)[0]);
-                    if(features[f].values_.obj && features[f].values_.obj.uid)
-                    if(dist*1800<=radius){
+                    let util = new UtilsMap();
+                    if(util.IsInsideRadius(that.map, features[f])){
                         if($('.deliver_but[supuid='+features[f].values_.obj.uid+']').length===0) {
-                            let incl =
-                                '<div><input type="image" class="deliver_but" ' +
+                            let deliver_but =
+                                '<div><input type="image" class="deliver_but"'+
                                 'src="'+that.path +"/server/images/"+features[f].values_.obj.profile.avatar+'"' +
-                                ' supuid=' +features[f].values_.obj.uid+
-                                ' style="display:block;position:relative;width:40px;"' +
-                                ' onclick="window.user.OnClickDeliver(this)"/></div>';
-                            $('#deliver_container').append(incl);
-                            // $('#deliver_but').css('display','block');
+                                ' supuid=' +features[f].values_.obj.uid+'></div>';
+                            $('#deliver_container').append(deliver_but);
+                            $('#deliver_container').css('display','block');
+
                             // $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar);
                         }
 
                         if(that.circleLayer.style_.fill_)
                             that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)';
 
-                        // if($('#deliver_but').attr('tooltip')!=='dispose')
-                        //     $('#deliver_but').tooltip('show',{title: features[f].values_.obj.profile.name, animation: true});
-
-                        setTimeout(function () {
-                            $('.deliver_but').tooltip('dispose');
-                            $('.deliver_but').attr('tooltip','dispose');
-                        }, 5000)
                     }else{
-                        $('.deliver_but[supuid='+features[f].values_.obj.uid+']').parent().remove();
+                        if(features[f].values_.obj)
+                            $('.deliver_but[supuid='+features[f].values_.obj.uid+']').parent().remove();
                         // that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
                     }
                 }
+
+                let pos = JSON.parse(localStorage.getItem("deliver_pos"));
+                if(pos)
+                    $('#deliver_container').offset({top:pos.top,left:pos.left});
+                $('#deliver_container').draggable(
+                    { delay: 100},
+                    { start: function (ev) {
+
+                    },
+                        drag: function (ev) {
+                            $('.deliver_but').attr('drag','true');
+                        },
+                        stop: function (ev) {
+
+                            $('.deliver_but').attr('drag','false');
+
+                            let left = $('#deliver_container').position().left;
+                            // $(el).css('right', rel_x + '%');
+                            let top = $('#deliver_container').position().top;
+                            // $(el).css('bottom', rel_y + '%');
+                            localStorage.setItem("deliver_pos",JSON.stringify({top:top,left:left}));
+
+                        }
+                    });
+                    $('.deliver_but').off();
+                    $('.deliver_but').on('click touchstart', function (ev) {
+                        setTimeout(function () {
+                            if($('.deliver_but').attr('drag')!=='true')
+                                window.user.OnClickDeliver(ev.currentTarget);
+                        },200);
+                    });
             });
 
 
@@ -190,10 +206,10 @@ class Layers {
 
                         if (feature.values_.object.date.valueOf() === new Date(window.user.date).valueOf()) {
 
-                            if(window.user.constructor.name==="Supplier"){
-                                if(feature.values_.object.profile.type==='marketer')
-                                    return;
-                            }
+                            // if(window.user.constructor.name==="Supplier"){
+                            //     if(feature.values_.object.profile.type==='marketer')
+                            //         return;
+                            // }
 
                             let style = getObjectStyle(feature.values_.object);
                             cluster_feature.setStyle(style);
@@ -243,7 +259,7 @@ class Layers {
                     let diff = new Date().getTime() - new Date(obj.published).getTime();
                     var days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-                    if (days >= 7)//просрочен
+                    if (days >= 30)//просрочен
                         obj.delayed = true;
 
                     let zoom = that.map.ol_map.getView().getZoom();
@@ -260,10 +276,16 @@ class Layers {
                         ic_clust = obj.img;
                         scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/10000;
                         opacity = 0;
+                    }else if(obj.profile.type==='foodtruck'){
+                        // if(that.map.ol_map.getView().getZoom()<15)
+                        //     return;
+                        ic_clust = obj.img;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),3)/10000;
+                        opacity = 1;
                     }
 
-                    if(days>=7) {
-                        opacity /= days-7;
+                    if(days>=30) {
+                        opacity /= days-30;
                     }
                     if(days>30){
                         opacity = 0.3;
@@ -275,35 +297,39 @@ class Layers {
 
 
                         let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
-                        //size: [100,100],
-                        //img: image,
-                        //imgSize:
-                        scale: obj.delayed?scale/1.5:scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                        anchor: [100, 100],
-                        anchorOrigin: 'bottom-left',
-                        offset: [0, 0],
-                        anchorXUnits: 'pixel',
-                        anchorYUnits: 'pixel',
-                        color: obj.delayed?[200, 200, 200]:[255, 255, 255],
-                        opacity: opacity,
-                        src: obj.profile.avatar?thmb: "./images/user.png",
-                        crossOrigin: 'anonymous'
-                    }));
+                            //size: [300,500],
+                            //img: image,
+                            //imgSize:
+                            scale: obj.delayed?scale/1.5:scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                            // anchor: [0.5,0.5],
+                            // anchorOrigin: 'top-left',//'bottom-left',
+                            offset: [0, 0],
+                            offsetOrigin:  'top-left',
+                            // anchorXUnits: 'pixel',
+                            // anchorYUnits: 'pixel',
+                            color: obj.delayed?[200, 200, 200]:[255, 255, 255],
+                            opacity: opacity,
+                            src: obj.profile.avatar?thmb: "./images/user.png",
+                            crossOrigin: 'anonymous',
+                            fill: new _ol_style_Fill_({
+                                color: 'gray'
+                            })
+                        }));
 
                     let iconStyle;
                     if (features.length > 1) {//cluster
-                        ic_clust = features[0].values_.object.img;
+                        ic_clust = "./images/user.png";
                         let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
                             //size: [100,100],
                             //img: image,
                             //imgSize:
                             crossOrigin: 'anonymous',
                             scale: scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
-                            anchor: [40, 40],
-                            anchorOrigin: 'top-right',
+                            // anchor: [40, 40],
+                            // anchorOrigin: 'top-right',
                             offset: [0, 0],
-                            anchorXUnits: 'pixel',
-                            anchorYUnits: 'pixel',
+                            // anchorXUnits: 'pixel',
+                            // anchorYUnits: 'pixel',
                             color: [255, 255, 255, 1],
                             opacity: 0.5,
                             src: ic_clust
@@ -407,6 +433,10 @@ class Layers {
 
     }
 
+    EmptyLayer(){
+
+    }
+
     SetFlash(feature) {
 
         let duration = 3000;
@@ -503,18 +533,6 @@ class Layers {
 
     }
 
-    getCoordsDistance(map,firstPoint, secondPoint, projection) {
-        projection = projection || 'EPSG:4326';
 
-        length = 0;
-        var sourceProj = map.getView().getProjection();
-        var c1 = proj.transform(firstPoint, sourceProj, projection);
-        var c2 = proj.transform(secondPoint, sourceProj, projection);
-
-        var wgs84Sphere = new Sphere(6378137);
-        length += wgs84Sphere.haversineDistance(c1, c2);
-
-        return length;
-    }
 }
 

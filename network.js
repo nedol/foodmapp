@@ -1,12 +1,12 @@
 'use strict'
 
-export {Network}
+export {Сетка}
 import axios from 'axios';//
 //import axios from 'axios-cancel';
 //import io from 'socket.io-client';
 
 
-class Network{
+class Сетка{
 
     constructor(url) {
         this.host = url;
@@ -14,6 +14,7 @@ class Network{
         //this.CancelToken = axios.CancelToken;
         this.cancel;
         this.send_req_func;
+        this.cnt_post = 0;
 
     }
 
@@ -62,31 +63,58 @@ class Network{
     }
 
 
-    postRequest(par, cb){
+    postRequest(par, cb, no_more){
         let that = this;
         let post_par = JSON.stringify(par);
         let cb_this = cb;
-        this.repeat = true;
+
+        if(no_more) {
+            cb_this();
+            return;
+        }
+
         axios.post(this.host, post_par,
             {
                 crossDomain: true
             }
         )
             .then(function (response) {
-                that.repeat = false;
                 cb_this(response.data);
+                return;
             })
             .catch(function (error) {//waiting for rem_client
-
                 setTimeout(function () {
-                    if(that.repeat) {
-                        that.repeat = false;
-                        that.postRequest(par, cb);
-                    }else{
-                        cb_this();
-                    }
+                    that.postRequest(par, cb, true);
                 },300);
-                //cb_this({err:error});
+
+            });
+
+    }
+
+    putRequest(par, cb, no_more){
+        let that = this;
+        let post_par = JSON.stringify(par);
+        let cb_this = cb;
+
+        if(no_more) {
+            cb_this();
+            return;
+        }
+
+        axios.put(this.host, post_par,
+            {
+                crossDomain: true
+            }
+        )
+            .then(function (response) {
+                cb_this(response.data);
+                return;
+            })
+            .catch(function (error) {//waiting for rem_client
+                setTimeout(function () {
+                    that.postRequest(par, cb, true);
+                },300);
+
             });
 
     }

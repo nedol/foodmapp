@@ -8,7 +8,7 @@ class Offer{
 
     constructor(date,uObj){
 
-        this.stobj = uObj.offer;//db stored object
+        this.stobj = uObj;//db stored object
         this.viewer = new OrderViewer();
 
     }
@@ -25,17 +25,16 @@ class Offer{
         });
     }
 
-    SetOfferDB(obj, dict,cb) {
-        this.stobj.data = obj.data;
-        window.db.SetObject('offerStore',obj,function (res) {
-            obj.date = 'tmplt';
-            delete obj.published;
-            window.db.SetObject('offerStore',obj);
+    SetOfferDB(items) {
+        let that = this;
+        window.db.SetObject('offerStore',items,function (res) {
+            items.date="tmplt";
+            window.db.SetObject('offerStore',items);
         });
-        if(dict){
-            for(let i in dict){
+        if(that.stobj.dict.dict){
+            for(let i in that.stobj.dict.dict){
                 try {
-                    window.db.SetObject('dictStore', {hash: i, obj: dict[i]}, function (res) {
+                    window.db.SetObject('dictStore', {hash: i, obj: that.stobj.dict.dict[i]}, function (res) {
 
                     });
                 }catch(ex){

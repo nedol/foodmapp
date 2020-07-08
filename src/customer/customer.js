@@ -1,49 +1,72 @@
 'use strict'
 export {Customer};
 
-let utils = require('../utils/utils');
-
-require('webpack-jquery-ui');
-require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
-
 import {OrderViewer} from "../order/order.viewer";
-
-
-require('../../lib/bootstrap-rating/bootstrap-rating.min.js')
-
 import {Dict} from '../dict/dict.js';
-
-//import {RTCOperator} from "../rtc/rtc_operator"
-
+import {Events} from '../map/events/events';
 import {OLMap} from '../map/map';
 import proj from 'ol/proj';
 import Extent from 'ol/extent';
-
-var urlencode = require('urlencode');
-
-// var ColorHash = require('color-hash');
-
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferOrder} from "./init.frame";
 
-var moment = require('moment/moment');
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
+require('bootstrap');
+require('bootstrap-select');
+require('../../lib/bootstrap-rating/bootstrap-rating.min.js');
+
+//import {RTCOperator} from "../rtc/rtc_operator"
+// var ColorHash = require('color-hash');
+
+
+import {Utils} from "../utils/utils";
+import {Categories} from "../categories/categories";
+let utils = new Utils();
+
 
 window.TriggerEvent = function (el, ev) {
     $(el).trigger(ev);
+}
+
+jQuery.loadScript = function (url, callback) {
+    jQuery.ajax({
+        url: url,
+        dataType: 'script',
+        success: callback,
+        async: true
+    });
+}
+
+jQuery.longTap = function(longTapCallback) {
+    return this.each(function(){
+        var elm = this;
+        var pressTimer;
+        $(elm).on('touchend mouseup', function (e) {
+            clearTimeout(pressTimer);
+        });
+        $(elm).on('touchstart mousedown', function (e) {
+            // Set timeout
+            pressTimer = window.setTimeout(function () {
+                longTapCallback.call(elm);
+            }, 500)
+        });
+    });
 }
 
 
 
 class Customer{
 
-    constructor(uObj) {
-
+    constructor() {
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+    }
 
+    SetParams(uObj){
         this.uid = uObj.uid;
         this.psw = uObj.psw;
         this.email = '';//!!! no need to registrate
@@ -52,7 +75,6 @@ class Customer{
         this.profile = new Profile(uObj.profile);
 
         this.orders = '';
-
     }
 
     IsAuth_test(cb){
@@ -61,155 +83,45 @@ class Customer{
         console.log(navigator.userAgent);
 
         if(!this.profile.profile.email && !this.profile.profile.mobile) {
-            window.user.OnClickUserProfile('profile', () => {
-                this.map = new OLMap();
-                this.map.Init();
-                this.import = new Import(this.map);
-                that.import.GetApprovedCustomer(that.uid);
-                let layers = that.map.ol_map.getLayers();
-                layers.forEach(function (layer, i, layers) {
-                    if (layer.type === "VECTOR") {
-                        if (layer.getSource())
-                            layer.getSource().clear(true);
-                        if (layer.getSource().source) {
-                            layer.getSource().source.clear(true);
-                        }
-                    }
-                });
 
-                this.map.ol_map.on('click', function (event) {
-                    onMapClick(event);
-                });
-            });
-
-        }else{
-            this.map = new OLMap();
-            this.map.Init();
-            this.import = new Import(this.map);
-            let layers = that.map.ol_map.getLayers();
-            layers.forEach(function (layer, i, layers) {
-                if (layer.type === "VECTOR") {
-                    if (layer.getSource())
-                        layer.getSource().clear(true);
-                    if (layer.getSource().source) {
-                        layer.getSource().source.clear(true);
-                    }
-                }
-            });
-            this.import.GetApprovedCustomer(that.uid);
-            this.map.ol_map.on('click', function (event) {
-                onMapClick(event);
-            });
-        }
-
-        function onMapClick(event) {
-
-            if (!event.loc_mode) {
-                that.map.geo.StopLocation();
-                window.user.isShare_loc = false;
-            }
-
-            // $('.menu_item', $('.client_frame').contents()).remove();
-            // $('#client_frame_container').css('display','none');
-            // $('.carousel-indicators', $('.client_frame').contents()).empty();
-            // $('.carousel-inner', $('.client_frame').contents()).empty();
-
-            var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
-
-            var latlon = proj.toLonLat(event.coordinate);
-            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
-            // and add it to the Map
-
-            window.sets.coords.cur = event.coordinate;
-
-            $('#datetimepicker').data("DateTimePicker").hide();
-
-            var time = new Date().getTime();
-            localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
-                "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
-
-            if (!event.loc_mode && $('#categories').is(':visible'))
-                $('#categories').slideToggle('slow', function () {
-                    $('.dropdown-menu').removeClass('show');
-                });
-            if (!event.loc_mode && $('.sup_menu').is(':visible')) {
-                $('.sup_menu').animate({'width': 'toggle'});
-            }
-
-            if (!event.loc_mode && $('#menu_items').is(':visible'))
-                $('#menu_items').slideToggle('slow', function () {
-                });
-
-
-
-            that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-
-                let closest = feature.getGeometry().getClosestPoint(event.pixel);
-
-                if(feature.values_)
-                    if(feature.values_.features && feature.values_.features.length >1) {//cluster
-
-                        var coordinates = [];
-                        $.each(feature.values_.features, function (key, feature) {
-                            coordinates.push(feature.getGeometry().flatCoordinates);
-                        });
-
-                        var extent = Extent.boundingExtent(coordinates);
-                        var buf_extent = Extent.buffer(extent, 5);
-                        //ol.extent.applyTransform(extent, transformFn, opt_extent)
-                        that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
-
-                        that.map.ol_map.getView().animate({
-                                center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
-                            },
-                            function () {
-
-                            });
-                    }else {
-
-                        if(feature){
-                            if(feature.values_.features && feature.values_.features.length === 1)
-                                feature = feature.values_.features[0];
-
-                            if (feature.values_.type === 'supplier') {
-                                window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
-                                    if (obj !== -1) {
-                                        if (window.user.constructor.name === 'Customer') {
-                                            if (!window.user.viewer) {
-                                                window.user.viewer = new OfferOrder();
-                                            }
-                                            window.user.viewer.InitCustomerOrder(obj);
-                                        }
-                                    }
-                                });
-                            } else if (feature.values_.type === 'customer') {
-                                window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
-                                    let orderViewer = new OrderViewer();
-                                    orderViewer.InitOrders(objs);
-                                });
-                            }
-                        }
-                    }
-
-            });
-
-        }
-
-        this.MakeDraggableCarousel($('#items_carousel')[0]);
-
-        $('#items_carousel').on('click touchstart', function (ev) {
             setTimeout(function () {
-                if($('.carousel-item.active').attr('drag')!=='true')
-                    that.map.OnItemClick($('.carousel-item.active')[0]);
-            },150);
+                $(that.map.ol_map).trigger('moveend');
+            },3000);
+
+            this.map = new OLMap();
+            this.import = new Import(this.map);
+
+            this.events = new Events(this.map);
+
+            that.import.LoadDataByKey(window.user.uid, 'demo', function (res) {
+
+            });
+
+            that.map.Init(0,0);
+
+            that.map.EmptyMap();
+            that.import.GetApprovedCustomer(that.uid);
+            that.map.ol_map.on('click', function (event) {
+                if(!event.loc_mode)
+                    event.loc_mode = false;
+                that.OnMapClick(event);
+            });
+        }
+
+        $('#category_container').load('./html/categories/food.'+window.sets.lang+'.html?v='+String(Date.now())+' #cat_incl',()=> {
+            this.categories = new Categories(this);
+
         });
+
+        $('#profile_but').on('click touchstart',{data:'orders'}, this.OnClickUserProfile);
+
+        that.MakeDraggableCarousel($('#items_carousel')[0]);
 
         window.network.InitSSE(this,function () {
 
         });
 
-        $.getJSON('../src/dict/sys.dict.json', function (data) {
+        $.getJSON('../src/dict/sys.dict.json?v='+new Date().valueOf(), function (data) {
             window.sysdict = new Dict(data);
             window.sysdict.set_lang(window.sets.lang, $('body'));
             window.sysdict.set_lang(window.sets.lang, $('#categories'));
@@ -222,13 +134,13 @@ class Customer{
 
         $( "#period_list" ).selectable({
             stop: function() {
-                var result;
+                let result = '';
                 $( ".ui-selected", this ).each(function(i) {
-                    let index = $( "#period_list li" ).index( this );
+                    let index = $( "#period_list a" ).index( this );
                     if(i===0)
-                    result = $($( "#period_list li")[index]).text().split(' - ')[0];
+                    result = $($( "#period_list a")[index]).text().split(' - ')[0];
                     if($( ".ui-selected").length===i+1)
-                        result+=" - "+ $($( "#period_list li")[index]).text().split(' - ')[1];
+                        result+=" - "+ $($( "#period_list a")[index]).text().split(' - ')[1];
                 });
                 $('.sel_period').text(result);
 
@@ -247,18 +159,119 @@ class Customer{
 
         this.DateTimePickerEvents();
 
-
         $('#datetimepicker').trigger("dp.change");
+
+
 
 
     }
 
 
+    OnMapClick(event) {
+        let that = this;
+        if (!event.loc_mode) {
+            that.map.geo.StopLocation();
+            window.user.isShare_loc = false;
+        }
+
+        if(isNaN(event.coordinate[0]) || isNaN(event.coordinate[1]))
+            return;
+
+        // $('.menu_item', $('.client_frame').contents()).remove();
+        // $('#client_frame_container').css('display','none');
+        // $('.carousel-indicators', $('.client_frame').contents()).empty();
+        // $('.carousel-inner', $('.client_frame').contents()).empty();
+
+        var degrees = proj.transform(event.coordinate, 'EPSG:3857', 'EPSG:4326');
+
+        var lonlat = proj.toLonLat(event.coordinate);
+        $('#locText').text(lonlat[1].toFixed(6) + " " + lonlat[0].toFixed(6));
+        // and add it to the Map
+
+        window.sets.coords.cur = event.coordinate;
+
+        $('#datetimepicker').data("DateTimePicker").hide();
+
+        var time = new Date().getTime();
+
+        localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
+            "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":"+that.map.ol_map.getView().getZoom()+"}");
+
+        if (!event.loc_mode && $('#categories').is(':visible'))
+            $('#categories').slideToggle('slow', function () {
+                $('.dropdown-menu').removeClass('show');
+            });
+        if (!event.loc_mode && $('.sup_menu').is(':visible')) {
+            $('.sup_menu').animate({'width': 'toggle'});
+        }
+
+        if (!event.loc_mode && $('#menu_items').is(':visible'))
+            $('#menu_items').slideToggle('slow', function () {
+            });
+
+
+        that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+        // that.map.ol_map.getFeaturesAtPixel(event.pixel, null, function (feature, layer) {
+            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+
+            let closest = feature.getGeometry().getClosestPoint(event.pixel);
+
+            if(feature.values_)
+                if(feature.values_.features && feature.values_.features.length >1) {//cluster
+
+                    var coordinates = [];
+                    $.each(feature.values_.features, function (key, feature) {
+                        coordinates.push(feature.getGeometry().flatCoordinates);
+                    });
+
+                    var extent = Extent.boundingExtent(coordinates);
+                    var buf_extent = Extent.buffer(extent, 5);
+                    //ol.extent.applyTransform(extent, transformFn, opt_extent)
+                    that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
+
+                    that.map.ol_map.getView().animate({
+                            center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
+                        },
+                        function () {
+
+                        });
+                }else {
+
+                    if(feature){
+                        if(feature.values_.features && feature.values_.features.length === 1)
+                            feature = feature.values_.features[0];
+
+                        if (feature.values_.type === 'supplier') {
+                            window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
+                                if (obj !== -1) {
+                                    if (window.user.constructor.name === 'Customer') {
+                                        if (!window.user.viewer) {
+                                            window.user.viewer = new OfferOrder();
+                                        }
+                                        window.user.viewer.InitCustomerOrder(obj);
+                                    }
+                                }
+                            });
+                        } else if (feature.values_.type === 'customer') {
+                            window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
+                                let orderViewer = new OrderViewer();
+                                orderViewer.InitOrders(objs);
+                            });
+                        }else if(feature.values_.type === 'foodtruck'){
+                            that.map.Carousel([feature.values_.object]);
+                        }
+                    }
+                }
+
+        });
+
+    }
+
     DateTimePickerEvents(){
         let that = this;
 
         $('#dt_from').on("dp.change",this, function (ev) {
-
+            let moment = require('moment/moment');
             let date_from =  new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
             let date = moment($(this).data("DateTimePicker").date().format('HH:mm'), 'HH:mm');
             if(date.isBefore(date_from)) {
@@ -319,13 +332,18 @@ class Customer{
 
             $(this).data("DateTimePicker").toggle();
 
-            that.import.GetApprovedCustomer(that.uid);
+            if(that.import)
+                that.import.GetApprovedCustomer(that.uid);
 
             that.SetOrdCnt();
 
-
-            $("#items_carousel").carousel('dispose');
-            $('.carousel-item').remove();
+            if(that.map) {
+                that.map.EmptyMap();
+                that.map.ol_map.dispatchEvent('moveend');
+                // window.user.import.LoadDataByKey(window.user.uid,'М11',function (res) {
+                //
+                // });
+            }
 
         });
     }
@@ -339,7 +357,7 @@ class Customer{
         $('#dt_to').val(to);
         let layers = this.map.ol_map.getLayers();
         layers.forEach(function (layer, i, layers) {
-            if(layer.constructor.name==="_ol_layer_Vector_") {
+            if(layer.type==="VECTOR") {
                 layer.getSource().refresh();
             }
         });
@@ -416,6 +434,7 @@ class Customer{
         });
     };
 
+
     DeleteOrder(date,title,cb){
         let that = this;
 
@@ -448,11 +467,17 @@ class Customer{
     }
 
 
-    OnClickUserProfile(tab, cb){
+    OnClickUserProfile(ev){
+
+        let tab = ev.data.data;
+        $('#my_profile_container iframe').attr('src','./customer/profile.customer.'+window.sets.lang+'.html?v='+new Date().valueOf());
 
         $('#my_profile_container').css('display','block');
-        $('#my_profile_container iframe').on('load',function () {
+
+        $('#my_profile_container iframe').on('load', function () {
+
             $('#my_profile_container iframe').off();
+
             $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
 
             $('.tab-pane', $('#my_profile_container iframe').contents()).removeClass('active');
@@ -461,45 +486,61 @@ class Customer{
             $('#' + tab, $('#my_profile_container iframe').contents()).addClass('active');
             $('#' + tab, $('#my_profile_container iframe').contents()).removeClass('fade');
 
-            $('#' + tab, $('#my_profile_container iframe').contents()).trigger('click touchstart');
 
+            //$('#' + tab, $('#my_profile_container iframe').contents()).trigger('click touchstart');
+
+            $('.close_browser',$('#my_profile_container iframe').contents()).off('touchstart click');
             $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
-                if($('#my_profile_container iframe')[0].contentWindow.profile_cus.Close())
+                $('#my_profile_container iframe')[0].contentWindow.profile_cus.Close(function () {
                     $('#my_profile_container').css('display', 'none');
-                if(cb)
-                    cb();
+                    $('.loader').css('display','none');
+                });
             });
-        });
-        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=6");
-
+        })
     }
 
     MakeDraggableCarousel(el){
         let that = this;
 
-        $(el).draggable(
-            //{ distance: 40},
-            { delay: 100},
-            {start: function (ev) {
-                console.log("drag start");
-                $('.carousel-item.active').attr('drag','true');
-            },
-            drag: function (ev) {
+            let carus_pos = JSON.parse(localStorage.getItem("carousel_pos"));
+            if (carus_pos)
+                $(el).offset({top: carus_pos.top, left: carus_pos.left});
+            $(el).draggable(
+                {delay: 100},
+                {
+                    start: function (ev) {
+                        console.log("drag start");
+                        $(el).find('.carousel-item').attr('drag', 'true');
+                        $(el).find('.nav-link').attr('drag', 'true');
+                    },
+                    drag: function (ev) {
 
-            },
-            stop: function (ev) {
+                    },
+                    stop: function (ev) {
 
-                // var rel_x = parseInt($(el).position().left / window.innerWidth * 100);
-                // $(el).css('right', rel_x + '%');
-                // var rel_y = parseInt($(el).position().top / window.innerHeight * 100);
-                // $(el).css('bottom', rel_y + '%');
-                $('.carousel-item.active').attr('drag','false');
+                        let left = $(el).position().left;
+                        // $(el).css('right', rel_x + '%');
+                        let top = $(el).position().top;
+                        // $(el).css('bottom', rel_y + '%');
+                        $(el).find('.carousel-item').attr('drag', 'false');
+                        $(el).find('.nav-link').attr('drag', 'false');
+                        localStorage.setItem("carousel_pos", JSON.stringify({top: top, left: left}));
+                        $(el).draggable("disable")
+                    }
+                });
 
-            }
-        });
-        $( ".ui-draggable" ).disableSelection();
+            $(el).draggable("disable");
+
+            $('.carousel-inner').on('click touchstart', function (ev) {
+                let el = this;
+                setTimeout(function () {
+                    if ($(el).attr('drag') !== 'true')
+                        that.map.OnItemClick($(el).find('.carousel-item')[0]);
+                }, 200);
+            });
+
     }
 
     OnMessage(data){
@@ -527,6 +568,7 @@ class Customer{
                 if(!obj) {
                     obj = data.obj;
                 }
+                let urlencode = require('urlencode');
                 obj.data = JSON.parse(urlencode.decode(data.obj.offer));
                 obj.dict = JSON.parse(data.obj.dict);
                 let loc = data.obj.location;
@@ -584,8 +626,12 @@ class Customer{
             for(let i in res){
                 let order = res[i];
                 for(let item in order.data) {
-                    if(order.data[item]) {
-                        $('.ord_cnt').text(++cnt);
+                    if(order.data[item] && order.data[item].ordlist) {
+                        let num = 0;
+                        _.findKey(order.data[item].ordlist, function(o){
+                            num+=o.qnty;
+                        });
+                        $('.ord_cnt').text(num);
                     }
                 }
             }

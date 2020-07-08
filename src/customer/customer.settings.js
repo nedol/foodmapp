@@ -1,6 +1,6 @@
 export {CustomerSettings}
 
-import {Network} from "../../network";
+import {Сетка} from "../../network";
 
 
 class CustomerSettings {
@@ -11,12 +11,13 @@ class CustomerSettings {
 
     Open() {
         let that = this;
-        this.network = new Network(host_port);
+        this.network = new Сетка(host_port);
         that.fillForm();
 
         $('.submit').on('click', this, function (ev) {
             let form = $('form');
             ev.data.OnSubmit(form);
+            $('.loader', $(window.parent.document).contents()).css('display','block');
         });
 
         $('input').on('change', function (ev) {

@@ -76,7 +76,7 @@ class Profile{
                 $('#profile_container').css('display','none');
             });
         });
-        browser.attr('src', './profile.supplier.html');
+        browser.attr('src', './profile.supplier.ru.html');
     }
     //Deliver
     InitDeliverProfile(){
@@ -142,7 +142,7 @@ class Profile{
         let browser = ovc.find('.browser');
         let avatar = ovc.find('.avatar').attr('src');
 
-        browser.attr('src', '../profile.supplier.html');
+        browser.attr('src', '../profile.supplier.ru.html');
         browser.off('load');
         browser.on('load', function () {
             browser[0].contentWindow.InitProfileSupplier({supuid:that.uid,user:window.user.constructor.name},

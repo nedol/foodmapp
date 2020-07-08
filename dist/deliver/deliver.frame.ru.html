@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2019 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Доставка</title>
+</head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
+<link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+<!--<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css" rel="stylesheet" >-->
+
+<!--<link  rel="stylesheet" href="../../lib/tablesorter/dist/css/theme.default.min.css">-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+
+<!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../../lib/style.css"  type='text/css'>
+
+<link id="cus_link" rel="stylesheet" href="../css/supplier.css" type='text/css'>
+
+<script type="text/javascript" src="../host.js"></script>
+<script type="text/javascript" src="../deliver_offer.js?v=19"></script>
+
+<link id="cus_link" rel="stylesheet" href="../css/supplier.css?v=3" type='text/css'>
+
+
+<script type='application/javascript'>
+    document.addEventListener("touchstart", function() {}, false);
+</script>
+
+
+<body>
+
+<div style="display:block; position: absolute;bottom: 50%; right: 2px; margin: 5px; color: white; z-index: 10000">
+    <span class="close 	fa fa-share-square-o" style="color:#0088BB" title="Publish"></span>
+</div>
+
+<ul class="nav nav-tabs">
+    <li><a data-toggle="tab" href="#editor_pane" data-translate="">
+        <img id="range_img" src="../images/product_range.png" style="height:30px" alt="Ассортимент">
+    </a>
+    </li>
+    <li><a data-toggle="tab" href="#orders_pane" data-translate="">
+        <img id="orders_img" src="../images/orders.png" style="height:30px" alt="Заказы">
+        <span>(</span><span class="order_amnt">0</span><span>)</span>
+    </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#profile_pane" class="fa fa-user fa-2x" data-translate="">
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <div class="tab-pane active" id="editor_pane" style="width: 100%; margin: 0 auto;">
+        <div class="modal-content">
+            <ul class="nav nav-tabs" id="menu_tabs">
+                <li id="add_tab_li" class="nav-item" title="add tab" style="display: none;">
+                    <span id="add_tab" class="add_tab nav-link" href="#add_tab" style="visibility: hidden;"></span>
+                </li>
+            </ul>
+            <div class="tab-content"
+                 style="position:relative;height: 100%;overflow-y: scroll;">
+                <!--div_tab_inserted-->
+                <div id="add_tab_div"  class="tab-pane fade" style="width:100%;border: none;"></div>
+
+            </div>
+        </div>
+        <div style="display:block; position:fixed;bottom: 7%;right: 1%; margin: 10px;  z-index: 1000">
+            <span id="add_item" class="fa fa-plus" style="color: black; opacity:.5;font-size: 30px;"></span>
+        </div>
+
+        <div  id="menu_item_tmplt">
+
+            <div class="content_div row">
+                <label class="item_cb btn" title="Publish" style="visibility: visible;">
+                    <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="item_cb_0" pos="0" tab="Drinks">
+                    <i class="fa fa-square-o fa-2x"></i>
+                    <i class="fa fa-check-square-o fa-2x"></i>
+                    <div>
+                        <i style="position:relative;color:grey; bottom:12px;">опубл</i>
+                    </div>
+                </label>
+                <h4>
+                    <textarea  class="item_title"  placeholder="название*"></textarea>
+                </h4>
+                <div class="item_content collapse" style="position: absolute; top:40px;width:100%;height: 100%">
+                    <div class="content">
+                        <textarea class="content_text"  placeholder="описание"  data-translate contenteditable="true"></textarea>
+                    </div>
+                </div>
+                <div style="position:relative;width: 95%; text-align: center">
+                    <i class="fa fa-image fa-3x" style="position:absolute; z-index:10;top:50%; right: 50%; left: 50%; color:grey; background-color: white"></i>
+                    <div class="cert_container carousel slide"  data-ride="carousel">
+
+                        <div class="carousel-inner mx-auto">
+                            <img class="img-fluid"   src="../images/empty.png" alt="">
+                        </div>
+                    </div>
+
+                    <a class="brand" style="position: absolute;bottom: 0px; right:3px;color:red;font-size:2em;z-index: 1000">
+                        <img class="brand_img" style="image-orientation:from-image;border-width: 0;" height="40px"
+                             src="">
+                        &trade;
+                    </a>
+                </div>
+
+            </div>
+            <div class="">
+                <div class="cert_container" style="
+                            margin-top:5px;
+                            margin-right:1px;
+                            overflow-x: scroll;
+                            white-space: nowrap;
+                            z-index:20;"></div>
+            </div>
+
+            <div class="row" style="margin: auto;">
+                <div class="pack_container dropup" style="width:40%;text-align: center;">
+                    <ul class="pack_list dropdown-menu" role="menu" ></ul>
+                    <textarea  class="item_pack dropdown-toggle" rows="1"  data-toggle="dropdown"
+                               placeholder="упак*"   data-toggle="popover"  data-content="Click" title="package"></textarea>
+                    <!--<span class="caret" style="display: inline-block;  visibility: hidden"></span>-->
+                </div>
+
+                <div class="price_div" style="width:20%;">
+                    <textarea class="input item_price" rows="1" contenteditable="true" placeholder="цена*"></textarea>
+                </div>
+
+                <div class="bargain_div" style="width:15%;">
+                    <label class="item_cb btn" title="bargain" data-toggle="tooltip" data-placement="top" style="visibility: visible;">
+                        <input type="checkbox" class="haggle checkbox-inline" style="display: none;" title="">
+                        <i class="fa fa-square-o fa-2x"></i>
+                        <i class="fa fa-check-square-o fa-2x"></i>
+                        <i style="position:relative;bottom:12px;color:grey;">торг</i>
+                    </label>
+                </div>
+
+                <div class="qnty_div" style="width:24%;">
+                    <textarea class="input item_qnty" rows="1" contenteditable="true" placeholder="кол-во"></textarea>
+                </div>
+            </div>
+
+            <span  data-toggle="collapse" data-target=".extras"
+                   style="display:none;position: relative; z-index: 1000;color: grey">
+                <i class="fa  fa-2x fa-angle-double-down" aria-hidden="true"></i>
+                <i style="position:relative;color:grey; bottom:2px;right: 2px;">добавки</i>
+            </span>
+
+
+            <div class="extras collapse" style="margin: 0 auto;">
+
+                <div class="row">
+                    <div class="add_div" style="width:60%;">
+                        <textarea class="input extra_title" rows="1" contenteditable="true" placeholder="название"></textarea>
+                    </div>
+
+                    <div class="add_price_div" style="width:24%;">
+                        <textarea class="input extra_price" rows="1" contenteditable="true" placeholder="цена"></textarea>
+                    </div>
+                    <div class="add_extra_div" style="margin-right: 2px;  z-index: 1000">
+                        <span class="add_extra fa fa-plus-circle" style="color: black; opacity:.5;font-size: 30px;"></span>
+                    </div>
+                </div>
+            </div>
+
+            <input type="file" class="file" multiple accept="image/*" style="display: none"/>
+        </div>
+    </div>
+
+    <div class="tab-pane" id="orders_pane">
+        <div  class="table-responsive text-nowrap">
+            <table id="ordtable" class="tablesorter" cellspacing="0" width="100%">
+                <thead style="color:gray;background-color: #f3f3f3">
+                <tr>
+                    <th scope="col">
+                        <span class="fa fa-hashtag"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                    </th>
+                    <th scope="col"><!-- checkbox status -->
+                        <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                    </th>
+                    <th  scope="col">
+                        <span class="fa fa-square"  data-translate title=""></span>
+                    </th>
+                    <th scope="col">
+                        <span class="fa fa-square"  data-translate title=""></span>
+                    </th>
+                    <th  scope="col">
+                        <span class="fa fa-square"  data-translate title=""></span>
+                    </th>
+                    <th  scope="col">
+                        <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                    </th>
+
+                    <th scope="col">
+                        <span class="fa fa-usd"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                    </th>
+                    <th scope="col">
+                        <span class="fa fa-user"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                    </th>
+                    <th  scope="col">
+                        <span class="fa fa-shopping-cart"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                    </th>
+
+                    <th scope="col">
+                        <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                    </th>
+                    <th  scope="col">
+                        <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                    </th>
+                    <th class="marketer"  scope="col">
+                        <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                    </th>
+                    <th scope="col">
+                        <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                    </th>
+                    <!--<th scope="col">-->
+                    <!--<span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>-->
+                    <!--</th>-->
+                </tr>
+                </thead>
+                <tbody style="background-color: #e6e6e6;"></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="tab-pane" id="profile_pane">
+        <div>
+            <div class="col">
+                <div class="browser_container" id="profile_container"
+                     style="
+                        position: absolute;
+                        margin-top: 10px;
+                        overflow: visible;
+                        z-index:2000;
+                        height: 90%;
+                        right:10px;
+                        /*max-height: 90% !important;*/
+                        /*min-height: 70% !important;*/
+                        width:96%;
+                        border: solid 0px lightslategrey;
+                        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Профиль</a></li>
+                        <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
+                        <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
+                        <li><a data-toggle="tab" href="#payment_pane" data-translate="">Оплата</a></li>
+                        <li></li>
+                    </ul>
+
+                    <div class="tab-content">
+                        <input type="hidden" id="supuid" class="form-control" name="supuid">
+                        <div class="tab-pane active" id="profile">
+                            <div class="row">
+                                <div class="col-sm-3  text-center">
+                                    <img src="" class="avatar img-circle img-thumbnail" alt="avatar">
+                                    <input type="file" class="center-block file-upload" style="display: none">
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="name"><h4>Имя</h4></label>
+                                            <input type="text"  id="name" class="form-control" name="name">
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label for="email"><h4>Email</h4></label>
+                                            <input type="email"  id="email" class="form-control" name="email" data-toggle="tooltip">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="mobile"><h4>Номер тел</h4></label>
+                                            <input type="phone" id="mobile"  class="form-control" name="mobile">
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label for="place"><h4>Адрес торговой точки</h4></label>
+                                            <input type="text"  class="form-control"  id="place"  placeholder="ФудСити, пав.А, 01-234" title="как вас найти?">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="dropdown col-xs-6">
+                                            <label for="worktime"><h4>Время работы</h4></label>
+                                            <textarea  id="worktime" type="text" class="sel_period"
+                                                       placeholder="08:00 - 20:00" value="08:00 - 20:00" title="working hours"></textarea>
+                                        </div>
+                                        <div class="col-xs-6" style="display: none">
+                                            <label for="delivery"><h4>Условия доставки</h4></label>
+                                            <div>
+                                                <textarea  id="delivery" style="width: 100%;text-align: left; ">
+                                                </textarea>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                    <div class="w-50 p-3"></div>
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="map_link">
+                                                <script>
+                                                    function copyLink(ev) {
+                                                        let textArea = document.createElement("textarea");
+                                                        textArea.textContent = ev.href;
+                                                        textArea.style.position = "fixed";  // Prevent scrolling to bottom of page in Microsoft Edge.
+                                                        document.body.appendChild(textArea);
+                                                        textArea.select();
+                                                        try {
+                                                            return document.execCommand("copy");  // Security exception may be thrown by some browsers.
+                                                        }
+                                                        catch (ex) {
+                                                            console.warn("Copy to clipboard failed.", ex);
+                                                            return false;
+                                                        }
+                                                        finally {
+                                                            $('#'+ev.id).tooltip("show");
+                                                            document.body.removeChild(textArea);
+                                                        }
+
+                                                    }
+                                                </script>
+                                                <h4> <a id="map_link" name="map_link" target="_blank" href="" onclick="copyLink(this);return false;"
+                                                        data-toggle="tooltip" data-placement="top" title="Ссылка скопирована!">Скопировать ссылку на олайн магазин</a>
+                                                </h4>
+                                            </label>
+
+                                        </div>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div><!--/tab-pane-->
+
+                        <div class="tab-pane fade" id="comments" style="overflow-y: auto; height: 400px">
+                            <div style="position: absolute;right: 0;color: red">
+                                <input type="hidden" class="rating"  data-filled="fa fa-star fa-3  custom-star" data-empty="fa fa-star-o fa-3  custom-star">
+                            </div>
+                            <div id="comments-container" style="overflow-y: hidden"></div>
+
+                        </div><!--/tab-pane-->
+                        <div class="tab-pane fade" id="settings">
+                            <div style="margin: 20px"></div>
+                            <div class="form-group dropdown">
+                                <label for="prolong"><h4>Продление</h4></label>
+                                <select id="prolong"  class="sel_prolong"  size="1" style="">
+                                    <option value="0"></option>
+                                    <option value="1">на следующие дни</option>
+                                    <!--<option value="7">на следующую неделю</option>-->
+                                </select>
+                            </div>
+
+                        </div><!--/tab-pane-->
+                        <div class="tab-pane" id="payment_pane">
+                            <label for="place"><h4>Промо-код</h4></label>
+                            <input type="text"  class="form-control"  id="promo"  placeholder="" title="promo">
+                        </div>
+                    </div><!--/tab-content-->
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>
+
+
+<style>
+    .unpublished{
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .published{
+        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(0%);
+    }
+</style>
+
+<div class="container center-block" style="display:none;position:absolute;bottom:10%;right:40%;z-index: 3000">
+    <div class="span4">
+        <div class="alert alert-danger fade">
+            <strong><h4></h4></strong>
+        </div>
+    </div>
+</div>
+
+</body>
+
+</html>

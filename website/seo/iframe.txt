@@ -1,0 +1,22 @@
+Скопируйте приведенный ниже код и вставьте его на каждую страницу сайта.
+Вставьте этот фрагмент в раздел <head> кода страницы как можно ближе к началу:
+
+
+<!-- Google Tag Manager -->
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-WPDDTPN');</script>
+<!-- End Google Tag Manager -->
+
+
+Также вставьте сразу после открывающего тега <body> следующий фрагмент:
+
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPDDTPN"
+height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+Подробнее о том, как добавить фрагмент кода Google Менеджера тегов, читайте в руководстве по началу работы.
+

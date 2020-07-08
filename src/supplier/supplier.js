@@ -11,6 +11,10 @@ require('bootstrap');
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
+
+import "add-to-homescreen/dist/style/addtohomescreen.css"
+import "add-to-homescreen/dist/addtohomescreen.min.js"
+
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
@@ -21,20 +25,22 @@ import {OLMap} from '../map/map'
 import proj from 'ol/proj';
 import Point from 'ol/geom/point';
 import Feature from 'ol/feature';
+import Extent from 'ol/extent';
 
 import {Overlay} from "../map/overlay/overlay";
 
 import {Profile} from "../profile/profile";
 
 import {Import} from "../import/import";
-import {OfferEditor} from "./init.offer.frame";
+import {OfferSupplier} from "./init.offer.supplier";
+import {OfferOrder} from "./init.frame";
 
 
 var urlencode = require('urlencode');
 
 var ColorHash = require('color-hash');
 
-
+import {Events} from '../map/events/events';
 import {Offer} from '../offer/offer';
 import {Dict} from '../dict/dict.js';
 
@@ -75,54 +81,61 @@ $(document).on("click" , "#target" , function() {
 
 });
 
+require("../../lib/DragDropTouch.js");
+require("../../lib/blueimp-load-image/js/load-image.all.min.js");
+
 
 export class Supplier{
 
     constructor(uObj) {
-        this.path  ="http://localhost:63342/d2d/server";
-        if(host_port.includes('nedol.ru'))
+
+        this.path = "http://localhost:63342/d2d/server";
+        if (host_port.includes('nedol.ru'))
             this.path = host_port;
 
         this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
         this.user_ovl;
 
-        if(uObj) {
-            this.offer = new Offer(this.date, uObj);
-            this.offer.GetOfferDB(this.date,function () {
+        if (uObj) {
 
-            });
-            this.editor = new OfferEditor();//offer editor
+            let that = this;
+
+            that.offer = new Offer(that.date, uObj);
+            this.map = new OLMap();
+            that.map.Init(uObj.latitude, uObj.longitude);
+            that.offer.stobj.data = uObj.data;
+            uObj.date = that.date;
+
+            this.editor = new OfferSupplier();//offer editor
 
             this.uid = uObj.set.uid;
             this.psw = uObj.set.psw;
             this.promo = uObj.set.promo;
+            this.prolong = uObj.set.prolong;
             this.email = uObj.set.profile.email;
 
             this.profile = new Profile(uObj.set.profile);
             this.profile.InitSupplierProfile(this);
 
-            this.settings = uObj.set.settings?uObj.set.settings:{};
-
-            this.map = new OLMap();
-
             this.import = new Import(this.map);
 
             this.isShare_loc = false;
+
+            this.events = new Events(this.map);
         }
 
     }
 
 
-    IsAuth_test(cb){
+    IsAuth_test(lat, lon,cb){
         let that = this;
 
-        this.map.Init();
         window.network.InitSSE(this,function () {
 
         });
 
-        $.getJSON('../src/dict/sys.dict.json', function (data) {
+        $.getJSON('../src/dict/sys.dict.json?v=2', function (data) {
             window.sysdict = new Dict(data);
             window.sysdict.set_lang(window.sets.lang, $('body'));
             window.sysdict.set_lang(window.sets.lang, $('#categories'));
@@ -134,16 +147,6 @@ export class Supplier{
             cb();
         });
 
-        if(this.settings && this.settings.prolong==='1') {
-            window.db.GetOfferTmplt(function (obj) {
-                if(obj) {
-                    obj.date = that.date;
-                    window.db.SetObject('offerStore', obj, function (res) {
-
-                    });
-                }
-            });
-        }
 
         //class_obj.menu.menuObj = JSON.parse(data.menu);
         //this.rtc_operator = new RTCOperator(this.uid, this.email,"browser", window.network);
@@ -158,16 +161,13 @@ export class Supplier{
                 window.user.isShare_loc = false;
             }
 
-            // $('.menu_item', $('.client_frame').contents()).remove();
-            // $('#client_frame_container').css('display','none');
-            // $('.carousel-indicators', $('.client_frame').contents()).empty();
-            // $('.carousel-inner', $('.client_frame').contents()).empty();
+            if(event.coordinate) {
+                var latlon = proj.toLonLat(event.coordinate);
+                $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
+                // and add it to the Map
 
-            var latlon = proj.toLonLat(event.coordinate);
-            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
-            // and add it to the Map
-
-            window.sets.coords.cur = event.coordinate;
+                window.sets.coords.cur = event.coordinate;
+            }
 
             $('#datetimepicker').data("DateTimePicker").hide();
 
@@ -179,6 +179,7 @@ export class Supplier{
                 $('#categories').slideToggle('slow', function () {
                     $('.dropdown-menu').removeClass('show');
                 });
+
             if (!event.loc_mode && $('.sup_menu').is(':visible')) {
                 $('.sup_menu').animate({'width': 'toggle'});
             }
@@ -187,108 +188,69 @@ export class Supplier{
                 $('#menu_items').slideToggle('slow', function () {
                 });
 
+            if(event.pixel)
+                that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
+                    let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
-            that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
-                let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
+                    let closest = feature.getGeometry().getClosestPoint(event.pixel);
 
-                let closest = feature.getGeometry().getClosestPoint(event.pixel);
+                    if(feature.values_)
+                        if(feature.values_.features && feature.values_.features.length >1) {//cluster
 
-                if(feature.values_)
-                    if(feature.values_.features && feature.values_.features.length >1) {//cluster
-
-                        var coordinates = [];
-                        $.each(feature.values_.features, function (key, feature) {
-                            coordinates.push(feature.getGeometry().flatCoordinates);
-                        });
-
-                        var extent = Extent.boundingExtent(coordinates);
-                        var buf_extent = Extent.buffer(extent, 5);
-                        //ol.extent.applyTransform(extent, transformFn, opt_extent)
-                        that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
-
-                        that.map.ol_map.getView().animate({
-                                center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
-                            },
-                            function () {
-
+                            var coordinates = [];
+                            $.each(feature.values_.features, function (key, feature) {
+                                coordinates.push(feature.getGeometry().flatCoordinates);
                             });
-                    }else {
 
-                        if(feature){
-                            if(feature.values_.features && feature.values_.features.length === 1)
-                                feature = feature.values_.features[0];
+                            var extent = Extent.boundingExtent(coordinates);
+                            var buf_extent = Extent.buffer(extent, 5);
+                            //ol.extent.applyTransform(extent, transformFn, opt_extent)
+                            that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
 
-                            if (feature.values_.type === 'supplier') {
-                                window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
-                                    if (obj !== -1) {
-                                        if (window.user.constructor.name === 'Supplier') {
+                            that.map.ol_map.getView().animate({
+                                    center: feature.getGeometry().flatCoordinates, duration: window.sets.animate_duration
+                                },
+                                function () {
+
+                                });
+                        }else {
+
+                            if(feature){
+                                if(feature.values_.features && feature.values_.features.length === 1)
+                                    feature = feature.values_.features[0];
+
+                                if (feature.values_.type === 'supplier') {
+                                    window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
+                                        if (obj !== -1) {
                                             //window.user.viewer = new OfferDeliver(obj.dict);
-                                            $("a[href=#profile]").text('Мой профиль')
-                                        }else if (window.user.constructor.name === 'Customer') {
+                                            //$("a[href=#profile]").text('Мой профиль')
+
                                             if (!window.user.viewer) {
                                                 window.user.viewer = new OfferOrder();
                                             }
                                             window.user.viewer.InitCustomerOrder(obj);
-                                        }
 
-                                    }
-                                });
-                            } else if (feature.values_.type === 'customer') {
-                                window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
-                                    let orderViewer = new OrderViewer();
-                                    orderViewer.InitOrders(objs);
-                                });
+                                            return true;
+
+                                        }
+                                    });
+                                } else if (feature.values_.type === 'customer') {
+                                    window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
+                                        let orderViewer = new OrderViewer();
+                                        orderViewer.InitOrders(objs);
+
+                                        return true;
+                                    });
+                                }
+
                             }
                         }
-                    }
 
-                return true;
-            });
+                });
         });
 
     }
 
-    GetWeekOffers() {
-
-        let that = this;
-        try {
-
-            var data_obj ={
-                proj:"d2d",
-                user: this.constructor.name.toLowerCase(),
-                func:"getoffers",
-                uid: this.uid,
-                psw: this.psw,
-                email:this.email,
-                date:this.date
-            }
-
-            window.network.postRequest(data_obj, function (data) {
-                if(data.err){
-
-                }
-                else if(data.offer.length>0) {
-                    for (let i in data) {
-                        window.db.IsOffer(data.offer[i].date, function (res) {
-                            if (!res) {
-                                //delete data.offer[i].id;delete data.offer[i].supuid;
-
-                                data[i].location = proj.fromLonLat([data[i].longitude, data[i].latitude]);
-                                data[i].data = JSON.parse(data.offer[i].data);
-                                data[i].data.data = Object.assign(that.offer.stobj.data, data[i].data.data);
-                                window.db.SetObject('offerStore', data[i], function (res) {
-
-                                });
-                            }
-                        });
-                    }
-                }
-            });
-            
-        }catch(ex){
-            console.log(ex);
-        }
-    }
 
     DateTimePickerEvents(){
         let that = this;
@@ -302,6 +264,10 @@ export class Supplier{
         //     $('#datetimepicker').trigger("dp.change");
         //
         // });
+        setTimeout(function () {
+            $('#datetimepicker').trigger("dp.change");
+        }, 2000);
+
         $('#datetimepicker').on("dp.change",this, function (ev) {
 
             that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
@@ -323,7 +289,7 @@ export class Supplier{
                 }
             });
 
-            if(that.map.layers.circleLayer) {
+            if(that.map.layers && that.map.layers.circleLayer) {
                 let source = that.map.layers.circleLayer.getSource();
                 source.clear();
             }
@@ -339,10 +305,10 @@ export class Supplier{
                 that.user_ovl = '';
             }
 
-            that.map.GetObjectsFromStorage();
+            //that.map.GetObjectsFromStorage();
 
 
-            if(that.settings && that.settings.prolong==='1') {
+            if(that.prolong==='2') {
                 window.db.GetOfferTmplt(function (obj) {
                     if(obj) {
                         obj.date = that.date;
@@ -358,86 +324,74 @@ export class Supplier{
             }
 
             function getOfferData() {
-                window.db.GetOffer(that.date, function (off) {
-                    let not_empty = $.grep(off, function (el,i) {
+                if(that.offer.stobj.data) {
+                    let not_empty = $.grep(that.offer.stobj.data, function (el, i) {
                         return (el && !_.isEmpty(el.data));
                     });
-                    if(!off[0]) {
-                        window.db.GetOfferTmplt(function (res) {
-                            if(!res){
-                                that.offer.stobj = {date:that.date}
-                            }else{
-                                that.offer.stobj = res;
-                                that.offer.stobj.date = that.date;
-                                delete that.offer.stobj.published;
-                            }
-                        });
-                    }else{
-                        that.offer.stobj = off[0];
-                    }
 
-                    if(that.offer.stobj && that.offer.stobj.location) {
+                    setTimeout(function () {
+                        if (that.offer.stobj.location && that.offer.stobj.location[0] && that.offer.stobj.location[1])
+                            that.map.MoveToLocation(that.offer.stobj.location, null, function () {
 
-                        let user_cont = $('#user_container').clone()[0];
-                        $(user_cont).find('img').attr('id', 'user_2');
-                        $(user_cont).find('img').longTap(function (el) {
-                            $(user_cont).removeClass('non_draggable');
-                        });
-                        if(true)
-                            $(user_cont).draggable(
-                                {delay:100},
-                                {
-                                //cancel: ".non_draggable",
-                                start: function (ev) {
-                                    console.log("drag start");
-                                },
-                                drag: function (ev) {
-                                    //$(el).attr('drag', true);
-                                },
-                                stop: function (ev) {
-                                    console.log("drag stop");
-                                    let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
-                                    // let pixel = that.map.ol_map.getEventPixel(ev)
-                                    let pos = $(user_2).find('img').offset();
-                                    let coor = that.map.ol_map.getCoordinateFromPixel(pixel);
-                                    window.user.offer.stobj.location = coor;
-                                    that.user_ovl.overlay.values_.position = coor;
-                                    that.user_ovl.overlay.changed();
-                                    if(that.user_ovl.modify) {
-                                        that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
-                                        that.user_ovl.modify.changed();
-                                    }
-                                }
                             });
+                    }, 100);
+                }
 
-                        let status;
-                        if (!that.offer.stobj.published)
-                            status = 'unpublished';
-                        else
-                            status = 'published';
+                    let user_cont = $('#user_container').clone()[0];
+                    $(user_cont).find('img').attr('id', 'user_2');
+                    let pos;
+                    $('#user_container').draggable(
+                        {delay:100},
+                        {
+                            //cancel: ".non_draggable",
+                            start: function (ev) {
+                                console.log("drag start");
+                                pos = $(this).offset();
+                            },
+                            drag: function (ev) {
+                                //$(el).attr('drag', true);
+                            },
+                            stop: function (ev) {
+                                console.log("drag stop");
 
-                        $(user_cont).find('img').addClass(status);
-                        if(that.profile.profile.type==='marketer') {
-                            if(that.profile.profile.avatar)
-                                $(user_cont).find('img').attr('src', that.path + '/images/' + (that.profile.profile.avatar));
-                            else
-                                $(user_cont).find('img').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
-                        }
-                        that.user_ovl = new Overlay(that.map, user_cont, that.offer.stobj);
-                        $('#user_2').on('click touchstart', (ev)=> {
-                            // if(that.offer.stobj.location)
-                            //     that.map.MoveToLocation(that.offer.stobj.location);
-                        });
+                                let pixel =[ev.originalEvent.clientX, ev.originalEvent.clientY]; //$('#user_container').offset();//;
+                                let coor = that.map.ol_map.getCoordinateFromPixel(pixel);//([pixel.left,pixel.top]);
+                                window.user.offer.stobj.location = coor;
+                                that.user_ovl.overlay.values_.position = coor;
 
-                        $('#user').on('click touchstart', (ev)=> {
-                            // that.OnClickSupplierOrders();
-                        });
+                                that.map.ol_map.render();
+                                $(this).offset(pos);
+                            }
+                    });
 
-                        setTimeout(()=>{
-                            if(that.offer.stobj.location)
-                                that.map.MoveToLocation(that.offer.stobj.location);
-                        },300);
+
+                    let status;
+                    if (!that.offer.stobj.published)
+                        status = 'unpublished';
+                    else
+                        status = 'published';
+
+                    $(user_cont).find('img').addClass(status);
+
+                    that.offer.stobj.profile = that.profile.profile;
+                    that.offer.stobj.profile.type = 'marketer';
+                    that.offer.stobj.profile.lang = window.sets.lang;
+
+                    if(!that.offer.stobj.latitude &&  !that.offer.stobj.longitude) {
+                        that.offer.stobj.latitude = 0;
+                        that.offer.stobj.longitude = 0;
+
+                        $('#loc_ctrl').trigger('click');
                     }
+
+                    that.map.CreateOverlay(that.offer.stobj, function () {
+                        if(that.profile.profile.avatar) {
+                            $('#user_container').find('img').attr('src', that.path + '/images/' + (that.profile.profile.avatar));
+                            $('#user').attr('src', that.path + '/images/' + (that.profile.profile.avatar));
+                        }
+                    });
+
+
 
                     $('#map').on('drop',function (ev, data) {
                         ev.preventDefault();
@@ -448,31 +402,40 @@ export class Supplier{
                             let pixel = [ev.originalEvent.clientX, ev.originalEvent.clientY];
                             coor = that.map.ol_map.getCoordinateFromPixel(pixel);
                         }
-                        window.user.offer.stobj.location = coor;
-                        if(!that.user_ovl) {
+                        if(!that.offer.stobj)
+                            that.offer.stobj = {};
+                        that.offer.stobj.location = coor;
+                        that.offer.stobj.longitude = proj.toLonLat(coor)[0];
+                        that.offer.stobj.latitude = proj.toLonLat(coor)[1];
+                        if(!window.user.user_ovl) {
                             let user_cont = $('#user_container').clone()[0];
                             $(user_cont).find('img').attr('id', 'user_2');
-                            if(that.profile.profile.type==='marketer') {
-                                if (that.profile.profile.avatar)
-                                    $(user_cont).find('img').attr('src', that.path + '/images/' + that.profile.profile.avatar);
-                                else
-                                    $(user_cont).find('img').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
-                            }
+
+                            if (that.profile.profile.avatar)
+                                $(user_cont).find('img').attr('src',  that.path + '/images/' + that.profile.profile.avatar);
+                            else
+                                $(user_cont).find('img').attr('src', that.path + '/images/' + '4ca7b7589b452a63ef7c34acdc61ad48');
+
                             let status;
                             if (!that.offer.stobj.published)
                                 status = 'unpublished';
                             else
                                 status = 'published';
                             $(user_cont).addClass(status);
-                            that.user_ovl = new Overlay(that.map, user_cont, that.offer.stobj);
-                            //$('#user').css('visibility', 'hidden');
-                        }
+                            that.offer.stobj.profile = that.profile.profile;
+                            that.offer.stobj.profile.type = 'marketer';
+                            that.offer.stobj.profile.lang = window.sets.lang;
+                            that.offer.stobj.uid = window.user.uid;
+                            that.map.CreateOverlay(that.offer.stobj, function () {
+                                
+                            });
 
-                        that.user_ovl.overlay.values_.position = coor;
-                        that.user_ovl.overlay.changed();
-                        if(that.user_ovl.modify) {
-                            that.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
-                            that.user_ovl.modify.changed();
+                            //$('#user').css('visibility', 'hidden');
+                        }else{
+                            window.user.user_ovl.overlay.values_.position = coor;
+                            if(window.user.user_ovl.modify)
+                                window.user.user_ovl.modify.features_.array_[0].values_.geometry.setCenter(coor);
+                            window.user.user_ovl.overlay.changed();
                         }
 
                         window.db.GetOffer(new Date(window.user.date),function (of) {
@@ -482,9 +445,9 @@ export class Supplier{
 
                                 });
                             }
-                        })
+                        });
                     });
-                });
+
 
                 that.import.GetOrderSupplier(function () {
                     var md5 = require('md5');
@@ -525,8 +488,8 @@ export class Supplier{
 
                 });
             }
-
         });
+
 
         $("#map").on('dragstart',function (ev) {
 
@@ -538,21 +501,6 @@ export class Supplier{
 
     }
 
-    OnClickSupplierOrders(li){
-
-        $('#my_profile_container').css('display','block');
-        $('#my_profile_container iframe').on('load',function () {
-            $('#my_profile_container iframe').off();
-            $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
-
-            $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
-                if($('#my_profile_container iframe')[0].contentWindow.profile_cus.Close())
-                    $('#my_profile_container').css('display', 'none');
-            });
-        });
-        $('#my_profile_container iframe').attr('src',"./profile.customer.html?v=2");
-
-    }
 
     UpdateOfferLocal(offer0,offer, location, dict){
 
@@ -621,7 +569,6 @@ export class Supplier{
                 categories: data.arCat,
                 date: date,
                 location: proj.toLonLat(this.offer.stobj.location),
-                radius: data.offer ? data.offer.radius : '',
                 offer: urlencode.encode(JSON.stringify(menu)),
                 dict: JSON.stringify(window.dict)
             };
@@ -629,7 +576,8 @@ export class Supplier{
             window.network.postRequest(data_obj, function (res) {
                 let data = res;
                 if (data && data.result.affectedRows > 0) {
-                    alert("Опубликовано: " + res.published, null, 3000);
+                    $('.loader').css('display', 'none');
+                    alert({ru:"Опубликовано: " + res.published,en:"Published:" + res.published}[window.parent.sets.lang], null, 3000);
 
                     $("#user_2").removeClass('unpublished');
                     $("#user_2").addClass('published');

@@ -4,6 +4,8 @@ export {DOMEvents};
 import {Overlay} from "../overlay/overlay";
 var moment = require('moment/moment');
 
+
+
 import Extent from 'ol/extent';
 import {Dict} from '../../dict/dict.js';
 
@@ -46,33 +48,38 @@ class DOMEvents {
             window.user.isShare_loc = false;
         });
 
+        let hint = '', search_text='';
+
         $('#search_but').on('click', this, function (ev) {
+            if(!hint)
+                hint = window.sysdict.dict["ee2faeed038501c1deab01c7b54f2fa9"][window.sets.lang];
 
             if ($("#search_but").attr('drag') === 'true') {
                 $("#search_but").attr('drag', false);
                 return;
             }
-            let text = "Input location name";
-            let hint = "London, Trafalgar Square";
-            if (window.window.sets.lang === 'ru') {
+            if(!search_text)
+                search_text = window.sysdict.dict["c6c0914deb2bca834b0faba62016256f"][window.sets.lang];
 
-                if ($('#search_but').attr('hint')) {
-                    hint = $('#search_but').attr('hint');
-                } else {
-
-                    text = "Введите наименование товара или адрес";
-                    hint = "Москва,  улица Адмирала Корнилова, 10";//"кофе";//
-                }
+            if ($('#search_but').attr('hint')) {
+                hint = $('#search_but').attr('hint');
             }
-            let search = prompt(text, hint);
+
+            let search = prompt(search_text, hint);
             $('#search_but').attr('hint', search);
 
-            if (search.split(',').length>2) {
-                window.user.map.geo.SearchLocation(search, function (bound) {
-                    if(bound)
-                        window.user.map.MoveToBound(bound);//{sw_lat: bound[0], sw_lng: bound[2], ne_lat: bound[1], ne_lng: bound[3]});
+            if (search.split(',').length>=1) {
+
+                hint = search;
+                window.user.map.geo.SearchLocation(search, function (loc) {
+                    if(loc) {
+                        window.user.map.MoveToLocation(loc, null, function () {
+
+                        });
+                    }
                 });
             }else{
+                let searchAr = [];
                 window.db.GetAllSuppliers(window.user.date,function (features) {
                     for(let f in features){
                         for(let a in features[f].data){
@@ -80,11 +87,26 @@ class DOMEvents {
                             for(let i in features[f].data[a]) {
                                 let val  = dict.getValByKey(window.sets.lang, features[f].data[a][i].title);
                                 if(val.toLowerCase().includes(search.toLowerCase())){
-                                    ;
+                                    searchAr.push({uid:features[f].uid,profile:features[f].profile,dict:features[f].dict,obj:features[f].data[a][i],
+                                        loc:[features[f].longitude,features[f].latitude]});
                                 }
                             }
                         }
                     }
+                    $('.search_browser').off('load');
+                    $('.search_browser').on('load',function () {
+                        $('.search_browser')[0].contentWindow.InitCustomerSearch(searchAr);
+                        $('.search_browser').parent().css('display','block');
+                        $('.close_browser',$('.search_browser').contents()).off('touchstart click');
+                        $('.close_browser',$('.search_browser').contents()).on('touchstart click', function (ev) {
+                            ev.preventDefault();
+                            ev.stopPropagation();
+                            $('.search_browser')[0].contentWindow.cus_search.Close(function () {
+                                $('.search_browser').parent().css('display', 'none');
+                            });
+                        });
+                    });
+                    $('.search_browser').attr('src','./customer/search.result.html');
                 });
             }
         });

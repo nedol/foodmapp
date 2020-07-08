@@ -28,7 +28,7 @@ class Import {
                 let cats= [];
                 if($(".category[state='1']").length===0)//первый запуск
                     $(".category").each(function (i, cat) {
-                        cats.push(parseInt(cat.id));
+                        //cats.push(parseInt(cat.id));
                     });
                 else
                     $(".category[state='1']").each(function (i, cat) {
@@ -48,6 +48,14 @@ class Import {
                     let uid = window.user.uid;
                     //for(let c in cats) {
                         that.LoadSupplierData(uid, cats, area, function (res) {
+                            that.areasAr.push(date + "_" + cats + "_" + area);
+
+                            // let extent = that.map.ol_map.getView().calculateExtent();
+                            // let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
+                            // that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
+
+                        });
+                        that.LoadDeliverData(uid, cats, area, function (res) {
                             that.areasAr.push(date + "_" + cats + "_" + area);
 
                             // let extent = that.map.ol_map.getView().calculateExtent();
@@ -78,6 +86,33 @@ class Import {
         }
     }
 
+    LoadDataByKey(uid, key, cb ) {
+        let that =  this;
+        try{
+            let date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+
+            let data_obj = {
+                proj: "d2d",
+                user: window.user.constructor.name.toLowerCase(),
+                func: "getbykey",
+                uid: uid,
+                date: date,
+                key: key
+            };
+
+            window.network.postRequest(data_obj, function (data) {
+                if(data) {
+                    that.processResult(data, cb);
+                    //that.map.GetObjectsFromStorage(area);
+                }
+
+            });
+
+        }catch (ex) {
+            console.log();
+        }
+    }
+
     LoadSupplierData(uid, cats, area, cb ) {
         let that =  this;
         try{
@@ -88,6 +123,7 @@ class Import {
                 user: window.user.constructor.name.toLowerCase(),
                 func: "getsuppliers",
                 uid: uid,
+                lang: window.sets.lang,
                 categories: cats,
                 date: date,
                 areas: area
@@ -95,7 +131,7 @@ class Import {
 
             window.network.postRequest(data_obj, function (data) {
                 if(data) {
-                    processResult(data);
+                    that.processResult(data, cb);
                     //that.map.GetObjectsFromStorage(area);
                 }
 
@@ -105,69 +141,103 @@ class Import {
                                                                                                                                                                                                                                                                                                                                                                                                 console.log();
         }
 
-        function processResult(res) {
-            try {
-                res = JSON.parse(urlencode.decode(res));
+    }
 
-                if (res) {
-                    cb(true);
-                    for (let i in res) {
-                        let obj = res[i];
-                        if(!obj || !obj.profile)
-                            continue;
-                        obj = formatObject(obj);
+    LoadDeliverData(uid, cats, area, cb ) {
+        let that =  this;
+        try{
+            let date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
 
-                        if(obj.uid ===window.user.uid && obj.date===window.user.date){
+            let data_obj = {
+                proj: "d2d",
+                user: window.user.constructor.name.toLowerCase(),
+                func: "getdelivers",
+                uid: uid,
+                lang: window.sets.lang,
+                categories: cats,
+                date: date,
+                areas: area
+            };
 
-                            if(!Object.keys(window.user.offer.stobj.data)[0] && obj) {
+            window.network.postRequest(data_obj, function (data) {
+                if(data) {
+                    that.processResult(data, cb);
+                    //that.map.GetObjectsFromStorage(area);
+                }
 
-                                window.db.SetObject('dictStore',obj.dict, function (res) {
+            });
 
-                                });
-                                window.user.offer  = obj;
-                                window.user.offer.location = proj.fromLonLat([obj.longitude,obj.latitude]);
-                                obj.location = window.user.offer.location;
-                                window.db.SetObject('offerStore', obj, function (res) {
-                                    $('#datetimepicker').trigger("dp.change");
-                                });
-                            }
+        }catch (ex) {
+            console.log();
+        }
 
-                            continue;
+    }
+
+    processResult(res, cb) {
+        let that = this;
+        try {
+            res = JSON.parse(urlencode.decode(res));
+
+            if (res) {
+                cb(true);
+                for (let i in res) {
+                    let obj = res[i];
+                    if(!obj || !obj.profile)
+                        continue;
+                    obj = that.formatObject(obj);
+
+                    let moment = require('moment');
+
+                    if(obj.uid ===window.user.uid && moment(obj.date).isSame(window.user.date)){
+
+                        if((!window.user.offer.stobj ||!Object.keys(window.user.offer.stobj.data)[0]) && obj) {
+
+                        //     window.db.SetObject('dictStore',obj.dict, function (res) {
+                        //
+                        //     });
+                        //     window.user.offer  = obj;
+                        //     window.user.offer.location = proj.fromLonLat([obj.longitude,obj.latitude]);
+                        //     obj.location = window.user.offer.location;
+                        //     window.db.SetObject('offerStore', obj, function (res) {
+                        //         $('#datetimepicker').trigger("dp.change");
+                        //     });
                         }
 
-                        window.db.SetObject('supplierStore',obj, function (success) {
-
-                        });
+                        continue;
                     }
 
-                }else{
-                    cb(false);
+                    window.db.SetObject('supplierStore',obj, function (success) {
+                        that.map.SetFeatures([obj]);
+                    });
                 }
-            }catch(ex){
-                console.log();
+
+            }else{
+                cb(false);
             }
+        }catch(ex){
+            console.log();
         }
+    }
 
-        function formatObject(obj) {
+    formatObject(obj) {
 
-            return {
-                uid: obj.uid,
-                date: new Date(obj.date),
-                period: obj.period,
-                categories: obj.cats,
-                longitude: obj.lon,
-                latitude: obj.lat,
-                radius:obj.radius,
-                logo: "../dist/images/truck.png",
-                data: JSON.parse(obj.data),
-                dict: obj.dict?JSON.parse(obj.dict):{},
-                rating: obj.rating?JSON.parse(obj.rating).value:'',
-                profile: obj.profile?JSON.parse(obj.profile):'',
-                apprs: obj.apprs,//общее кол-во подтверждений
-                published: obj.published,
-                deleted: obj.deleted
-            };
-        }
+        return {
+            uid: obj.uid,
+            date: new Date(obj.date),
+            period: obj.period,
+            categories: obj.cats,
+            longitude: obj.lon,
+            latitude: obj.lat,
+            radius:obj.radius,
+            logo: "../dist/images/truck.png",
+            data: JSON.parse(obj.data),
+            dict: obj.dict?JSON.parse(obj.dict):{},
+            rating: obj.rating?JSON.parse(obj.rating).value:'',
+            profile: obj.profile?JSON.parse(obj.profile):'',
+            apprs: obj.apprs,//общее кол-во подтверждений
+            published: obj.published,
+            deleted: obj.deleted
+        };
     }
 
     GetOrderSupplier(cb) {
@@ -290,6 +360,29 @@ class Import {
             }catch(ex){
                 console.log();
             }
+        }
+    }
+
+    SetLead(sup, cus){
+        let that =  this;
+        try{
+            let date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+
+            let data_obj = {
+                proj: "d2d",
+                user: window.user.constructor.name.toLowerCase(),
+                func: "setlead",
+                supuid: sup,
+                cusuid: cus,
+                date: date
+            };
+
+            window.network.postRequest(data_obj, function (data) {
+
+
+            });
+        }catch(ex){
+
         }
     }
 }

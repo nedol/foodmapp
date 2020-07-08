@@ -1,0 +1,862 @@
+{
+    "Сладости": [{
+    "checked": "true",
+    "title": "110c8596a3c9d2e49024b68cffc0805a",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "250г": "350"
+    },
+    "cert": [{
+        "src": "6cdb1390d25e3a6dc122190707ba0cd4"
+    }]
+}, {
+    "checked": "true",
+    "title": "fd5ea422780c6c091fc1c95c51c2002f",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "550 г": "650"
+    },
+    "cert": [{
+        "src": "f91e5696f55df8eed2b3dcf30d57fda2"
+    }, {
+        "src": "c5c1c00d6a80ef37561ba00f4c63783e"
+    }, {
+        "src": "6c7217da9a73536065d21d38e1792551"
+    }]
+}, {
+    "checked": "true",
+    "title": "d2d9007589cfa968c43b47254e5ab5b2",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "1 кг": "700"
+    },
+    "cert": [{
+        "src": "5f2a0938a615c4d4a0a09c9e7b9402ce"
+    }]
+}, {
+    "checked": "true",
+    "title": "f7df20ef4fa7db0d74fce16b7dda3770",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "1кг": "700",
+        "1350г": "800р"
+    },
+    "cert": [{
+        "src": "ff4907a1918e9bded0a701f0351413b3"
+    }]
+}, {
+    "checked": "true",
+    "title": "688f3f90c318b316352af71d31b16a46",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "570г": "500"
+    },
+    "cert": [{
+        "src": "5f2a0938a615c4d4a0a09c9e7b9402ce"
+    }]
+}, {
+    "checked": "true",
+    "title": "438da6c7ead9e54532277f2f83b81726",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "500г ": "750"
+    },
+    "cert": [{
+        "src": "a1fcebec241ab23e5d745a5bb08771a3"
+    }]
+}, {
+    "checked": "true",
+    "title": "1e8bb3697499792f302d6249c1cbf1db",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "5 кг ": "1250"
+    },
+    "cert": [{
+        "src": "4bb15b550fa404cb5c7f2ec89af87ec2"
+    }, {
+        "src": "459df42956cd74def8b9b04fe26fdc8e"
+    }]
+}, {
+    "checked": "true",
+    "title": "daf836d320bea244d52b6eb01cca1a80",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "1кг": "750"
+    },
+    "cert": [{
+        "src": "a1fcebec241ab23e5d745a5bb08771a3"
+    }]
+}, {
+    "checked": "true",
+    "title": "8a3aeed7178560045d1697e3ca6b827a",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "570г ": "650"
+    },
+    "cert": [{
+        "src": "5f2a0938a615c4d4a0a09c9e7b9402ce"
+    }, {
+        "src": "3631c4582da172f41f166264a05ffbe9"
+    }, {
+        "src": "7687b806ae6058589da45c36d824a76e"
+    }]
+}, {
+    "checked": "true",
+    "title": "72c31287dcf0b7a47471bbf7fd2cfb3a",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "1 кг ": "950"
+    },
+    "cert": [{
+        "src": "eb9cb0a7a3f709a1a674407b8638fe58"
+    }]
+}, {
+    "checked": "true",
+    "title": "5ccc4a691ffa3953e84b75e92524b5bc",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "250 г": "350"
+    },
+    "cert": [{
+        "src": "11cd6ca307147f7e6021bd889e8258ab"
+    }]
+}, {
+    "checked": "true",
+    "title": "eb8ad81ccac220e971f8cda1a03bf857",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "250 г": "400"
+    },
+    "cert": [{
+        "src": "b36e2a2aedd1ab0300c9db411d4b936e"
+    }]
+}],
+    "Чай":[{
+    "checked": "true",
+    "title": "d27c7943cdda0a49129d0244a6deb136",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/198869d92dd82fcf036444ea508e42ea"
+    },
+    "packlist": {
+        "100г": "250"
+    },
+    "cert": [{
+        "src": "8a6a7e6a6aa536dc47610574dd7e05e2"
+    }]
+}, {
+    "checked": "true",
+    "title": "59063077f4b146d5deb5bfbe7582abdf",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/198869d92dd82fcf036444ea508e42ea"
+    },
+    "packlist": {
+        "100г": "250"
+    },
+    "cert": [{
+        "src": "1254de8bc430682984a316b77fe73c42"
+    }]
+}, {
+    "checked": "true",
+    "title": "59063077f4b146d5deb5bfbe7582abdf",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/198869d92dd82fcf036444ea508e42ea"
+    },
+    "packlist": {
+        "100г": "250"
+    },
+    "cert": [{
+        "src": "ecd3bed9fb173bc45d230fe1b5d3b947"
+    }]
+}, {
+    "checked": "true",
+    "title": "4c9746982d5676a1dca65fc739c999a3",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/a7e7d3e96142781ea9592acd6a076cc4"
+    },
+    "packlist": {
+        "120г": "120"
+    },
+    "cert": [{
+        "src": "5ca74a93c75a2c6cc9bbd2ef7513f005"
+    }]
+}, {
+    "checked": "true",
+    "title": "7b3b70594a4078d99845bed9bf85b4b0",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/a7e7d3e96142781ea9592acd6a076cc4"
+    },
+    "packlist": {
+        "20г": "120"
+    },
+    "cert": [{
+        "src": "21ca882ebd0945817cd0ebe2da74d903"
+    }]
+}, {
+    "checked": "true",
+    "title": "43d8942f1b5ead8956b01f92e512147e",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8b1e5cebc317aed4d8928835977e6b9d"
+    },
+    "packlist": {
+        "75г": "350"
+    },
+    "cert": [{
+        "src": "461f24936d70ca9b512523a400816141"
+    }, {
+        "src": "19e9e9abb4dff9fbe2e86df82fd7f280"
+    }]
+}, {
+    "checked": "true",
+    "title": "4a151342dc62dbd7aa89fa6d28bb28f7",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8b1e5cebc317aed4d8928835977e6b9d"
+    },
+    "packlist": {
+        "75г": "350"
+    },
+    "cert": [{
+        "src": "065635ed2e41917bbf909ca65a07b710"
+    }, {
+        "src": "c4c7194a9f7bad9997ddd6c8a5331093"
+    }]
+}, {
+    "checked": "true",
+    "title": "25579bfe7652018029261746a06cfb47",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8b1e5cebc317aed4d8928835977e6b9d"
+    },
+    "packlist": {
+        "75г": "350"
+    },
+    "cert": [{
+        "src": "5e4718f6333fe4eb29dcfb72314e8ee9"
+    }, {
+        "src": "5924bf78580e29f8a6dd615be408ca20"
+    }]
+}, {
+    "checked": "true",
+    "title": "671654efe2a3e09ced03ca9cbc9ad113",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "af614221bba19b9135126d375bbdd875"
+    },
+    "packlist": {
+        "50г": "50"
+    },
+    "cert": [{
+        "src": "b7d9f86242c1992eaf83d587794815eb"
+    }, {
+        "src": "af614221bba19b9135126d375bbdd875"
+    }]
+}, {
+    "checked": "true",
+    "title": "eda94583537e5c40150a753dfb570dba",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "6dac29eaa5281710aba2a2b8db39f926"
+    },
+    "packlist": {
+        "100г ": "350"
+    },
+    "cert": [{
+        "src": "6dac29eaa5281710aba2a2b8db39f926"
+    }]
+}, {
+    "checked": "true",
+    "title": "55641b8fc7e7663a6c56ebc352b16f87",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "c9350bcf9da801f4bd3fbbf6af14a38d"
+    },
+    "packlist": {
+        "300г": "500"
+    },
+    "cert": [{
+        "src": "c9350bcf9da801f4bd3fbbf6af14a38d"
+    }]
+}, {
+    "checked": "true",
+    "title": "db679eabce86503f9e0c663ab4f442f9",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "aa10b0e4dbdba5776ca654edf5804253"
+    },
+    "packlist": {
+        "100г": "300"
+    },
+    "cert": [{
+        "src": "aa10b0e4dbdba5776ca654edf5804253"
+    }]
+}, {
+    "checked": "true",
+    "title": "9ed3c55f1674bd5b39e151dd185b7afa",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "d303efeea156b4f037f69df5c3976c25"
+    },
+    "packlist": {
+        "100г": "200"
+    },
+    "cert": [{
+        "src": "d303efeea156b4f037f69df5c3976c25"
+    }]
+}, {
+    "checked": "true",
+    "title": "9efe7f625308fd5f0f31d8afbdb3d6b2",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "c34748755e259174c1efe4460ea38eed"
+    },
+    "packlist": {
+        "100г": "800"
+    },
+    "cert": [{
+        "src": "c34748755e259174c1efe4460ea38eed"
+    }]
+}, {
+    "checked": "true",
+    "title": "f762d8e141855b1b8a7ee0b279899344",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "8607c6488c9c59668ddc848eaf80aff0"
+    },
+    "packlist": {
+        "30 г": "300"
+    },
+    "cert": [{
+        "src": "8607c6488c9c59668ddc848eaf80aff0"
+    }]
+}, {
+    "checked": "true",
+    "title": "ab5cb72e108660c53f8dbf828c42983a",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "4b6c3908b6b662559b81044147b9e784"
+    },
+    "packlist": {
+        "100 г": "800"
+    },
+    "cert": [{
+        "src": "4b6c3908b6b662559b81044147b9e784"
+    }]
+}, {
+    "checked": "true",
+    "title": "1ba89dab5315d1fc2b43bf84402ff1b3",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "2563217d04e15c8d03f36b5abadfcb7e"
+    },
+    "packlist": {
+        "100г": "450"
+    },
+    "cert": [{
+        "src": "2563217d04e15c8d03f36b5abadfcb7e"
+    }]
+}, {
+    "checked": "true",
+    "title": "5a8366f9008bb0aa49f40b47e861caa2",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "a9bde726bf29e116fac2bd50003125b6"
+    },
+    "packlist": {
+        "10 шт ": "450",
+        " ": "450"
+    },
+    "cert": [{
+        "src": "a9bde726bf29e116fac2bd50003125b6"
+    }]
+}, {
+    "checked": "true",
+    "title": "affeebd48e335d09edcfb879c74256b9",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "3a92a4401293434fee8ff6445955013d"
+    },
+    "packlist": {
+        "100г": "450"
+    },
+    "cert": [{
+        "src": "3a92a4401293434fee8ff6445955013d"
+    }]
+}, {
+    "checked": "true",
+    "title": "0a8685542fedde03118cc0dd9903ca76",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "a5b50bac4005ecbf1f1dc3adc5e9197b"
+    },
+    "packlist": {
+        "357 г": "4500"
+    },
+    "cert": [{
+        "src": "a5b50bac4005ecbf1f1dc3adc5e9197b"
+    }]
+}, {
+    "checked": "true",
+    "title": "692ab53c3226197343e7b0462ffbdfc2",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "067be3e38b6fe6b540f06f3603bc95bb"
+    },
+    "packlist": {
+        "50 г": "550"
+    },
+    "cert": [{
+        "src": "86e44d2531580e894237bc5e78226e75"
+    }, {
+        "src": "81f2ff7ecd93a2dc0fd3474610ef192c"
+    }, {
+        "src": "067be3e38b6fe6b540f06f3603bc95bb"
+    }]
+}, {
+    "checked": "true",
+    "title": "46ba13bd2753d8464be68f5f543e69b1",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "eb2f53a6b2abe1063b3d7c1545f90497"
+    },
+    "packlist": {
+        "100г": "850"
+    },
+    "cert": [{
+        "src": "eb2f53a6b2abe1063b3d7c1545f90497"
+    }]
+}, {
+    "checked": "true",
+    "title": "4f3d7caa8172bd90b1f8c702ab3bf3d2",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "2922449503070fe0304ea503ef1ac289"
+    },
+    "packlist": {
+        "100 г ": "1450"
+    },
+    "cert": [{
+        "src": "8e945007bd51bbfe032fcdce4d899f1b"
+    }]
+}, {
+    "checked": "true",
+    "title": "65b805917e38fe53d7900b8a33552d97",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "c034bb912e2fbd6e64250ca49fb0de9d"
+    },
+    "packlist": {
+        "100г": "2200"
+    },
+    "cert": [{
+        "src": "c034bb912e2fbd6e64250ca49fb0de9d"
+    }]
+}, {
+    "checked": "true",
+    "title": "538d3fe41efbb9d591e878d3cb06c4de",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "226e8e46b04a6e9ce924451e903a88fa"
+    },
+    "packlist": {
+        "100 гр": "1000"
+    },
+    "cert": [{
+        "src": "226e8e46b04a6e9ce924451e903a88fa"
+    }]
+}, {
+    "checked": "true",
+    "title": "b8d88f2ea8138652734fe61248818692",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "ba57919298d1978051a364d6aef0decd"
+    },
+    "packlist": {
+        "100 гр": "1000"
+    },
+    "cert": [{
+        "src": "ba57919298d1978051a364d6aef0decd"
+    }]
+}, {
+    "checked": "true",
+    "title": "e605e9262c555841a5a99ea7db5501cc",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "bc820743922741988692fccfd35a745f"
+    },
+    "packlist": {
+        "50г": "350"
+    },
+    "cert": [{
+        "src": "bc820743922741988692fccfd35a745f"
+    }]
+}, {
+    "checked": "true",
+    "title": "1e2abc0d6e2d1398db121b9582cc33ad",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "a895acd1350b9d0790ce6dc82f34cd40"
+    },
+    "packlist": {
+        "50 г ": "350"
+    },
+    "cert": [{
+        "src": "a895acd1350b9d0790ce6dc82f34cd40"
+    }]
+}, {
+    "checked": "true",
+    "title": "748fd3d399ff513a34144b9460c7e540",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "З57 г": "8500"
+    },
+    "cert": [{
+        "src": "d3814c4eca0012d102d8cdfd18bc108f"
+    }]
+}],
+    "Кофе":[{
+    "checked": "true",
+    "title": "867b6d5e507778db291d9cd8d2a77489",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8d3ca12fcce2609207e72b79213a8836"
+    },
+    "packlist": {
+        "250г": "400"
+    },
+    "cert": [{
+        "src": "ee38cf8d7259b6a0b8e3833c83eb69ad"
+    }, {
+        "src": "b4aaa18aebea67937c017af05e41fb57"
+    }]
+}, {
+        "checked": "true",
+        "title": "867b6d5e507778db291d9cd8d2a77489",
+        "content_text": {
+            "value": "24061416a35eb51f403307148c5f4cef"
+        },
+        "brand": {
+            "logo": "https://nedol.ru/server/images/8d3ca12fcce2609207e72b79213a8836"
+        },
+        "packlist": {
+            "250г": "400"
+        },
+        "cert": [ {
+            "src": "86e50971db343afda04a5d5236ab95c1"
+        }]
+    },{
+    "checked": "true",
+    "title": "8e730cf5545ef026d2a5b2214fda0f37",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8d3ca12fcce2609207e72b79213a8836"
+    },
+    "packlist": {
+        "500г": "700"
+    },
+    "cert": [{
+        "src": "3124eb4cf168f62bcc1bb92df2d66cec"
+    }, {
+        "src": "74fc0bafef8dc0b354e9fb64f21ad800"
+    }]
+}, {
+    "checked": "true",
+    "title": "929bbd5a20eaa0151c0473079a3c86e0",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "brand": {
+        "logo": "https://nedol.ru/server/images/8d3ca12fcce2609207e72b79213a8836"
+    },
+    "packlist": {
+        "250г": "400"
+    },
+    "cert": [{
+        "src": "6451ee5302d1e02b1b434407c017a15f"
+    }, {
+        "src": "c510247b04e880cccf08c92a28b3f675"
+    }]
+}, {
+    "checked": "true",
+    "title": "a4013d90e6ad665387a924977c2f77f8",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "packlist": {
+        "300г": "1000"
+    },
+    "cert": [{
+        "src": "7953e5e4f0c064607140d303db699fc2"
+    }]
+}],
+    "Наборы":[{
+    "checked": "true",
+    "title": "527450e52c40707820ecaa5a72d5770f",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "packlist": {
+        "1 шт": "3500"
+    },
+    "cert": [{
+        "src": "47a563e7c414afcd605c23f3a152a9d5"
+    }]
+}, {
+    "checked": "true",
+    "title": "01629d5b77584986352f090211f1be9e",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "packlist": {
+        "1 шт": "5000"
+    },
+    "cert": [{
+        "src": "c1786de7f47d0c7f8f10077426eb16b5"
+    }, {
+        "src": "a167ee07eeeb1ce4ef9a369987a7c1b4"
+    }, {
+        "src": "919949766735b0f7d6f1eddfd5403554"
+    }]
+}, {
+    "checked": "true",
+    "title": "2887faa6cdcd217f90412a25a7491400",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "packlist": {
+        "400г": "3500"
+    },
+    "cert": [{
+        "src": "bb5ec7b105bcdee7672ddd1c7a50d7db"
+    }, {
+        "src": "642c2862ae956b1c055feb0ff154260f"
+    }, {
+        "src": "baaa0a59814e13bb98ac7f003f4381db"
+    }]
+}, {
+    "checked": "true",
+    "title": "dfe36b123c47ec431ca51487aacde52c",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "packlist": {
+        "450г": "2500"
+    },
+    "cert": [{
+        "src": "89eb5190a3c991246ba7a7d0a50b1cb7"
+    }, {
+        "src": "315363d92d676ed8e2bb01c79d2ae554"
+    }, {
+        "src": "5b978f6bf856913981c379b4e4b0285d"
+    }]
+}, {
+    "checked": "true",
+    "title": "44dce186710874cea65ee04b404e4967",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "packlist": {
+        "1 шт": "-"
+    },
+    "cert": [{
+        "src": "1c022e3e47090ff8a50bbf88d422870a"
+    }]
+}, {
+    "checked": "true",
+    "title": "f0f071dfd09ffd177b282ea1c9064aa9",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "7f67d91da740a38a5618597e0c5a3564"
+    },
+    "packlist": {
+        "3 шт 100 г": "800"
+    },
+    "cert": [{
+        "src": "7f67d91da740a38a5618597e0c5a3564"
+    }]
+}],
+    "Посуда":[{
+    "checked": "true",
+    "title": "a3007126c4cef9ac2c7e626f43d93ae9",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "f61c8e53ca4899dd9227d0d6e937cdd3"
+    },
+    "packlist": {
+        "0,95л": "2500"
+    },
+    "cert": [{
+        "src": "f61c8e53ca4899dd9227d0d6e937cdd3"
+    }]
+}, {
+    "checked": "true",
+    "title": "16584d8b491529bc2eb20b6a9870ec94",
+    "content_text": {
+        "value": "24061416a35eb51f403307148c5f4cef"
+    },
+    "img": {
+        "src": "f54721a39561f1f965e81b4da5a9fee6"
+    },
+    "packlist": {
+        "0,85л": "1300"
+    },
+    "cert": [{
+        "src": "f54721a39561f1f965e81b4da5a9fee6"
+    }]
+}, {
+    "checked": "true",
+    "title": "2f76789d238526b5c29d491a19874668",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "5c0c4c9e4432ff46beb9d9e14308f85a"
+    },
+    "packlist": {
+        "О.95 л": "2000"
+    },
+    "cert": [{
+        "src": "5c0c4c9e4432ff46beb9d9e14308f85a"
+    }]
+}, {
+    "checked": "true",
+    "title": "d2794d6aba987f5dbdd61b886f6c7f0a",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "9e8de27f76bfa40bd0a8d5f6d67e2022"
+    },
+    "packlist": {
+        "1 шт": "18000"
+    },
+    "cert": [{
+        "src": "9e8de27f76bfa40bd0a8d5f6d67e2022"
+    }]
+}, {
+    "checked": "true",
+    "title": "33827a53907dc1b53efad8899574adc0",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "3b68d159bf1052c79c4e74b7be388c3e"
+    },
+    "packlist": {
+        "1 шт": "20000"
+    },
+    "cert": [{
+        "src": "3b68d159bf1052c79c4e74b7be388c3e"
+    }]
+}, {
+    "checked": "true",
+    "title": "07fc5e9a08838021448582ac69eaf6c7",
+    "content_text": {
+        "value": "d41d8cd98f00b204e9800998ecf8427e"
+    },
+    "img": {
+        "src": "17993bc51730d4f0d0400d68dd8df546"
+    },
+    "packlist": {
+        "1 шт": "12000"
+    },
+    "cert": [{
+        "src": "17993bc51730d4f0d0400d68dd8df546"
+    }]
+}]
+}

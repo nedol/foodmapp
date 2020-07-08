@@ -19,28 +19,32 @@ $(document).on('readystatechange', function () {
 
 
     $(".file-upload").on('change', function(e){
-        loadImage(
-            e.target.files[0],
-            function (img, data) {
-                if(img.type === "error") {
-                    console.error("Error loading image ");
-                } else {
-                    $('.avatar').attr('src', img.toDataURL());
+        try {
+            loadImage(
+                e.target.files[0],
+                function (img, data) {
+                    if (img.type === "error") {
+                        console.error("Error loading image ");
+                    } else {
+                        $('.avatar').attr('src', img.toDataURL());
 
-                    $('.avatar').siblings('input:file').attr('changed',true);
-                    console.log("Original image width: ", data.originalWidth);
-                    console.log("Original image height: ", data.originalHeight);
+                        $('.avatar').siblings('input:file').attr('changed', true);
+                        console.log("Original image width: ", data.originalWidth);
+                        console.log("Original image height: ", data.originalHeight);
+                    }
+                },
+                {
+                    orientation: true,
+                    maxWidth: 600,
+                    maxHeight: 300,
+                    minWidth: 100,
+                    minHeight: 50,
+                    canvas: true
                 }
-            },
-            {
-                orientation:true,
-                maxWidth: 600,
-                maxHeight: 300,
-                minWidth: 100,
-                minHeight: 50,
-                canvas: true
-            }
-        );
+            );
+        }catch(ex){
+
+        }
 
     });
 });

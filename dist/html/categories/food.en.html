@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="cat_incl">
+
+    <div class="row">
+        <div class="word_ig input-group ml-4 mb-3 input-group-md">
+            <div class="cat_menu input-group-prepend">
+                <i class="fa fa-window-maximize fa-2x" aria-hidden="true" style="transform: rotate(180deg);color: rgb(0, 0, 255);  "></i>
+            </div>
+            <style>
+                ::placeholder {
+                    color: #b21312 !important;
+                    font-weight: normal;
+                    font-size:small;
+                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                }
+
+            </style>
+            <input type="text" class="word_input form-control ml-2" placeholder="#">
+
+        </div>
+        <div class="word_tmplt" style="display: none;">
+            <div class="input-group-prepend">
+                <button class="word_btn btn btn-primary" type="button">Basic Button</button>
+                <button class="word_rmv btn-sm btn-danger" type="button">X</button>
+            </div>
+        </div>
+    </div>
+    <div id="categories"  data-toggle="tooltip" data-placement="top" title="Choose food category">
+
+        <style>
+            .tooltip {
+                font-family: Georgia;
+                font-size: 20px;
+            }
+            .tooltip-inner {
+                max-width: 500px !important;
+            }
+            #cat_incl{
+                position: absolute;
+                width:100%;
+                bottom:0px;
+            }
+
+            #categories{
+                position: relative;
+                overflow-x: scroll !important;
+                -webkit-overflow-scrolling: touch;
+                padding: 10px;
+                width:100%;
+                bottom:0px;
+                background-color: rgba(243, 243, 243, 1.0);
+                white-space: nowrap;
+                z-index:100;
+            }
+            .main_category{
+
+                /*margin-left: 25px;*/
+                /*margin-right: 25px;*/
+                /*padding-left: 10px;*/
+                /*padding-right: 10px;*/
+                height: 45px;
+                width: 45px;
+            }
+            .category{
+
+                margin-left: 25px;
+                margin-right: 25px;
+                /*padding-left: 10px;*/
+                /*padding-right: 10px;*/
+                height: 45px;
+                width: 45px;
+            }
+
+            .category:hover{
+                /*height: 50px;*/
+                /*width: 50px;*/
+            }
+            .dropup{
+                display: inline-block !important;
+                position: relative;
+                margin-right:30px;
+                margin-left: 30px;
+
+            }
+            .dropdown-menu{
+                width: 350px;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                background-color: #8f8f8f;
+                white-space: nowrap;
+            }
+            .title{
+                position: absolute;
+                bottom:2px;
+                color: #273be6;
+                background-color: rgba(243, 243, 243, .0);
+                /*-webkit-text-stroke: .5px #ffffff;*/
+                pointer-events: none;
+                /*top:0;*/
+                left: 0;
+                right:0;
+                bottom: -3px;
+                margin:auto;
+                text-align: center;
+            }
+            .cat_div{
+                display: inline-block;
+                position: relative;
+            }
+            .badge{
+                position: absolute;
+                top: 0;
+                right: 0px;
+
+            }
+            input{
+                cursor:pointer
+            }.html
+
+        </style>
+
+        <div  class="dropup text-center">
+            <input type="image" class="main_category " data-toggle="dropdown" title="Essentials" src="https://nedol.ru/d2d/dist/images/ic_150.png" state="0"/>
+            <h5 class="title">Essentials</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                 <div class="cat_div   text-center">
+                    <input type="image" id="152" class="category" cat="Toiletries" title="Toiletries" src="https://nedol.ru/d2d/dist/images/ic_152.png" state="0" />
+                    <h5 class="title">Toiletries</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" id="153" class="category" cat="Medicines" title="Medicines" src="https://nedol.ru/d2d/dist/images/ic_153.png" state="0" />
+                    <h5 class="title">Medicines</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div  class="dropup  text-center">
+            <input type="image" class="main_category" data-toggle="dropdown" title="Еда" src="https://nedol.ru/d2d/dist/images/ic_0.0.png" state="0"/>
+            <h5 class="title  text-center">Street<br>Food</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div   text-center">
+                    <input type="image" id="0" class="category" extra="true" cat="Pizza" title="Pizza" src="https://nedol.ru/d2d/dist/images/ic_0.png" state="0" />
+                    <h5 class="title">Pizza</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" id="1" class="category"  extra="true" cat="Sushi" title="Susshi" src="https://nedol.ru/d2d/dist/images/ic_1.png" state="0" />
+                    <h5 class="title">Sushi</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" id="2" class="category"  extra="true" cat="StreetFood" title="StreetFood" src="https://nedol.ru/d2d/dist/images/ic_2.png" state="0" />
+                    <h5 class="title">Street<br>Food</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image"  class="category" cat="Ice-cream" id="3" title="Ice-cream" src="https://nedol.ru/d2d/dist/images/ic_3.png" state="0" />
+                    <h5 class="title">Ice cream</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </ol>
+        </div>
+
+
+        <div  class="dropup text-center">
+            <input type="image"   class="main_category" data-toggle="dropdown"  title="Veggies" src="https://nedol.ru/d2d/dist/images/ic_10.png"/>
+            <h5 class="title">Veggies</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div   text-center">
+                    <input type="image" id="10" class="category" cat="Veggies" title="Veggies" src="https://nedol.ru/d2d/dist/images/ic_10.png" state="0"/>
+                    <h5 class="title">Veggies</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" id="14" class="category"  cat="Greens" title="Greens" src="https://nedol.ru/d2d/dist/images/ic_14.png" state="0"/>
+                    <h5 class="title">Greens</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div  text-center">
+                    <input type="image" id="15" class="category  stretched-link"  cat="Mushrooms" title="Mushrooms" src="https://nedol.ru/d2d/dist/images/ic_15.png" state="0"/>
+                    <h5 class="title">Mushrooms</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" id="19" class="category"  cat="Pickles" title="Pickles" src="https://nedol.ru/d2d/dist/images/ic_19.png" state="0"/>
+                    <h5 class="title">Pickles</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </ol>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image" id="30" class="main_category" data-toggle="dropdown"   title="Fruits" src="https://nedol.ru/d2d/dist/images/ic_30.png" state="0"/>
+            <h5 class="title">Fruits</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Fruits" id="31" title="Fruits" src="https://nedol.ru/d2d/dist/images/ic_30.png" state="0"/>
+                    <h5 class="title">Fruits</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Berries" id="32" title="Berries" src="https://nedol.ru/d2d/dist/images/ic_32.png" state="0"/>
+                    <h5 class="title">Berries</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Gourds" id="33" title="Gourds" src="https://nedol.ru/d2d/dist/images/ic_33.png" state="0"/>
+                    <h5 class="title">Gourds</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Exotic" id="34" title="Exotic" src="https://nedol.ru/d2d/dist/images/ic_34.png" state="0"/>
+                    <h5 class="title">Exotic<br>Fruits</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </ol>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image" class="main_category" data-toggle="dropdown"  title="Молочка" src="https://nedol.ru/d2d/dist/images/ic_20.0.png" state="0" />
+            <h5 class="title">Dairy<br>Eggs</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Milk" id="20" title="Milk" src="https://nedol.ru/d2d/dist/images/ic_20.png" state="0"/>
+                    <h5 class="title">Milk</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="SourCream" id="21" title="Sour Cream,Yogurts" src="https://nedol.ru/d2d/dist/images/ic_21.png" state="0"/>
+                    <h5 class="title">Sour Cream<br/>Yogurts</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="CottageCheese" id="22" title="Cottage Cheese" src="https://nedol.ru/d2d/dist/images/ic_22.png" state="0"/>
+                    <h5 class="title">Cottage<br/>Cheese</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Cheese" id="24" title="Cheese" src="https://nedol.ru/d2d/dist/images/ic_24.png" state="0"/>
+                    <h5 class="title">Cheese</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Eggs" id="29" title="Eggs" src="https://nedol.ru/d2d/dist/images/ic_23.png" state="0"/>
+                    <h5 class="title">Eggs</h5>
+                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </ol>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category" data-toggle="dropdown" title="Мясо" src="https://nedol.ru/d2d/dist/images/ic_40.png" state="0"/>
+            <h5 class="title">Meat</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Beef" id="40" title="Beef" src="https://nedol.ru/d2d/dist/images/ic_40.png" state="0"/>
+                    <h5 class="title">Beef</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Pork" id="41" title="Pork" src="https://nedol.ru/d2d/dist/images/ic_41.png" state="0"/>
+                    <h5 class="title">Pork</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Lamb" id="42" title="Lamb" src="https://nedol.ru/d2d/dist/images/ic_42.png" state="0"/>
+                    <h5 class="title">Lamb</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Semifinished" id="45" title="Semifinished" src="https://nedol.ru/d2d/dist/images/ic_45.png" state="0"/>
+                    <h5 class="title">Semifinished</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Sausages" id="46" title="Sausages" src="https://nedol.ru/d2d/dist/images/ic_46.png" state="0"/>
+                    <h5 class="title">Sausages</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category" data-toggle="dropdown" title="Рыба" src="https://nedol.ru/d2d/dist/images/ic_50.png" state="0"/>
+            <h5 class="title">Fish</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Fish" id="50" title="Fish" src="https://nedol.ru/d2d/dist/images/ic_50.png" state="0"/>
+                    <h5 class="title">Fish</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="SeaFood" id="52" title="Sea Food" src="https://nedol.ru/d2d/dist/images/ic_52.png" state="0"/>
+                    <h5 class="title">Sea<br>Food</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+        <div  class="dropup text-center">
+            <input type="image"  cat="Птица"  title="Птица" class="main_category" data-toggle="dropdown" src="https://nedol.ru/d2d/dist/images/ic_60.png" state="0">
+            <h5 class="title">Poultry</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Chicken" id="60" title="Chicken" src="https://nedol.ru/d2d/dist/images/ic_60.png" state="0"/>
+                    <h5 class="title">Chicken</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Turkey" id="61" title="Turkey" src="https://nedol.ru/d2d/dist/images/ic_61.png" state="0"/>
+                    <h5 class="title">Turkey</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Duck" id="62" title="Duck" src="https://nedol.ru/d2d/dist/images/ic_62.png" state="0"/>
+                    <h5 class="title">Duck</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image" cat="Напитки" class="main_category "  title="Напитки" data-toggle="dropdown" src="https://nedol.ru/d2d/dist/images/ic_70.0.png">
+            <h5 class="title">Drinks</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu">
+                <div class="cat_div text-center">
+                    <input type="image" class="category" cat="Water" id="70" title="Water" src="https://nedol.ru/d2d/dist/images/ic_70.png" state="0"/>
+                    <h5 class="title">Water</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div text-center">
+                    <input type="image" class="category" cat="Limonade" id="73" title="Limonade" src="https://nedol.ru/d2d/dist/images/ic_73.png" state="0"/>
+                    <h5 class="title">Cola<br/>Limonade</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Juice" id="75" title="Juice" src="https://nedol.ru/d2d/dist/images/ic_75.png" state="0"/>
+                    <h5 class="title">Juice</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Energetic" id="76" title="Energetics" src="https://nedol.ru/d2d/dist/images/ic_76.png" state="0"/>
+                    <h5 class="title">Energetic</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Brewery" id="78" title="Brewery" src="https://nedol.ru/d2d/dist/images/ic_78.png" state="0"/>
+                    <h5 class="title">Brewery</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Winery" id="79" title="Winery" src="https://nedol.ru/d2d/dist/images/ic_79.png" state="0"/>
+                    <h5 class="title">Winery</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category " data-toggle="dropdown"  title="Кондитерка" src="https://nedol.ru/d2d/dist/images/ic_90.png" state="0"
+                   class="dropdown-toggle" data-toggle="dropdown" />
+            <h5 class="title">Confectionery</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Cakes" id="91" title="Cakes" src="https://nedol.ru/d2d/dist/images/ic_90.png" state="0"/>
+                    <h5 class="title">Cakes</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Cookies" id="92" title="Cookies" src="https://nedol.ru/d2d/dist/images/ic_92.png" state="0"/>
+                    <h5 class="title">Cookies<br/>Crackers<h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Marshmallow" id="93" title="Marshmallow, Marmelade" src="https://nedol.ru/d2d/dist/images/ic_93.png" state="0"/>
+                    <h5 class="title">Marshmallow<br/>Marmelade</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Candies" id="94" title="Candies" src="https://nedol.ru/d2d/dist/images/ic_94.png" state="0"/>
+                    <h5 class="title">Candies</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Chokolate" id="95" title="Chokolate" src="https://nedol.ru/d2d/dist/images/ic_95.png" state="0"/>
+                    <h5 class="title">Chokolate</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Sweets" id="96" title="Sweets" src="https://nedol.ru/d2d/dist/images/ic_96.png" state="0"/>
+                    <h5 class="title">Sweets</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div   text-center">
+                    <input type="image"  class="category" cat="Jams" id="98" title="Jams" src="https://nedol.ru/d2d/dist/images/ic_98.png" state="0" />
+                    <h5 class="title">Jams</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category " data-toggle="dropdown"  title="Бакалея" src="https://nedol.ru/d2d/dist/images/ic_80.png" state="0"
+                   class="dropdown-toggle" data-toggle="dropdown" />
+            <h5 class="title">Grocery</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Pasta" id="81" title="Pasta" src="https://nedol.ru/d2d/dist/images/ic_81.png" state="0"/>
+                    <h5 class="title">Pasta</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Cereals" id="82" title="Cereals" src="https://nedol.ru/d2d/dist/images/ic_82.png" state="0"/>
+                    <h5 class="title">Cereals</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Oil" id="85" title="Oil" src="https://nedol.ru/d2d/dist/images/ic_85.png" state="0"/>
+                    <h5 class="title">Oil</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Sauces" id="87" title="Sauces, Spices" src="https://nedol.ru/d2d/dist/images/ic_87.png" state="0"/>
+                    <h5 class="title">Sauces<br/>Spices</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+
+            </div>
+        </div>
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category " data-toggle="dropdown"  title="Чай Кофе" src="https://nedol.ru/d2d/dist/images/ic_130.png" state="0"/>
+            <h5 class="title">Tea<br>Coffee</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Tea" id="130" title="Tea" src="https://nedol.ru/d2d/dist/images/ic_88.png" state="0"/>
+                    <h5 class="title">Tea</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Coffee" id="135" title="Coffee" src="https://nedol.ru/d2d/dist/images/ic_89.png?v=1" state="0"/>
+                    <h5 class="title">Coffee</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+        <div  class="dropup text-center">
+            <input type="image"  class="main_category " data-toggle="dropdown"  title="Baking" src="https://nedol.ru/d2d/dist/images/ic_110.png" state="0"/>
+            <h5 class="title">Baking</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Baking" id="111" title="Baking" src="https://nedol.ru/d2d/dist/images/ic_111.png" state="0"/>
+                    <h5 class="title">Baking</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Bread" id="112" title="Bread" src="https://nedol.ru/d2d/dist/images/ic_112.png" state="0"/>
+                    <h5 class="title">Bread</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+        <div  class="dropup text-center">
+            <input type="image" class="main_category " data-toggle="dropdown" title="Bio" src="https://nedol.ru/d2d/dist/images/ic_120.png" state="0"/>
+            <h5 class="title">Bio</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <div class="dropdown-menu ">
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Bio" id="120" title="Bio" src="https://nedol.ru/d2d/dist/images/ic_120.png" state="0"/>
+                    <h5 class="title">Bio</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="HealthyFood" id="121" title="Healthy Food" src="https://nedol.ru/d2d/dist/images/ic_121.png" state="0"/>
+                    <h5 class="title">Healthy<br>Food</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Vegan" id="122" title="Vegan" src="https://nedol.ru/d2d/dist/images/ic_122.png" state="0"/>
+                    <h5 class="title">Vegan</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+                <div class="cat_div   text-center">
+                    <input type="image" class="category" cat="Gluten" id="123" title="Out of Gluten" src="https://nedol.ru/d2d/dist/images/ic_123.png" state="0"/>
+                    <h5 class="title">Out of<br>Gluten</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+</body>
+</html>

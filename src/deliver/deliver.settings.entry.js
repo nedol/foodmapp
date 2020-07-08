@@ -8,7 +8,8 @@ import 'bootstrap'
 $(document).on('readystatechange', function () {
 
     if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.').addClass('show');
+
+        alert({'ru':'В этом браузере нет поддержки EventSource','en':'No SSE support in the browser'}[window.sets.lang]).addClass('show');
         return;
     }
 

@@ -5,7 +5,6 @@ export {SupplierSettings}
 
 import {DB} from "../map/storage/db";
 
-
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
@@ -26,7 +25,7 @@ $(document).on('readystatechange', function () {
 class SupplierSettings {
     constructor(){
 
-        // this.network = new Network(host_port);
+        // this.network = new Сетка(host_port);
         //this.fillForm();
         $('input[type="submit"]').on('click', this, function (ev) {
             ev.preventDefault();
@@ -48,10 +47,10 @@ class SupplierSettings {
     OnSubmit(form){
         var urlencode = require('urlencode');
         let that = this;
-        // if(!$(form).find('#email').val()) {
-        //     $(form).find('#email').focus();
-        //     return;
-        // }
+        if(!$(form).find('#email').val()) {
+            $(form).find('#email').focus();
+            return;
+        }
         // if(!$(form).find('#place').val()) {
         //     $(form).find('#place').focus();
         //     return;
@@ -67,7 +66,6 @@ class SupplierSettings {
                 promo: $(form).find('#promo').val(),
                 profile: {
                     type: $(':checked').val(),
-                    radius: $(':checked').val()==='deliver'?'1000':'',
                     avatar:avatar.src,
                     email: $(form).find('#email').val().toLowerCase(),
                     name: $(form).find('#name').val(),
@@ -101,15 +99,13 @@ class SupplierSettings {
                         localStorage.clear();
                         window.db.ClearStore('setStore',function () {
 
-                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
+                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, promo:data_post.promo,profile: data_post.profile}, function (res) {
                                 //alert('На указанный email-адрес была выслана ссылка для входа в программу');
 
                                 if(window.location.hostname==='localhost') {
-                                    window.location.replace("http://localhost:63342/d2d/dist/supplier.html?uid="+obj.uid+"&lang=ru");
-                                }
-
-                                else if(window.location.hostname==='nedol.ru') {
-                                    window.location.replace("https://nedol.ru/d2d/dist/supplier.html?uid="+obj.uid+"&lang=ru");
+                                    window.location.replace("http://localhost:63342/d2d/dist/supplier.html?uid="+obj.uid+"&lang="+$('html').attr('lang'));
+                                } else {
+                                    window.location.replace("../supplier.html?uid="+obj.uid+"&lang="+$('html').attr('lang'));
                                 }
 
                                 obj = '';
@@ -180,7 +176,7 @@ class SupplierSettings {
                     });
                     data[0]['profile'] = profile;
                     that.db.SetObject('setStore', data[0], function (res) {
-                        
+
                     });
                 });
 
@@ -213,35 +209,30 @@ $(document).on('readystatechange', function () {
     }
 
 
-    $(".file-upload").on('change', function(e) {
-        setTimeout(function () {
-            loadImage(
-                e.target.files[0],
-                function (img, data) {
-                    if (img.type === "error") {
-                        console.error("Error loading image ");
-                    } else {
-                        let data_url = img.toDataURL();
-                        img = '';
-                        $('.avatar').attr('src', data_url);
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
 
-                        //$('.avatar').siblings('input:file').attr('changed',true);
-                        console.log("Original image width: ", data.originalWidth);
-                        console.log("Original image height: ", data.originalHeight);
-                    }
-                },
-                {
-                    orientation: true,
-                    maxWidth: 800,
-                    maxHeight: 500,
-                    minWidth: 100,
-                    minHeight: 50,
-                    canvas: false
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
                 }
-            );
-            e = '';
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
+            }
+        );
 
-        },100);
     });
 });
 

@@ -3,7 +3,6 @@ let http = require('http');
 let https = require('https');
 
 
-
 $.fn.setCursorPosition = function(pos) {
     this.each(function(index, elem) {
         if (elem.setSelectionRange) {
@@ -42,6 +41,9 @@ window.alert_ = function(msg,type,fadeout){
         $(".alert_container").css('display','none')
     });
 }
+
+
+
 
 export class Utils{
 
@@ -275,6 +277,20 @@ export class Utils{
         return d * 1000; // meters
     }
 
+    GetCoordsDistance(map,firstPoint, secondPoint, projection) {
+        projection = projection || 'EPSG:4326';
+
+        length = 0;
+        var sourceProj = map.getView().getProjection();
+        var c1 = proj.transform(firstPoint, sourceProj, projection);
+        var c2 = proj.transform(secondPoint, sourceProj, projection);
+
+        var wgs84Sphere = new Sphere(6378137);
+        length += wgs84Sphere.haversineDistance(c1, c2);
+
+        return length;
+    }
+
     HandleFileSelect(evt, files, cb) {
         evt.stopPropagation();
         evt.preventDefault();
@@ -317,32 +333,33 @@ export class Utils{
     }
 
     LoadImage(f, callback){
+        try {
+            loadImage(
+                f,
+                function (img) {
+                    let or = (img.width >= img.height) ? 'l' : 'p';
+                    let options = [];
+                    options['canvas'] = true;
+                    options['orientation'] = true;
+                    if (or === 'l') {
+                        options['minWidth'] = 70;
+                        options['maxHeight'] = 50;
+                    } else if (or === 'p') {
+                        options['minHeight'] = 70;
+                        options['maxWidth'] = 50;
+                    }
 
-        loadImage(
-            f,
-            function (img) {
-                let or = (img.width >= img.height) ? 'l' : 'p';
-                let options = [];
-                options['canvas'] = true;
-                options['orientation'] = true;
-                if (or === 'l') {
-                    options['minWidth'] = 70;
-                    options['maxHeight'] = 50;
-                } else if (or === 'p') {
-                    options['minHeight'] = 70;
-                    options['maxWidth'] = 50;
-                }
+                    callback(img.toDataURL(f.type));
 
-                callback(img.toDataURL(f.type));
-
-            },
-            {
-                orientation:true,
-                canvas:true,
-                maxWidth: 1000,
-                maxHeight: 600
-            }// Options
-        );
+                },
+                {
+                    orientation: true,
+                    canvas: true,
+                    maxWidth: 1000,
+                    maxHeight: 600
+                }// Options
+            );
+        }catch(ex){}
 
     }
 

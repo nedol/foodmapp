@@ -8,6 +8,9 @@ require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
 
 // global.jQuery = require('jquery');
+$.getScript("../../lib/blueimp-load-image/js/load-image.all.min.js", function () {
+    console.log();
+});
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -27,7 +30,7 @@ window.InitProfileSupplier = function (user, settings) {
         }else{
             $('.avatar').attr('src', user.profile.profile.avatar);
         }
-        $('img.avatar').after("<h6>Загрузить мою фотографию...</h6>");
+        $('img.avatar').after("<h6>"+window.parent.sysdict.getValByKey(window.parent.sets.lang,"9f2021284ca26bc3dc2862add9ca84c6")+"</h6>");
         $('img.avatar').on('click',function (ev) {
             $(this).siblings('.file-upload').trigger('click');
         });
@@ -39,7 +42,7 @@ window.InitProfileSupplier = function (user, settings) {
                     $('.avatar').attr('src', e.target.result);
                     $('.avatar').on('load',function (ev) {
                         ev.preventDefault();
-                        let k = 70/$(this).height();
+                        let k = 60/$(this).height();
                         utils.createThumb_1(this, $(this).width()*k, $(this).height()*k, function (thmb) {
                             $('.avatar').attr('thmb', thmb.src);
                         });
@@ -176,19 +179,7 @@ export class ProfileSupplier{
 
     }
 
-    InitRating() {
-        let data_obj = {
-            proj: "d2d",
-            user:window.parent.user.constructor.name.toLowerCase(),
-            func: "getrating",
-            psw: window.parent.user.psw,
-            supuid: window.parent.user.uid
-        }
-        window.parent.network.postRequest(data_obj, function (data) {
-            if (data.rating)
-                $('.rating').rating('rate', data.rating);
-        });
-    }
+
 
     InitRateSupplier(){
         let that = this;

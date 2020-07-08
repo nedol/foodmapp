@@ -16,6 +16,8 @@ class MapEvents{
 
         let that = this;
 
+        that.map.ol_map.getView().on('propertychange',  OnPropertyChange);
+
         $(window).on("orientationchange", function (event) {
             if( that.map.ol_map)
                 that.map.ol_map.updateSize();
@@ -28,10 +30,6 @@ class MapEvents{
         });
 
 
-
-
-
-
         function OnPropertyChange(event) {
             that.map.ol_map.dispatchEvent('movestart');
             that.map.ol_map.getView().un('propertychange', OnPropertyChange);
@@ -40,9 +38,6 @@ class MapEvents{
             });
 
         };
-
-        this.map.ol_map.getView().on('propertychange',  OnPropertyChange);
-
 
         // Map.getView().on('change:center', function (event) {
         //

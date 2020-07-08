@@ -54,20 +54,26 @@ class Overlay {
         this.draw;
         this.modify;
         this.snap; // global so we can remove them later
+        this.offer = offer;
 
         let domRect = $(element)[0].getBoundingClientRect();
         this.overlay = new _ol_Overlay_({
             element: element,
             position: offer.location,
-            positioning: 'bottom-right',//'center-center',//'bottom-right',//'top-left',//'bottom-left',
-            offset: [0,0],//,
-            anchor: [0, 0]
+            positioning: 'center-center',//'top-left'//'bottom-right',//'center-center',//'bottom-right',//'top-left',//'bottom-left',
+            offset: [-parseInt($(element).css('width'))/2,-parseInt($(element).css('height'))/2],
+            //offset: [0,0],
+            // anchor: [-150,50],
+            autoPan:true
         });
 
+
         if(window.user.profile.profile.type==='deliver')
-           this.CreateCircle(offer);
+            this.CreateCircle(offer);
 
         element.ovl = this.overlay;
+
+        this.map.ol_map.addOverlay(this.overlay);
 
         $(element).on('map:pointerdrag', function (ev) {
 
@@ -83,36 +89,20 @@ class Overlay {
             }
         });
 
-        this.map.ol_map.addOverlay(this.overlay);
-
-        // this.transition = setTimeout(function () {
-        //
-        //     $(element).addClass("ovl_scale");
-        //     $(element).trigger("scale");
-        //     var scale = 1;//Math.pow((Map.getView().getZoom()/15),3).toFixed(3);
-        //     $(element).css('transform', 'scale(' + scale + ')');
-        //     // $(element).css('transition', 'transform 100ms');
-        // }, 5);
-
-        $(element).on('click touchstart', window.user, function (ev) {
+        $('#user',$(element).contents()).on('click touchstart', window.user, function (ev) {
             if(window.user.constructor.name==='Deliver')
                 window.user.editor.OpenOffer();
-            else
+            else if(window.user.constructor.name==='Supplier')
                 window.user.editor.InitSupplierOffer();
+            else if(window.user.constructor.name==='Customer') {
+                $(element).attr('supuid',that.offer.uid);
+                that.map.OnItemClick(element)
+            }
 
         });
 
-
         this.map.ol_map.getView().on('change:resolution', function (ev) {
 
-            // var scale = Math.pow((this.getZoom()/15),3).toFixed(3);
-            // $(element).css('width', parseInt(parseInt($(element).attr('width'))*scale));
-            // $(element).css('height', parseInt(parseInt($(element).attr('width'))*scale));
-            //
-            // $(element).css('transition', 'transform 100ms');
-            // $("#"+$(element).attr('id')+"_img").height(scale);
-            // $("#"+$(element).attr('id')+"_img").width(scale);
-            $( element ).trigger("change:zoom", [event]);
         });
 
         this.overlay.on('change:position', function (e) {
@@ -165,9 +155,9 @@ class Overlay {
             layer = window.user.map.layers.circleLayer;
         }else{
             let style =  new _ol_style_Style_({
-                fill: new _ol_style_Fill_({
-                    color: 'rgba(255, 255, 255, .2)'
-                }),
+                // fill: new _ol_style_Fill_({
+                //     color: 'rgba(255, 255, 255, .2)'
+                // }),
                 stroke: new _ol_style_Stroke_({
                     color: 'rgba(255, 0, 0, 1)',
                     width: 1
@@ -181,30 +171,50 @@ class Overlay {
         var source = layer.getSource();
 
         var radiusFeature = new Feature({
-            geometry: new Circle(offer.location,offer.radius?offer.radius:1000)
+            geometry: new Circle(offer.location,offer.radius?offer.radius:1000),
             //name: cursor.value.title ? cursor.value.title : "",
             //tooltip: cursor.value.title ? cursor.value.title : "",
+            type:offer.profile.type,
+            object: offer
         });
 
-        radiusFeature.setId('radius_feature');
+        radiusFeature.un('click', function (ev) {
+
+        });
+
+        radiusFeature.setId('radius_'+offer.uid);
+        radiusFeature.supuid = offer.uid;
         source.addFeature(radiusFeature);
 
-        let col = new Collection();
-        col.push(radiusFeature);
+
+        if(!this.collection)
+            this.collection = new Collection();
+        this.collection.push(radiusFeature);
         that.draw = new Draw({
             geometryName:'circle',
             source: source,
             type: 'Circle',
-            features:col
+            features:that.collection
         });
 
         //that.map.ol_map.addInteraction(that.draw);
         that.snap = new Snap({source: source});
         that.map.ol_map.addInteraction(that.snap);
-
-        that.modify = new Modify({source: source});
-
-        that.map.ol_map.addInteraction(that.modify);
+        if(window.user.constructor.name==='Deliver') {
+            that.modify = new Modify({source: source});
+            that.modify.addEventListener('modifyend', function (ev) {
+                let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
+                window.db.GetOffer(new Date(window.user.date),function (of) {
+                    if(of[0]) {
+                        of[0].radius = radius;
+                        window.db.SetObject('offerStore', of[0], res => {
+                            window.user.offer.stobj.radius = radius;
+                        });
+                    }
+                })
+            });
+            that.map.ol_map.addInteraction(that.modify);
+        }
 
         that.draw.addEventListener('drawstart', function (ev) {
 
@@ -213,17 +223,7 @@ class Overlay {
            // that.map.ol_map.removeInteraction(that.draw);
             that.overlay.values_.position = ev.target.sketchCoords_[0];
         });
-        that.modify.addEventListener('modifyend', function (ev) {
-            let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
-            window.db.GetOffer(new Date(window.user.date),function (of) {
-                if(of[0]) {
-                    of[0].radius = radius;
-                    window.db.SetObject('offerStore', of[0], res => {
-                        window.user.offer.stobj.radius = radius;
-                    });
-                }
-            })
-        });
+
     }
 
     DownloadOverlay(url, obj) {

@@ -15,7 +15,7 @@ require('bootstrap-select');
 
 import {Utils} from "../utils/utils";
 
-import {Network} from "../../network";
+import {Сетка} from "../../network";
 import {DB} from "../map/storage/db";
 import {Deliver} from './deliver';
 import proj from 'ol/proj';
@@ -39,7 +39,7 @@ $(document).on('readystatechange', function () {
         return;
     }
 
-
+    window.sets.css = utils.getParameterByName('css');
 
     //!!! jquery polyfill
     $.ajaxPrefilter(function (options, original_Options, jqXHR) {
@@ -58,17 +58,19 @@ $(document).on('readystatechange', function () {
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
             if(utils.getParameterByName('psw_hash') || !set[0]){
                 toReg(function (uid, psw, data) {
-                    window.location.replace(window.location.href.split('&')[0]+'&uid='+uid);
+                    window.location.replace(window.location.href.split('&')[0]+'&css=supplier');
                 })
             }else if(set[0]) {
-                uObj['set'] = set[0];
-                // window.db.DeleteObject('setStore',uObj['set'].uid);
-                // return;
-                window.network = new Network(host_port);
+                window.network = new Сетка(host_port);
 
-                window.user = new Deliver(uObj);
-                window.user.IsAuth_test(function () {
+                window.db.GetOfferTmplt(function (res) {
+                    if(!res)
+                        res={};
+                    res['set'] = set[0];
+                    window.user = new Deliver(res);
+                    window.user.IsAuth_test(0, 0, function () {
 
+                    });
                 });
             }
         });
@@ -84,11 +86,7 @@ $(document).on('readystatechange', function () {
             user: "Deliver",
             func: 'reguser',
             host: location.origin,
-            psw_hash:psw_hash,
-            profile: {
-                type: 'marketer',
-                lang: $('html').attr('lang')
-            }
+            psw_hash:psw_hash
         }
 
 
@@ -114,10 +112,10 @@ $(document).on('readystatechange', function () {
                 localStorage.clear();
                 let set;
                 if(obj.deliver && obj.deliver[0].profile){
-                    set =  {uid: obj.deliver[0].uid, psw: obj.deliver[0].psw, profile: JSON.parse(obj.deliver[0].profile)};
+                    set =  {uid: obj.deliver[0].uid, psw: obj.deliver[0].psw, promo:obj.deliver[0].promo, prolong:obj.deliver[0].prolong,profile: JSON.parse(obj.deliver[0].profile)};
 
                 }else{
-                    set = {uid: obj.uid, psw: obj.psw, profile: data_post.profile};
+                    set = {uid: obj.uid, psw: obj.psw, profile: data_post.profile?data_post.profile:{email:''}};
                 }
 
                 window.db.ClearStore('setStore', function () {
@@ -125,39 +123,38 @@ $(document).on('readystatechange', function () {
                         if(obj.deliver) {
                             window.db.ClearStore('offerStore', function () {
                                 if (obj.deliver[0].data) {
-                                    let offer_tmplt = {
-                                        date: 'tmplt',
-                                        data: JSON.parse(obj.deliver[0].data)
-
-                                    };
-                                    setTimeout(function () {
-                                        window.db.SetObject('offerStore', offer_tmplt, function () {
-
-                                        });
-                                    },100);
-
-
                                     let offer = {
-                                        date: new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD')),
+                                        date: "tmplt",
                                         data: JSON.parse(obj.deliver[0].data),
-                                        location: proj.fromLonLat([obj.deliver[0].lon, obj.deliver[0].lat]),
+                                        location: proj.fromLonLat([obj.deliver[0].longitude, obj.deliver[0].latitude]),
+                                        latitude: obj.deliver[0].lat,
+                                        longitude:obj.deliver[0].lon,
                                         radius: obj.deliver[0].radius
                                     };
+
+
+                                    window.db.SetObject('offerStore', offer, function () {
+
+                                    });
+
+                                    offer.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+
                                     window.db.SetObject('offerStore', offer, function () {
 
                                     });
                                 }
                             });
                             window.db.ClearStore('dictStore', function () {
-                                if(obj.deliver[0].dict && obj.deliver[0].dict.dict)
+                                if(obj.deliver[0].dict)
                                 {
                                     let dict = JSON.parse(obj.deliver[0].dict).dict;
                                     if (dict) {
                                         recursDict(dict, Object.keys(dict), 0, set, cb);
                                     }
                                 }else{
-                                    cb(set.uid,set.psw);
+                                    cb(obj.deliver[0].uid, obj.deliver[0].psw,obj.deliver[0].latitude,obj.deliver[0].longitude,obj.deliver[0].radius);
                                 }
+
                             });
                         }
                         else {

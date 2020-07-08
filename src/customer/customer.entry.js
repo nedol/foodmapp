@@ -1,35 +1,30 @@
 'use strict'
 
-// require('webpack-jquery-ui');
-// require('webpack-jquery-ui/css');
-// require('jquery-ui-touch-punch');
-
-
 require("../../global");
 
-import {Utils} from "../utils/utils";
-import {Customer} from './customer'
-import {Network} from "../../network";
-import {DB} from "../map/storage/db"
-
-const langs = require("../dict/languages");
+import {Customer} from './customer';
+import {Сетка} from "../../network";
+import {DB} from "../map/storage/db";
 
 import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
 
 const EventSource = NativeEventSource || EventSourcePolyfill;
 // OR: may also need to set as global property
 global.EventSource =  NativeEventSource || EventSourcePolyfill;
 
-
-require('bootstrap');
-require('bootstrap-select');
-
-//let moment = require('moment');
-
+import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-
 $(document).on('readystatechange', function () {
+
+    if((navigator.userAgent.indexOf("MSIE") != -1 ) || (navigator.userAgent.indexOf("Edge") != -1 ) || (!!document.documentMode == true )) //IF IE > 10
+    {
+        alert('IE не поддерживает функциональность приложения в полном объеме, рекомендуем обновить программу или использовать браузеры других производителей.');
+    }
 
     if (!window.EventSource) {
         alert('В этом браузере нет поддержки EventSource.');
@@ -49,7 +44,63 @@ $(document).on('readystatechange', function () {
 
     window.sets.lang = utils.getParameterByName('lang');
 
-    // $('.date_ctrl').draggable();
+    window.sets.country_code = utils.getParameterByName('cc');
+    window.sets.currency = {gb: '£',us:'$',eu:'€',ru:"₽"}[window.sets.country_code];
+    if(window.sets.country_code===null){
+        window.sets.currency = '';
+    }
+
+    window.sets.css = utils.getParameterByName('css');
+
+    $('title').text({'ru':'ДоТуДо Покупатель','en':'Delivery Angels'}[window.sets.lang]);
+
+
+    let date_pos = JSON.parse(localStorage.getItem("date_pos"));
+    if(date_pos)
+        $('.date_ctrl').offset({top:date_pos.top,left:date_pos.left});
+
+    $('.date_ctrl').draggable(
+        { delay: 0},
+        { start: function (ev) {
+
+        },
+            drag: function (ev) {
+                $('.sel_period').attr('drag','true');
+            },
+            stop: function (ev) {
+
+                $('.sel_period').attr('drag','false');
+
+                let left = $('.date_ctrl').position().left;
+                // $(el).css('right', rel_x + '%');
+                let top = $('.date_ctrl').position().top;
+                // $(el).css('bottom', rel_y + '%');
+                localStorage.setItem("date_pos",JSON.stringify({top:top,left:left}));
+
+            }
+        });
+
+    $( ".ui-draggable" ).disableSelection();
+    $('.dt_val').on('click touchstart', function (ev) {
+        setTimeout(function () {
+            if($('.sel_period').attr('drag')!=='true'){
+                ev.preventDefault();
+                ev.stopPropagation();
+                $('#datetimepicker').data("DateTimePicker").toggle();
+            }
+        },200);
+    });
+
+    $('.sel_period').on('touchstart', function (ev) {
+        setTimeout(function () {
+            if($('.sel_period').attr('drag')!=='true'){
+                ev.preventDefault();
+                ev.stopPropagation();
+                $('.sel_period').dropdown("toggle");
+            }
+        },200);
+    });
+
     let date;
 
     (function initDP() {
@@ -80,25 +131,12 @@ $(document).on('readystatechange', function () {
         $('#datetimepicker').on('dp.show', function (ev) {
             $(this).css("background-color", "rgba(255,255,255,.8)");
             $('#dtp_container').css('display', 'block');
-
-            // let dt_w = $('#dtp_container').css('width');
-            // let dt_h = $('#dtp_container').css('height');
-            // let scale = window.innerWidth > window.innerHeight ? (window.innerHeight) / (parseFloat(dt_h)*2) : (window.innerWidth) / (parseFloat(dt_w)*2);
-            //
-            // $('#debug').text(scale);
-
-            // $('#dtp_container').css('transform', 'scale(' + (scale) + ',' + (scale) + ')');
         });
 
         $('#datetimepicker').on('dp.hide', function (ev) {
             $('#dtp_container').css('display', 'none');
         })
 
-        $('.dt_val').on('click touchstart', function (ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
-            $('#datetimepicker').data("DateTimePicker").toggle();
-        });
 
     })();
 
@@ -107,7 +145,7 @@ $(document).on('readystatechange', function () {
         console.log();
     });
 
-    window.network = new Network(host_port);
+    window.network = new Сетка(host_port);
 
     let uObj = {};
     window.db = new DB('Customer', function () {
@@ -119,42 +157,20 @@ $(document).on('readystatechange', function () {
                 return k.uid === uid;
             });
             res=0;
+            window.user = new Customer();
             if (set[res]) {
                 uObj = set[res];
-                if (set[res]['profile'] && !set[res]['profile'].email && utils.getParameterByName('email')) {
 
-                    if (utils.getParameterByName('uid') &&
-                        uid === uObj.uid) {
-                        uObj['profile'].email = utils.getParameterByName('email');
-                        window.network.RegUser(uObj, function (reg) {
-                            if (!reg || reg.err) {
-                                alert(res.err);
-                                return;
-                            }
+                window.user.SetParams(uObj);
+                window.user.IsAuth_test(function (data) {//TODO:
 
-                            window.db.SetObject('setStore', uObj, function (res) {
-                                window.user = new Customer(uObj);
-                                window.user.IsAuth_test(function (data) {//TODO:
-                                });
-                            });
-                        });
-                    }else{
-                        window.user = new Customer(uObj);
-                        window.user.IsAuth_test(function (data) {//TODO:
+                });
 
-                        });
-                    }
-                }else {
-                    window.user = new Customer(uObj);
-                    window.user.IsAuth_test(function (data) {//TODO:
-
-                    });
-                }
             }else {
                 let md5 = require('md5');
                 uObj = {uid:md5(new Date())};
                 window.db.SetObject('setStore', uObj, function (res) {
-                    window.user = new Customer(uObj);
+                    window.user.SetParams(uObj);
                     window.user.IsAuth_test(function (data) {//TODO:
                     });
                 });

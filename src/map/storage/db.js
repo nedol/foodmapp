@@ -10,7 +10,7 @@ class DB {
     constructor(user, f) {
 
         this.DBcon;
-        this.version = 30;
+        this.version = 37;
 
         if (!window.indexedDB) {
             alert("Ваш браузер не поддерживат стабильную версию IndexedDB. Некоторые функции будут недоступны");
@@ -129,7 +129,7 @@ class DB {
 
     //unified storage function
     SetObject(storeName, obj, f) {
-        var objectStore = this.DBcon.transaction([storeName], "readwrite").objectStore(storeName);
+        var objectStore = DB.prototype.DBcon.transaction([storeName], "readwrite").objectStore(storeName);
         var request = objectStore.put(obj);
         request.onerror = function (err) {
             console.log(err);
@@ -179,16 +179,13 @@ class DB {
         if(!this.DBcon)
             return;
 
-        var tx = this.DBcon.transaction([this.supplierStore], "readonly");
+        var tx = DB.prototype.DBcon.transaction([this.supplierStore], "readonly");
         var objectStore = tx.objectStore(this.supplierStore);
         let idateuid = objectStore.index("dateuid");
-        var lowerBound = [date, uid];
-        var upperBound = [date, uid];
-        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
 
-        var features = [];
+        var ar = [];
 
-        idateuid.openCursor(boundKeyRange).onsuccess = function (event) {
+        idateuid.openCursor().onsuccess = function (event) {
 
             var cursor = event.target.result;
             if (cursor) {
@@ -209,7 +206,7 @@ class DB {
                 });
 
                 markerFeature.setId(cursor.value.uid);
-                features.push(markerFeature);
+                ar.push(markerFeature);
 
                 try {
                     cursor.continue();
@@ -220,7 +217,7 @@ class DB {
         };
 
         tx.oncomplete = function () {
-            cb(features);
+            cb(ar);
         }
     }
 
@@ -229,24 +226,15 @@ class DB {
         if(!this.DBcon)
             return;
 
-        var tx = this.DBcon.transaction([this.supplierStore], "readonly");
+        var tx = DB.prototype.DBcon.transaction([this.supplierStore], "readonly");
         var objectStore = tx.objectStore(this.supplierStore);
         let idateuid = objectStore.index("dateuid");
-        var lowerBound = [date, uid];
-        var upperBound = [date, uid];
-        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, false);
-
-        var features = [];
-
-        idateuid.openCursor(boundKeyRange).onsuccess = function (event) {
-
-            var cursor = event.target.result;
-            if (cursor) {
-                try {
-                    cb(cursor.value);
-                }catch (ex){
-                    console.log();
-                }
+        let request = idateuid.get([date,uid]);
+        request.onsuccess = function (event) {
+            try {
+                cb(this.result);
+            }catch (ex){
+                console.log();
             }
         };
     }
@@ -256,27 +244,54 @@ class DB {
         if(!this.DBcon)
             return;
 
-        var tx = this.DBcon.transaction([this.supplierStore], "readonly");
+        var tx = DB.prototype.DBcon.transaction([this.supplierStore], "readonly");
         var objectStore = tx.objectStore(this.supplierStore);
-        var ilatlon = objectStore.index("datelatlon");
-        var lowerBound = [date,lat_0,lon_0];
-        var upperBound = [date,lat_1,lon_1];
-        let boundKeyRange = IDBKeyRange.bound(lowerBound,upperBound, true);
+        var idateuid = objectStore.index("dateuid");
 
         var features = [];
 
-        ilatlon.openCursor(boundKeyRange).onsuccess = function (event) {
+        idateuid.openCursor().onsuccess = function (event) {
 
-            var cursor = event.target.result;
+            let cursor = event.target.result;
             if (cursor) {
                 if(lat_0<cursor.value.latitude && lat_1>cursor.value.latitude &&
                     lon_0<cursor.value.longitude && lon_1>cursor.value.longitude)
-                    features.push(cursor.value);
-            }
-            try {
+                    if(cursor.value.date.valueOf()=== new Date(date).valueOf())
+                        features.push(cursor.value);
+
                 cursor.continue();
-            }catch (ex){
-                console.log();
+            }
+        };
+
+        tx.oncomplete = function () {
+            f(features);
+        }
+
+    }
+
+
+    GetRangeDeliver(date, lat_0, lon_0, lat_1, lon_1, f) {
+
+        if(!this.DBcon)
+            return;
+
+        var tx = DB.prototype.DBcon.transaction([this.supplierStore], "readonly");
+        var objectStore = tx.objectStore(this.supplierStore);
+        var idateuid = objectStore.index("dateuid");
+
+        var features = [];
+
+        idateuid.openCursor().onsuccess = function (event) {
+
+            let cursor = event.target.result;
+            if (cursor) {
+                if((lat_0<cursor.value.latitude && lat_1>cursor.value.latitude &&
+                    lon_0<cursor.value.longitude && lon_1>cursor.value.longitude) ||
+                    cursor.value.profile.type==='deliver')
+                    if(cursor.value.date.valueOf()=== new Date(date).valueOf())
+                        features.push(cursor.value);
+
+                cursor.continue();
             }
         };
 
@@ -287,15 +302,32 @@ class DB {
     }
 
     GetAllSuppliers(date,cb) {
-        let objectStore = this.DBcon.transaction('supplierStore', "readonly").objectStore('supplierStore');
-        let ind = objectStore.index("date");
-        ind.getAll([date]).onsuccess = function(event) {
-            cb(event.target.result);
+
+        let tx = DB.prototype.DBcon.transaction([this.supplierStore], "readonly");
+        var objectStore = tx.objectStore(this.supplierStore);
+        let ind = objectStore.index("dateuid");
+        let ar = [];
+        ind.openCursor().onsuccess = function (event) {
+
+            var cursor = event.target.result;
+            if (cursor) {
+                if(cursor.value.date.getDay() ===date.getDay())
+                    ar.push(cursor.value);
+            }
+            try {
+                cursor.continue();
+            }catch (ex){
+                console.log();
+            }
         };
+        tx.oncomplete = function () {
+            cb(ar);
+        }
     }
 
     GetDictValue(hash, cb){
-        let tx = this.DBcon.transaction([this.dictStore], "readonly");
+        let tx = DB.prototype.DBcon.transaction([this.dictStore], "readonly");
+        let objectStore = tx.objectStore(this.dictStore);
         let ind = objectStore.index("hash");
         var request = ind.get([hash]);
         request.onerror = function (ev) {
@@ -314,45 +346,58 @@ class DB {
     GetSupOrders(date, supuid, cb){
         if(!this.DBcon)
             return;
-        let tx = this.DBcon.transaction([this.orderStore], "readonly");
-        let objectStore = tx.objectStore(this.orderStore);
+        let tx = DB.prototype.DBcon.transaction([this.orderStore], "readonly");
+        var objectStore = tx.objectStore(this.orderStore);
         let idatesupuid = objectStore.index("datesupuid");
-        var request = idatesupuid.getAll([date,supuid]);
-        request.onerror = function (ev) {
-            cb(-1);
-        }
-        request.onsuccess = function (ev) {
-            if(this.result){
-                cb(this.result);
-            }else{
-                cb(-1);
+        let ar = [];
+        idatesupuid.openCursor().onsuccess = function (event) {
+
+            var cursor = event.target.result;
+            if (cursor) {
+                if (cursor.value.date.getDate() === date.getDate()) {
+                    ar.push(cursor.value);
+                }
+            }
+            try {
+                cursor.continue();
+            }catch (ex){
+                console.log();
             }
         };
+        tx.oncomplete = function () {
+            cb(ar);
+        }
     }
 
     GetCusOrders(date, cb){
         if(!this.DBcon)
             return;
-        let tx = this.DBcon.transaction([this.orderStore], "readonly");
-        let objectStore = tx.objectStore(this.orderStore);
+        let tx = DB.prototype.DBcon.transaction(this.orderStore, "readonly");
+        var objectStore = tx.objectStore(this.orderStore);
         let idate = objectStore.index("date");
-        var request = idate.getAll(date);
-        request.onerror = function (ev) {
-            cb(-1);
-        }
-        request.onsuccess = function (ev) {
-            if(this.result){
-                cb(this.result);
-            }else{
-                cb(-1);
+        let ar = [];
+        idate.openCursor().onsuccess = function (event) {
+            var cursor = event.target.result;
+            if (cursor) {
+                if (cursor.value.date.getDate() === date.getDate()) {
+                    ar.push(cursor.value);
+                }
+                try {
+                    cursor.continue();
+                }catch (ex){
+                    console.log();
+                }
             }
         };
+        tx.oncomplete = function () {
+            cb(ar);
+        }
     }
 
     GetOrder(date, supuid, cusuid, cb){
 
-        let tx = this.DBcon.transaction([this.orderStore], "readonly");
-        let objectStore = tx.objectStore(this.orderStore);
+        let tx = DB.prototype.DBcon.transaction(this.orderStore, "readonly");
+        var objectStore = tx.objectStore(this.orderStore);
         let ind = objectStore.index("datesupuidcusuid");
         var request = ind.get([date,supuid, cusuid]);
         request.onerror = function (ev) {
@@ -384,7 +429,7 @@ class DB {
         if (!email || !date)
             return;
         try {
-            let objectStore = this.DBcon.transaction(storeName, "readonly").objectStore(storeName);
+            let objectStore = DB.prototype.DBcon.transaction(storeName, "readonly").objectStore(storeName);
             let index = objectStore.index("dateemail");
             var request = index.get([date,email]);
             request.onerror = this.logerr;
@@ -411,20 +456,32 @@ class DB {
     }
 
     GetSettings(cb) {
-        try {
-            let objectStore = this.DBcon.transaction('setStore', "readonly").objectStore('setStore');
-            var request = objectStore.getAll();
-            request.onerror = this.logerr;
-            request.onsuccess = function (ev) {
-                cb(this.result);
+
+        let tx = DB.prototype.DBcon.transaction([this.settingsStore], "readonly");
+        var objectStore = tx.objectStore(this.settingsStore);
+        let ind = objectStore.index("uid");
+
+        var ar = [];
+        ind.openCursor().onsuccess = function (event) {
+
+            var cursor = event.target.result;
+            if (cursor) {
+                ar.push(cursor.value);
             }
-        } catch (ex) {
-            console.log(ex);
+            try {
+                cursor.continue();
+            }catch (ex){
+                console.log();
+            }
+        };
+        tx.oncomplete = function () {
+            cb(ar);
         }
+
     }
 
     GetOfferTmplt(cb){
-        var tx = this.DBcon.transaction([this.offerStore], "readonly");
+        var tx = DB.prototype.DBcon.transaction([this.offerStore], "readonly");
         var objectStore = tx.objectStore(this.offerStore);
         var objectStoreRequest = objectStore.get(["tmplt"]);
 
@@ -439,7 +496,7 @@ class DB {
     GetOffer(date,  cb) {
         try {
 
-            var tx = this.DBcon.transaction([this.offerStore], "readonly");
+            var tx = DB.prototype.DBcon.transaction([this.offerStore], "readonly");
             var objectStore = tx.objectStore(this.offerStore);
             var idate = objectStore.index("date");
             var lowerBound = new Date(date);
@@ -449,9 +506,7 @@ class DB {
             let boundKeyRange = IDBKeyRange.bound(lowerBound, upperBound,false);
 
             var ar = [];
-
             idate.openCursor(boundKeyRange).onsuccess = function (event) {
-
                 var cursor = event.target.result;
                 if (cursor) {
                     ar.push(cursor.value);
@@ -473,7 +528,8 @@ class DB {
     }
 
     IsOffer(key, cb){
-        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        var tx = DB.prototype.DBcon.transaction([this.offerStore], "readonly");
+        var objectStore = tx.objectStore(this.offerStore);
         let request = objectStore.getKey([key]);
         request.onsuccess = (event) => {
             cb(event.target.result);
@@ -481,14 +537,33 @@ class DB {
     }
 
     GetAllOffers(cb) {
-        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        let tx = DB.prototype.DBcon.transaction([this.offerStore], "readonly");
+        var objectStore = tx.objectStore(this.offerStore);
+        let ind = objectStore.index("date");
+        var ar = [];
+        ind.openCursor().onsuccess = function (event) {
+            var cursor = event.target.result;
+            if (cursor) {
+                ar.push(cursor.value);
+
+                try {
+                    cursor.continue();
+                } catch (ex) {
+                    console.log();
+                }
+            }
+        };
+
+        tx.oncomplete = function () {
+            cb(ar);
+        }
         objectStore.getAll().onsuccess = function(event) {
             cb(event.target.result);
         };
     }
 
     GetLastOffer(cb) {
-        let objectStore = this.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
+        let objectStore = DB.prototype.DBcon.transaction('offerStore', "readonly").objectStore('offerStore');
         objectStore.getAll().onsuccess = function(event) {
             cb(event.target.result[event.target.result.length-1]);
         };
@@ -496,7 +571,7 @@ class DB {
 
     GetApproved(date, supuid, cusuid, title, cb){
         try {
-            let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
+            let objectStore = DB.prototype.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
             let index = objectStore.index("datesupcustitle");
             var request = index.get([date,supuid, cusuid, title]);
             request.onerror = this.logerr;
@@ -511,15 +586,23 @@ class DB {
     GetSupApproved(supuid, cb){
         //TODO: проверить нужна ли дата date
         try {
-            let objectStore = this.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
+            let objectStore = DB.prototype.DBcon.transaction('approvedStore', "readonly").objectStore('approvedStore');
             let index =  objectStore.index('sup');
             var request = index.get([supuid]);
             request.onerror = this.logerr;
             request.onsuccess = function (ev) {
-                cb(this.result);
+                cb();
             }
         } catch (ex) {
             console.log(ex);
         }
     }
 }
+
+
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/map/storage/db.js
+// module id = 401
+// module chunks = 1 2 8 9

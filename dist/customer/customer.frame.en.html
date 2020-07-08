@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta name="yandex-verification" content="1341767254c3c462" />
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta name="description" content="">
+    <meta name="author" content="nedol">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2019 11:12:01 GMT">
+    <title>Delivery Angels</title>
+    <!-- Bootstrap core CSS -->
+    <link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
+    <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
+    <link href='https://fonts.googleapis.com/css?family=Constantia:400,700' rel='stylesheet' type='text/css'>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+    <link id="cus_link" rel="stylesheet" href="../css/customer.css" type='text/css'>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>-->
+    <!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>-->
+
+    <!-- Custom styles for this template -->
+    <script type="text/javascript" src="../host.js"></script>
+    <script src="../customer_order.js?v=45"></script>
+    <!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
+
+    <!-- Google Tag Manager -->
+    <script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+        new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+        j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+        'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+    })(window,document,'script','dataLayer','GTM-WPDDTPN');</script>
+    <!-- End Google Tag Manager -->
+</head>
+
+<body>
+
+
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WPDDTPN"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+
+
+<!-- Nav tabs -->
+<ul class="nav nav-tabs"  role="tablist">
+    <a class="actual_price"></a>
+    <li  class="active"><a data-toggle="tab" href="#order_pane"  title="Food Range">
+        <img id="range_img" src="https://nedol.ru/d2d/dist/images/product_range.png" style="height:30px" alt="Food Range">
+    </a>
+    </li>
+    <li>
+        <a data-toggle="tab" href="#profile_pane" title="Profile">
+            <img id="profile_img" style="height:30px" alt="Profile">
+            <div class="rating_div">
+                <input type="hidden" class="rating"  data-filled="fa fa-star fa-3  custom-star" data-empty="fa fa-star-o fa-3  custom-star">
+            </div>
+        </a>
+    </li>
+</ul>
+
+
+
+<div class="input-group" style="display:none;position:relative;width: 100%">
+    <input type="address" class="form-control"  id="address" placeholder="input shipping address or point on map" title="input shipping address"
+           style="width: 100%">
+    <img id="address_loc" src="https://nedol.ru/d2d/dist/images/ic_location.png" style="position:absolute;top:0;right:0;height:30px;z-index: 100">
+</div>
+
+
+
+<div class="tab-content">
+    <div class="tab-pane fade in active" id="order_pane">
+
+        <div class="modal-content">
+            <ul class="nav nav-tabs" id="menu_tabs">
+                <li id="add_tab_li" class="nav-item" title="add tab" style="display: none;">
+                    <span id="add_tab" class="add_tab nav-link" href="#add_tab" style="visibility: hidden;">
+                    </span>
+                </li>
+            </ul>
+            <div class="tab-content tab_sticky">
+                <!--div_tab_inserted-->
+                <div id="add_tab_div"  class="tab-pane fade">
+
+                </div>
+
+            </div>
+        </div>
+
+
+
+    </div><!--/tab-pane-->
+
+    <div class="tab-pane container" id="profile_pane">
+        <div class="row">
+            <div class="col-sm-12">
+                <div  id="profile_container"
+                      style="
+                        position: absolute;
+                        height: 99%;
+                        /*max-height: 90% !important;*/
+                        /*min-height: 70% !important;*/
+                       width:90%;
+                       margin: auto;
+                       border: solid 0px lightslategrey;
+                       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Profile</a></li>
+                        <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Reviews</a></li>
+                        <!--<li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Settings</a></li>-->
+                    </ul>
+                    <div class="tab-content">
+                        <input type="hidden" id="supuid" class="form-control" name="supuid">
+                        <div class="tab-pane active" id="profile">
+                            <div class="row">
+                                <div class="col-sm-3  text-center">
+                                    <img src="" class="avatar img-circle img-thumbnail" alt="avatar">
+                                    <input type="file" class="center-block file-upload" style="display: none">
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="name"><h4>Name</h4></label>
+                                            <input type="text"  disabled  id="name" class="form-control" name="name">
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label for="email"><h4>Email</h4></label>
+                                            <input type="email"  disabled  id="email" class="form-control" name="email" data-toggle="tooltip">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="mobile"><h4>Phone Num</h4></label>
+                                            <input type="phone" id="mobile"  disabled  class="form-control" name="mobile">
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label for="place"><h4>Point of Sale</h4></label>
+                                            <input type="text" required   disabled  class="form-control"  id="place"  placeholder="address" title="how to find">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-12">
+                                            <label for="worktime"><h4>Working hours</h4></label>
+                                            <textarea  id="worktime" type="text" class="sel_period form-control" disabled
+                                                placeholder="08:00 - 20:00" title="часы работы">
+                                            </textarea>
+
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-12">
+                                            <label for="delivery"><h4>Delivery Terms</h4></label>
+                                            <textarea id="delivery" class="delivery_opt form-control" disabled>
+                                            </textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--/tab-pane-->
+                        <div class="tab-pane fade" id="comments" style="overflow-y: auto; height: auto">
+                            <div id="comments-container" style="overflow-y: hidden"></div>
+                        </div><!--/tab-pane-->
+                        <div class="tab-pane fade" id="settings">
+                            <div style="margin: 20px"></div>
+                            <div class="row">
+                                <div class="form-group dropdown">
+                                    <div class="col-xs-6">
+
+                                    </div>
+                                    <div class="col-xs-6">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--/tab-pane-->
+                    </div><!--/tab-content-->
+                </div>
+
+            </div>
+        </div>
+    </div><!--/tab-pane-->
+</div>
+
+
+<!-- /.container -->
+<div id="menu_item_tmplt">
+
+        <div class="item_title" placeholder="title"></div>
+        <span style="display: none;position: absolute;top: 36px; left: 0px; z-index: 1000"><i class="fa fa-angle-double-down" aria-hidden="true"></i></span>
+
+        <i class="fa fa-spinner fa-spin" style="display:none;position:absolute;right:50%; top:50%;font-size:24px"></i>
+        <div class="cert_container carousel slide carousel-fade"  data-ride="carousel">
+            <div class="carousel-inner">
+
+            </div>
+            <div class="item_price" contenteditable="false"></div>
+        </div>
+
+
+        <div class="item_content collapse" style="position: absolute; top:40px;width:100%;">
+            <textarea class="content_text"  placeholder="description"  data-translate>
+            </textarea>
+        </div>
+
+
+    <div class="order_container container">
+        <div class="row  align-items-center">
+            <div class="col">
+                <div class="dropup pack_container" style="left:1px;">
+                    <button class="pack_btn btn btn-outline-secondary" type="button"></button>
+
+                    <div class="pack_list input dropdown-menu"
+                         style="font-size:x-large;white-space: nowrap;">
+                    </div>
+                </div>
+            </div>
+            <!--<div class="add_price_div col">-->
+                <!--<a class="extra_price" style="vertical-align: middle" ></a>-->
+            <!--</div>-->
+            <div class="col" style="right:10px;">
+                    <div class=""  style="white-space: nowrap;color:#273be6;">
+                    <span class="reduce_ord ctrl"
+                          style="vertical-align:middle; font-size: x-large;"><i class="fa fa-minus"></i>
+                    </span>
+                        <button class="ord_amount btn btn-outline-secondary"
+                                style="font-size: x-large;border-width: 0px; padding-left: 1px; padding-right:1px">0
+                        </button>
+                        <span class="increase_ord ctrl"
+                              style="vertical-align: middle ; font-size: x-large;color: #d51312"><i class="fa fa-plus"></i>
+                    </span>
+                    </div>
+                </div>
+
+        </div>
+    </div>
+        <!--<div style='position:absolute; right:0; padding:5px' >-->
+        <!--<i class='add_cart fa fa-shopping-cart fa-2x' style='vertical-align: middle; color: #5a5a5a;text-align: center;'></i>-->
+        <!--</div>-->
+    <div class="extra_collapse" style="display: none;text-align: center;">
+        <span  data-toggle="collapse" data-target=".extras"
+               style="position: relative; bottom:2px;z-index: 1000;color: grey">
+                <i class="fa  fa-2x fa-angle-double-down" aria-hidden="true"></i>
+            </span>
+        <i style="position:relative;color:grey; bottom:2px;">extras</i>
+    </div>
+    <div class="extras container collapse">
+        <div style="display: none">
+        <div class="row tmplt align-items-center">
+            <div class="add_div col"  style="vertical-align: middle" >
+                <a class="extra_title" ></a>
+            </div>
+
+            <div class="add_price_div col">
+                <a class="extra_price" style="color:red;font-weight: bold; vertical-align: middle" ></a>
+            </div>
+
+            <div class="col" style="right:10px;">
+                <div class=""  style="white-space: nowrap;color:#273be6;">
+                    <span class="reduce ctrl"
+                          style="vertical-align:middle; font-size: x-large;"><i class="fa fa-minus"></i>
+                    </span>
+                    <button class="extra_amount btn btn-outline-secondary"
+                            style="font-size: x-large;border-width: 0px; padding-left: 1px; padding-right:1px">0
+                    </button>
+                    <span class="increase ctrl"
+                          style="vertical-align: middle ; font-size: x-large;color: #d51312"><i class="fa fa-plus"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+
+</div><!--menu_item_tmplt-->
+
+<div class="alert alert-warning alert-dismissible fade" style="display: none">
+    <button type="button" class="close">&times;</button>
+    <h3></h3>
+</div>
+
+<div id="close_frame" style="display:block; position: fixed;bottom: 50%; right: 1%; margin: 10px; color: white; z-index: 10000">
+    <span class="close 	fa fa-share-square-o" style="color:#0088BB" title="Publish"></span>
+</div>
+
+<div class="loader"></div>
+
+</body>
+
+</html>

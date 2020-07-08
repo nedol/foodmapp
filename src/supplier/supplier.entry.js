@@ -2,18 +2,24 @@
 
 import("../../lib/glyphicons/glyphicons.css");
 
+import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+
+const EventSource = NativeEventSource || EventSourcePolyfill;
+// OR: may also need to set as global property
+window.EventSource =  NativeEventSource || EventSourcePolyfill;
+
 require("../../global");
 
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
 import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
 
-import  proj from 'ol/proj';
-
 import {Utils} from "../utils/utils";
 
-import {Network} from "../../network";
+import {Сетка} from "../../network";
 import {DB} from "../map/storage/db";
 import {Supplier} from './supplier';
+
+let _ = require('lodash');
 
 
 let utils = new Utils();
@@ -35,57 +41,60 @@ $(document).on('readystatechange', function () {
         return;
     }
 
-
+    window.sets.css = utils.getParameterByName('css');
 
     //!!! jquery polyfill
     $.ajaxPrefilter(function (options, original_Options, jqXHR) {
         options.async = true;
     });
 
-
+    window.user = '';
     initDP();
+
 
     window.db = new DB('Supplier', function () {
 
         window.db.GetSettings(function (set) {
             var _ = require('lodash');
             let uObj = {};
-
             let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
-            if(utils.getParameterByName('psw_hash') || !set[0]){
-                toReg(function (uid, psw, data) {
-                    window.location.replace(window.location.href.split('&')[0]+'&uid='+uid);
-                })
+            let psw_hash = utils.getParameterByName('psw_hash');
+            if(psw_hash || !set[0]){
+                toReg(psw_hash,function (uid, psw, lat, lon, data) {
+                    window.location.replace(window.location.href.split('&')[0]);
+                });
             }else if(set[0]) {
-                uObj['set'] = set[0];
                 // window.db.DeleteObject('setStore',uObj['set'].uid);
                 // return;
-                window.network = new Network(host_port);
+                window.network = new Сетка(host_port);
+                window.db.GetOfferTmplt(function (res) {
+                    if(!res)
+                        res = {};
 
-                window.user = new Supplier(uObj);
-                window.user.IsAuth_test(function () {
+                    res.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+                    window.db.SetObject('offerStore', res, function () {
 
+                    });
+                    res['set'] = set[0];
+                    window.user = new Supplier(res);
+                    window.user.IsAuth_test(0,0,function () {
+
+                    });
                 });
-
             }
         });
     });
 
-    function toReg(cb){
+    function toReg(psw_hash, cb){
 
         let that = this;
-        let psw_hash = utils.getParameterByName('psw_hash');
 
         var data_post = {
             proj: 'd2d',
             user: "Supplier",
             func: 'reguser',
             host: location.origin,
-            psw_hash:psw_hash,
-            profile: {
-                type: 'marketer',
-                lang: $('html').attr('lang')
-            }
+            psw_hash:psw_hash
         }
 
 
@@ -109,53 +118,61 @@ $(document).on('readystatechange', function () {
                 delete data_post.func;
                 delete data_post.host;
                 localStorage.clear();
-                let set = '';
+                let set;
+
                 if(obj.supplier && obj.supplier[0].profile){
-                    set =  {uid: obj.supplier[0].uid, psw: obj.supplier[0].psw, promo:obj.supplier[0].promo,settings:{prolong:obj.supplier[0].prolong},profile: JSON.parse(obj.supplier[0].profile)};
+                    set =  {uid: obj.supplier[0].uid, psw: obj.supplier[0].psw, promo:obj.supplier[0].promo, prolong:obj.supplier[0].prolong,
+                        profile: JSON.parse(obj.supplier[0].profile)};
 
                 }else{
-                    set = {uid: obj.uid, psw: obj.psw, profile: data_post.profile};
+                    obj.supplier = [{profile:{},data:{}}]
+                    set = {uid: obj.uid, psw: obj.psw, profile: data_post.profile?data_post.profile:{email:''}};
                 }
 
                 window.db.ClearStore('setStore', function () {
-                    window.db.SetObject('setStore',set, function (res) {
-                        if(obj.supplier) {
-                            window.db.ClearStore('offerStore', function () {
-                                if (obj.supplier[0].data) {
-                                    let offer = {
-                                        date: 'tmplt',
-                                        data: JSON.parse(obj.supplier[0].data)
 
+                    window.db.SetObject('setStore',set, function (res) {
+
+                            window.db.ClearStore('offerStore', function () {
+                                if (obj.supplier && obj.supplier[0].data) {
+                                    if(_.isString(obj.supplier[0].data)){
+                                        obj.supplier[0].data = JSON.parse(obj.supplier[0].data);
+                                    }
+                                    let offer = {
+                                        date: "tmplt",
+                                        data: obj.supplier[0].data?obj.supplier[0].data:{},
+                                        latitude: obj.supplier[0].lat,
+                                        longitude:obj.supplier[0].lon,
+                                        radius: obj.supplier[0].radius
                                     };
+
 
                                     window.db.SetObject('offerStore', offer, function () {
 
                                     });
 
-                                    offer = {
-                                        date: new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD')),
-                                        data: JSON.parse(obj.supplier[0].data),
-                                        location: proj.fromLonLat([obj.supplier[0].lon, obj.supplier[0].lat]),
-                                    };
+                                    offer.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+
                                     window.db.SetObject('offerStore', offer, function () {
 
                                     });
                                 }
                             });
                             window.db.ClearStore('dictStore', function () {
-                                if(obj.supplier[0].dict) {
+
+                                if (obj.supplier[0].dict) {
                                     let dict = JSON.parse(obj.supplier[0].dict).dict;
                                     if (dict) {
-                                        recursDict(dict, Object.keys(dict), 0, set, cb);
+                                        recursDict(dict, Object.keys(dict), 0, set, function (ev) {
+                                            cb(obj.supplier[0].uid, obj.supplier[0].psw, obj.supplier[0].data, obj.supplier[0].latitude, obj.supplier[0].longitude);
+                                        });
                                     }
-                                }else{
-                                    cb(set.uid,set.psw);
+                                } else {
+                                    cb(obj.supplier[0].uid, obj.supplier[0].psw, obj.supplier[0].data, obj.supplier[0].latitude, obj.supplier[0].longitude);
                                 }
+
                             });
-                        }
-                        else {
-                            cb(set.uid);
-                        }
+
                     });
                 });
 
@@ -166,7 +183,7 @@ $(document).on('readystatechange', function () {
                             if(dict[keys[i+1]])
                                 recursDict(dict,Object.keys(dict), i+1,set, cb);
                             else{
-                                cb(set.uid,set.psw);
+                                cb();
                             }
                         });
                     } catch (ex) {
@@ -235,10 +252,6 @@ $(document).on('readystatechange', function () {
             $('#datetimepicker').data("DateTimePicker").toggle();
         });
 
-        setTimeout(function () {
-            $('#datetimepicker').trigger("dp.change");
-            // $('#datetimepicker').data("DateTimePicker").toggle();
-        }, 2000);
     }
 });
 

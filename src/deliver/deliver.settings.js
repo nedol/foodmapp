@@ -26,7 +26,7 @@ $(document).on('readystatechange', function () {
 class DeliverSettings {
     constructor(){
 
-        // this.network = new Network(host_port);
+        // this.network = new Сетка(host_port);
         //this.fillForm();
         $('input[type="submit"]').on('click', this, function (ev) {
             ev.preventDefault();
@@ -76,37 +76,66 @@ class DeliverSettings {
 
                 $('.loader').css('display','block');
 
-                $.ajax({
-                    url: host_port,
-                    type: "POST",
-                    // contentType: 'application/x-www-form-urlencoded',
-                    crossDomain: true,
-                    data: JSON.stringify(data_post),
-                    dataType: "json",
-                    success: function (obj) {
-                        $('.loader').css('display','none');
-                        if (obj.err) {
-                            alert(obj.err);
-                            return true;
-                        }
-                        delete data_post.proj;
-                        delete data_post.func;
-                        delete data_post.profile.email;
-                        delete data_post.host;
-                        data_post.profile.avatar = obj.avatar;
-                        data_post.profile.thmb = obj.thmb;
-                        window.db = new DB('Deliver', function () {
-                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, profile: data_post.profile}, function (res) {
-                                alert('На указанный email-адрес была выслана ссылка для входа в программу');
-                            });
-                        });
-                    },
-                    error: function (xhr, status) {
-                        setTimeout(function () {
-                            that.OnSubmit(form)
-                        },1000);
+            $.ajax({
+                url: host_port,
+                type: "POST",
+                // contentType: 'application/x-www-form-urlencoded',
+                crossDomain: true,
+                data: JSON.stringify(data_post),
+                dataType: "json",
+                success: function (obj) {
+                    $('.loader').css('display','none');
+                    if (obj.err) {
+                        alert(obj.err);
+                        return true;
                     }
-                });
+                    delete data_post.proj;
+                    delete data_post.func;
+                    delete data_post.host;
+                    data_post.profile.avatar = obj.avatar;
+                    window.db = new DB('Deliver', function () {
+
+                        localStorage.clear();
+                        window.db.ClearStore('setStore',function () {
+
+                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, promo:data_post.promo,profile: data_post.profile}, function (res) {
+                                //alert('На указанный email-адрес была выслана ссылка для входа в программу');
+
+                                if(window.location.hostname==='localhost') {
+                                    window.location.replace("http://localhost:63342/d2d/dist/deliver.html?uid="+obj.uid+"&lang="+$('html').attr('lang'));
+                                } else {
+                                    window.location.replace("../deliver.html?uid="+obj.uid+"&lang="+$('html').attr('lang')+"&css=order.1");
+                                }
+
+                                obj = '';
+                            });
+                            window.db.ClearStore('offerStore', function () {
+
+                                let offer = {
+                                    date: 'tmplt',
+                                    data: {}
+
+                                };
+
+                                window.db.SetObject('offerStore', offer, function () {
+
+                                });
+                            });
+
+                            window.db.ClearStore('dictStore', function () {
+
+                            });
+
+                        });
+                    });
+                },
+                error: function (xhr, status) {
+                    setTimeout(function () {
+                        that.OnSubmit(form)
+                    },1000);
+                }
+
+            });
 
             });
 
@@ -180,28 +209,32 @@ $(document).on('readystatechange', function () {
 
 
     $(".file-upload").on('change', function(e){
-        loadImage(
-            e.target.files[0],
-            function (img, data) {
-                if(img.type === "error") {
-                    console.error("Error loading image ");
-                } else {
-                    $('.avatar').attr('src', img.toDataURL());
+        try {
+            loadImage(
+                e.target.files[0],
+                function (img, data) {
+                    if (img.type === "error") {
+                        console.error("Error loading image ");
+                    } else {
+                        $('.avatar').attr('src', img.toDataURL());
 
-                    $('.avatar').siblings('input:file').attr('changed',true);
-                    console.log("Original image width: ", data.originalWidth);
-                    console.log("Original image height: ", data.originalHeight);
+                        $('.avatar').siblings('input:file').attr('changed', true);
+                        console.log("Original image width: ", data.originalWidth);
+                        console.log("Original image height: ", data.originalHeight);
+                    }
+                },
+                {
+                    orientation: true,
+                    maxWidth: 500,
+                    maxHeight: 300,
+                    minWidth: 100,
+                    minHeight: 50,
+                    canvas: true
                 }
-            },
-            {
-                orientation:true,
-                maxWidth: 600,
-                maxHeight: 300,
-                minWidth: 100,
-                minHeight: 50,
-                canvas: true
-            }
-        );
+            );
+        }catch(ex){
+
+        }
 
     });
 });

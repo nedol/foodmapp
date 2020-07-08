@@ -61,6 +61,8 @@ class OfferOrder {
 
     InitCustomerOrder(obj, targ_title){
         let that = this;
+        $('.loader').css('display','block');
+        $('.client_frame_tmplt').attr('src','./customer/customer.frame.'+window.sets.lang+'.html?v='+new Date().valueOf());
         let client_frame = $('.client_frame_tmplt').clone();
         $(client_frame).removeClass('client_frame_tmplt');
         $(client_frame).addClass('client_frame');

@@ -10,6 +10,8 @@ class Geo {
         this.map = map;
         this.period;
         this.init();
+        this.isMoved = true;
+        this.isTileLoaded = '';
     }
 
     init() {
@@ -47,9 +49,6 @@ class Geo {
             var time = new Date().getTime();
             //do_something(position.coords.latitude, position.coords.longitude);
             var coordinates = proj.fromLonLat([position.coords.longitude, position.coords.latitude]);
-            //coords.gps_coord = coordinates;
-            // localStorage.setItem("cur_loc","{\"lon\":"+coordinates[0]+","+
-            //     "\"lat\":"+coordinates[1]+", \"time\":"+time+"}");
             if (coordinates)
                 window.postMessage(coordinates, '*');//http://nedol.ru');
         }
@@ -77,9 +76,6 @@ class Geo {
 
             geolocation.on('error', function (error) {
                 console.log(error.toString());
-                //            var info = document.getElementById('info');
-                //            info.innerHTML = error.message;
-                //            info.style.display = '';
             });
 
             geolocation.on('change:accuracyGeometry', function (ev) {
@@ -88,16 +84,7 @@ class Geo {
 
 
             geolocation.on('change:position', function() {
-            //     var coords = geolocation.getPosition();
-            //
-            //     var time = new Date().getTime();
-            //     localStorage.setItem("cur_loc","{\"lon\":"+coords[0]+","+
-            //         "\"lat\":"+coords[1]+", \"time\":"+time+"}");
-            //     if(coords) {
-            //         window.postMessage(coords, '*');//http://nedol.ru');
-            //     }
-            //
-            //     return;
+
             });
 
             geolocation.on('change:speed', function () {
@@ -110,25 +97,30 @@ class Geo {
 
             if (coords) {
                 that.ChangeGPSPosition(that,coords);
-                var latlon = proj.toLonLat(coords);
             }
         }
 
         var loc_interval = setInterval(request, 1000);
+
+
+        // for(let l in that.map.ol_map.getLayers().array_) {
+        //     if (that.map.ol_map.getLayers().array_[l].type === 'TILE') {
+        //         that.map.ol_map.getLayers().array_[l].getSource().on('tileloadend', function () {
+        //             that.isTileLoaded = true;
+        //             that.map.ol_map.getLayers().array_[l].getSource().un('tileloadend');
+        //         });
+        //     }
+        // }
 
     }
 
     ChangeGPSPosition(that,coor) {
 
         $("#location_img").css("visibility", 'visible');
-        var time = new Date().getTime();
+
+        if(window.sets.coords.cur===coor)
+            return;
         window.sets.coords.gps = coor;
-
-        var latlon = proj.toLonLat(window.sets.coords.gps);
-
-        localStorage.setItem("cur_loc", "{\"lon\":" + window.sets.coords.cur[0] + "," +
-            "\"lat\":" + window.sets.coords.cur[1] + ", \"time\":" + time + "}");
-
         //TODO: поиск текущего места
         // let cur_loc = JSON.parse(localStorage.getItem("cur_loc"));
         // if(!cur_loc.address) {
@@ -139,31 +131,49 @@ class Geo {
         //         localStorage.setItem("cur_loc", JSON.stringify(cur_loc));
         //     });
         // }
-
-        if(window.sets.loc_mode)
-            this.SetCurPosition(that,window.sets.coords.gps);
+        this.SetCurPosition(that,coor);
 
         if(window.user.SendLocation)
-            window.user.SendLocation(window.sets.coords.gps);
+            window.user.SendLocation(coor);
 
     }
 
-    SetCurPosition(that,coordinate) {
+    SetCurPosition(that,coor) {
 
         try {
+            var time = new Date().getTime();
+            let lonlat = proj.toLonLat(coor);
+
+            localStorage.setItem("gps_loc", "{\"lon\":" + lonlat[0] + "," +
+                "\"lat\":" + lonlat[1] + ", \"time\":" + time + "}");
+
             var size = that.map.ol_map.getSize();// @type {ol.Size}
             //alert(loc.toString());
+            
+            if(window.sets.loc_mode && (that.map.ol_map.getView().getCenter()[0]!==coor[0] ||
+                that.map.ol_map.getView().getCenter()[1]!==coor[1])) {
 
-            if( window.sets.loc_mode && (that.map.ol_map.getView().getCenter()[0]!==coordinate[0] ||
-                that.map.ol_map.getView().getCenter()[1]!==coordinate[1])) {
-                that.map.MoveToLocation(coordinate);
-                $('#map').trigger('drop',{'coordinate': coordinate});
+                if(!that.isTileLoaded) {
+                    that.isTileLoaded = true;
+                    that.map.MoveToLocation(coor, "SetCurPosition", function () {
+                        for(let l in that.map.ol_map.getLayers().array_) {
+                            if (that.map.ol_map.getLayers().array_[l].type === 'TILE') {
+                                that.map.ol_map.getLayers().array_[l].getSource().on('tileloadend', function () {
+
+                                    that.isTileLoaded = '';
+                                    this.un('tileloadend');
+                                });
+                            }
+                            let time = new Date().getTime();
+                            localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
+                                "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":" + that.map.ol_map.getView().getZoom() + "}");
+                            break;
+                        }
+                     });
+
+                }
+
             }
-
-            var latlon = proj.toLonLat(coordinate);
-            window.sets.coords.gps = coordinate;
-
-            $(that.map.ol_map).trigger('click', {'coordinate': coordinate, 'loc_mode': true});
 
             // var pixel = that.map.ol_map.getPixelFromCoordinate(coordinate);
             //
@@ -176,9 +186,6 @@ class Geo {
         } catch (ex) {
             console.log(ex);
         }
-
-        if(latlon)
-            $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
 
     }
 
@@ -220,9 +227,64 @@ class Geo {
         let that = this;
 
         let fadr = urlencode.encode(place);
+        //
+        // let here =
+        //     {
+        //         url: 'https://geocoder.ls.hereapi.com/6.2/geocode.json',
+        //         type: 'GET',
+        //         dataType: 'jsonp',
+        //         jsonp: 'jsoncallback',
+        //         data: {
+        //             searchtext: place,
+        //             //mapview: '42.3902,-71.1293;42.3312,-71.0228',
+        //             gen: '9',
+        //             apiKey: 'qJ0yfS-igVDE9eFQW9wHbSD6TLcThiTcz3jF_gLmDjU'
+        //         },
+        //         error: function (data) {
+        //             console.log(data);
+        //         },
+        //         success:function(data, res) {
+        //
+        //             if (!data || res!=='success' ) {
+        //                 cb(null);
+        //                 return;
+        //             }
+        //             let lat = data.Response.View[0].Result[0].Location.DisplayPosition.Latitude;
+        //             let lon = data.Response.View[0].Result[0].Location.DisplayPosition.Longitude;
+        //             let location = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+        //             cb(location);
+        //         }
+        //     };
 
         let nominatim =
-            "https://nominatim.openstreetmap.org/search?q="+fadr+"&format=json&polygon=1&addressdetails=1";///reverse";
+            {
+                url: "https://nominatim.openstreetmap.org/search", //
+                //url:locationiq,//nominatim, //
+                data: {
+                    polygon: 1,
+                    addressdetails: 1,
+                    format: "json",
+                    q: place,
+                    "accept-language": window.sets.lang
+                },
+                method: "GET",
+                dataType: "json",
+                success: function (data){
+
+                        if (!data[0] || !data[0].boundingbox) {
+                            cb(null);
+                            return;
+                        }
+                        let bound = data[0].boundingbox;
+                        let lat = data[0].lat;
+                        let lon = data[0].lon;
+                        let location = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+                        window.sets.country_code = data[0].address.country_code;
+                        window.sets.currency = {gb: '£',us:'$',eu:'€'}[window.sets.country_code];
+                        cb(location);
+                    }
+                };
+
         let query =
             "https://nominatim.openstreetmap.org/reverse?format=geojson&lat=52.5487429714954&lon=-1.81602098644987&zoom=18&addressdetails=1";
         let mapques =
@@ -233,46 +295,25 @@ class Geo {
         let photon =
             "https://photon.komoot.de/api/?q=berlin&lat=52.3879&lon=13.0582";
 
-        $.ajax({
-            url:nominatim, //
-            //url:locationiq,//nominatim, //
-            // data: {
-            //     key: 'f6b910f0af894f1746b1',//locationiq
-            //     format: "json",
-            //     q: place,
-            //     "accept-language": "en"
-            // },
-            method: "GET",
-            dataType: "json",
-            success: function (data) {
-
-                if (!data[0] || !data[0].boundingbox) {
-                    cb(null);
-                    return;
-                }
-                let bound = data[0].boundingbox;
-                let lat = data[0].lat;
-                let lon = data[0].lon;
-
-                cb(bound, lat, lon);
-                //$("#marker").trigger("change:cur_pos", [proj.fromLonLat([parseFloat(lon), parseFloat(lat)]), "Event"]);
-                //Marker.overlay.setPosition(proj.fromLonLat([parseFloat(lon), parseFloat(lat)]), '*');//http://nedol.ru');
-
-                // for (let i = 0; i < localStorage.length; i++) {
-                //     let key = localStorage.key(i);
-                //     if(key==='ObjectsAr')
-                //        localStorage.removeItem(key);
-                //     console.log(key + ' = ' + localStorage[key]);
-                // }
-
-            },
-            error: function (data) {
-                console.log(data);
-            }
-        });
+        $.ajax(nominatim);
     }
 
     SearchPlace(latlon, zoom, cb) {
+
+        let here =
+            {
+            url: 'https://reverse.geocoder.ls.hereapi.com/6.2/reversegeocode.json',
+            type: 'GET',
+            dataType: 'jsonp',
+            jsonp: 'jsoncallback',
+            data: {
+                prox: latlon,
+                mode: 'retrieveAddresses',
+                maxresults: '1',
+                gen: '9',
+                apiKey: 'qJ0yfS-igVDE9eFQW9wHbSD6TLcThiTcz3jF_gLmDjU'
+            }
+        };
 
         let reverse =
             "https://nominatim.openstreetmap.org/reverse?format=json&lat="+latlon[0]+"&lon="+latlon[1]+"&zoom="+zoom+"&addressdetails=2&accept-language="+window.sets.lang;
@@ -280,8 +321,8 @@ class Geo {
             "https://open.mapquestapi.com/geocoding/v1/reverse?key=KEY&location=30.333472,-81.470448&includeRoadMetadata=true&includeNearestIntersection=true";
         let locationiq =
             "https://locationiq.org/v1/search.php";
-        let here =
-            "https://geocoder.cit.api.here.com/6.2/geocode.json?searchtext=200%20S%20Mathilda%20Sunnyvale%20CA&app_ id=DemoAppId01082013GAL&app_code=AJKnXv84fjrb0KIHawS0Tg&gen=8";
+        //let here = "https://geocoder.cit.api.here.com/6.2/geocode.json?searchtext=200%20S%20Mathilda%20Sunnyvale%20CA&app_ id=DemoAppId01082013GAL&app_code=AJKnXv84fjrb0KIHawS0Tg&gen=8";
+
 
         $.ajax({
             url: reverse,
@@ -298,6 +339,8 @@ class Geo {
             }
         });
     }
+
+
 
     GetDistanceToPlace(loc, place, cb){
         let lonlat = proj.toLonLat(loc);
