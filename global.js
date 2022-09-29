@@ -8,7 +8,7 @@ window.sets = {
     user : '-1',
     loc_mode : false,
     coords : {cur:[0,0] , gps:[0,0]},
-    bing_key : 'AkQqfe7m2Q3FRMizeCsCJNaXAirRejSOceljgiUsK5qvvBEUp6OuZbpZj-6cPDCe',
+    bing_key : '',
     SCREEN_WIDTH : parent.innerWidth,
     SCREEN_HEIGHT : parent.innerHeight,
     aspect : parent.innerWidth / parent.innerHeight,
