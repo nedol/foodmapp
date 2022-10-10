@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="dataSourceStorageLocal">
+    <data-source name="a07513cy_d2d@a07513cy.beget.tech" uuid="a3593f92-4f22-4967-9d91-9dbe407b97a0">
+      <database-info product="MySQL" version="5.7.21-20-beget-5.7.21-20-1-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.47 ( Revision: fe1903b1ecb4a96a917f7ed3190d80c049b1de29 )">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>a07513cy_d2d</user-name>
+      <introspection-schemas>*:a07513cy_d2d</introspection-schemas>
+    </data-source>
+    <data-source name="a07513cy_tn@a07513cy.beget.tech" uuid="4321b10c-7a05-48b9-a1fe-fe5f12dca5aa">
+      <database-info product="MySQL" version="5.7.21-20-beget-5.7.21-20-1-log" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.47 ( Revision: fe1903b1ecb4a96a917f7ed3190d80c049b1de29 )">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>a07513cy_tn</user-name>
+      <introspection-schemas>*:a07513cy_tn</introspection-schemas>
+    </data-source>
+    <data-source name="remote_d2d@193.200.74.37" uuid="20d9fb2a-1112-4ed6-8be7-3fc1f654b4a0">
+      <database-info product="MySQL" version="5.7.32-0ubuntu0.18.04.1" jdbc-version="4.0" driver-name="MySQL Connector Java" driver-version="mysql-connector-java-5.1.47 ( Revision: fe1903b1ecb4a96a917f7ed3190d80c049b1de29 )">
+        <extra-name-characters>#@</extra-name-characters>
+        <identifier-quote-string>`</identifier-quote-string>
+      </database-info>
+      <case-sensitivity plain-identifiers="exact" quoted-identifiers="exact" />
+      <secret-storage>master_key</secret-storage>
+      <user-name>admin_d2d</user-name>
+      <introspection-schemas>*:*</introspection-schemas>
+      <ssh-properties>
+        <enabled>true</enabled>
+        <proxy-host>193.200.74.37</proxy-host>
+        <proxy-port>22</proxy-port>
+        <secret-storage>master_key</secret-storage>
+        <user>root</user>
+        <use-password>true</use-password>
+      </ssh-properties>
+    </data-source>
+  </component>
+</project>

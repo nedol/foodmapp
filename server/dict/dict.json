@@ -1,0 +1,201 @@
+{
+  "dict": {
+    "b61541208db7fa7dba42c85224405911": {
+      "en": "Menu",
+      "fr": "Carte"
+    },
+    "a6080006fe365de590e36613692039e8": {
+      "en": "Menu Editor",
+      "fr": "Carte Éditeur"
+    },
+    "a4078983ea2dd318ef80b2c13849b782": {
+      "en": "Order for",
+      "fr": "Commande pour"
+    },
+    "7be83b8c2599af113aa97a0335f0e538": {
+      "en": "Menu for",
+      "fr": "Menu pour"
+    },
+    "bfc39df16534455648afdbdf761cad44": {
+      "en": "Put Username",
+      "fr": "Nom d&apos;utilisateur"
+    },
+    "7f005c3fa691e77c52d3297cc2699072": {
+      "en": "reserved",
+      "fr": "réservé"
+    },
+    "c679b3488ea95e3fb6d343b56bba5968": {
+      "en": "Add Menu Item",
+      "fr": "Ajouter un élément de carte"
+    },
+    "d4acb5850c2a8ddf85cfadfe3c1a5dd5": {
+      "en": "Daytime of visit",
+      "fr": "Jour et heure de la visite"
+    },
+    "be192bc9b7150341cfa0cb7bafae72f2": {
+      "en": "Main Course",
+      "fr": "Plat",
+      "ru": "Основные блюда"
+    },
+    "0c96179df5834759b90ee5cb3834a365": {
+      "en": "Drinks",
+      "fr": "Boissons"
+    },
+    "ef6f6a1c0e002ecd1063b3ee0ac9302d": {
+      "en": "content_text",
+      "fr": "texte de contenu"
+    },
+    "ea44d72bb3383b275e1f49b333eb3050": {
+      "en": "Add Tab",
+      "fr": "Ajouter un onglet"
+    },
+    "9d44e336e31130bea94764accc8a426a": {
+      "en": "Add Comments",
+      "fr": "Ajoutez des commentaires"
+    },
+    "0ba80006400cc1b99c2bc9a160fa64a5": {
+      "fr": "Biere",
+      "en": "Beer"
+    },
+    "04bd09bce3173f943374c299c3b52df9": {
+      "en": "<h1>Your table reservation was successfully canceled</h1>",
+      "fr": "Votre réservation de table a été annulée avec succès"
+    },
+    "3e68ad9b7ced9994b62721c5af7c5fbc": {
+      "en": "Input image address (ex: http://www.delivery-angels.ru) or click Cancel to upload image from the device",
+      "fr": "Entrez l&apos;adresse de l&apos;image (ex: http://www.delivery-angels.ru) ou cliquez sur Annuler pour charger l&apos;image de l&apos;appareil"
+    },
+    "b7beed125a75ff65d74424407f05e8b1": {
+      "en": "RAW BAR",
+      "fr": "Huîtres",
+      "ru": "Устрицы"
+    },
+    "849a556747218b6cee002b1623e33734": {
+      "en": "Pig",
+      "fr": "Cochon frit"
+    },
+    "fccbc3bcaa538e545918294ab221694a": {
+      "fr": "item_title"
+    },
+    "06cb14c36977f51533b0a20964e92989": {},
+    "936beb3789addd4616f024f2cd2caac8": {
+      "fr": "APÉRITIFS",
+      "en": "APPETIZERS"
+    },
+    "3fb5a1fd02693fe2959220f291b05f19": {
+      "fr": "Laitue",
+      "en": "ENTREE SALADS"
+    },
+    "d4acb5850c2a8ddf85cfadfe3c1a5dd6": {
+      "fr": "Langue",
+      "en": "Language",
+      "ru": "Язык"
+    },
+    "99dea78007133396a7b8ed70578ac6ae": {
+      "fr": "S'identifier",
+      "en": "Login"
+    },
+    "ea4788705e6873b424c65e91c2846b19": {
+      "fr": "Annuler",
+      "en": "Cancel"
+    },
+    "03a6047fc6d4cd986c98ea39fcda082a": {
+      "fr": "La description",
+      "en": "Description"
+    },
+    "95bab09e015aa657732aff4c267585d9": {
+      "en": "Put Email",
+      "fr": "Mettre l'email"
+    },
+    "1641c6d0fc8087efba5e0af4bafd3b0d": {
+      "en": "Smith's Bouquet (for two)"
+    },
+    "dabf7e442ad28fe766e07e13c5905001": {},
+    "0750e17ac92224b657b18cf31c8663d1": {
+      "en": "Wollensky’s Grand Bouquet (for four)"
+    },
+    "fded39c28da467b370db872af456a607": {},
+    "87e202616250f462500ce1f3c1799f68": {
+      "en": "Fresh Shucked Oysters"
+    },
+    "0961d9a02c25e48636a0d00b5d1b4d9d": {},
+    "c2f73e5f5863800f98e2b66188e7109d": {
+      "en": "Littleneck Clams"
+    },
+    "eb08fe83afdbf25347411dd67d182ee0": {},
+    "538642ceab503d8990c7b7b750b15943": {
+      "en": "Our Shrimp Cocktail 3/4"
+    },
+    "6be42edc9d781bcd1341cc2b5144b16c": {},
+    "158e93681f6db6f57ccab1e56cd18f82": {
+      "en": "Fresh Colossal Lump Crabmeat Cocktail"
+    },
+    "0b93b94f25aae5c8e21dac1ddabc97e4": {},
+    "5c4c754134a087e66a8442695a42a520": {
+      "en": "The S&W Lobster Cocktail"
+    },
+    "4badd8a95a338a08e94b2c51e7f45fa7": {},
+    "763090f3d1887e690c9105e18f36ec4e": {
+      "en": "Florida Colossal Stone Crabs"
+    },
+    "113142bc6f45f58f6d874482cfe11558": {},
+    "b597564d714393cebc808383f5caef55": {
+      "en": "Maryland Crab Cake"
+    },
+    "cc471719cd000fcf4894cdc4f6aabd6d": {},
+    "b6e11ce5caf35daf7e58294445e714e9": {
+      "en": "Clams Casino"
+    },
+    "729cd55b58f69ce71bc89f0049eaec69": {},
+    "31145d71a37cbbea404cf3cc65bc9f55": {
+      "en": "Our Famous Split Pea Soup"
+    },
+    "ac527aa8e2bbd863832068e8500f4d2a": {},
+    "966b863eb5e8a94e6b4720d09871fc98": {
+      "en": "Fried Calamari"
+    },
+    "609030e7816db235d6fceb1b472de0f5": {},
+    "206ed66e78ae2de174fc7730f9cd6ebf": {
+      "en": "New England Clam Chowder"
+    },
+    "518b4e50e81c1baee4cf920c43c5f468": {},
+    "3d6f9f8c79713e167cb3352f876e87a7": {
+      "en": "Line-Caught Tuna Tartare"
+    },
+    "f0be0cc8a3394f1c7b6138fd3246019e": {},
+    "879d9426b45feee8e58e074f6d6ffe66": {
+      "en": "Maine Lobster Salad"
+    },
+    "1100e344d4f34557aa09092b35400071": {},
+    "c45e837f2787a8460c9ac76e292df856": {
+      "en": "Cobb Salad"
+    },
+    "5a024065c4db51f34d7c38d349edede4": {},
+    "099b9c03ad0a702c63e3bde285d0489d": {
+      "en": "Grilled Chicken Caesar Salad"
+    },
+    "f3048337b19005ceadc291cf3679034f": {},
+    "694143cdc2ede0ec3ac78b29b4b0a17c": {},
+    "9a6cd77e316836f7d41257da3bebad4b": {},
+    "46388f3428045c7dca06e6f02a205f8c": {
+      "en": "Live Lobsters (3 to 13 lbs.)"
+    },
+    "8ea8af669c2ed622cab4d42ae6e0fd50": {},
+    "0180f91ca1491db207dae180099e2dd9": {
+      "en": "Cold Water Lobster Tails (10oz/15oz)"
+    },
+    "b9ad11081b005e659a1c4b19c00bb048": {},
+    "f3d5840c5a17c2fabec8c07d8a993272": {
+      "en": "LOBSTERS"
+    },
+    "81cc194c9698c0afdb4dcb9baf6a3591": {
+      "en": "Cajun Baby Potatoes"
+    },
+    "b9d8d413b50edbd26d34cbd4a5a5f8e7": {
+      "en": "POTATOES"
+    },
+    "0ecb0fb0eaae52bf0438bf36489d7363": {
+      "en": "Loaded Baked Potato Gratin"
+    }
+  }
+}

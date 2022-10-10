@@ -1,0 +1,156 @@
+{
+  "a7a45eefb4e8d53933cb97fd2fd23add":{
+    "en":"Complete Registration",
+    "ru":"Пройдите регистрацию"
+  },
+  "9894ba007958648fbb95dab79f5c49b8": {
+    "en": "Pizza",
+    "ru": "Пицца"
+  },
+  "5204a8300227b12b9344514e31658a57": {
+    "en": "Fruits & Veges",
+    "ru": "Овощи-фрукты"
+  },
+  "936beb3789addd4616f024f2cd2caac8": {
+    "en": "Milk & Butter",
+    "ru": "Молоко-масло"
+  },
+  "3fb5a1fd02693fe2959220f291b05f19": {
+    "en": "Cheese",
+    "ru": "Сыр"
+  },
+  "f3d5840c5a17c2fabec8c07d8a993272": {
+    "en": "Meat",
+    "ru": "Мясо"
+  },
+  "b9d8d413b50edbd26d34cbd4a5a5f8e7": {
+    "en": "Fish",
+    "ru": "Рыба"
+  },
+  "54a790c38eed762e354f16fb664c53de": {
+    "en": "Mushrooms",
+    "ru": "Грибы"
+  },
+  "25090ca7ae49ae5e0826233de9b89a30": {
+    "en": "Eggs",
+    "ru": "Яйца"
+  },
+  "c1680e5a5622cdeebcf7d4e8795f3569": {
+    "en": "Chicken",
+    "ru": "Птица"
+  },
+  "822ce45977e6e321b1a6b2efa72df99f": {
+    "en": "Liver",
+    "ru": "Колбасы"
+  },
+  "161af5daa71abf18b8ad2c9593678e78": {
+    "en": "Ice-cream",
+    "ru": "Мороженное"
+  },
+  "710cabd76238783bc3ebd5dc4ddf91bc": {
+    "en": "Bread",
+    "ru": "Хлеб"
+  },
+  "54976a99e9bea2b1c5ca1b04cfcca910": {
+    "en": "Bio",
+    "ru": "Био"
+  },
+  "7e6d0ea3b4fc6b8e1d5b451e1feec025": {
+    "ru": "Дорада",
+    "en": "Dorada"
+  },
+  "af98240f456501fac70a7e0055283302": {
+    "ru": "Маасдам"
+  },
+  "de5cd441feebf6ec87a49ae0846648e6": {
+    "ru": "Пицца"
+  },
+  "0207b930f29b28fef13a112f55c5dc40": {
+    "ru": "Хлеб"
+  },
+  "d7b285d3c3dc52fae17b6f5cd217e5af": {
+    "ru": "Молоко-масло"
+  },
+  "88dbcef4b4b443ce35a7a59570dae498": {
+    "ru": "Молоко",
+    "en": "name"
+  },
+  "d201dd3df448cef50027a3f5bc830583": {
+    "ru": "   Вкусное"
+  },
+  "96d31d5a4564e01572fb431d53cae66e": {
+    "ru": "Масло"
+  },
+  "59268d8cb53b431ec0b04aac37a210b0": {
+    "ru": "   Сливочное"
+  },
+  "3ae431941d83da3130be0a28ffa7888e": {
+    "ru": "4 сыра"
+  },
+  "f549df0f0b73114dbacf565ab036ff26": {
+    "ru": "Сыр"
+  },
+  "3238515a5aff7f6902ce5424f6d4d76c": {
+    "ru": "   Самая вкусная"
+  },
+  "739fc677a2c34ef2e33d972d43f29210": {
+    "ru": "Мясо"
+  },
+  "43583cf84faf49c74a224f5fec3bb2ef": {
+    "ru": "Пироженное"
+  },
+  "ddfe8bb38993fd74342ca7b0d5139a80": {
+    "ru": "   Test"
+  },
+  "0b35f96ef863229ca9f75d9678551f82": {
+    "ru": "Овощи-фрукты"
+  },
+  "b42eb6462e6e98c766f9808ea735af42": {
+    "ru": "БИО"
+  },
+  "6cebea0afe887cb6ef78b738eb7ab8a1": {
+    "ru": "BIO"
+  },
+  "5ea7514718c3079ad6ac448c95b19ee8": {
+    "ru": " Цельнозерновой"
+  },
+  "346d2b5e50a010b9a69760413cedab05": {
+    "ru": "био"
+  },
+  "5fc732311905cb27e82d67f4f6511f7f": {
+    "ru": "date"
+  },
+  "d60db28d94d538bbb249dcc7f2273ab1": {
+    "ru": "offer"
+  },
+  "4b2a1529867b8d697685b1722ccd0149": {
+    "ru": "viewer"
+  },
+  "9871d3a2c554b27151cacf1422eec048": {
+    "ru": "uid"
+  },
+  "0c83f57c786a0b4a39efab23731c7ebc": {
+    "ru": "email"
+  },
+  "1acea494cb4d9c244fe638d362eb0648": {
+    "ru": "my_truck_ovl"
+  },
+  "189d641b5adcb72de6cc191d4fbc8d4c": {
+    "ru": "Хлебушек"
+  },
+  "d0384a5f433a948be7f6ebe19f77db89": {
+    "ru": "Птица"
+  },
+  "8b2f67d7879157fbd05d6958a9fbad52": {
+    "ru": "Кура, кг."
+  },
+  "447b7147e84be512208dcc0995d67ebc": {
+    "ru": "item"
+  },
+  "b37a6ebb25eb83df1578392cd5ad7810": {
+    "ru": "Маргарита, 36 см."
+  },
+  "d95740eb35ab71890646d7611955d475": {
+    "ru": "Маргарита"
+  }
+}

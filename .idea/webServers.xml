@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="968e09d0-cfe9-42be-814a-8ed7947e6040" name="beget.tech.bonmenu" url="http://a07513cy.beget.tech">
+        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/nedol/public_html/bonmenu">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="a5e25df8-2cca-4f55-861c-874bf07200af" name="reserve" url="http://a07513cy.beget.tech">
+        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/reserve">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="041ee651-025b-4883-a997-a620835cae48" name="beget_server_root(u~R9zsGCKz!9)" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="5021dd25-7892-4ec9-81dc-2884ae0501f1" name="beget.nedol.ru" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/nedol/web/nedol.ru" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+      <webServer id="77fa8274-ef65-45ef-a22e-292f718af719" name="beget.d2d" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/admin/web/delivery-angels.ru" accessType="SFTP">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="22" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

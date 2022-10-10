@@ -1,0 +1,461 @@
+
+    <div id="popup" style="display:none">
+    <style>
+        .table-borderless > tbody > tr > td,
+        .table-borderless > tbody > tr > th,
+        .table-borderless > tfoot > tr > td,
+        .table-borderless > tfoot > tr > th,
+        .table-borderless > thead > tr > td,
+        .table-borderless > thead > tr > th {
+            border: none;
+        }
+        .description {
+            display: none;
+            position: absolute;
+            top: 0px;
+            left: 5px;
+            color: rgb(157, 160, 164);
+            z-index: 101;
+            border-width: 0;
+            margin: 10px;
+            background-color: transparent;
+        }
+        .item_price{
+            left: 2%;
+            /*background-color: transparent;*/
+            /* -webkit-text-stroke: 1px white; */
+            font-family: 'Montserrat', serif;
+            font-weight: 100;
+            color: #6f6f6f;
+            font-size: 2em;
+            white-space: nowrap;
+            z-index: 1000;
+        }
+        .pack_btn{
+            font-size: large !important;
+            color:gray;
+            background-color: transparent;
+            border-style: solid;
+            border-width: 0px;
+            padding-left: 1px;
+        }
+        .content_text {
+            position: absolute;
+            top:0;
+            color: grey;
+            height:100%;
+            width:100%;
+            line-height:20px;
+            overflow-y: scroll;
+            font-family:'Constantia';
+            font-size: medium;
+            padding: 20px;
+            margin: 0px;
+            background-color: rgba(255,255,255,0.8);
+            border-width: 0;
+            -webkit-appearance: textarea;
+            -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+            -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+            box-sizing: border-box;         /* IE 8+ */
+            white-space: pre-wrap;
+        }
+        /* pager wrapper, div */
+        .pager{
+            /*position: fixed;*/
+            /*top:-20px;*/
+            /*left:0;*/
+            margin:0;
+            font-size: small;
+        }
+
+        .pager img{
+            width:20px;
+        }
+
+        .pager input, .pager select{
+            border:1px solid transparent;
+            background-color: transparent;
+        }
+        .tablesorter-pager {
+          padding: 5px;
+        }
+        /* pager wrapper, in thead/tfoot */
+        td.tablesorter-pager {
+          background-color: #e6eeee;
+          margin: 0; /* needed for bootstrap .pager gets a 18px bottom margin */
+        }
+        /* pager navigation arrows */
+        .tablesorter-pager img {
+          vertical-align: middle;
+          margin-right: 2px;
+          cursor: pointer;
+        }
+
+        /* pager output text */
+        .tablesorter-pager .pagedisplay {
+          padding: 0 5px 0 5px;
+          width: 50px;
+          text-align: center;
+        }
+
+        /* pager element reset (needed for bootstrap) */
+        .tablesorter-pager select {
+          margin: 0;
+          padding: 0;
+        }
+
+        /*** css used when "updateArrows" option is true ***/
+        /* the pager itself gets a disabled class when the number of rows is less than the size */
+        .tablesorter-pager.disabled {
+          display: none;
+        }
+        /* hide or fade out pager arrows when the first or last row is visible */
+        .tablesorter-pager .disabled {
+          /* visibility: hidden */
+          opacity: 0.5;
+          filter: alpha(opacity=50);
+          cursor: default;
+        }
+        .pagesize{
+            width:42px
+        }
+
+        /* Extra selectors needed to override the default styling */
+        table.tablesorter tbody tr.normal-row {
+          background: #e3e3e3;
+          color: #fff;
+        }
+        table.tablesorter tbody tr.alt-row {
+          background: #acacac;
+          color: #fff;
+        }
+
+        /* Extra selectors needed to override the default styling */
+        table.tablesorter tbody tr.odd {
+          background: #838383;
+          color: #fff;
+        }
+        table.tablesorter tbody tr.even {
+          background: #acacac;
+          color: #fff;
+        }
+
+        .pack_list{
+             width:auto;
+        }
+
+        input[type=search]{
+            border-width: 0;
+        }
+
+        .form-check-input {
+           position: relative;
+        }
+
+        .noUi-connect{
+            background-color: transparent;
+        }
+
+        .cat_div.active{
+            background-color: darkgrey;
+        }
+
+        .ord_amount{
+            font-size: large !important;
+            border-width: 0;
+            padding-left: 1px;
+            padding-right:1px;
+        }
+
+        .ordered .ord_amount {
+            color:white;
+            background-color: red;
+            padding-left: 5px; padding-right:5px;
+            font-weight: bold;
+            font-size: x-large !important;
+        }
+
+        .checked .ord_amount {
+            color:white;
+            background-color: darkgrey;
+            padding-left: 5px; padding-right:5px;
+            font-weight: bold;
+            font-size: x-large !important;
+        }
+        .mp_ord_cnt{
+            top: 34px !important;
+            position: absolute;
+        }
+
+        .mp_appr_cnt{
+            top: 20px !important;
+            position: absolute;
+        }
+
+        .approved .ord_amount {
+            color:white;
+            background-color: green;
+            padding-left: 5px; padding-right:5px;
+            font-weight: bold;
+            font-size: x-large !important;
+        }
+
+        ::-webkit-scrollbar {
+            /*display:none ;*/
+            border-width: thin;
+        }
+
+        @media screen and (min-width: 120px) {
+            .content_text{
+                font-size:smaller
+            }
+        }
+
+        @media screen and (min-width: 320px) {
+              .content_text{
+                   font-size:small
+               }
+        }
+
+        @media screen and (min-width: 480px) {
+           .content_text{
+                font-size:medium
+            }
+        }
+
+        @media screen and (min-width: 960px) {
+           .content_text{
+                font-size:large;
+                line-height:30px;
+            }
+        }
+
+        @media screen and (min-width: 1200px) {
+           .content_text{
+                font-size:x-large;
+                line-height:40px;
+            }
+        }
+
+        @media screen and (min-width: 1600px) {
+           .content_text{
+                font-size:larger
+            }
+        }
+    </style>
+
+    <div class="address_div input-group" style="display:none;position:relative;width: 100%">
+        <input type="address" id="address" class="form-control"
+            title="введите адрес доставки"
+            placeholder="введите адрес доставки"
+            style="width: 100%">
+             <button  type="button"  id="address_loc"
+                style="
+                position:absolute;
+                top:0;
+                right:0;
+                z-index: 100;
+                border-width: 0;
+                height: 100%;
+                background-color: transparent">
+                <i class="icofont-map icofont-2x"></i>
+            </button>
+
+    </div>
+
+    <div class="mp_categories" style="overflow-x: auto;white-space:nowrap">
+        <div class="cat_div text-center" id="add_tab_li" title="add tab">
+        </div>
+    </div>
+
+     <div class="d-flex justify-content-center mb-3" style="position: relative;height:0px">
+        <div id="pager" class="pager p-2">
+            <a class="first icofont-rounded-double-left icofont-1x"/></a>
+            <a class="prev icofont-rounded-left  icofont-1x"/></a>
+
+            <span class="pagedisplay" data-pager-output-filtered="{startRow:input} - {endRow} / {filteredRows} of {totalRows} total rows"></span>
+            <a class="next icofont-rounded-right  icofont-1x"/></a>
+            <a class="last icofont-rounded-double-right icofont-1x"/></a>
+            <select class="pagesize">
+              <option value="10">10</option>
+              <option value="20">20</option>
+              <option value="30">30</option>
+              <option value="40">40</option>
+              <option value="all" data-translate="08a34eba38f85f425f9af8f41d5d9eab"></option>
+            </select>
+            <select class="gotoPage" title="Select page number" aria-disabled="false">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+            </select>
+        </div>
+    </div>
+
+    <div style="overflow-x: scroll">
+        <table  class="tablesorter mp text-nowrap table-borderless" cellspacing="0" width="auto">
+        <thead>
+        <tr>
+            <th>
+                <span class="icofont-food-cart icofont-2x nosorting"></span>
+            </th>
+            <th>
+                <span span="icofont-console icofont-2x"></span>
+            </th>
+
+            <th>
+                <span class="icofont-image  icofont-2x nosorting"></span>
+            </th>
+
+            <th>
+                <span class="fas fa-coins fa-2x"></span>
+            </th>
+
+            <th>
+                <span class="icofont-copy icofont-2x nosorting"></span>
+            </th>
+
+            <th>
+                <span class="icofont-square icofont-2x nosorting"></span>
+            </th>
+
+        </tr>
+       </thead>
+        <tfoot>
+            <tr class='tr_tmplt' style='display:none;text-align: center; font-weight: bold;'>
+                <td type  style="position: relative">
+                    <div  style="position: absolute;top: 0;">
+                      <img src=''  style='max-width:50px;max-height:50px'>
+                    </div>
+                </td>
+                <td title >
+                     <div style="
+                             min-width: 200px;
+                             text-align: center;
+                             /* height: 32px; */
+                             /* background-image: linear-gradient(white, #c5c5c5,transparent); */
+                             /* font-family: 'Roboto', 'fallback font 2', 'fallback font 2', sans-serif; */
+                             /* font-weight: bold; */
+                             font-size: large;
+                             color: #9da0a4;
+                             /* -webkit-text-stroke: 1px #868686; */
+                             white-space: normal;
+                             z-index: 100;
+                          ">
+                    </div>
+                </td>
+                <td image style="position: relative">
+                    <!--button  type="button" class="description"  data-toggle="collapse">
+                        <i class="icofont-justify-center icofont-2x"></i>
+                    </button-->
+                    <div class="img_container">
+                        <img src='../dist/images/700x400.png' style='max-width:200px;padding: 10px'>
+                        <div class="content_text collapse" contenteditable="false">
+                        </div>
+                    </div>
+                </td>
+                <td>
+                   <div class='item_price'></div>
+                   <div class='dropup pack_container'>
+                      <button class='pack_btn btn btn-outline-secondary' type='button' style="background-color: #e4ddc8"></button>
+                      <div class='pack_list input dropdown-menu' style='font-size:medium;white-space: nowrap;background-color: cornsilk;'>
+                      </div>
+                   </div>
+                   <div style="margin-top: 20px;">
+                       <button type="button" class='reduce_ord ctrl'
+                           style='vertical-align:middle; font-size: large;color: #0b22d5; background-color:transparent;border: 0;outline: none;'>
+                           <i class='icofont-minus'></i>
+                       </button>
+                       <button class='ord_amount btn btn-outline-secondary'>0
+                       </button>
+                       <button type="button" class='increase_ord ctrl'
+                           style='vertical-align: middle ; font-size: large;color: #d51312;  background-color:transparent; border: 0;outline: none;'>
+                           <i class='icofont-plus'></i>
+                       </button>
+                   </div>
+                </td>
+                <td>
+                    <div class='extra_collapse' style='display: none;text-align: center;'>
+                        <span  data-toggle='collapse' data-target='.extras'
+                          style='position: relative; top:0px;z-index: 1000;color: grey'>
+                       <i class='fa  fa-2x fa-plus' aria-hidden='true'></i>
+                       </span>
+                    </div>
+                    <div class='extras collapse' style='
+                        width: 300px;
+                        height:150px;
+                        font-size: medium;
+                        position:relative;
+                        transform: scale(0.9);
+                        border-radius: 5px;
+                        z-index:200;'></div>
+                </td>
+                <td></td>
+            </tr>
+        </tfoot>
+        <tbody>
+
+        </tbody>
+    </table>
+    </div>
+
+    <table class="thidden" style="display:none"></table>
+
+    <div id="slider" style="min-width:200px;  margin-left: 10px;  margin-right: 10px;"></div>
+
+    <div style='display: none'>
+        <div class='row tmplt_extra align-items-center' style='background-color: #cbced2'>
+            <div class="carousel-item" title="" tab="" supuid="">
+                <div class="carousel_title">  title  </div>
+                <div class="carousel_img_div">
+                    <img class="carousel_img"  alt="slide">
+                </div>
+                <div>
+                    <div class="carousel_price" style="display: inline-block;">35</div>
+                    <div class="dscnt_price" style="display: inline-block; visibility: hidden">30</div>
+                </div>
+                <div class="discount"  style="display:none">-20%</div>
+            </div>
+            <div class='add_div col'  style='vertical-align:middle; text-align:left'>
+                <a class='extra_title'></a>
+            </div>
+            <div class='add_price_div' style='text-align:center'>
+               <a class='extra_price' style='color:darkgrey;font-family:"Montserrat, serif;font-weight: bold;vertical-align: middle"'></a>
+            </div>
+            <div class='col'  style='text-align:right;white-space: nowrap;color:#273be6;'>
+               <span class='reduce ctrl' style='vertical-align:middle; font-size: large;'>
+                    <i class=' fa fa-minus'></i>
+               </span>
+               <button class='extra_amount btn btn-outline-secondary' style='font-size: large;border-width: 0; padding-left: 1px; padding-right:1px'>0
+               </button>
+               <span class='increase ctrl' style='vertical-align: middle ; font-size: large;color: #d51312'>
+                    <i class=' fa fa-plus'></i>
+               </span>
+            </div>
+        </div>
+    </div>
+    <style>
+        .loader {
+            display: none;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            z-index: 1;
+            margin: -75px 0 0 -75px;
+            vertical-align: middle;
+            border: 16px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 16px solid #3498db;
+            width: 120px;
+            height: 120px;
+            -webkit-animation: spin 2s linear infinite; /* Safari */
+            animation: spin 2s linear infinite;
+        }
+    </style>
+    <div style="display:inline-block; position: fixed;bottom: 0; right:0; color: white; z-index: 10000">
+        <span id="close_frame" class="close fa fa-times-circle-o" style="color:#0088BB;margin: 10px"  title=""></span>
+    </div>
+    <div class="loader"></div>
+</div>
+

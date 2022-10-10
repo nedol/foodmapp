@@ -1,10 +1,9 @@
-import {OrderViewer} from "../../order/order.viewer";
 
 export {MapEvents}
-
-import proj from 'ol/proj';
-import Extent from 'ol/extent';
-import {OfferOrder} from "../../customer/init.frame";
+// import {OrderViewer} from "../../order/order.viewer";
+// import proj from 'ol/proj';
+// import Extent from 'ol/extent';
+//import {OfferOrder} from "../../customer/init.frame";
 
 import {UtilsMap} from "../../utils/utils.map"
 let utils_map = new UtilsMap();
@@ -31,10 +30,12 @@ class MapEvents{
 
 
         function OnPropertyChange(event) {
+
             that.map.ol_map.dispatchEvent('movestart');
             that.map.ol_map.getView().un('propertychange', OnPropertyChange);
             that.map.ol_map.on('moveend', function () {
                 that.map.ol_map.on('propertychange', OnPropertyChange);
+
             });
 
         };

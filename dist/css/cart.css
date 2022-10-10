@@ -1,0 +1,101 @@
+
+th {
+    text-align: center;
+    font-size: 20px;
+    padding-right: 30px;
+    padding-left: 30px;
+    color: #c4e3f3;
+}
+td{
+    white-space: normal;
+}
+
+/* Extra selectors needed to override the default styling */
+table.tablesorter tbody tr.odd {
+    background: #838383;
+    color: #fff;
+}
+table.tablesorter tbody tr.even {
+    background: #acacac;
+    color: #fff;
+}
+
+/* Extra selectors needed to override the default styling */
+table.tablesorter tbody tr.supuid {
+    background: darkgrey;
+    color: #4b4b4b;
+}
+table.tablesorter tbody tr.pay_supuid {
+    background: white;
+    color: #6b86dc;
+}
+
+input::placeholder,textarea::placeholder, div::placeholder {
+    position: absolute;
+    color: #9c9c9c !important;
+    opacity: 1;
+    font-weight: 200;
+    font-size: smaller;
+    bottom: 0;
+    right:0;
+    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
+    /*-webkit-text-stroke: 0px #d51312;*/
+}
+
+::placeholder {
+    color: grey;
+    font-weight: lighter;
+    font-size: small;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.item_cb{
+    width: 4%;
+}
+
+.notoday{
+    display:none;!important;
+}
+[contentEditable=true]:empty:not(:focus):before{
+    content:attr(placeholder);
+    color: #c8c8c8;
+}
+
+th{
+    position: relative;
+}
+
+tr,td{
+    text-align: center;
+}
+
+.tip{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: small;
+    font-style: italic;
+    color: grey;
+}
+.place{
+    font-size: small;
+    border: none;
+    background-color:
+            transparent;
+    outline: none;
+}
+.delivery_adr{
+    border: none;
+    outline: none;
+    background-color: transparent;
+    text-align: center;
+}
+.tacomment{
+    background-color:transparent;
+    border-color: transparent;
+    font-style: italic;
+}
+
+.table-responsive{
+    min-height: 350px;
+}

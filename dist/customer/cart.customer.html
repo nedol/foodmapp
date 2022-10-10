@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ru">
+<!--https://bootsnipp.com/snippets/4Mm5R-->
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">-->
+ <link href="../assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../../lib/style.css">
+<link rel="stylesheet" href="../css/cart.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+
+<!-- Libraries -->
+<script src="../host.js"></script>
+
+<script src="../customer_cart.js"></script>
+
+
+<body>
+    <div class="dropdown" style="display: none">
+        <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
+                data-width="fit" type="button" style="background-color: #ffffff">
+            <span class="glyphicon glyphicon-option-vertical"
+                style="color:black; background-color: white !important;margin: 10px"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li class="odr_ctrl" data-width="fit"><a href="#">Заказ</a>
+            </li>
+        </ul>
+    </div>
+    <div class="bootstrap snippet" style="padding: 5px">
+
+        <div style="display: block; position:fixed; right:5%; bottom:5%; font-size:xx-large;z-index:100">
+            <span class="close_browser  fa fa-times-circle-o"></span>
+        </div>
+
+        <!--Мои заказы-->
+        <div class="tab-pane" id="orders">
+            <!--<div class="ord_container"></div>-->
+            <div  class="table-responsive  text-nowrap">
+                <table class="tablesorter" cellspacing="0" width="100%">
+                    <thead>
+                    <tr>
+                        <th>
+                            <span class="">#</span>
+                        </th>
+                        <th>
+                            <span class="fa fa-square-o"><i class="tip" data-translate>c944d745b377880c6e3a2f851bb3510a</i></span>
+                        </th>
+                        <th>
+                            <span class="fa fa-clone"><i class="tip" data-translate>b7bb52d46441267cf30ffd51668e311e</i></span>
+                        </th>
+
+                        <th>
+                            <span class="fa fa-ruble"><i class="tip" data-translate>252d601fadd75eba972d2dc0bfb22e67</i></span>
+                        </th>
+                        <th>
+                            <span class="fa fa-commenting-o"><i class="tip" data-translate>2eaf1074f07aa11c39a919c930c40b88</i></span>
+                        </th>
+
+                    </tr>
+                    </thead>
+                    <tbody style="background-color: #e6e6e6"></tbody>
+                    <tfoot>
+                    <tr style="height: 200px">
+                    </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div id="menu_item_tmplt" style="display:none"></div>
+
+<style>
+    .loader {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        vertical-align: middle;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<div class="loader"></div>
+</body>
+</html>

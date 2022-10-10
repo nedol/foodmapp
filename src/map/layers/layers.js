@@ -1,23 +1,21 @@
 export {Layers};
 
-import layerVector from 'ol/layer/vector';
-import srcVector from 'ol/source/vector';
-import BingMaps from 'ol/source/bingmaps';
-import TileLayer from 'ol/layer/tile';
-import OSM from 'ol/source/osm';
-import proj from 'ol/proj';
+import VectorLayer  from 'ol/layer/vector';
+import VectorSource  from 'ol/source/vector';
+
+
 import Cluster from 'ol/source/cluster';
-import _ol_style_Style_ from 'ol/style/style';
-import _ol_style_Circle_ from 'ol/style/circle';
-import _ol_style_Icon_ from 'ol/style/icon';
-import _ol_style_Fill_ from 'ol/style/fill';
+import Style from 'ol/style/style';
+import Circle from 'ol/style/circle';
+import Icon from 'ol/style/icon';
+import Fill from 'ol/style/fill';
 import Text from 'ol/style/text';
-import _ol_style_Stroke_ from 'ol/style/stroke';
+import Stroke from 'ol/style/stroke';
 
 import Observable from 'ol/observable';
 
 import {UtilsMap} from "../../utils/utils.map.js";
-
+let moment = require('moment/moment');
 
 class Layers {
     constructor(map){
@@ -25,119 +23,83 @@ class Layers {
         let that = this;
         this.ar = [];
         this.flag = true;
-        this.path  = './../..';
-        if(location.origin.includes('localhost'))
-            this.path = 'https://nedol.ru'
+        this.path = 'https://delivery-angels.ru/server/';
+        this.zoom = this.map.ol_map.getView().getZoom();
 
-        try {
-            //osm.setVisible(false);
+    }
 
-            let sourceBingMaps = new BingMaps({
-                key: window.sets.bing_key,
-                imagerySet: 'Road',
-                culture: 'ru'
-            });
-
-            let bingMapsRoad = new TileLayer({
-                preload: Infinity,
-                source: sourceBingMaps,
-                map_type: true,
-                url: 'http://[…]/{z}/{x}/{y}.png',
-                crossOrigin: 'null'
-            });
-
-            bingMapsRoad.setVisible(true);
-            map.ol_map.getLayers().push(bingMapsRoad, true);
-            map.ol_map.getLayers().set("Bing", bingMapsRoad, true);
-
-            // if(!that.circleLayer && window.user.profile.profile.type!=='deliver') {
-            //     this.CreateCircleLayer();
-            // }
-
-            that.map.ol_map.on('moveend', function (event) {
-
-                let extent = that.map.ol_map.getView().calculateExtent();
-                let tr_ext = proj.transformExtent(extent,'EPSG:3857','EPSG:4326');
-                if(isNaN(tr_ext[1]) || isNaN(tr_ext[3]) || isNaN(tr_ext[0]) || isNaN(tr_ext[2]))
-                    return;
-                that.map.GetObjectsFromStorage([tr_ext[1],tr_ext[3],tr_ext[0],tr_ext[2]]);
-
-                let source;
-                if(that.circleLayer) {
-                    source = that.circleLayer.getSource();
-                }else {
-                    return;
-                }
-
-                let features = source.getFeatures();
-                let utils = new UtilsMap();
-
-                for(let f in features){
-                    let util = new UtilsMap();
-                    if(util.IsInsideRadius(that.map, features[f])){
-                        if($('.deliver_but[supuid='+features[f].values_.obj.uid+']').length===0) {
-                            let deliver_but =
-                                '<div><input type="image" class="deliver_but"'+
-                                'src="'+that.path +"/server/images/"+features[f].values_.obj.profile.avatar+'"' +
-                                ' supuid=' +features[f].values_.obj.uid+'></div>';
-                            $('#deliver_container').append(deliver_but);
-                            $('#deliver_container').css('display','block');
-
-                            // $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].values_.obj.profile.avatar);
-                        }
-
-                        if(that.circleLayer.style_.fill_)
-                            that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)';
-
-                    }else{
-                        if(features[f].values_.obj)
-                            $('.deliver_but[supuid='+features[f].values_.obj.uid+']').parent().remove();
-                        // that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
-                    }
-                }
-
-                let pos = JSON.parse(localStorage.getItem("deliver_pos"));
-                if(pos)
-                    $('#deliver_container').offset({top:pos.top,left:pos.left});
-                $('#deliver_container').draggable(
-                    { delay: 100},
-                    { start: function (ev) {
-
-                    },
-                        drag: function (ev) {
-                            $('.deliver_but').attr('drag','true');
-                        },
-                        stop: function (ev) {
-
-                            $('.deliver_but').attr('drag','false');
-
-                            let left = $('#deliver_container').position().left;
-                            // $(el).css('right', rel_x + '%');
-                            let top = $('#deliver_container').position().top;
-                            // $(el).css('bottom', rel_y + '%');
-                            localStorage.setItem("deliver_pos",JSON.stringify({top:top,left:left}));
-
-                        }
-                    });
-                    $('.deliver_but').off();
-                    $('.deliver_but').on('click touchstart', function (ev) {
-                        setTimeout(function () {
-                            if($('.deliver_but').attr('drag')!=='true')
-                                window.user.OnClickDeliver(ev.currentTarget);
-                        },200);
-                    });
-            });
-
-
-        } catch (ex) {
-            console.log("InitLayers");
+    PutDeliversOnMap(){
+        let that = this;
+        let source;
+        if(that.circleLayer) {
+            source = that.circleLayer.getSource();
+        }else {
+            return;
         }
+        let features = source.getFeatures();
+
+        for(let f in features){
+            let util = new UtilsMap();
+            if(util.IsInsideRadius(that.map, features[f])){
+                if($('.deliver_but[supuid='+features[f].values_.obj.uid+']').length===0) {
+                    let deliver_but =
+                        '<div><input type="image" class="deliver_but"'+
+                        'src="'+that.path +"images/"+features[f].values_.obj.profile.avatar+'"' +
+                        ' supuid=' +features[f].values_.obj.uid+'></div>';
+                    $('#deliver_container').append(deliver_but);
+                    $('#deliver_container').css('display','block');
+
+                    // $('#deliver_but').attr('src',that.path +"/server/images/"+features[f].obj.profile.avatar);
+                }
+
+                if(that.circleLayer.style_.fill_)
+                    that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0.2)';
+
+            }else{
+                if(features[f].values_.obj)
+                    $('.deliver_but[supuid='+features[f].values_.obj.uid+']').parent().remove();
+                // that.circleLayer.style_.fill_.color_ = 'rgba(255, 255, 255, 0)'
+            }
+        }
+
+        let pos = JSON.parse(localStorage.getItem("deliver_pos"));
+        if(pos)
+            $('#deliver_container').offset({top:pos.top,left:pos.left});
+            $('#deliver_container').draggable(
+                { delay: 100},
+                { start: function (ev) {
+
+                },
+                    drag: function (ev) {
+                        $('.deliver_but').attr('drag','true');
+                    },
+                    stop: function (ev) {
+
+                        $('.deliver_but').attr('drag','false');
+
+                        let left = $('#deliver_container').position().left;
+                        // $(el).css('right', rel_x + '%');
+                        let top = $('#deliver_container').position().top;
+                        // $(el).css('bottom', rel_y + '%');
+                        localStorage.setItem("deliver_pos",JSON.stringify({top:top,left:left}));
+
+                    }
+                });
+            $('.deliver_but').off();
+            $('.deliver_but').on('click touchstart', function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                setTimeout(function () {
+                    if($('.deliver_but').attr('drag')!=='true')
+                        window.user.OnClickDeliver(ev.currentTarget);
+                },200);
+        });
     }
 
     CreateCircleLayer(style){
 
-        this.circleLayer = new layerVector({
-            source: new srcVector(),
+        this.circleLayer = new VectorLayer ({
+            source: new VectorSource(),
             style: style
         });
         this.map.ol_map.getLayers().push(this.circleLayer);
@@ -148,24 +110,13 @@ class Layers {
 
         let layers = this.map.ol_map.getLayers();
         layers.forEach(function (layer, i, layers) {
-            if (layer.values_.map_type) {
-                layer.setVisible(false);
+            if (layer.map_type) {
+                layer.setVisible(true);
             }
         });
 
         $("[map='" + map + "']").attr("checked", "checked");
 
-        switch (map) {
-            case "osm":
-                layers.get("OSM").setVisible(true);
-                break;
-            case "google":
-                layers.get("Google").setVisible(true);
-                break;
-            case "bing":
-                layers.get("Bing").setVisible(true);
-                break;
-        }
     }
 
     CreateLayer(cat, state) {
@@ -173,7 +124,7 @@ class Layers {
         let style;
         let features = [];
 
-        let vectorSource = new srcVector({
+        let vectorSource = new VectorSource({
             features: features
         });
 
@@ -184,7 +135,7 @@ class Layers {
         });
         let id_str='';
 
-        let vectorLayer = new layerVector({
+        let vectorLayer = new VectorLayer ({
             map_type: false,
             source: vectorSource,
             vector: vectorSource,
@@ -193,33 +144,56 @@ class Layers {
 
                 let period = $('.sel_period').text().split(' - ');
                 let features = cluster_feature.values_.features?cluster_feature.values_.features:[cluster_feature];
-                let rem_feat = [];
-                if (cluster_feature.values_ || (features && features.length > 0)){
+
+                if (features || (features && features.length > 0)){
 
                     $.each(features,  (key, feature)=> {
-                        // if(feature.getId()===id_str)
-                        //     return;
+                        if(!feature) {
+                            features.splice(key,1);
+                            return;
+                        }
                         id_str = feature.getId();
-                        setTimeout(function () {
-                            id_str = '';
-                        },300);
 
-                        if (feature.values_.object.date.valueOf() === new Date(window.user.date).valueOf()) {
+                        // setTimeout(function () {
+                        //     id_str = '';
+                        // },300);
 
-                            // if(window.user.constructor.name==="Supplier"){
-                            //     if(feature.values_.object.profile.type==='marketer')
-                            //         return;
-                            // }
+                        try {
+                            if (feature.values_.object.date === moment(window.user.date).format('YYYY-MM-DD')) {
 
-                            let style = getObjectStyle(feature.values_.object);
-                            cluster_feature.setStyle(style);
+                                // if(window.user.constructor.name==="Supplier"){
+                                //     if(feature.object.profile.type==='marketer')
+                                //         return;
+                                // }
+                                // if(that.map.ol_map.getView().getZoom()===that.zoom){
+                                //     if(feature.object.style)
+                                //         cluster_feature.setStyle(feature.object.style);
+                                //     return;
+                                // }
 
-                        }else{
-                            vectorSource.removeFeature(feature);
+                                that.zoom = that.map.ol_map.getView().getZoom();
+
+                                let style = getObjectStyle(feature.values_.object);
+                                cluster_feature.setStyle(style);
+
+                            } else {
+
+                                if(clusterSource.getFeatureById(id_str)) {
+                                    let f = clusterSource.getFeatureById(id_str);
+                                    clusterSource.removeFeature(f);
+                                }
+                                if(vectorSource.getFeatureById(id_str)) {
+                                    let f = vectorSource.getFeatureById(id_str);
+                                    vectorSource.removeFeature(f);
+                                }
+
+                            }
+                        }catch(ex){
+                            console.log(JSON.stringify(ex))
                         }
                     });
                 }
-                else if(cluster_feature.values_){
+                else if(cluster_feature){
                     ;
                 }
 
@@ -259,16 +233,17 @@ class Layers {
                     let diff = new Date().getTime() - new Date(obj.published).getTime();
                     var days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-                    if (days >= 30)//просрочен
-                        obj.delayed = true;
+                    //TODO: delayed features
+                    obj.delayed = false;
+                    // if (days >= 30)//просрочен
+                    //     obj.delayed = true;
 
-                    let zoom = that.map.ol_map.getView().getZoom();
-                    scale = Math.pow(zoom,3)/30000;
+                    scale = Math.pow(that.zoom,3)/30000;
                     if(obj.profile.type==='marketer'){
-                        if(zoom<12 && features.length===1)//non cluster
-                            return;
+                        if(that.zoom<12 && features.length===1)//non cluster
+                            return null;
                         ic_clust = obj.img;
-                        scale = Math.pow(that.map.ol_map.getView().getZoom(),4)/600000;
+                        scale = Math.pow(that.map.ol_map.getView().getZoom(),4)/200000;
 
                     }else if(obj.profile.type==='deliver'){
                         // if(that.map.ol_map.getView().getZoom()<15)
@@ -284,26 +259,24 @@ class Layers {
                         opacity = 1;
                     }
 
-                    if(days>=30) {
-                        opacity /= days-30;
-                    }
-                    if(days>30){
-                        opacity = 0.3;
-                    }
+                    //TODO:
+                    // if(days>=30) {
+                    //     opacity /= days-30;
+                    // }
+                    // if(days>30){
+                    //     opacity = 0.3;
+                    // }
 
-                        let thmb = window.location.origin +"/d2d/server/images/"+obj.profile.avatar;
-                        if(host_port.includes('nedol.ru/server'))
-                            thmb = host_port +"/images/"+obj.profile.avatar;
+                        let thmb = that.path+'images/'+obj.profile.avatar;
 
-
-                        let iconItem = new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
-                            //size: [300,500],
+                        let iconItem = new Icon(/** @type {olx.style.IconOptions} */ ({
+                            //size: [500,500],
                             //img: image,
                             //imgSize:
-                            scale: obj.delayed?scale/1.5:scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
+                            scale: obj.delayed?scale/2.5:scale, //cl_feature.I.features.length>1 || obj.image.indexOf('/categories/')!== -1?0.3:1.0,//
                             // anchor: [0.5,0.5],
                             // anchorOrigin: 'top-left',//'bottom-left',
-                            offset: [0, 0],
+                            //offset: [20, 20],
                             offsetOrigin:  'top-left',
                             // anchorXUnits: 'pixel',
                             // anchorYUnits: 'pixel',
@@ -311,15 +284,17 @@ class Layers {
                             opacity: opacity,
                             src: obj.profile.avatar?thmb: "./images/user.png",
                             crossOrigin: 'anonymous',
-                            fill: new _ol_style_Fill_({
+                            fill: new Fill({
                                 color: 'gray'
                             })
                         }));
 
                     let iconStyle;
                     if (features.length > 1) {//cluster
-                        ic_clust = "./images/user.png";
-                        let iconCluster= new _ol_style_Icon_(/** @type {olx.style.IconOptions} */ ({
+                        const cat = _.intersection(features[0].values_.categories,features[1].values_.categories);
+
+                        ic_clust = "./images/ic_"+cat+".png";
+                        let iconCluster= new Icon(/** @type {olx.style.IconOptions} */ ({
                             //size: [100,100],
                             //img: image,
                             //imgSize:
@@ -331,23 +306,23 @@ class Layers {
                             // anchorXUnits: 'pixel',
                             // anchorYUnits: 'pixel',
                             color: [255, 255, 255, 1],
-                            opacity: 0.5,
+                            opacity: 0.9,
                             src: ic_clust
                         }));
 
-                        let label  = cluster_feature.values_.features.length.toString();
-                        iconStyle = new _ol_style_Style_({
+                        let label  = features.length.toString();
+                        iconStyle = new Style({
                             text: new Text({
                                 text: label,
                                 font: (90*scale).toFixed(0)+'px serif',
                                 textAlign: 'end',
                                 //scale: .1,
-                                offsetX:0,
+                                offsetX:10,
                                 offsetY: -5,
-                                fill: new _ol_style_Fill_({
+                                fill: new Fill({
                                     color: 'blue'
                                 }),
-                                stroke: new _ol_style_Stroke_({
+                                stroke: new Stroke({
                                     color: 'white',
                                     width: 2
                                 })
@@ -363,7 +338,7 @@ class Layers {
                         let canvas = document.createElement('canvas');
                         let context = canvas.getContext('2d');
                         let width = context.measureText(label).width;
-                        iconStyle = new _ol_style_Style_(
+                        iconStyle = new Style(
                             {
                             // text: new Text({
                             //     text: zoom>=18?label:'',
@@ -374,16 +349,16 @@ class Layers {
                             //     offsetX: 0,//width/2,
                             //     offsetY: 25,
                             //     baseline: 'bottom',
-                            //     fill: new _ol_style_Fill_({
+                            //     fill: new style.Fill({
                             //         color: 'gray'
                             //     }),
-                            //     stroke: new _ol_style_Stroke_({
+                            //     stroke: new style.Stroke({
                             //         color: 'white',
                             //         width: 2
                             //     })
                             // }),
                             image: iconItem,
-                            zIndex: 20
+                            zIndex: 200
                         });
                         try {
                             if(that.circleLayer) {
@@ -400,8 +375,8 @@ class Layers {
 
                     //circle_style.image_.setScale(that.map.ol_map.getView().getZoom());
                     //TODO
-                    let shadowStyle = new _ol_style_Style_({
-                        stroke: new _ol_style_Stroke_({
+                    let shadowStyle = new Style({
+                        stroke: new Stroke({
                             color: 'rgba(0,0,0,0.5)',
                             width: 100
                         }),
@@ -457,14 +432,14 @@ class Layers {
                 let elapsed = frameState.time - start;
                 let elapsedRatio = elapsed / duration;
                 // radius will be 5 at start and 30 at end.
-                let radius = ol.easing.easeOut(elapsedRatio) * 25 + 5;
-                let opacity = ol.easing.easeOut(1 - elapsedRatio);
+                let radius = easing.easeOut(elapsedRatio) * 25 + 5;
+                let opacity = easing.easeOut(1 - elapsedRatio);
 
-                let style = new _ol_style_Style_({
-                    image: new _ol_style_Circle_({
+                let style = new Style({
+                    image: new Circle({
                         radius: radius,
                         snapToPixel: false,
-                        stroke: new _ol_style_Stroke_({
+                        stroke: new Stroke({
                             color: 'rgba(255, 0, 0, ' + opacity + ')',
                             width: 0.25 + opacity
                         })
@@ -496,11 +471,11 @@ class Layers {
 
     AddCluster(layer, new_features) {
 
-        let vectorSource = layer.values_.vector;
+        let vectorSource = layer.vector;
 
         vectorSource.addFeature(new_features);
 
-        let clusterSource = new Cluster({
+        let clusterSource = new source.Cluster({
             distance: 100,//parseInt(50, 10),
             source: vectorSource
         });
@@ -536,3 +511,11 @@ class Layers {
 
 }
 
+
+
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/map/layers/layers.js
+// module id = 438
+// module chunks = 0

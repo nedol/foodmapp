@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="SshConfigs">
+    <configs>
+      <sshConfig authType="PASSWORD" host="a07513cy.beget.tech" id="ea8f754a-f033-47b2-921a-ee311f99c147" port="22" customName="nedol (project level) (Nissan@720)" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="193.200.74.37" id="b6b7661a-fc1e-4ac9-ae1b-a96f07b1109b" port="22" customName="beget_server_nedol(Nissan@386)" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="193.200.74.37" id="d47b5cd5-7e66-4f26-9129-313d0bb55553" port="22" customName="beget_server_root" nameFormat="CUSTOM" />
+      <sshConfig authType="PASSWORD" host="193.200.74.37" id="76e48af1-cf43-45cd-a421-bbd01be1bf3f" port="22" customName="delivery-angels" nameFormat="CUSTOM" />
+    </configs>
+  </component>
+</project>

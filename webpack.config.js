@@ -6,7 +6,7 @@ var HtmlWebpackPlugin = require('html-webpack-plugin');
 var ExtractTextPlugin = require('extract-text-webpack-plugin');
 const NODE_ENV = process.env.NODE_ENV //|| 'development';
 
-var JavaScriptObfuscator = require('webpack-obfuscator');
+// var JavaScriptObfuscator = require('webpack-obfuscator');
 
 module.exports = {
 

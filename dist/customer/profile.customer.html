@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="ru">
+<!--https://bootsnipp.com/snippets/4Mm5R-->
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="../../lib/style.css">
+
+
+
+<!-- Libraries -->
+<script src="../host.js"></script>
+
+<script src="../customer_profile.js"></script>
+
+    <style>
+    .container{
+        -webkit-overflow-scrolling: touch;
+    }
+    .label{
+        text-align: center;
+        white-space: nowrap;
+    }
+    .ctrl{
+        font-family: "arial";
+        font-size: x-large;
+        padding: 10px;
+    }
+    .menu_item{
+        position: relative;
+        border-radius: 5px;
+        border: 0px solid #343434;
+        padding-left: 5px;
+        margin: 5px;
+        width: 98.7%;
+        height: auto;
+        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .item_title:focus{
+        outline: none !important;
+        border-color: #719ECE;
+        box-shadow: 0 0 10px #719ECE;
+    }
+    .item_title{
+        display: inline-block;
+        position: absolute;
+        width: 50%;
+        top:5px;
+        background-color: transparent;
+        font-family:"Courier New";
+        font-weight:bold;
+        font-size: x-large;
+        color:#0088bb;
+        border-width: 0px;
+    }
+
+    .content_text{
+        color: grey;
+        width: 100%;
+        overflow-y: scroll;
+        font-family:'Segoe Script';
+        font-size: medium;
+        margin-left:10px;
+        background-color: transparent;
+        border-width: 0;
+        -webkit-appearance: textarea;
+        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+        box-sizing: border-box;         /* IE 8+ */
+    }
+
+    .item_price{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .item_pack{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .qnty{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:18px;
+    }
+    [contentEditable=true]:empty:not(:focus):before{
+        content:attr(placeholder);
+        color:gray;
+    }
+    /* Extra selectors needed to override the default styling */
+    table.tablesorter tbody tr.normal-row td {
+        background: #888;
+        color: #fff;
+    }
+    table.tablesorter tbody tr.pay_supuid td {
+        background: #c8c8c8;
+        color: #fff;
+    }
+
+</style>
+<div class="container">
+
+        <div class="row">
+            <div class="col-sm-10"><h1 data-translate="a46c372347e02010f5ef45fe441e4349">Мой профиль</h1></div>
+            <div class="col-sm-2"></div>
+        </div>
+        <div class="col-sm-9">
+            <div class="form-group">
+                <div class="col-xs-6">
+                     <div class="dropdown">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" style="font-weight: 700">
+                          en
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" role="langitem">ru</a>
+                          <a class="dropdown-item" href="#"  role="langitem">en</a>
+                          <a class="dropdown-item" href="#"  role="langitem">fr</a>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+
+                <div class="col-xs-6">
+
+                </div>
+            <div class="form-group">
+                <div class="col-xs-6">
+                     <input type="text" id="name" class="form-control" name="name" data-translate placeholder="02aa853964a1542a8ee08c71a95bbf64">
+                </div>
+
+                <div class="col-xs-6">
+                    <input type="email" id="email"  class="form-control" name="email" data-translate placeholder="96c7b6402b3c977daed27d8692d472fc">
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <input type="phone" id="mobile" class="form-control" name="mobile" data-translate placeholder="9fdc3f131f7923e7bdd4ec60d465ae87">
+                </div>
+                <div class="col-xs-6">
+                    <input type="address" class="form-control"  id="address"data-translate placeholder="bec946b0e151ea413af70bbc0f36ab98">
+                </div>
+            </div>
+
+    </div>
+
+    <div id="menu_item_tmplt" style="display:none"></div>
+</div>
+
+
+    <span id="close_browser" class="close fa fa-times-circle-o"
+        style="
+            display: block;
+            position: fixed;
+            bottom: 5%;
+            right:5%;
+            font-size: xx-large;
+            color:#0088BB;
+            margin: 10px;
+            z-index: 10000;"
+        title="Publier">
+    </span>
+
+
+<style>
+    .loader {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        vertical-align: middle;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<div class="loader"></div>
+<script type="text/javascript" src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+
+</html>

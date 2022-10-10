@@ -2,11 +2,11 @@
 
 require('bootstrap');
 // require('bootstrap-select');
-import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+// import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 
-const EventSource = NativeEventSource || EventSourcePolyfill;
+// const EventSource = NativeEventSource || EventSourcePolyfill;
 // OR: may also need to set as global property
-window.EventSource =  NativeEventSource || EventSourcePolyfill;
+// window.EventSource =  NativeEventSource || EventSourcePolyfill;
 
 import 'tablesorter/dist/css/theme.default.min.css';
 // import 'tablesorter/dist/css/theme.blue.css';

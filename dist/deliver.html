@@ -2,35 +2,62 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <link rel="apple-touch-icon" sizes="57x57" href="./images/favicon/apple-icon-57x57.png">
+    <link rel="apple-touch-icon" sizes="60x60" href="./images/favicon/apple-icon-60x60.png">
+    <link rel="apple-touch-icon" sizes="72x72" href="./images/favicon/apple-icon-76x76.png">
+    <link rel="apple-touch-icon" sizes="114x114" href="./images/favicon/apple-icon-114x114.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="./images/favicon/apple-icon-120x120.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="./images/favicon/apple-icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="./images/favicon/apple-icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="180x180" href="./images/favicon/apple-icon-180x180.png">
+    <link rel="icon" type="image/png" sizes="192x192"  href="./images/favicon/android-icon-192x192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-96x96.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
+
+    <meta name="msapplication-TileColor" content="#ffffff">
+    <meta name="msapplication-TileImage" content="./ms-icon-144x144.png">
+    <meta name="theme-color" content="#ffffff">
+
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+
+    <meta name="description" content="Food Map">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
+    <meta http-equiv="Expires" content="0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ДоТуДо Доставка</title>
+    <title>FoodMap</title>
+
 </head>
 
-<meta charset="utf-8">
-<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
 
+<!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../lib/style.css">
 <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css"  type='text/css'>
+<link id="cus_link" rel="stylesheet" href="./css/supplier.css" type='text/css'>
 
+<script type="text/javascript" src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+ <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 
-<!-- jQuery library -->
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<script src="../lib/DragDropTouch.js"></script>
-
-<script src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
 <script type="text/javascript" src="./host.js"></script>
-<script type="text/javascript" src="deliver.js"></script>
-<script src="../lib/jquery.ui.touch-punch.min.js"></script>
+
+<script type="text/javascript" src="./deliver.js?v=36"></script>
+
+<style>
+    .unpublished{
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .published{
+        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(0%);
+    }
+</style>
+
 <style>
 
     html, body{
@@ -59,8 +86,9 @@
         margin: 0px;
         height: 100%;
         width: 100%;
-        position: fixed;
+        position: absolute;
         z-index: 0;
+        right: 0;
     }
 
     #main_menu{
@@ -87,17 +115,9 @@
         z-index: 11;
     }
 
-    #locText{
-        display: inline-block;
-        position: absolute;
-        bottom: 5px;
-        right: 5px;
-        width: 100px;
-        /*text-align: right;*/
-        /*left: 400px;*/
-        color:red;
-        font-size: small;
-        z-index:1;
+    .dt_val{
+        font-size: x-large;
+        text-align: center;
     }
 
     #mouse_pos_div{
@@ -131,28 +151,27 @@
         z-index:10;
     }
 
-    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); }}
 
-    @-webkit-keyframes bounce {
-        0%       { -webkit-transform:  scale(1, 1);}
-        25%      { -webkit-transform:  scale(1.2, 1.2);}
-        50%      { -webkit-transform:  scale(0.7, 0.7);}
-        75%      { -webkit-transform:  scale(1.1, 1.1);}
-        100%     { -webkit-transform:  scale(1, 1);}
+    #user_container{
+        position:absolute;
+        bottom:85%;
+        right: 1%;
     }
-    .grow { transition: all .2s ease-in-out; }
-    .grow:hover { transform: scale(1.75); }
 
-    #my_truck{
+    #user{
         display: block;
         visibility: hidden;
-        position: absolute;
-        right: 10px;
-        top: 10%;
         width: 40px;
         height: 40px;
+        border-radius: 5px;
+        background-color: rgba(200,200,200,0.7);
+    }
+
+    #user_2{
+        display: block;
+        visibility: hidden;
+        width: 60px;
+        height: 60px;
         border-radius: 5px;
         background-color: rgba(200,200,200,0.7);
     }
@@ -167,30 +186,30 @@
     }
 
     #zoom_but{
-        display:block;
+        display: block;
         position: absolute;
         /*z-index:30;*/
         color: #1b1b1b;
         top: 50%;
-        right: 10px;
+        right: 5px;
         width: 40px;
-        height: 40px;
+        /*height: 28px;*/
         /*line-height: auto;*/
-        border: solid 1px grey;
-        text-align:center;
-        vertical-align:middle;
-        font-size: 170%;
+        border: solid 0px grey;
+        text-align: center;
+        font-size: 200%;
         font-weight: bold;
         border-radius: 5px;
         background-color: whitesmoke;
         cursor: n-resize;
     }
 
+
     #search_but{
         display: block;
-        position: absolute;
-        right: 10px;
-        bottom: 10%;
+        position: fixed;
+        right: 1%;
+        bottom: 20%;
         width: 40px;
         height: 40px;
         border-radius: 5px;
@@ -200,7 +219,7 @@
     #loc_ctrl {
         display: block;
         position: absolute;
-        right: 10px;
+        right: 1%;
         top: 30%;
         width: 40px;
         height: 40px;
@@ -229,274 +248,301 @@
         z-index:12;
         /*-webkit-animation:bounce 1s infinite;*/
     }
+
+    #locText{
+        display: block;
+        position: absolute;
+        bottom: 5px;
+        right: 10px;
+        width: 100px;
+        font-family: serif;
+        color:red;
+        font-size: small;
+        text-align: right;
+        z-index:1;
+    }
 </style>
-
 <body>
-
 <div id="map" class="map"></div>
 
-<section id="marker" title="kolobot">
-    <img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>
-</section>
+
+<!--<section id="marker" title="kolobot">-->
+<!--<img  src="https://nedol.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--</section>-->
 
 
-<style>
-    #feedback { font-size: 1.4em; }
-    #period_list .ui-selecting { background: #FECA40; }
-    #period_list .ui-selected { background: #F39814; color: white; }
-    #period_list { list-style-type: none; margin: 0; padding: 0; width: 60%; }
-    /*#period_list li { margin: 3px; padding: 0.4em; font-size: 1.4em; height: 18px; }*/
-</style>
-
-<div id="main_window" class="container">
-    <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
-
-        <div class="d-inline-block">
-            <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: medium"></div>
-        </div>
-    </div>
-    <style>
-        #dtp_container {
-            display: none;
-            position: absolute;
-            /*left:50%;*/
-            right:65%;
-            top:15%;
-            z-index: 11;
-        }
-    </style>
-    <div id="dtp_container" class="center-block scaled">
-        <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
-    </div>
-
+<div id="splash" style="position: absolute;background-color: white;text-align: center;width: 100%;height: 100%;z-index: 50;">
+    <label for="splash_img" style="position: absolute;top: 135px;right: 50%;font-family: 'Roboto';font-size: xx-large;">FoodMap</label>
+    <img src="./images/pineapple-food-globe.png" id="splash_img" align="middle" width="50%" style="position: absolute;
+        margin: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;">
 </div>
 
-<div id="category_include" style="">
 
-    <div id="category_container">
+<div class="date_ctrl"  style="display:inline-block;position:absolute;">
+    <div>
+        <input type="date" class="dt_val" style="width:120px; height: 30px;
+        background-color:white;text-align:center;float:left;height:34px;font-size: small;
+        border-width: 0; border-radius: 5px;outline: none">
 
     </div>
-
 </div>
+
+<div id="category_include">
+    <div id="category_container"></div>
+</div>
+
+   <div>
+        <iframe id="supplier_frame"
+                src=""
+                style="
+                    display:none;
+                    z-index:2000;
+                    position:absolute;
+                    overflow: hidden;
+                    width:100%;
+                    height: 100%;
+                    top:0";
+                    >
+        </iframe>
+    </div>
+
 
 <div>
-    <div id="supplier_frame_container"
-         style="display:none;
-             /*-webkit-transform: translateZ(0px);*/
-             z-index:2000;
-             position: absolute;
-             height: 100%;
-             max-height: 100% !important;
-             /*min-height: 50% !important;*/
-             width: 100%;
-              -webkit-overflow-scrolling: touch;
-             overflow: scroll;
-             /*border: solid 0px lightslategrey;*/
-             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
 
-    </div>
-
-    <iframe id="offer_frame"
-            src="./deliver/deliver.frame.html"
+<div>
+    <iframe id="deliver_frame"
+            src=""
             style="
-                display: none;
+                display:none;
+                z-index:1000;
                 position:absolute;
                 overflow: hidden;
-                z-index: 10;
                 width:100%;
-                height: 100%;">
+                height: 100%;
+                top:0";
+                >
     </iframe>
-
 </div>
 
+<data class="alerts" id="choose_region"  data-translate="4b310a8f25bcb1082f21fa8cde0b28e9" style="display: none">Choose a region for delivery</data>
+<data class="alerts" id="do_publish_offer" data-translate="46534fd998c8f508d0bc9d15f134a68a" style="display: none">Do Publlish offer?</data>
+<data class="alerts" id="item_title" data-translate="0ad4f20d1443d9529ab35534c1ba505b" style="display: none">&nbsp;&nbsp;</data>
+<data class="alerts" id="show_orders" data-translate="54a228ac1da8df4602aa2052461c1349" style="display: none">Show Orders</data>
+<data class="alerts" id="offer_delivery" data-translate="2dd63ed2ec0b1a276c6a24eed9ddf874" style="display: none">Предложение по доставке</data>
+<data class="alerts" id="published" data-translate="44ec8d4ee84b681847b88ee0c5b3b790" style="display: none">Опубликовано</data>
+<data class="tariff" id="items_limit" value="5" style="display: none"></data>
 
-
-<div class="alert alert-warning alert-dismissible fade">
-    <button type="button" class="close">&times;</button>
-    <h3></h3>
-</div>
-
-
-<div id="offer_viewer" class="order_container"
-       style="display:none;   position: fixed;
-       overflow-x: hidden; overflow-y: hidden; z-index:2147483646; margin: auto;
-       width:70%;  height: auto; left: 20%; top: 5%;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    <div data-translate="3e68ad9b7ced9994b62721c5af7c5fbc" hidden>Image</div>
-    <div>
-        <div class="modal-content">
-            <div class="modal-header" style="position: relative;width: 100%;">
-                <div class="row">
-                    <div class="col-sm-6 col-xs-6">
-                        <h4 class="modal-title"  style="display: inline-block">Order for</h4>
-                        <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-                        <h4 class="modal-menu-number"  style="display: none">Offer</h4>
-                    </div>
-                    <div class="col-sm-1 col-xs-1" style="display: inline-block; position:absolute; top:0;right: 5px;color: white">
-                        <span class="close_browser glyphicon glyphicon-remove-sign scaled"></span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-body">
-                <div class="tab-content dropup">
-                    <ul class="nav nav-tabs menu_tabs">
-                        <li class="add_tab_li" title="add tab">
-                        </li>
-                    </ul>
-                    <div class="tab-content">
-                        <div class="tab-pane fade add_tab_div" style="border: none"></div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-
-
-<div id="order_viewer"
-     style="display:none;position: absolute;
-       z-index:10; margin: auto;
-       width:80%;    left: 0%;  right:0; height: 80%; top: 50px;
-       border: solid 0px lightslategrey;
-       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-
-    <div class="modal-content" style="position: absolute;top:0px;height:100%;width: 100%;">
-        <div style="display: inline-block; z-index:11; position:absolute; right: 10px;  color:grey">
-            <span class="close_browser glyphicon glyphicon-remove-sign"></span>
-        </div>
-        <div class="modal-header" style="position: relative;width: 100%;">
-            <h4 class="modal-title"  style="display: inline-block" data-translate="7442e29d7d53e549b78d93c46b8cdcfc">Type</h4>
-            <h4 class="modal-title-date"  style="display: inline-block">Date</h4>
-            <h4 class="modal-menu-number"  style="display: none">Order</h4>
-
-        </div>
-
-        <div class="modal-body table-responsive">
-
-            <ul class="nav nav-tabs" id="orders_tabs">
-                <li id="orders_add_tab_li" title="add tab" style="display: none;">
-                    <span id="orders_add_tab" class="add_tab" href="#orders_add_tab"
-                          style="visibility: hidden;">
-                    </span>
-                </li>
-            </ul>
-            <div class="tab-content" style="position:relative;height:90%;overflow-y: scroll">
-                <!--orders_add_tab_div-->
-                <div id="orders_add_tab_div"  class="tab-pane fade" style="border: none"></div>
-
-                <span id="orders_add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; opacity: .5;font-size: 30px; margin-left: 2px"></span>
-
-            </div>
-
-            <table id="tbl_orders" class="table tablesorter">
-                <thead style="position: sticky">
-                <tr>
-                    <th>
-                        <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
-                    </th>
-                    <th>
-                        <span class="glyphicon glyphicon-apple"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                    </th>
-                    <th>
-                        <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
-                    </th>
-                    <th>
-                        <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
-                    </th>
-                </tr>
-                </thead>
-                <tbody> </tbody>
-            </table>
-        </div>
-
-        <!--<div class="modal-footer" style="display: none"></div>-->
-    </div>
-</div>
-
-<div id="offer_editor_div"></div>
-
-<span id="locText" style="font-family: serif">Lat Lon</span>
 
 <div id="mouse_pos_div" style="display:none; position:absolute; z-index:20;bottom:2px; visibility: visible"></div>
 
 <!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
-    <!--visibility: visible" align="center"/>-->
+<!--visibility: visible" align="center"/>-->
+
+
+
+
+<div id="user_container" style="visibility: hidden" draggable="true">
+    <!--<i class='far fa-user' style='font-size:48px;color:red'></i>-->
+    <img id="user"  src="data:image/png;base64,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"
+         title="Продавец"  style="image-orientation: from-image;width: auto">
+</div>
+
+<div class="browser_container" id="my_profile_container"
+     style="display:none;
+         overflow: visible; z-index:2000;
+         position: absolute;
+         -webkit-overflow-scrolling: auto;
+         height: 90%;
+         max-height: 90% !important;
+         min-height: 50% !important;
+         width:90%; left: 5%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+</div>
+
+<img id="search_but"  src="https://delivery-angels.ru/d2d/dist/images/ic_map_search.png" title="Search">
+
+<section id="loc_ctrl"  title="Моё местоположение">
+    <img id="location_img"  draggable="true" src="https://delivery-angels.ru/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://delivery-angels.ru/d2d/dist/images/ic_pin.png">
+</section>
+
+<h1 id="zoom_but" title="Zoom">
+    <i class="icofont-dotted-up"></i>
+    <i class="icofont-dotted-down"></i>
+</h1>
+<span id="locText">Lat Lon</span>
 
 <style>
-    .unpublished{
-        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
-        filter: grayscale(100%);
+    .loader {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 10;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        vertical-align: middle;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
     }
-    .published{
-        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
-        filter: grayscale(0%);
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
+<div class="loader"></div>
 
-<img id="my_truck" class="unpublished" src="https://nedol.ru/d2d/dist/images/my_truck.png"
-     title="My Truck" draggable="true" >
+<div class="alert_container center-block" style="display:none;position:fixed;white-space:pre;top:30%;left:40%;margin:0 auto;z-index: 1000">
+    <div class="span4">
+        <div class="alert alert-primary">
+            <button type="button" class="close">×</button>
+            <h4><a></a></h4>
+        </div>
+    </div>
 
-<img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
-<section id="loc_ctrl"  title="Location">
-    <img id="location_img" src="https://nedol.ru/d2d/dist/images/ic_location.png">
-    <img id="pin" src="https://nedol.ru/d2d/dist/images/ic_pin.png">
-</section>
-<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
-
-<div id="debug" style="display: block;position: fixed;bottom: 0;left: 0;width: 100px"></div>
-
+</div>
 <style>
+    @media screen and (min-width: 120px) {
+        .word_ig{
+            width: 35%;
+        }
+    }
     @media screen and (min-width: 320px) {
-        #supplier_frame_container{
+        #datetimepicker{
+            transform: scale(1.1);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:25%;
+            right:75%;
+            top:7%;
+            z-index: 11;
+        }
+        #deliver_frame_container{
+            max-width: 100%;
+        }
+        #client_frame_container{
             max-width: 100%;
         }
     }
     @media screen and (min-width: 480px) {
-        #supplier_frame_container{
-            max-width: 60%;
+        #datetimepicker{
+            transform: scale(1.0);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:35%;
+            right:65%;
+            top:7%;
+            z-index: 11;
+        }
+        #deliver_frame_container{
+            max-width: 75%;
+        }
+        #client_frame_container{
+            max-width: 75%;
         }
     }
     @media screen and (min-width: 960px) {
-        #supplier_frame_container{
-            max-width: 40%;
+        #datetimepicker{
+            transform: scale(1.4);
         }
-    }
-    @media screen and (min-width: 1200px) {
-        #supplier_frame_container{
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:40%;
+            right:60%;
+            top:7%;
+            z-index: 11;
+        }
+        #deliver_frame_container{
+            max-width: 30%;
+        }
+        #client_frame_container{
             max-width: 30%;
         }
     }
+    @media screen and (min-width: 1200px) {
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:50%;
+            right:50%;
+            top:7%;
+            z-index: 11;
+        }
+        #deliver_frame_container{
+            max-width: 30%;
+        }
+        #client_frame_container{
+            max-width: 30%;
+        }
+        #user_2{
+            display: block;
+            visibility: hidden;
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            background-color: rgba(200,200,200,0.7);
+        }
+    }
     @media screen and (min-width: 1600px) {
-        #supplier_frame_container{
-            max-width: 20%;
+        #datetimepicker{
+            transform: scale(1.4);
+        }
+        #dtp_container {
+            display: none;
+            position: absolute;
+            left:50%;
+            right:50%;
+            top:7%;
+            z-index: 11;
+        }
+        #deliver_frame_container{
+            max-width:25%;
+        }
+        #client_frame_container{
+            max-width: 25%;
+        }
+        #user_2{
+            display: block;
+            visibility: hidden;
+            width: 80px;
+            height: 80px;
+            border-radius: 5px;
+            background-color: rgba(200,200,200,0.7);
         }
     }
 </style>
-</body>
+
+<div id="foodtrucks">
+    <iframe  id="fd_frame_tmplt"  src="./html/type/foodtruck.html" scrolling="no"
+             onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));'
+             style="display: none; position:absolute;border:none;overflow:hidden; left:0; top:0;z-index: 1000"></iframe>
+    <!--style="height:200px;width:100%;border:none;overflow:hidden;"-->
+</div>
+
 </html>

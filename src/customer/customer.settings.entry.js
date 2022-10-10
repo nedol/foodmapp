@@ -26,11 +26,15 @@ $(document).on('readystatechange', function () {
                     if (img.type === "error") {
                         console.error("Error loading image ");
                     } else {
-                        $('.avatar').attr('src', img.toDataURL());
+                        let this_img = img.toDataURL();
 
-                        $('.avatar').siblings('input:file').attr('changed', true);
-                        console.log("Original image width: ", data.originalWidth);
-                        console.log("Original image height: ", data.originalHeight);
+                        setTimeout(function () {
+                            $('.avatar').attr('src', this_img);
+
+                            $('.avatar').siblings('input:file').attr('changed', true);
+                            console.log("Original image width: ", data.originalWidth);
+                            console.log("Original image height: ", data.originalHeight);
+                        },200)
                     }
                 },
                 {

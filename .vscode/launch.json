@@ -1,0 +1,50 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "MP Fruits&Vegs",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5500/dist/customer.html?lang=en&lat=58.594424&lon=49.6632714&zoom=15&cat=[10,14,31]",
+        },
+        {
+            "name": "Delivery Builder",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5500/dist/deliver.html?lang=en&market=food&psw_hash=29ffe4467d083d656f5d990a4e4a1cb7",
+        },
+        {
+            "name": "Store Builder (Fruits&Vegs)",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5500/dist/supplier.html?lang=en&css=supplier&lat=58.594424&lon=49.6632714&psw_hash=084a42636fbd915deda6e934f38aa514",
+        },
+
+        {
+            "name": "MP Santa Rose Wineries",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5500/dist/customer.html?lang=en&lat=38.47418&lon=-122.808265&zoom=15&cat=[79]",
+        },
+
+        {
+            "name": "MP Food City",
+            "request": "launch",
+            "type": "chrome",
+            "url": "http://localhost:5500/dist/customer.html?lang=en&lat=55.600587&lon=37.469248&zoom=15&cat=[22]"
+        },
+
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Node Server",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}/server/app_.js"
+        }
+    ]
+}

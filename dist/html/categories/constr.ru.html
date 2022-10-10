@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div id="cat_incl">
+
+    <div class="d-inline-flex justify-content-start" style="min-width:20px;max-width:100%;background-color:white;border-radius: 5px;">
+        <div class="word_ig p-2" style="min-width:25px;color: rgb(57,137,206); ">
+            <div class="cat_menu input-group-prepend">
+                <i class="icofont-bolt icofont-2x"></i>
+                <i class="icofont-drill icofont-2x"></i>
+                <i class="icofont-cement-mix icofont-2x"></i>
+            </div>
+            <style>
+                ::placeholder {
+                    color: #b21312 !important;
+                    font-weight: normal;
+                    font-size:small;
+                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                }
+
+            </style>
+        </div>
+        <div class="p-2">
+            <input type="text" class="word_input form-control p-2" placeholder="#" style="min-width:25px;">
+
+        </div>
+        <div class="word_tmplt p-2" style="display: none;">
+            <div class="input-group-prepend">
+                <button class="word_btn btn btn-primary" type="button">Basic Button</button>
+                <button class="word_rmv btn-sm btn-danger" type="button">X</button>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .tooltip {
+            font-family: Georgia;
+            font-size: 20px;
+        }
+        .tooltip-inner {
+            max-width: 500px !important;
+        }
+        #cat_incl{
+            position: absolute;
+            width:100%;
+            bottom:0px;
+        }
+
+
+        #categories{
+            display:inline-block;
+            position: relative;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 10px;
+            width: 100%;
+            bottom:0px;
+            background-color: rgba(243, 243, 243, 1.0);
+            white-space: nowrap;
+            z-index:100;
+        }
+        .main_category{
+
+            /*margin-left: 25px;*/
+            margin-right: 20px;
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 40px;
+            width: 40px;
+            font-size:4em;
+        }
+        .category{
+            margin-left: 25px;
+            margin-right: 25px;
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 45px;
+            width: 45px;
+            font-size:4em;
+        }
+
+        .category:hover{
+            /*height: 50px;*/
+            /*width: 50px;*/
+        }
+
+        .dropup{
+            display: inline-block !important;
+            position: relative;
+            margin-right:30px;
+            margin-left: 30px;
+
+        }
+        .dropdown-menu{
+            width: auto;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: #8f8f8f;
+            white-space: nowrap;
+        }
+        .title{
+            position: absolute;
+            bottom:2px;
+            color: #273be6;
+            background-color: rgba(243, 243, 243, .0);
+            /*-webkit-text-stroke: .5px #ffffff;*/
+            pointer-events: none;
+            /*top:0;*/
+            left: 0;
+            right:0;
+            bottom: -3px;
+            margin:auto;
+            text-align: center;
+        }
+        .cat_div{
+            display: inline-block;
+            position: relative;
+        }
+        .badge{
+            position: absolute;
+            top: 0;
+            right: 0px;
+
+        }
+        input{
+            cursor:pointer
+        }
+
+    </style>
+    <div id="categories"  data-toggle="tooltip" data-placement="top" title="Выбрать товарную категорию">
+
+        <div  class="dropup  text-center">
+            <span class="main_category icofont-video" data-toggle="dropdown"  title="Инструменты" state="0"></span>
+            <h5 class="title  text-center">Инструменты</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_2000">
+                    <span id="2000" class="category icofont-microphone"  extra="false" title="Слесарные" state="0"></span>
+                    <h6 class="title">Слесарные</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+            </ol>
+        </div>
+        <div  class="dropup  text-center">
+            <span class="main_category icofont-game-controller" data-toggle="dropdown"  title="СтройМатериалы" state="0"></span>
+            <h5 class="title  text-center">Строй<br>Материалы</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1100">
+                    <span id="1100" class="category icofont-ui-game" cat="Игры" extra="true" title="Игры" state="0"></span>
+                    <h6 class="title">Игры</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1101">
+                    <span id="1101" class="category icofont-game" cat="Приставки" extra="true" title="Приставки" state="0"></span>
+                    <h6 class="title">Приставки</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+            </ol>
+        </div>
+        <div  class="dropup  text-center">
+            <span class="main_category icofont-computer" data-toggle="dropdown"  title="Kомпьютеры" state="0"></span>
+            <h5 class="title  text-center">Крепеж</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1200">
+                    <span id="1200" class="category fa fa-hdd"  extra="true" title="Десктопы" state="0"></span>
+                    <h6 class="title">Метизы</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1201">
+                    <span id="1201" class="category icofont-imac"  extra="false" title="Моноблоки" state="0"></span>
+                    <h6 class="title">Моноблоки</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1202">
+                    <span id="1202" class="category icofont-laptop-alt"  extra="true" title="Ноутбуки" state="0"></span>
+                    <h6 class="title">Ноутбуки</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+
+            </ol>
+        </div>
+
+        <div  class="dropup  text-center">
+            <span class="main_category icofont-printer" data-toggle="dropdown"  title="Оргтехника, расходники" state="0"></span>
+            <h5 class="title  text-center">Свет</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1400">
+                    <span id="1400" class="category icofont-printer"  extra="true" title="Десктопы" state="0"></span>
+                    <h6 class="title">Оргтехника</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+            </ol>
+        </div>
+       <div  class="dropup  text-center">
+            <span class="main_category icofont-drawing-tablet" data-toggle="dropdown"  title="Планшеты, эл.книги" state="0"></span>
+            <h5 class="title  text-center">Водоснабжение</h5>
+            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
+            <ol class="dropdown-menu">
+                <div class="cat_div  text-center" data-toggle="tab" href="#tab_1500">
+                    <span id="1500" class="category icofont-drawing-tablet"  extra="true" title="Планшеты, эл.книги" state="0"></span>
+                    <h6 class="title">Планшеты</h6>
+                    <h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>
+                </div>
+            </ol>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

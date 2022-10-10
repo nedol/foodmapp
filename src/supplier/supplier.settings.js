@@ -1,28 +1,66 @@
 'use strict'
 
-export {SupplierSettings}
 
-
+import {Сетка} from "../../network";
 import {DB} from "../map/storage/db";
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
+import {Dict} from '../dict/dict.js';
 
 $(document).on('readystatechange', function () {
-
-    if (!window.EventSource) {
-        $('.alert').text('В этом браузере нет поддержки EventSource.').addClass('show');
-        return;
-    }
 
     if (document.readyState !== 'complete') {
         return;
     }
 
+    window.network = new Сетка(host_ws);
+
+    window.cs = new SupplierSettings();
+
+    var readURL = function(input) {
+        if (input.files && input.files[0]) {
+
+        }
+    }
+
+    $.getJSON('../../src/dict/sys.dict.json?v=2', function (data) {
+        window.sysdict = new Dict(data);
+        window.sysdict.set_lang( utils.getParameterByName('lang'), $('body'));
+    });
+
+
+    $(".file-upload").on('change', function(e){
+        loadImage(
+            e.target.files[0],
+            function (img, data) {
+                if(img.type === "error") {
+                    console.error("Error loading image ");
+                } else {
+                    $('.avatar').attr('src', img.toDataURL());
+
+                    $('.avatar').siblings('input:file').attr('changed',true);
+                    console.log("Original image width: ", data.originalWidth);
+                    console.log("Original image height: ", data.originalHeight);
+                }
+            },
+            {
+                orientation:true,
+                maxWidth: 600,
+                maxHeight: 300,
+                minWidth: 100,
+                minHeight: 50,
+                canvas: true
+            }
+        );
+
+    });
 });
 
-class SupplierSettings {
+
+
+export class SupplierSettings {
     constructor(){
 
         // this.network = new Сетка(host_port);
@@ -33,7 +71,6 @@ class SupplierSettings {
             let form = $('form');
             ev.data.OnSubmit(form);
         });
-        // $('.avatar').attr('src',location.origin+'/door2door/dist/images/avatar_2x.png');
     }
 
     Open() {
@@ -44,20 +81,20 @@ class SupplierSettings {
         });
     }
 
-    OnSubmit(form){
+    OnSubmit(form) {
         var urlencode = require('urlencode');
         let that = this;
-        if(!$(form).find('#email').val()) {
-            $(form).find('#email').focus();
+        if (!$(form).find('#place').val()) {
+            $(form).find('#place').focus();
             return;
         }
-        // if(!$(form).find('#place').val()) {
-        //     $(form).find('#place').focus();
-        //     return;
-        // }
+        if (!$(form).find('#market').val()) {
+            $(form).find('#market').focus();
+            return;
+        }
 
-        let k = 200/  $(form).find('.avatar').height();
-        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+        let k = 200 / $(form).find('.avatar').height();
+        utils.createThumb_1($('.avatar')[0], $('.avatar').width() * k, $('.avatar').height() * k, function (avatar) {
             var data_post = {
                 proj: 'd2d',
                 user: "Supplier",
@@ -65,8 +102,9 @@ class SupplierSettings {
                 host: location.origin,
                 promo: $(form).find('#promo').val(),
                 profile: {
+                    market: $(form).find('#market').val(),
                     type: $(':checked').val(),
-                    avatar:avatar.src,
+                    avatar: avatar.src,
                     email: $(form).find('#email').val().toLowerCase(),
                     name: $(form).find('#name').val(),
                     place: $(form).find('#place').val(),
@@ -75,71 +113,59 @@ class SupplierSettings {
                 }
             }
 
-            $('.loader').css('display','block');
+            $('.loader').css('display', 'block');
 
-            $.ajax({
-                url: host_port,
-                type: "POST",
-                // contentType: 'application/x-www-form-urlencoded',
-                crossDomain: true,
-                data: JSON.stringify(data_post),
-                dataType: "json",
-                success: function (obj) {
-                    $('.loader').css('display','none');
-                    if (obj.err) {
-                        alert(obj.err);
-                        return true;
-                    }
-                    delete data_post.proj;
-                    delete data_post.func;
-                    delete data_post.host;
-                    data_post.profile.avatar = obj.avatar;
-                    window.db = new DB('Supplier', function () {
+            window.network.SendMessage(data_post, function (obj) {
+                $('.loader').css('display', 'none');
+                if (obj.err) {
+                    alert(window.sysdict.getDictValue( utils.getParameterByName('lang'),obj.err));
+                    return true;
+                }
+                delete data_post.proj;
+                delete data_post.func;
+                delete data_post.host;
+                data_post.profile.avatar = obj.avatar;
+                window.db = new DB('Supplier', function () {
+                    //localStorage.clear();
+                    window.db.ClearStore('setStore', function () {
+                        window.db.SetObject('setStore', {
+                            market: $(form).find('#market').val(),
+                            uid: obj.uid,
+                            psw: obj.psw,
+                            promo: data_post.promo,
+                            profile: data_post.profile
+                        }, function (res) {
+                            alert(window.sysdict.getValByKey($('html').attr('lang'),'1a82a60f6461f27f40b6596c09ade00d'));
+                            if (window.location.hostname === 'localhost') {
+                                window.location.replace("http://" + window.location.host + "/d2d/dist/supplier.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
+                            } else {
+                                window.location.replace("../supplier.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
+                            }
 
-                        localStorage.clear();
-                        window.db.ClearStore('setStore',function () {
+                            obj = '';
+                        });
+                        window.db.ClearStore('offerStore', function () {
 
-                            window.db.SetObject('setStore', {uid: obj.uid, psw: obj.psw, promo:data_post.promo,profile: data_post.profile}, function (res) {
-                                //alert('На указанный email-адрес была выслана ссылка для входа в программу');
+                            let offer = {
+                                date: 'tmplt',
+                                data: {}
 
-                                if(window.location.hostname==='localhost') {
-                                    window.location.replace("http://localhost:63342/d2d/dist/supplier.html?uid="+obj.uid+"&lang="+$('html').attr('lang'));
-                                } else {
-                                    window.location.replace("../supplier.html?uid="+obj.uid+"&lang="+$('html').attr('lang'));
-                                }
+                            };
 
-                                obj = '';
+                            window.db.SetObject('offerStore', offer, function () {
+
                             });
-                             window.db.ClearStore('offerStore', function () {
+                        });
 
-                                    let offer = {
-                                        date: 'tmplt',
-                                        data: {}
-
-                                    };
-
-                                    window.db.SetObject('offerStore', offer, function () {
-
-                                    });
-                                });
-
-                                window.db.ClearStore('dictStore', function () {
-
-                                });
+                        window.db.ClearStore('dictStore', function () {
 
                         });
+
                     });
-                },
-                error: function (xhr, status) {
-                    setTimeout(function () {
-                        that.OnSubmit(form)
-                    },1000);
-                }
+                });
 
-    });
-            avatar = '';
-
-    });
+            });
+        });
     }
 
     fillForm(){
@@ -185,54 +211,3 @@ class SupplierSettings {
     }
 
 }
-
-$(document).on('readystatechange', function () {
-
-    if (!window.EventSource) {
-        alert('В этом браузере нет поддержки EventSource.');
-        return;
-    }
-
-    if (document.readyState !== 'complete') {
-        return;
-    }
-    // parent
-
-    window.cs = new SupplierSettings();
-
-
-
-    var readURL = function(input) {
-        if (input.files && input.files[0]) {
-
-        }
-    }
-
-
-    $(".file-upload").on('change', function(e){
-        loadImage(
-            e.target.files[0],
-            function (img, data) {
-                if(img.type === "error") {
-                    console.error("Error loading image ");
-                } else {
-                    $('.avatar').attr('src', img.toDataURL());
-
-                    $('.avatar').siblings('input:file').attr('changed',true);
-                    console.log("Original image width: ", data.originalWidth);
-                    console.log("Original image height: ", data.originalHeight);
-                }
-            },
-            {
-                orientation:true,
-                maxWidth: 600,
-                maxHeight: 300,
-                minWidth: 100,
-                minHeight: 50,
-                canvas: true
-            }
-        );
-
-    });
-});
-

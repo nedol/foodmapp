@@ -1,6 +1,6 @@
 'use strict'
 
-import {DeliverSettings} from "./deliver.settings";
+import {DeliverSettings} from "./deliver.settings.old";
 import {DB} from "../map/storage/db"
 
 import 'bootstrap'

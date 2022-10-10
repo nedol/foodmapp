@@ -2,6 +2,9 @@ export {CustomerSettings}
 
 import {Сетка} from "../../network";
 
+import {Utils} from "../utils/utils";
+let utils = new Utils();
+
 
 class CustomerSettings {
     constructor(db){
@@ -70,30 +73,35 @@ class CustomerSettings {
     OnSubmit(form){
         let that = this;
 
-        var data_post ={
-            proj:"d2d",
-            user:"Customer",
-            func:"confirmem",
-            host:location.origin,
-            profile: {
-                avatar: $(form).find('.avatar').attr('src'),
-                lang: $('html').attr('lang'),
-                email: urlencode.encode($(form).find('#email').val().toLowerCase()),
-                name: $(form).find('#name').val(),
-                address: $(form).find('#address').val(),
-                mobile: $(form).find('#mobile').val()
+        let k = 50/  $(form).find('.avatar').height();
+        utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
+
+            var data_post = {
+                proj: "d2d",
+                user: "Customer",
+                func: "confirmem",
+                host: location.origin,
+                profile: {
+                    avatar: avatar.src,
+                    lang: $('html').attr('lang'),
+                    email: urlencode.encode($(form).find('#email').val().toLowerCase()),
+                    name: $(form).find('#name').val(),
+                    address: $(form).find('#address').val(),
+                    mobile: $(form).find('#mobile').val()
+                }
             }
-        }
 
-        this.network.postRequest(data_post, function (res) {
-            delete data_post.proj; delete data_post.func;
-            that.db.GetSettings(function (obj) {
-                obj[0].profile = data_post;
-                that.db.SetObject('setStore',obj[0], function (res) {
-                    alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
+            this.network.SendMessage(data_post, function (res) {
+                delete data_post.proj;
+                delete data_post.func;
+                that.db.GetSettings(function (obj) {
+                    obj[0].profile = data_post;
+                    that.db.SetObject('setStore', obj[0], function (res) {
+                        alert('На указанный вами email-адрес была выслана ссылка для входа в программу');
+                    });
                 });
-            });
 
+            });
         });
     }
 }

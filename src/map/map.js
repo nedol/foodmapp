@@ -1,18 +1,20 @@
 'use strict'
-export {OLMap};
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
+let moment = require('moment/moment');
 // let shortHash = require('shorthash');
 // let md5 = require('md5');
 
-import map from 'ol/map';
+import Map from 'ol/map';
 import View from 'ol/view';
-import TileLayer from 'ol/layer/tile';
+import Layer from 'ol/layer/layer';
+import Tile from 'ol/layer/tile';
 import Cluster from 'ol/source/cluster';
 
 import XYZ from 'ol/source/xyz';
+import OSM from 'ol/source/osm';
 import interaction from 'ol/interaction';
 import control from 'ol/control';
 import Projection from 'ol/proj/projection';
@@ -21,9 +23,9 @@ import DeviceOrientation from 'ol/deviceorientation';
 
 import proj from 'ol/proj';
 import Draw from 'ol/interaction/draw';
-import _ol_style_Style_ from 'ol/style/style';
-import _ol_style_Fill_ from 'ol/style/fill';
-import _ol_style_Stroke_ from 'ol/style/stroke';
+import Style from 'ol/style/style';
+import Fill from 'ol/style/fill';
+import Stroke from 'ol/style/stroke';
 
 import Modify from 'ol/interaction/modify';
 import Snap from 'ol/interaction/snap';
@@ -33,29 +35,32 @@ import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import {Geo} from './location/geolocation';
 
-
 import {Animate} from "./animate/animate";
 import {Layers} from './layers/layers';
-import {Events} from './events/events';
 
 import {OfferOrder} from "../customer/init.frame";
-import {Marker} from "./marker/marker";
-import {Dict} from '../dict/dict.js';
 
-import {Overlay} from "../map/overlay/overlay";
+import {OverlayItem} from "../map/overlay/overlay";
+
+import {Carousel} from "./carousel/carousel";
 import {UtilsMap} from "../utils/utils.map.js";
 
+// import proj4 from 'ol/proj/proj4';
+// import {register} from 'ol/proj/proj4';
+// import {get as getProjection} from 'ol/proj';
 
-
-class OLMap {
+export class OLMap {
 
     constructor() {
-        //let full_screen = new ol.control.FullScreen();
+        //let full_screen = new control.FullScreen();
         //full_screen.setTarget('full_screen');
         window.sets.app_mode = 'd2d';
 
-        this.path  ="http://localhost:63342/d2d/server";
+ 
+        this.path  ="http://localhost:5500/d2d/server";
         if(host_port.includes('nedol.ru'))
+            this.path = "https://delivery-angels.ru/server";
+        else
             this.path = host_port;
 
         window.sets.app_mode = 'd2d';
@@ -64,22 +69,22 @@ class OLMap {
         this.lon_param = utils.getParameterByName('lon');
         this.zoom_param = utils.getParameterByName('zoom');
 
-        var projection = new Projection({
-            code: 'EPSG:3857',//'EPSG:4326', //
-            units: 'm'
-        });
-
         if (!this.ol_map) {
-            this.ol_map = new map({
+            this.ol_map = new Map({
+                // layers: [
+                //     new Tile({
+                //         source: new OSM()
+                //     })
+                // ],
                 layers: [
-                    new TileLayer({
+                    new Tile({
                         preload: 4,
                         source: new XYZ({
                             url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibmVkb2wiLCJhIjoiY2s3ejJzbXViMDF1bTNvbXRzZ3ZqMnFqNCJ9.QGsoAD2JcX-6bmpbKjvmWw'
                         })
                     })
                 ],
-                interactions: interaction.defaults({altShiftDragRotate: false, pinchRotate: false}),
+                //interactions: interaction.defaults({altShiftDragRotate: false, pinchRotate: false}),
                 controls: control.defaults({
                     zoom: false,
                     attribution: false,
@@ -90,17 +95,13 @@ class OLMap {
                 }).extend([
                     // full_screen
                 ]),
-                target: 'map',
-                view: new View({
-                    center: proj.fromLonLat( [parseFloat('0.0'), parseFloat('51.4934')]),
-                    projection:projection,
-                    zoom: 17
-                })
+                target: 'map'
             });
 
         }
 
         this.mapEvents();
+
 
         this.geo = new Geo(this);
 
@@ -108,71 +109,76 @@ class OLMap {
 
         this.layers = new Layers(this);
 
+        this.carousel = new Carousel();
 
-        this.feature = new Feature(this);
+        this.carousel.CarouselEvents(this);
 
         this.featureAr = {};
 
-        var rotateMap = false;
-        var deviceOrientation = new DeviceOrientation();
 
-        deviceOrientation.on('change', function(event) {
-
-        });
-
-        deviceOrientation.on('change:heading', function(event) {
-
-        });
-        deviceOrientation.setTracking(true);
-
-        //$('#items_carousel').carousel({interval:2000});
-        $('#items_carousel').carousel("cycle");
     }
 
-    Init(lat, lon) {
+    Init(lat, lon, cb) {
         let that = this;
 
         that.lat_param = lat;
         that.lon_param = lon;
 
-
         setTimeout(function () {
 
-            that.CarouselEvents();
-
             let time = new Date().getTime();
-            // let cl = localStorage.getItem('cur_loc');
-            // cl = JSON.parse(cl);
-            // if (cl != null && cl.time < 1503824276869) {
-            //     localStorage.clear();
-            // }
 
-            let c ='';
-            if (!localStorage.getItem("cur_loc")) {
-
-                let lonlat = [parseFloat('37.47'), parseFloat('55.6')];
-
-                localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
-                    "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":"+that.ol_map.getView().getZoom()+"}");
-            }else{
-                try {
-                    c = JSON.parse(localStorage.getItem("cur_loc"));
-                }catch(ex){
-
-                }
-            }
-
-
-            if (that.lat_param && that.lon_param)
-                window.sets.coords.cur = proj.fromLonLat([parseFloat(that.lon_param), parseFloat(that.lat_param)]);
-            else if (c)
-                window.sets.coords.cur = proj.fromLonLat([parseFloat(c.lon), parseFloat(c.lat)]);
-
-            if(utils.getParameterByName('lat') && utils.getParameterByName('lon')){
+            if (utils.getParameterByName('lat') && utils.getParameterByName('lon')) {
                 let lat = utils.getParameterByName('lat');
                 let lon = utils.getParameterByName('lon');
                 window.sets.coords.cur = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+
+            }else if(lat && lon){
+                localStorage.setItem("cur_loc", "{\"lon\":" + lon + "," +
+                    "\"lat\":" + lat + ", \"time\":" + time + ",\"zoom\":\"15\"}");
+                window.sets.coords.cur = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
+            }else {
+
+                let c = '';
+                let cur_loc = JSON.parse(localStorage.getItem("cur_loc"));
+                if (!cur_loc || (!cur_loc.lat || !cur_loc.lon)) {
+                    let lonlat = [parseFloat('0'), parseFloat('0')];
+                    that.lat_param = lonlat[1];
+                    that.lon_param = lonlat[0];
+                    if(window.sets.coords.gps[0]!=0 && window.sets.coords.gps[1]!=0) {
+                        lonlat = window.sets.coords.gps;
+                    }
+                    //
+                    localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
+                        "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":\"15\"}");
+
+                }
+
+                try {
+                    c = JSON.parse(localStorage.getItem("cur_loc"));
+                } catch (ex) {
+
+                }
+
+                window.sets.coords.cur = proj.fromLonLat([parseFloat(c.lon), parseFloat(c.lat)]);
             }
+
+            // proj4.defs('EPSG:21781',
+            //     '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 ' +
+            //     '+x_0=600000 +y_0=200000 +ellps=bessel ' +
+            //     '+towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+            // register(proj4);
+            // const swissProjection = getProjection('EPSG:21781');
+
+
+            that.ol_map.setView(new View({
+                center: window.sets.coords.cur,
+                projection:new Projection({
+                    code: 'EPSG:3857',//'EPSG:4326', //
+                    units: 'm'
+                }),
+                zoom: 17
+            }));
 
             that.ol_map.getView().animate({
                 center: window.sets.coords.cur,
@@ -183,8 +189,10 @@ class OLMap {
                 //$("#marker").trigger("change:cur_pos", [window.sets.coords.cur, "Event"]);
                 let latlon = proj.toLonLat(window.sets.coords.cur);
                 $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
-                $("#zoom_but").text(that.zoom_param ? that.zoom_param : 15);
+                $("#zoom_but").val(that.zoom_param ? that.zoom_param : 15);
+                cb();
             });
+
 
         }, 300);
     }
@@ -211,7 +219,7 @@ class OLMap {
             //alert(JSON.stringify(objs[o]));
             if(objs[o].deleted)
                 continue;
-            var markerFeature = new Feature({
+            var feature = new Feature({
                 geometry: new Point(proj.fromLonLat([objs[o].longitude, objs[o].latitude])),
                 labelPoint: new Point(proj.fromLonLat([objs[o].longitude,objs[o].latitude])),
                 //name: cursor.value.title ? cursor.value.title : "",
@@ -220,18 +228,21 @@ class OLMap {
                 type:'supplier',
                 object: objs[o]
             });
-            markerFeature.setId(objs[o].uid);
+            feature.setId(objs[o].uid);
 
             let c = 0;
 
             for(let tab in objs[o].data) {
 
-                let cat = $(".category[state=1]").attr('id');//features[f].values_.categories[c++];
+                let catAr = $(".category[state=1]").toArray();//features[f].values_.categories[c++];
 
-                if(!Object.keys(objs[o].data).includes(cat))
+                let res = $.grep(catAr, function (el,i) {
+                    return el.id === tab;
+                });
+                if(res.length===0)
                     continue;
 
-                if (!cat || !objs[o].profile) {
+                if (!objs[o].profile) {
 
                     continue;
                 }
@@ -244,12 +255,14 @@ class OLMap {
                     continue;
                 }
 
-                let layer = that.ol_map.getLayers().get(cat + "_" + objs[o].profile.type);
+                let layer = that.ol_map.getLayers().get(tab + "_" + objs[o].profile.type);
                 if (!layer) {
-                    layer = that.layers.CreateLayer(cat + "_" + objs[o].profile.type, '1');
+                    layer = that.layers.CreateLayer(tab + "_" + objs[o].profile.type, '1');
                 }
 
-                let source = layer.values_.vector;
+                let source = layer.getSource();
+                if(source.source)
+                    source = source.source;
 
                 if (objs[o].uid === window.user.uid) {
 
@@ -259,16 +272,18 @@ class OLMap {
                 if(objs[o].profile.type==='deliver' && window.user.constructor.name ==='Supplier')
                     continue;
 
-                if (!source.getFeatureById(markerFeature.getId())) {
+                if (!source.getFeatureById(objs[o].uid)
+                    ||source.getFeatureById(objs[o].uid).values_.object.date.valueOf() !== objs[o].date.valueOf()
+                ){
 
-                    source.addFeature(markerFeature);
 
-                    markerFeature.uid = objs[o].uid;
+                    feature.uid = objs[o].uid;
+                    source.addFeature(feature);
 
                     if (objs[o].profile.type && objs[o].profile.type.toLowerCase() === 'marketer') {
-                        objs[o].img = "./images/ic_" + cat + ".png";
+                        objs[o].img = "./images/ic_" + tab + ".png";
                         let clusterSource = new Cluster({
-                            distance: 20,
+                            distance: 50,
                             source: source
                         });
 
@@ -277,28 +292,27 @@ class OLMap {
                     }else if(objs[o].profile.type.toLowerCase() === 'deliver' && window.user.constructor.name==="Customer"){
 
                         objs[o].img = objs[o].profile.thmb;
-                        let clusterSource = new Cluster({
-                            distance: 150,
-                            source: source
-                        });
-                        layer.setSource(clusterSource);
+                        // let clusterSource = new  Cluster({
+                        //     distance: 150,
+                        //     source: source
+                        // });
+                        // layer.setSource(clusterSource);
 
                         let ColorHash = require('color-hash');
                         var colorHash = new ColorHash();
                         let clr = colorHash.rgb(objs[o].uid);
 
-                        let style =  new _ol_style_Style_({
-                            // fill: new _ol_style_Fill_({
+                        let style =  new Style({
+                            // fill: new style.Fill_({
                             //     color: 'rgba(255, 255, 255, 0)'
                             // }),
-                            stroke: new _ol_style_Stroke_({
-                                color: clr,
+                            stroke: new Stroke({
+                                color: 'rgba('+clr[0]+','+clr[1]+','+clr[2]+', .1)',
                                 width: 1
                             })
                         });
 
-                        // if(window.user.profile.profile.type==="deliver")
-                        //     return;
+
                         if(!that.layers.circleLayer){
                             that.layers.CreateCircleLayer(style);
                         }
@@ -330,10 +344,14 @@ class OLMap {
                                 features: col,
                                 style: style
                             });
-                            if (!circle_source.getFeatureById(objs[o].uid))
-                                circle_source.addFeature(radiusFeature);
+                            // if (!circle_source.getFeatureById(objs[o].uid))
+                            //     circle_source.addFeature(radiusFeature);
+
+                            that.layers.PutDeliversOnMap();
                         }
                     }
+                }else{
+
                 }
             }
 
@@ -345,10 +363,12 @@ class OLMap {
         let period = $('.sel_period').text().split(' - ');
         $('.cat_cnt').text('0');
 
+        $('.mp_open').prop('disabled', true);
+
         if(area) {
 
             setTimeout(function () {
-                window.db.GetRangeDeliver(window.user.date,
+                window.db.GetRangeDeliver(moment(window.user.date).format('YYYY-MM-DD'),
                     parseFloat(area[0]), parseFloat(area[2]), parseFloat(area[1]), parseFloat(area[3]), function (features) {
                         if(features.length===0){
                             let layers = that.ol_map.getLayers();
@@ -358,15 +378,17 @@ class OLMap {
                                     if (layer.getSource())
                                         layer.getSource().clear(true);
                                     if (layer.getSource().source) {
-                                        layer.getSource().source.clear(true);
+                                        layer.getSource().clear(true);
                                     }
                                 }
                             }
                             $('.carousel-inner').empty();
+                            $('#items_carousel').css('display', 'none');
+                            //$('.nav-link').addClass('disabled');
 
                         }else {
                             that.SetFeatures(features);
-                            that.Carousel(features);
+                            that.carousel.SetFeatures(features);
                         }
 
                     });
@@ -389,208 +411,12 @@ class OLMap {
         }
     }
 
-    Carousel(features){
 
-        let that = this;
-
-        $('#items_carousel').css('display','none').carousel('dispose');
-        $('.carousel-inner').empty();
-
-        that.featureAr = {};
-        that.htmlAr = {pickup:[],delivery:[]};
-        let el_id = '';
-
-        for (let f in features) {
-            let util = new UtilsMap();
-            if (!features[f]) {
-                delete features[f];
-                continue;
-            }
-            if(features[f].profile.type === 'deliver') {
-                if (!util.IsInsideRadiusCoor(window.user.map, [features[f].latitude, features[f].longitude], features[f].radius)) {
-                    delete features[f];
-                    continue;
-                }
-                el_id = 'delivery';
-            }else if(features[f].profile.type === 'marketer'){
-                el_id = 'pickup';
-            }
-
-            let diff = new Date().getTime() - new Date(features[f].published).getTime();
-            var days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            days = days - 30;
-            if (days >= 0)//просрочен
-                features[f].delayed = true;
-
-            let cat_cnt_1 = 0, main_cnt = 0;
-
-            for (let tab in features[f].data) {
-                if ($(".category[id=" + tab + "]").length > 0) {
-                    let cat_cnt = $('input[id="'+tab+'"]').parent().find('.cat_cnt').text()
-                    $('input[id="'+tab+'"]').parent().find('.cat_cnt').text(parseInt(cat_cnt)+1)
-
-                    main_cnt  = parseInt($($('input[id="'+tab+'"]').closest('.dropdown-menu').siblings().find('.cat_cnt')[0]).text());
-                    $($('input[id="'+tab+'"]').closest('.dropdown-menu').siblings().find('.cat_cnt')[0]).text(main_cnt+1);
-                }
-                if ($(".category[state='1'][id=" + tab + "]").length === 0)
-                    continue;
-
-                cat_cnt_1++;
-            }
-
-            if(features[f].delayed === true)
-                continue;
-
-            let supplier = features[f];
-            let dict = new Dict(supplier.dict.dict);
-
-            for (let tab in features[f].data) {
-
-                if ($(".category[state='1'][id=" + tab + "]").length === 0)
-                    continue;
-
-                for (let i in  features[f].data[tab]) {
-                    i = parseInt(i);
-                    let item = features[f].data[tab][i];
-                    if ($(".carousel-item[title=" + item.title + "]").length > 0)
-                        continue;
-
-                    let title = dict.getValByKey(window.sets.lang, item.title);
-
-                    if($('.word').find('.word_btn').length>0) {
-                        let res = $.grep($('.word').find('.word_btn'), function (el, i) {
-                            return title.toLowerCase().includes(el.value.toLowerCase());
-                        });
-
-                        if(res.length===0)
-                            continue;
-                    }
-
-                    let car_numb = 1;
-                    car_numb = Math.ceil(features[f].data[tab].length / cat_cnt_1) > 0 ? Math.ceil(features[f].data[tab].length / cat_cnt_1) : 1;
-                    //ограничение кол-ва позиций карусели в зав-ти от кол-ва выбранных элементов
-                    // if($(".carousel-item[supuid="+obj.uid+"]").length>=car_numb)
-                    //     continue;
-
-                    let src = '';
-                    if(item.cert && item.cert[0]) {
-                        if (!item.cert[0].src.includes('http')) {
-                            src = that.path + "/images/" + item.cert[0].src;
-                        } else {
-                            src = item.cert[0].src;
-                        }
-                    }else if(item.img) {
-                        if (!item.img.src.includes('http')) {
-                            src = that.path + "/images/" + item.img.src;
-                        } else {
-                            src = item.img.src;
-                        }
-                    }
-
-                    let price = '';
-                    try {
-                        price = (!window.sets.currency ? '' : window.sets.currency) +
-                            (Object.values(item.packlist)[0].price ? Object.values(item.packlist)[0].price : Object.values(item.packlist)[0]);
-                    }catch(ex){
-
-                    }
-
-                    let html = '<div class="carousel-item" title="' + item.title + '" tab="' + tab + '" supuid="' + features[f].uid + '">' +
-                        '<h1 class="carousel_title carousel-caption">' + title + '</h1>' +
-                        '<img class="carousel_img" src=' + src + ' alt="slide">' +
-                        '<h1 class="carousel_price carousel-caption">' + price + '</h1>' +
-                        '</div>';
-
-                    that.htmlAr[el_id].push(html);
-                    that.featureAr[item.title]= item;
-
-                }
-            }
-        }
-
-        if(that.htmlAr['pickup'].length===0){
-            $('#pickup').removeClass('active');
-            $('#delivery').addClass('active');
-            $('.nav-link[href="#pickup"]').removeClass('active');
-            $('.nav-link[href="#delivery"]').addClass('active');
-        }
-
-        $('#items_carousel').css('display','block');
-
-        let id = $('.tab-pane.active').attr('id');
-
-        let shuffled = that.shuffle(that.htmlAr[id]);
-
-        $('#' + id).find('.carousel-inner').append(shuffled);
-        $($('#' + id).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
-
-        //$('#items_carousel').carousel({pause: false});
-        // $('#items_carousel').carousel({interval: 2000});
-        $('#items_carousel').carousel('cycle');
-
-
-
-    }
-
-    CarouselEvents(){
-        let that =this;
-
-            function onClick(ev) {
-                $('#items_carousel').draggable("enable");
-                $(this).off('click touchstart');
-                $(this).click();
-                $(this).on('click touchstart', onClick);
-            }
-
-            $('.nav-link').on('click touchstart', onClick);
-
-
-            $('a[data-toggle="tab"]').on('show.bs.tab', function (ev) {
-            let el = this;
-            setTimeout(function () {
-                if ($(el).attr('drag') !== 'true') {
-                    let href = ev.target.hash;
-                    let id = $(href).attr('id');
-                    let shuffled = that.shuffle(that.htmlAr[id]);
-                    $(href).find('.carousel-inner').append(shuffled);
-                    $($(href).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
-                    // $('#items_carousel').carousel({interval: 2000});
-                    $('#items_carousel').carousel('cycle');
-
-                }
-            },200);
-
-        });
-
-        $('a[data-toggle="tab"]').on('hide.bs.tab', function (ev) {
-            $('#items_carousel').carousel('pause');
-            let href = ev.target.hash;
-            $(href).find('.carousel-inner').find('.carousel-item').removeClass('active');
-            $(href).find('.carousel-inner').empty();
-        });
-    }
-
-
-    shuffle(array) {
-        var currentIndex = array.length, temporaryValue, randomIndex;
-
-        while (0 !== currentIndex) {
-
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex -= 1;
-
-            temporaryValue = array[currentIndex];
-            array[currentIndex] = array[randomIndex];
-            array[randomIndex] = temporaryValue;
-        }
-
-        return array;
-    }
 
     OnItemClick(el){
         let that = this;
         this.geo.StopLocation();
-        window.db.GetSupplier(window.user.date,$(el).attr('supuid'), function (obj) {
+        window.db.GetSupplier(moment(window.user.date).format('YYYY-MM-DD'),$(el).attr('supuid'), function (obj) {
 
             if(obj.profile.type!=='deliver') {
 
@@ -600,8 +426,6 @@ class OLMap {
                     zoom: 17,
                     duration: window.sets.animate_duration * 2
                 }, function (ev) {
-
-
                 });
             }
 
@@ -639,8 +463,10 @@ class OLMap {
 
     MoveToLocation(location, orig, cb) {
         let that = this;
-        if((window.user.constructor.name==='Supplier' || window.user.constructor.name==='Deliver') && orig==='SetCurPosition')
-            that.geo.StopLocation();
+        if((window.user.constructor.name==='Supplier' || window.user.constructor.name==='Deliver')
+            && orig==='SetCurPosition') {
+            window.user.map.geo.StopLocation();
+        }
         that.ol_map.getView().animate({
             center: location
             //,duration: window.sets.animate_duration * 2,
@@ -649,17 +475,15 @@ class OLMap {
             //$("#marker").trigger("change:cur_pos", [window.sets.coords.cur, "Event"]);
             let latlon = '';
             if(location) {
-
                 latlon = proj.toLonLat(location);
                 $('#locText').text(latlon[1].toFixed(6) + " " + latlon[0].toFixed(6));
             }
             if(window.user.constructor.name==='Supplier' || window.user.constructor.name==='Deliver') {
 
                 if(window.user.user_ovl){
-                        window.user.offer.stobj.location = location;
                         window.user.user_ovl.overlay.values_.position = location;
                         window.user.user_ovl.overlay.changed();
-                        let loc = proj.toLonLat(window.user.offer.stobj.location);
+                        let loc = proj.toLonLat(location);
                         window.user.offer.stobj.latitude = loc[1];
                         window.user.offer.stobj.longitude = loc[0];
                         if (window.user.user_ovl.modify) {
@@ -670,8 +494,13 @@ class OLMap {
                     }
             }
 
-            $('#loc_ctrl[data-toggle="tooltip"]').tooltip("dispose");
+            try {
 
+                $('#loc_ctrl[data-toggle="tooltip"]').tooltip("dispose");
+            }catch(ex)
+            {
+
+            }
             cb();
         });
     }
@@ -694,7 +523,7 @@ class OLMap {
     }
 
     SetFeatureGeometry(feature, loc){
-        feature.setGeometry( new Point(loc));
+        feature.setGeometry( new geom.Point(loc));
     }
 
     mapEvents(){
@@ -703,23 +532,35 @@ class OLMap {
         this.ol_map.on('movestart', function (event) {
             //this.dispatchEvent('click');
 
+
         });
 
         this.ol_map.on('moveend', function (event) {
 
             if (event) {
-                // if (window.user.constructor.name === 'Supplier')
-                //     return;
 
             var time = new Date().getTime();
-            let lonlat  = proj.toLonLat(that.ol_map.getView().values_.center);
+            let lonlat  = proj.toLonLat(that.ol_map.getView().getCenter());
             if(isNaN(lonlat[0]) || isNaN(lonlat[1]) || lonlat[0]===0.0 || lonlat[1]===0.0)
                 return;
             localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
                 "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":"+that.ol_map.getView().getZoom()+"}");
+
+            if (window.user.constructor.name === 'Supplier') {
+                window.user.offer.stobj.location = that.ol_map.getView().getCenter();
+                window.user.PublishOffer
+
+                return;
+            }
+            if (window.user.constructor.name === 'Deliver') {
+                var zoom = parseInt(that.ol_map.getView().getZoom()).toString();
+
+                if(window.user.user_ovl)
+                    $(window.user.user_ovl.overlay.element).css('width','50px');
+
+            }
             if(window.user.import)
                 window.user.import.ImportDataByLocation(event);
-
             }
         });
 
@@ -736,7 +577,7 @@ class OLMap {
                 //$('.fd_frame')[0].ovl.values_.offset = [-w / 2, -w / 2];
             }
 
-            $("#zoom_but").text(zoom);
+            $("#zoom_but").val(zoom);
             if (zoom >= 9)
                 $("#zoom_but").css('color', 'blue');
             else
@@ -746,7 +587,9 @@ class OLMap {
         });
 
         this.ol_map.on('pointerdrag', function (event) {
-            $("#marker").trigger("change:cur_pos", ["Custom", event]);
+
+            //TODO: положение маркера по клику $("#marker").trigger("change:cur_pos", ["Custom", event]);
+
             try {
                 that.coord.cur = event.target.focus_;
             } catch (ex) {
@@ -763,8 +606,9 @@ class OLMap {
         $(fd_frame).css('display','block');
 
         var zoom = parseInt(that.ol_map.getView().getZoom()).toString();
-        let w = (Math.pow(zoom,3)/50).toFixed(2);
-        $(fd_frame).css('width',w);
+
+        $(fd_frame).css('max-width','100px');
+        $(fd_frame).css('max-height','100px');
 
         if($('#'+obj.uid).length===0) {
 
@@ -773,17 +617,20 @@ class OLMap {
 
             $(fd_frame).on('load', function (ev) {
                 $(fd_frame).off('load');
-                if(!window.user.user_ovl ) {
-                    window.user.user_ovl = new Overlay(that, $(fd_frame)[0], obj);
+                if(!window.user.user_ovl && $(fd_frame)[0]) {
+                    window.user.user_ovl = new OverlayItem(that, $(fd_frame)[0], obj);
                     cb();
-                    setTimeout(function () {
+
+                    obj.dict = window.dict;
+                    if (window.user.constructor.name === 'Deliver')
+                        window.user.editor.InitDeliverOffer(obj);
+
+                    setTimeout(function (){
 
                         $("#user", $(fd_frame).contents()).on('click touchstart', function () {
                             $(fd_frame).attr('supuid', obj.uid);
-                            obj.dict = window.dict;
-                            if (window.user.constructor.name === 'Deliver')
-                                window.user.editor.InitDeliverOffer(obj);
-                            else if (window.user.constructor.name === 'Supplier')
+
+                            if (window.user.constructor.name === 'Supplier')
                                 window.user.editor.InitSupplierOffer();
                             else if (window.user.constructor.name === 'Customer') {
                                 that.OnItemClick(fd_frame);
@@ -791,9 +638,10 @@ class OLMap {
                         });
                         $('#user', $(fd_frame).contents()).attr('src', that.path + '/images/' + obj.profile.avatar);
 
-                    }, 1500);
+                    }, 2000);
                 }
             });
+
             $('#foodtrucks').append(fd_frame);
         }
 
@@ -805,11 +653,11 @@ class OLMap {
         if(that.layers.circleLayer) {
             layer = that.layers.circleLayer;
         }else{
-            let style =  new _ol_style_Style_({
-                // fill: new _ol_style_Fill_({
+            let style =  new Style_({
+                // fill: new style.Fill_({
                 //     color: 'rgba(255, 255, 255, .2)'
                 // }),
-                stroke: new _ol_style_Stroke_({
+                stroke: new Stroke_({
                     color: 'rgba(255, 0, 0, 1)',
                     width: 1
                 })
@@ -835,7 +683,7 @@ class OLMap {
 
         radiusFeature.setId('radius_'+offer.uid);
         radiusFeature.supuid = offer.uid;
-        source.addFeature(radiusFeature);
+        addFeature(radiusFeature);
 
 
         if(!this.collection)
@@ -849,13 +697,13 @@ class OLMap {
         });
 
         //that.map.ol_map.addInteraction(that.draw);
-        that.snap = new Snap({source: source});
+        that.snap = new interaction.Snap({source: source});
         that.ol_map.addInteraction(that.snap);
         if(window.user.constructor.name!=='Customer') {
-            that.modify = new Modify({source: source});
+            that.modify = new interaction.Modify({source: source});
             that.modify.addEventListener('modifyend', function (ev) {
                 let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
-                window.db.GetOffer(new Date(window.user.date),function (of) {
+                window.db.GetOffer(moment(window.user.date).format('YYYY-MM-DD'),function (of) {
                     if(of[0]) {
                         of[0].radius = radius;
                         window.db.SetObject('offerStore', of[0], res => {

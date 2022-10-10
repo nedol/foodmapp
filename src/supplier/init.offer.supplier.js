@@ -6,16 +6,10 @@ require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
 
 
-require('tablesorter/dist/js/jquery.tablesorter.js');
-require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
-
-let Dict = require('../dict/dict.js');
-const langs = require("../dict/languages");
-
 // var moment = require('moment');
 //
 var md5 = require('md5');
-// var isJSON = require('is-json');
+
 
 import {Utils} from "../utils/utils";
 let utils = new Utils();
@@ -30,25 +24,25 @@ export class OfferSupplier{
         this.arCat = [];
 
         this.off_frame = $("#supplier_frame");
-        const v = new Date().valueOf();
-        this.off_frame.attr('src','./supplier/supplier.frame.'+window.sets.lang+'.html?v='+v);
 
     }
 
     InitSupplierOffer(){
         let that = this;
 
-        $('#supplier_frame_container').css('display', 'block');
-
-        this.off_frame.off('load');
-        this.off_frame.on('load', function () {
-            that.off_frame[0].contentWindow.InitSupplierOffer();
-        });
         this.off_frame.css('display', 'block');
-        // this.off_frame.attr('src',"./supplier/deliver.frame.html?v="+String(Date.now()));
-        $('#supplier_frame_container').prepend(this.off_frame[0]);
+        if(that.off_frame[0].contentWindow.InitSupplierOffer) {
+            that.off_frame[0].contentWindow.InitSupplierOffer();
+        }else {
+            const v = new Date().valueOf();
+            this.off_frame.attr('src', './supplier/supplier.frame.html?v=' + v);
+            $(this.off_frame).off('load');
+            $(this.off_frame).on('load', function () {
+                $('#splash').css('display','none')
+                that.off_frame[0].contentWindow.InitSupplierOffer();
+            });
+        }
     }
-
 
     OnClickAddCert(ev){
         let menu_item = ev.mi;
@@ -392,7 +386,7 @@ export class OfferSupplier{
         // if(active) {
         //     items = this.getTabItems(active, lang);
         // }
-        window.user.UpdateOfferLocal(this.offer,items['local'], this.location, window.dict.dict);
+        window.user.UpdateOfferLocal(items['local'], this.location, window.dict.dict);
         return items;
     }
 

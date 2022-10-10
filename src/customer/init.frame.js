@@ -33,14 +33,14 @@ class OfferOrder {
 
         this.address;
 
-        this.ord_frame = $("#client_frame");
+        this.customer_frame = $("#customer_frame");
 
-        this.ord_frame.addTouch();
+        this.customer_frame.addTouch();
 
-        this.ord_frame.find('.modal-title-date').text($('.dt_val').text());
+        this.customer_frame.find('.modal-title-date').text($('.dt_val').text());
 
-        this.ord_frame.find('.publish_order').off('click touchstart');
-        this.ord_frame.find('.publish_order').on('click touchstart',this,function (ev) {
+        this.customer_frame.find('.publish_order').off('click touchstart');
+        this.customer_frame.find('.publish_order').on('click touchstart',this,function (ev) {
             let that = ev.data;
             let items = ev.data.GetOrderItems(ev.data.lang,true);
             window.user.PublishOrder(items,(data)=> {
@@ -62,21 +62,20 @@ class OfferOrder {
     InitCustomerOrder(obj, targ_title){
         let that = this;
         $('.loader').css('display','block');
-        $('.client_frame_tmplt').attr('src','./customer/customer.frame.'+window.sets.lang+'.html?v='+new Date().valueOf());
-        let client_frame = $('.client_frame_tmplt').clone();
-        $(client_frame).removeClass('client_frame_tmplt');
-        $(client_frame).addClass('client_frame');
 
+        if(this.customer_frame[0].contentWindow.InitCustomerOrder) {
+            this.customer_frame.css('height','100%');
+            this.customer_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
+        }else{
+            this.customer_frame.attr('src','./customer/customer.frame.html?v='+v);
 
-        $(client_frame).on('load', function () {
-            client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
-        });
+            this.customer_frame.on('load', function () {
+                this.contentWindow.InitCustomerOrder(obj, targ_title);
+            });
+        }
 
-        $(client_frame).css('display', 'inline-block');
-        $('#client_frame_container').css('display', 'inline');
+        $(this.customer_frame).css('display', 'inline-block');
 
-        $('#client_frame_container').empty();
-        $('#client_frame_container').prepend(client_frame[0]);
         // $('#client_frame_container').draggable();
         // $('#client_frame_container').resizable({
         //     aspectRatio: 16 / 9
