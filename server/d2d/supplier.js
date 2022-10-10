@@ -7,10 +7,8 @@ let utils = require('../utils');
 let fs = require('fs');
 var md5 = require('md5');
 const shortid = require('shortid');
-// var isJSON = require('is-json');
 var urlencode = require('urlencode');
-// const translate = require('google-translate-api');//ISO 639-1
-// var intersection = require('array-intersection');
+
 const _ = require('lodash');
 
 let moment = require('moment');
@@ -22,7 +20,6 @@ const IMG_SIZE_LIMIT = 500000;
 const MSG_NO_REG = 0x0001;
 
 module.exports = class Supplier extends D2D{
-
 
     constructor(){
         super();
@@ -44,7 +41,6 @@ module.exports = class Supplier extends D2D{
         });
 
     }
-
 
     ConfirmEmail(q, ws) {
 
@@ -260,7 +256,7 @@ module.exports = class Supplier extends D2D{
                             that.updateOfferDB(q, ws, sql_upd, values, now);
                             if(sel[0].deliver) {
                                 //copy offer to deliver's offer
-                                //that.updateOfferDeliver(q, ws, sel[0].deliver,offer);
+                                //that.updateOfferDeliver(q, ws, sel[0].deliver,offer);//TODO:
                             }
                         });
                     }
