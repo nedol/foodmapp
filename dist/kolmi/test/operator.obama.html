@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="Kolmi User">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <title>Kolmi Operator</title>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+    <!--link rel="icon" sizes="192x192" href="https://nedol.ru/rtc/img/webrtc-icon-192x192.png"-->
+    <!--<link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">-->
+    <!--<link rel="stylesheet" href="main.css" />-->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+
+</head>
+<body>
+
+<div style="display:none;position: absolute; bottom:0px;">
+    <p>Logs:</p>
+    <textarea id="logs" rows="4" cols="100"></textarea>
+</div>
+<div id="container" style="visibility: visible">
+   <iframe id="JEMY.SEDONCE" class="kolmi" allow="microphone; camera; speaker; autoplay"
+        src="../kolmi.html?trans=all&role=operator&em=JEMY.SEDONCE@mail.com"
+        style="position:absolute;top:0px;left:0px;width:100%;height:350px;z-index: 100" frameborder="0" scrolling="no">
+    </iframe>
+</div>
+
+
+
+</body>
+
+<!--<script src="../node_modules/webrtc-adapter/out/adapter.js"></script>-->
+<!--<script src="./lib/adapter.js"></script>-->
+<!--<script src="https://cdn.temasys.com.sg/adapterjs/0.15.x/adapter.screenshare.js"></script>-->
+<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
+</html>

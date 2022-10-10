@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ru">
+<!--https://bootsnipp.com/snippets/4Mm5R-->
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">-->
+
+<link rel="stylesheet" href="../../lib/style.css">
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+
+<!-- Libraries -->
+<script src="../host.js"></script>
+
+<script src="../customer_profile.js?v=16"></script>
+
+    <style>
+    .container{
+        -webkit-overflow-scrolling: touch;
+    }
+    .label{
+        text-align: center;
+        white-space: nowrap;
+    }
+    .ctrl{
+        font-family: "arial";
+        font-size: x-large;
+        padding: 10px;
+    }
+    .menu_item{
+        position: relative;
+        border-radius: 5px;
+        border: 0px solid #343434;
+        padding-left: 5px;
+        margin: 5px;
+        width: 98.7%;
+        height: auto;
+        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+    .item_title:focus{
+        outline: none !important;
+        border-color: #719ECE;
+        box-shadow: 0 0 10px #719ECE;
+    }
+    .item_title{
+        display: inline-block;
+        position: absolute;
+        width: 50%;
+        top:5px;
+        background-color: transparent;
+        font-family:"Courier New";
+        font-weight:bold;
+        font-size: x-large;
+        color:#0088bb;
+        border-width: 0px;
+    }
+
+    .content_text{
+        color: grey;
+        width: 100%;
+        overflow-y: scroll;
+        font-family:'Segoe Script';
+        font-size: medium;
+        margin-left:10px;
+        background-color: transparent;
+        border-width: 0;
+        -webkit-appearance: textarea;
+        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
+        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
+        box-sizing: border-box;         /* IE 8+ */
+    }
+
+    .item_price{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .item_pack{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:24px;
+        word-wrap:normal
+    }
+    .qnty{
+        color: #0088bb;
+        position: relative;
+        font-weight:normal;
+        font-size:18px;
+    }
+    [contentEditable=true]:empty:not(:focus):before{
+        content:attr(placeholder);
+        color:gray;
+    }
+    /* Extra selectors needed to override the default styling */
+    table.tablesorter tbody tr.normal-row td {
+        background: #888;
+        color: #fff;
+    }
+    table.tablesorter tbody tr.pay_supuid td {
+        background: #c8c8c8;
+        color: #fff;
+    }
+
+</style>
+<div class="container">
+
+    <div class="dropdown" style="display: none">
+        <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
+                data-width="fit" type="button" style="background-color: #ffffff">
+            <span class="glyphicon glyphicon-option-vertical"
+                style="color:black; background-color: white !important;margin: 10px"></span>
+        </button>
+        <ul class="dropdown-menu">
+            <li class="odr_ctrl" data-width="fit"><a href="#">Заказ</a>
+            </li>
+        </ul>
+    </div>
+
+        <div style="display: block; position:fixed; right: 10px; top:50%; font-size:xx-large;z-index:100">
+            <span class="close_browser  fa fa-times-circle-o"></span>
+        </div>
+        <div class="row">
+
+            <div class="tab-pane active" id="profile">
+                <div class="row">
+                    <div class="col-sm-3 text-center">
+                        <img class="avatar img-circle img-thumbnail" src="https://delivery-angels.com/d2d/dist/images/avatar_2x.png" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
+                        <h6>Загрузить мою фотографию...</h6>
+                        <input type="file" class="center-block file-upload" style="display: none">
+                    </div>
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="name"><h4>Имя</h4></label>
+                                <input type="text" id="name" class="form-control" name="name"  placeholder="имя" title="Введите ваше имя.">
+                            </div>
+
+                            <div class="col-xs-6">
+                                <label for="email"><h4>Эл.почта</h4></label>
+                                <input type="email" id="email"  class="form-control" name="email"  placeholder="you@email.com" title="введите email." data-toggle="tooltip">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-xs-6">
+                                <label for="mobile"><h4>Телефон</h4></label>
+                                <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="введите номер телефона" title="введите номер телефона">
+                            </div>
+                            <div class="col-xs-6">
+                                <label for="address"><h4>Адрес доставки</h4></label>
+                                <input type="address" class="form-control"  id="address" placeholder="введите адрес доставки" title="введите адрес доставки">
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    <div id="menu_item_tmplt" style="display:none"></div>
+</div>
+<style>
+    .loader {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 1;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        vertical-align: middle;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
+
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<div class="loader"></div>
+<script type="text/javascript" src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="RTC User">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <title>RTC User</title>
+    <link rel="stylesheet" type="text/css" href="./lib/bootstrap/css/bootstrap.min.css">
+    <link rel="icon" sizes="192x192" href="./img/webrtc-icon-192x192.png">
+    <!--<link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">-->
+    <!--<link rel="stylesheet" href="main.css" />-->
+    <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>-->
+
+
+    <script src="./host.js"></script>
+    <script src="./common.js"></script>
+    <script src="./user.js"></script>
+
+</head>
+<body>
+<div style="width: 100%;height: 100%" id="all" ondrop="drop(event)" ondragover="allowDrop(event)">
+
+<style>
+    .column {
+        float: left;
+        width: 50%;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+</style>
+
+<div style="display:none;position: absolute; bottom:0px;">
+    <p>Logs:</p>
+    <textarea id="logs" rows="4" cols="100"></textarea>
+</div>
+<div id="container" style="visibility: hidden;position:sticky; top: 5px;right:5px;width:60px; height:auto;">
+
+    <div id='video' class="row">
+        <video class='column' id="localVideo" autoplay muted  style="display:none"></video>
+        <!--<video class='column' id="remoteVideo" autoplay muted style="display:none; position: fixed;right: 20px;bottom:10px;width:200px"></video>-->
+        <video class='column' id="recordedVideo" autoplay muted style="display:none;"></video>
+    </div>
+    <div id='audio' class="row">
+        <audio class='column' id="remoteAudio" autoplay muted></audio>
+        <audio class='column' id="localSound"  muted src='./assets/call.mp3'></audio>
+    </div>
+</div>
+
+<div class="rtc_container" style="position: absolute;top:5px">
+    <div class="row">
+        <div class="callObject">
+            <img class="callButton"   src='./img/outline-phone-24px.svg'
+                 style="position: fixed;right: 0px;bottom: 0px;height: 60px;width:60px;" alt="callButton">
+            <b class="call_cnt"  style="position: fixed;right:26px;bottom:24px;color:#0e0cff;font-size: 12px;visibility: visible" >5</b>
+        </div>
+    </div>
+</div>
+
+<script>
+    function allowDrop(ev) {
+        ev.preventDefault();
+    }
+
+    function drag(ev) {
+        ev.dataTransfer.setData("video", ev.target.id);
+    }
+
+    function drop(event) {
+        event.preventDefault();
+        var data = event.dataTransfer.getData("video");
+        //ev.target.appendChild(document.getElementById(data));
+
+        var xPosition = event.clientX - $('#remoteVideo').parent()[0].getBoundingClientRect().left - (theThing.clientWidth / 2);
+        var yPosition = event.clientY - $('#remoteVideo').parent()[0].getBoundingClientRect().top - (theThing.clientHeight / 2);
+        // in case of a wide border, the boarder-width needs to be considered in the formula above
+        $('#remoteVideo')[0].style.left = xPosition + "px";
+        $('#remoteVideo')[0].style.top = yPosition + "px";
+
+    }
+</script>
+
+<div id="video_container" class="h-25 col-3" style="display: none;position:absolute;background:transparent;right: 0%; top: 0%; z-index:10;">
+    <div class="div_video">
+        <video id="remoteVideo"  autoplay muted   draggable="true" ondragstart="drag(event)"  poster="./img/person.png"
+               style="display: block;position:absolute;height:100%;left:50%;right: 50%; top: 50%;transform: translate(-50%,-50%);"></video>
+    </div>
+</div>
+
+
+
+<div id="browser_container"  draggable="true"
+    style="display:none;   position: absolute;
+    overflow-x: hidden; overflow-y: hidden; z-index:2; margin: auto;
+    width:75%;  height: 80%; left: 10%; top: 5%; padding-right: 2px; padding-left: 2px;
+    border: solid 0px lightslategrey;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <input type="image" class="move_browser" src="/browser/images/ic_move.png" draggable="false" style="position: absolute;
+        display:block; top:0px; left:0px; width:40px; height:40px;  z-index:2; opacity: .3"/>
+    <input type="image" class="resize_browser" src="/browser/images/ic_resize.png" width=40px; height=40px; draggable="false"
+           style="position: absolute; display:block; bottom:0px; right:0px; z-index:2;opacity: .3"/>
+    <input type="image" class="close_browser" src="/browser/images/ic_stop.png" draggable="false" style="position: absolute;
+        display:block; bottom:0px; left:0px; width:30px; height:30px;  z-index:2;"/>
+    <iframe id="browser" src = "browser.ru.html?v=1" style="position:absolute;overflow:hidden;" width="100%" height="100%"></iframe>
+</div>
+</div>
+</body>
+
+<!--<script src="../node_modules/webrtc-adapter/out/adapter.js"></script>-->
+<!--<script src="./lib/adapter.js"></script>-->
+<!--<script src="https://cdn.temasys.com.sg/adapterjs/0.15.x/adapter.screenshare.js"></script>-->
+<!--<script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>-->
+</html>

@@ -1,0 +1,522 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <!--<meta name="description" content="360&deg; Image - A-Frame">-->
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2030 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Продавец</title>
+</head>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
+<link rel="canonical" href="http://www.bootstraptoggle.com">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css" rel="stylesheet" >
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+<!--<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.0/css/bootstrap-toggle.min.css" rel="stylesheet">-->
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
+
+<!--<link href="./css/bootstrap-datetimepicker.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../../lib/style.css">
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+
+<script src="../../lib/load-image/load-image.all.min.js"></script>
+<script type="text/javascript" src="../host.js"></script>
+<script type="text/javascript" src="../supplier_offer.js"></script>
+<script src="../../lib/jquery.ui.touch-punch.min.js"></script>
+
+<style>
+
+    html, body{
+        padding: 0px;
+        margin: 0px;
+        height: 100%;
+        width: 100%;
+    }
+
+    .scaled{
+        transform: scale(1.5)
+    }
+
+</style>
+
+<body>
+
+    <div style="display: block; position:fixed; top:5px;right: 5px; color: white; z-index: 1000">
+        <span class="close 	fa fa-share-square-o" style="color:#0088BB" title="Опубликовать"></span>
+    </div>
+    <style>
+        .nav-tabs>li>a {
+            background-color: #f0f0f0;
+            border-color: #777777;
+            color: #3533ff;
+        }
+        /* active tab color */
+        .nav-tabs>li.active>a, .nav-tabs>li.active>a:hover, .nav-tabs>li.active>a:focus {
+            color: #fff;
+            background-color: #7472ff;
+            border: 1px solid #888888;
+        }
+
+        /* hover tab color */
+        .nav-tabs>li>a:hover {
+            border-color: #000000;
+            background-color: #4f4f4f;
+        }
+    </style>
+    <ul class="nav nav-tabs">
+        <li class=""><a data-toggle="tab" href="#editor" data-translate="">Ассортимент</a></li>
+        <li><a data-toggle="tab" href="#profile_pane" data-translate="">Мой профиль</a></li>
+        <li><a data-toggle="tab" href="#payment_pane" data-translate="">Оплата</a></li>
+    </ul>
+
+    <div class="tab-content">
+        <div class="tab-pane active" id="editor" style="width: 100%; margin: 0 auto;">
+            <style>
+                .modal-content{
+                    position: absolute;
+                    height: 99%;
+                    width: 100%;
+                    margin: auto;
+                    border-width: 0px;
+                }
+
+                textarea:focus {
+                    outline: none !important;
+                    border-color: #719ECE;
+                    box-shadow: 0 0 10px #719ECE;
+                }
+                .tab-content{
+                    height: 90%;
+                }
+
+                .tab-content::-webkit-scrollbar {
+                    width: 0 !important;
+
+                }
+                li {
+                    float: left;
+                }
+
+                li a {
+                    display: inline-block;
+                    text-align: center;
+                    padding: 14px 16px;
+                    text-decoration: none;
+                }
+
+                li a:hover, .dropdown:hover .dropbtn {
+
+                }
+
+                .dropdown {
+                    display: inline-block;
+                }
+
+                li.dropdown {
+                    display: inline-block;
+                }
+
+                .dropdown-content a {
+                    padding: 12px 16px;
+                    text-decoration: none;
+                    display: block;
+                    text-align: left;
+                }
+
+                .dropdown-content a:hover {
+                    background-color: #d51312
+                }
+
+                .dropdown:hover .dropdown-content {
+                    display: block;
+                }
+                .close {
+                    color: #1d2124;
+                    font-size: xx-large;
+                    opacity: 1;
+                }
+                .close:hover {
+                    color: #d51312;
+                    opacity: 1;
+                }
+                .offer_status{
+                    font-size: x-small;
+                }
+                .display_none{
+                    display: none;
+                }
+                .inv_price{
+                    color:red
+                }
+            </style>
+            <div class="modal-content">
+                <ul class="nav nav-tabs" id="menu_tabs">
+                    <li id="add_tab_li" class="nav-item" title="add tab" style="display: none;">
+                        <span id="add_tab" class="add_tab nav-link" href="#add_tab" style="visibility: hidden;">
+                        </span>
+                    </li>
+                </ul>
+                <div class="tab-content" style="position:relative;height: 92%;overflow-y: scroll">
+                    <!--div_tab_inserted-->
+                    <div id="add_tab_div"  class="tab-pane fade" style="border: none"></div>
+                    <span id="add_item" class="glyphicon glyphicon-plus-sign add_item" style="display: none; position:fixed; top:95%; right:5px; opacity: .5;font-size: 30px; margin-left: 2px"></span>
+                </div>
+            </div>
+            <style>
+                th {
+                    text-align: center;
+                    color: #c4e3f3;
+                    font-size: 20px
+                }
+                ::placeholder {
+                    color: grey;
+                    font-weight: lighter;
+                    font-size: small;
+                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+                }
+                #menu_item_tmplt{
+                    display: none;
+                }
+                .menu_item{
+                    display:block;
+                    position: relative;
+                    border-radius: 5px;
+                    border: 0px solid #343434;
+                    padding-left: 5px;
+                    margin: 5px;
+                    width: 98%;
+                    box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
+                }
+                .item_cb{
+                    width: 4%;
+                }
+                .item_title:focus{
+                    outline: none !important;
+                    border-color: #719ECE;
+                    box-shadow: 0 0 10px #719ECE;
+                }
+                .item_title{
+                    display: inline-block;
+                    position: absolute;
+                    width: 100%;
+                    top:7px;
+                    background-color: transparent;
+                    font-family:"Courier New";
+                    font-weight:bold;
+                    font-size: x-large;
+                    color: #f3f3f3;
+                    border-width: 0px;
+                    -webkit-text-stroke: 1px #737373;
+                }
+                li.active a{
+                    color:blue;
+                    background-color:grey;
+                }
+                textarea{
+                    color: #0088bb;
+                    text-align: center;
+                    font-weight:normal;
+                    font-size:24px;
+                    width:100%;
+                    white-space: nowrap;
+                    border: none;
+                    resize: none;
+                }
+                .item_price{
+                    color: #0088bb;
+                    font-weight:normal;
+                    font-size:24px;
+                    white-space: nowrap;
+                }
+                .order_ctrl{
+                    width: 7%;
+                    position: relative;
+                    color: #80afbb;
+                    font-weight:normal;
+                    font-size:30px;
+                }
+                .content_text{
+                    position: absolute;
+                    color:black;
+                    width: 95%;
+                    overflow-y: scroll;
+                    text-align: left;
+                    word-wrap: break-word;      /* IE 5.5-7 */
+                    white-space: -moz-pre-wrap; /* Firefox 1.0-2.0 */
+                    white-space: normal;      /* current browsers */
+                    font-family:'Segoe Script';
+                    font-size: medium;
+                    margin-left: 10px;
+                    border-width: 0;
+                    border-color: #9da0a4;
+                    background-color: rgba(255,255,255,0.7);
+                    z-index: 3000;
+                }
+                .orders{
+                    visibility: hidden;
+                    margin-top: 15px;
+                }
+                .cert{
+                    z-index: 50;
+                    padding: 5px;
+                }
+                .notoday{
+                    display:none;!important;
+                }
+                [contentEditable=true]:empty:not(:focus):before{
+                    content:attr(placeholder);
+                    color:gray;
+                }
+
+            </style>
+            <div  id="menu_item_tmplt">
+                <div class="row">
+                    <div class="content_div col-lg-10 col-sm-10 col-xs-10">
+                        <h4>
+                            <input type="text" class="item_title input input-sm " contenteditable="true" placeholder="название" data-toggle="collapse">
+                        </h4>
+                        <div class="item_content collapse" style="position: absolute; top:40px;width:100%">
+
+                            <div class="content">
+                                <textarea class="content_text"  placeholder="ef6f6a1c0e002ecd1063b3ee0ac9302d"  data-translate contenteditable="true">
+                                </textarea>
+                            </div>
+
+                        </div>
+                        <div style="width: 300px;margin: 0 auto">
+                            <img class="card-img-top img-fluid" style="width: 100%;z-index: 1000" src="http://placehold.it/700x400" alt="">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-sm-2 col-xs-2">
+                        <div class="cert_container" style="
+                                /*position: absolute;*/
+                                width:100%;
+                                max-height: 350px;
+                                margin-top:5px;
+                                margin-right:5px;
+                                background-color: rgb(240,240,240);
+                                overflow-y: scroll;
+                                /*white-space: pre-wrap;*/
+                                z-index:20;">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-2 col-sm-2 col-xs-2">
+                        <label  class="item_cb btn" title="Опубликовать" style="width: 4%;margin-right:20px;visibility:visible">
+                            <input type="checkbox" class="checkbox-inline" style="display: none">
+                            <i class="fa fa-square-o fa-2x"></i>
+                            <i class="fa fa-check-square-o fa-2x"></i>
+                        </label>
+                    </div>
+
+                    <div class="pack_container col-lg-4 col-sm-4 col-xs-4 dropup" style="  text-align: center;">
+                        <ul class="pack_list dropdown-menu" role="menu"  data-width="fit">
+                        </ul>
+                        <textarea  class="item_pack input" rows="1"  data-toggle="dropdown"  contentEditable="true"  placeholder="расфасовка"></textarea>
+                        <span class="caret" style="display: inline-block;  visibility: hidden"></span>
+                    </div>
+
+                    <div class="price_div col-lg-4 col-sm-4 col-xs-4">
+                        <textarea class="input item_price"  rows="1" contentEditable="true" placeholder="руб"></textarea>
+                    </div>
+                    <div  class="orders_div col-lg-2 col-sm-2 col-xs-2">
+                        <span class="order_ctrl fa fa-group" title="заказы" style="visibility: hidden"></span>
+                        <span class="order_amnt badge" style="position: relative;left:15px;top:0px;visibility: hidden">0</span>
+                    </div>
+                </div>
+                <div  class="collapse orders">
+                    <table class="table tablesorter">
+                        <thead style="color:gray;background-color: #f3f3f3">
+                        <tr>
+                            <th>
+                                <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-cart-plus"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-clone"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
+                            </th>
+                            <th class="marketer">
+                                <span class="glyphicon glyphicon-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-truck"  data-translate title="a74ec9c5b6882f79e32a8fbd8da90c1b"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
+                            </th>
+                            <th class="marketer">
+                                <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-heart-o"  data-translate title="25ae4884275a34b33820d6e17013bed1"></span>
+                            </th>
+                            <th>
+                                <span class="fa fa-check-square-o"  data-translate title="07ca5050e697392c9ed47e6453f1453f"></span>
+                            </th>
+                        </tr>
+                        </thead>
+                        <tbody style="background-color: #e6e6e6"></tbody>
+                    </table>
+                </div>
+                <input type="file" class="file" multiple accept="image/*" style="display: none"/>
+            </div>
+        </div><!--/tab-pane-->
+
+        <div class="tab-pane" id="profile_pane">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="browser_container" id="profile_container"
+                         style="
+                         position: absolute;
+                        overflow: visible; z-index:2147483646;
+                        height: 90%; left:2%;
+                        /*max-height: 90% !important;*/
+                        /*min-height: 70% !important;*/
+                       width:96%;
+                       border: solid 0px lightslategrey;
+                       box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#profile" data-translate="21e6c471bf5fa31fa235b6669e8943ca">Профиль</a></li>
+                        <li><a data-toggle="tab" href="#comments" data-translate="1c3fea01a64e56bd70c233491dd537aa">Отзывы</a></li>
+                        <li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <input type="hidden" id="supuid" class="form-control" name="supuid">
+                        <div class="tab-pane active" id="profile">
+                            <div class="row">
+                                <div class="col-sm-3  text-center">
+                                    <img src="" class="avatar img-circle img-thumbnail" alt="avatar">
+                                    <input type="file" class="center-block file-upload" style="display: none">
+                                </div>
+                                <div class="col-sm-9">
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="name"><h4>Имя</h4></label>
+                                            <input type="text"  id="name" class="form-control" name="name">
+                                        </div>
+
+                                        <div class="col-xs-6">
+                                            <label for="email"><h4>Email</h4></label>
+                                            <input type="email"  readonly="true"  id="email" class="form-control" name="email" data-toggle="tooltip">
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group">
+                                        <div class="col-xs-6">
+                                            <label for="mobile"><h4>Телефон</h4></label>
+                                            <input type="phone" id="mobile"  class="form-control" name="mobile">
+                                        </div>
+                                        <div class="col-xs-6">
+                                            <label for="place"><h4>Адрес торговой точки</h4></label>
+                                            <input type="text" required  class="form-control"  id="place"  placeholder="ФудСити, пав.А, 01-234" title="как вас найти?">
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <div class="dropdown col-xs-6">
+                                            <label for="worktime"><h4>Часы работы</h4></label>
+                                            <input  id="worktime" type="text" class="sel_period form-control dropdown-toggle"  data-toggle="dropdown" data-width="fit"
+                                                    placeholder="08:00 - 20:00" value="08:00 - 20:00" title="часы работы">
+                                            <!--button  id="worktime" class="sel_period btn btn-default dropdown-toggle" type="button" data-toggle="dropdown"
+                                                    data-width="fit" style="display:inline-block;float:right">
+                                                <span class="caret"></span>
+                                            </button-->
+                                        <ol id="period_list" class="dropdown-menu period_list" role="menu">
+                                            <li href="#">06:00 - 08:00</li>
+                                            <li href="#">08:00 - 10:00</li>
+                                            <li href="#">10:00 - 12:00</li>
+                                            <li href="#">12:00 - 14:00</li>
+                                            <li href="#">14:00 - 16:00</li>
+                                            <li href="#">16:00 - 18:00</li>
+                                            <li href="#">18:00 - 20:00</li>
+                                            <li href="#">20:00 - 22:00</li>
+                                            <li href="#">22:00 - 24:00</li>
+                                        </ol>
+                                    </div>
+                                    <div class="col-xs-6">
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane fade" id="comments" style="overflow-y: auto; height: 400px">
+                        <div style="position: absolute;right: 0;top:0px;">
+                            <input type="hidden" class="rating"  data-filled="fa fa-star fa-3x  custom-star" data-empty="fa fa-star-o fa-3x  custom-star">
+                        </div>
+                        <div id="comments-container" style="overflow-y: hidden"></div>
+
+
+                    </div><!--/tab-pane-->
+                    <div class="tab-pane fade" id="settings">
+                        <div style="margin: 20px"></div>
+                        <div class="row">
+                            <div class="form-group dropdown">
+                                <div class="col-xs-6">
+                                    <label for="prolong"><h4>Продление предложения</h4></label>
+                                    <select id="prolong" disabled class="sel_prolong"  size="1" style="">
+                                        <option value="0"></option>
+                                        <option value="1"  selected>на следующий день</option>
+                                        <option value="7">на следующую неделю</option>
+                                    </select>
+                                </div>
+                                <div class="col-xs-6">
+
+                                </div>
+                            </div>
+                        </div>
+                    </div><!--/tab-pane-->
+                </div><!--/tab-content-->
+            </div>
+
+            </div>
+            </div>
+        </div>
+
+        <div class="tab-pane" id="payment_pane">
+
+        </div>
+    </div>
+
+
+<!--<input type="file" id="files" name="files[]" multiple style="display:none;position:absolute; bottom:5px;-->
+<!--visibility: visible" align="center"/>-->
+
+<style>
+    .unpublished{
+        -webkit-filter: grayscale(100%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(100%);
+    }
+    .published{
+        -webkit-filter: grayscale(0%); /* Safari 6.0 - 9.0 */
+        filter: grayscale(0%);
+    }
+</style>
+
+    <div class="container center-block" style="position:absolute;bottom:10%;right:40%;z-index: 3000">
+        <div class="span4">
+            <div class="alert alert-danger fade">
+                <strong><h4></h4></strong>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,24 +1,20 @@
 'use strict'
-var md5 = require('md5.js');
-var RTCItem = require('./RTCItem');
-var fs = require('fs');
+let md5 = require('md5.js');
+
+const fs = require('fs');
 
 const utils = require('../utils');
+let _ = require('lodash');
 
-
-var log4js = require('log4js');
+let log4js = require('log4js');
 log4js.configure({
     appenders: { users: { type: 'file', filename: 'users.log' }},
     categories: { default: { appenders: ['users'], level: 'all' } }
 });
 const logger = log4js.getLogger('users');
 
-global.rtcPull = {'all':{},
-                  'relay':{}};
-global.queue = {'all':{},
-                'relay':{}}
+global.rtcPull = {'user':{}, 'operator':{}};
 
-global.resAr = [];
 
 module.exports = class RTC {
 
@@ -27,395 +23,305 @@ module.exports = class RTC {
     }
 
 
-    dispatch(req, q , res) {
-        if(q.content){
-            fs.readFile(q.content, 'utf8', function(err, contents) {
-                res.writeHead(200, {'Content-Type': 'application/json'});
-                res.end(JSON.stringify({'html':contents}));
-            });
+    dispatch(req, q , ws) {
+        console.log("func:"+q.func+" "+q.role+":"+q.uid);
+        switch (q.func) {
+            case 'check':
+                this.SetParams(req, q, ws);
+
+                if(q.role==='user'){
+                    let cnt_queue = 0;
+                    let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid})
+                    try {
+                        // for (let uid in global.rtcPull[q.role][q.trans]) {
+                        //     if (global.rtcPull[q.role][q.trans][q.em][uid])
+                        //         if (global.rtcPull[q.role][q.trans][q.em][uid].status === 'call' ||
+                        //             global.rtcPull[q.role][q.trans][q.em][uid].status === 'wait')
+                        //             if (global.rtcPull[q.role][q.trans][q.em][uid].uid === q.uid) {
+                        //                 cnt_queue++;
+                        //             }
+                        // }
+
+                    }catch(ex){
+
+                    }
+                    item.ws.send(JSON.stringify({
+                            check: true,
+                            queue: String(cnt_queue)
+                        }));
+
+                    this.SendOperatorStatus(q);
+
+                }
+
+                break;
+
+            case 'offer':
+
+                this.SetParams(req, q, ws);
+                this.BroadcastOperatorStatus(q, 'offer');
+
+                break;
+
+            case 'call':
+                this.SetParams(req, q, ws);
+                this.HandleCall(req, q);
+
+                break;
+
+            case 'status':
+                if(q.status==='call'){
+                    if(q.role==='operator') {
+                        let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+                        item.status = 'busy';
+                        this.BroadcastOperatorStatus(q, 'busy');
+                        // global.rtcPull['operator'][q.trans][q.em].shift();
+                    }
+                    break;
+                }
+                if(q.status==='close') {
+                    let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+                    item.status = q.status;
+                    if(q.role==='operator')
+                        this.BroadcastOperatorStatus(q, 'close');
+                    //this.RemoveAbonent(q);
+                    break;
+                }
+
+                this.SetParams(req, q, ws);
+                
+                break;
+            
+            case 'datach':
+                this.SetParams(req, q, ws);
+                this.HandleCall(req, q, ws);
+                ws.send(JSON.stringify({msg: 'empty'}));
+
+                break;
         }
-        else if(q.sse){
-            res.writeHead(200, {
-                'Content-Type': 'text/event-stream; charset=utf-8',
-                'Cache-Control': 'no-cache',
-                'Connection': 'keep-alive'
-            });
 
-            if(!global.rtcPull['all'][q.uid])
-                global.rtcPull['all'][q.uid] = {};
-            if(!global.rtcPull['relay'][q.uid])
-                global.rtcPull['relay'][q.uid] = {};
-            global.rtcPull['all'][q.uid].res = res;
-            global.rtcPull['relay'][q.uid].res = res;
-
-            if(!global.rtcPull['all'][q.uid].email)
-                global.rtcPull['all'][q.uid].email = q.email;
-            if(!global.rtcPull['relay'][q.uid].email)
-                global.rtcPull['relay'][q.uid].email = q.email;
-
-            if(!global.rtcPull['all'][q.uid].role)
-                global.rtcPull['all'][q.uid].role = q.role;
-            if(!global.rtcPull['relay'][q.uid].role)
-                global.rtcPull['relay'][q.uid].role = q.role;
-
-
-            res.write(utils.formatSSE({msg:'sse'}));
-
-        }else {
-            res.end();
-              switch (q.func) {
-                case 'log':
-                    logger.info(q.func + " from " + q.role + ":" + q.text);
-                    break;
-                  case 'check':
-
-                      if (!global.rtcPull['all'][q.uid].status)
-                          global.rtcPull['all'][q.uid].status = q.status;
-                      if (!global.rtcPull['relay'][q.uid].status)
-                          global.rtcPull['relay'][q.uid].status = q.status;
-                      if(q.role==='operator') {
-
-                          var files;
-                          try {
-                              files = fs.readdirSync('../rtc/html/');//not the same on server!!!!
-                          } catch (ex) {
-                              files = fs.readdirSync('../rtc/dist/html/');//
-                          }
-
-                          global.rtcPull[q.trans][q.uid].res.write(utils.formatSSE({'html': files}));
-
-                          this.SendOperators(req, q, res);
-                          this.SendQueueOperator(q.uid,q);
-                          this.BroadcastOperatorStatus(q, q.status);
-
-
-                      }else if(q.role==='user'){
-                          let cnt_queue = 0;
-                          for (let uid in global.rtcPull[q.trans]) {
-                              if (global.rtcPull[q.trans][uid].role==='user')
-                                  if(global.rtcPull[q.trans][uid].status==='call')
-                                      if (global.rtcPull[q.trans][uid].email === q.email) {
-                                        cnt_queue++;
-                                      }
-                          }
-                          global.rtcPull[q.trans][q.uid].res.write(utils.formatSSE({
-                              email: q.email,
-                              check: true,
-                              queue: String(cnt_queue)
-                          }));
-                      }
-
-                    break;
-
-                case 'offer':
-                      //logger.info("func:"+q.func+" "+q.role+":"+q.uid);
-
-                    this.SetParams(req, q);
-
-                    this.HandleCall(req, q);
-
-                    this.BroadcastOperatorStatus(q, 'offer');
-
-                    break;
-
-                case 'call':
-                    //logger.info("func:"+q.func+" "+q.role+":"+q.uid);
-                    this.SetParams(req, q);
-                    this.HandleCall(req, q);
-
-                    break;
-
-
-                case 'status':
-                    this.SetParams(req, q);
-                    break;
-
-                case 'close':
-
-                    this.BroadcastOperatorStatus(q, 'close');
-                    global.rtcPull['relay'][q.uid].res.end(utils.formatSSE({close: true,uid:q.uid}));
-                    global.rtcPull['all'][q.uid].res.end(utils.formatSSE({close: true,uid:q.uid}));
-                    let email = global.rtcPull['all'][q.uid].email || global.rtcPull['relay'][q.uid].email;
-
-                    delete global.rtcPull['relay'][q.uid];
-                    delete global.rtcPull['all'][q.uid];
-
-                    if(global.queue['all'][email])
-                        delete global.queue['all'][email][q.uid];
-                    if(global.queue['relay'][email])
-                        delete global.queue['relay'][email][q.uid];
-
-                    break;
-                  case 'translate':
-                      this.translate(q, res);
-                      break;
-
-                case 'datach':
-
-                    this.SetParams(req, q, global.rtcPull[q.trans][q.uid].res);
-                    this.HandleCall(req, q, global.rtcPull[q.trans][q.uid].res);
-                    if (!global.rtcPull[q.trans][q.uid].res.finished)
-                        global.rtcPull[q.trans][q.uid].res.write(utils.formatSSE({msg: 'empty'}));
-                    break;
-            }
-
-        }
     }
 
-    SendOperators(req, q , res){
+    SendOperators(req, q , ws){
 
         let operators = {};
 
         for(let trans in global.rtcPull) {
-            for (let uid in global.rtcPull[trans]) {
-                if(global.rtcPull[trans][uid]!=='operator')
-                    continue;
-                let email = global.rtcPull[trans][uid].email;
-
-                var domain = email.split("@")[1];
-                let req_dom = q.email.split("@")[1];
-                let status = global.rtcPull[trans][uid].status;
-                if (domain === req_dom) {
-                    operators[uid] = {
-                        trans:trans,
-                        email: global.rtcPull[trans][uid].email,
-                        status: status,
-                        queue: global.queue[trans][global.rtcPull[trans][uid].email]}
-                    }
-            }
-        }
-
-        global.rtcPull[q.trans][q.uid].res.write(utils.formatSSE({operators: operators}));
-    }
-
-    SetParams(req, q){
-
-        if(!global.rtcPull[q.trans][q.uid]){
-            global.rtcPull[q.trans][q.uid] = new RTCItem(req, q);
-        }
-
-        global.rtcPull[q.trans][q.uid].origin = req.headers.origin;//
-
-        if(q.uid)
-            global.rtcPull[q.trans][q.uid].uid = q.uid;//
-        if(q.email)
-            global.rtcPull[q.trans][q.uid].email = q.email;//
-        if(q.status)
-            global.rtcPull[q.trans][q.uid].status = q.status;//
-        if(q.desc)
-            global.rtcPull[q.trans][q.uid].desc = q.desc;//store local desc
-        if(q.cand)
-            global.rtcPull[q.trans][q.uid].cand = q.cand;//
-
-        if(q.role==='user') {
-            if (!global.queue[q.trans]) {
-                global.queue[q.trans] = {};
-            }
-            if (!global.queue[q.trans][q.email]) {
-                global.queue[q.trans][q.email] = [];
-            }
-            global.queue[q.trans][q.email].push(q.uid);
-        }
-    }
-
-    BroadcastOperatorStatus(q, status){
-        let queue = 0;
-        for (let uid in global.rtcPull[q.trans]) {
-            if (global.rtcPull[q.trans][uid].role==='user')
-                if (global.rtcPull[q.trans][uid].email === q.email && global.rtcPull[q.trans][uid].res.socket.writable){
-                    queue++;
-                }
-        }
-
-        if(q.role==='operator') {
-            let operators = {};
-            operators[q.uid] = {
-                trans:'all',
-                email: global.rtcPull['all'][q.uid].email,
-                status: status,
-                queue:queue
-            }
-            for (let uid in global.rtcPull['all']) {
-                if (!global.rtcPull['all'][uid].res.finished) {
-                    global.rtcPull['all'][uid].res.write(utils.formatSSE({operators:operators}));
-                }
-            }
-        }
-    }
-
-    SendQueueUsers(q, queue){
-        for(let i in queue){
-            let uid = queue[i];
-            global.rtcPull[q.trans][uid].res.write(utils.formatSSE(
-                {
-                    uid:uid,
-                    email: q.email,
-                    element: '.call-queue',
-                    html:i,
-                    trans:q.trans
-                }));
-        }
-    }
-
-    SendQueueOperator(uid, q){
-        let queue = 0;
-        for (let uid in global.rtcPull[q.trans]) {
-            if (global.rtcPull[q.trans][uid].role==='user' && global.rtcPull[q.trans][uid].status==='call')
-                if (global.rtcPull[q.trans][uid].email === q.email && global.rtcPull[q.trans][uid].res.socket.writable){
-                    queue++;
-                }
-        }
-        global.rtcPull[q.trans][uid].res.write(utils.formatSSE(
-            {
-                uid:uid,
-                email: q.email,
-                element: '.call-queue',
-                html:String(queue),
-                trans:q.trans
-            }));
-
-    }
-
-    HandleCall(req, q, res) {
-
-        let remAr = {};
-        let caller = global.rtcPull[q.trans][q.uid];
-        if (!caller)
-            return;
-        let abonent = global.rtcPull[q.trans][caller.peer];
-        if (abonent && (abonent.peer === q.uid)) {
-            if (caller.desc) {
-                remAr = {
-                    "desc": caller.desc,
-                    "cand": caller.cand,
-                    "trans": q.trans,
-                    "abonent":q.uid
-                }
-                abonent.res.write(utils.formatSSE(remAr));
-                caller.desc = null;
-                caller.cand = null;
-            } else if (caller.msg) {
-                remAr = {
-                    "msg": caller.msg
-                }
-                abonent.res.write(utils.formatSSE(remAr));
-            }
-        } else {
-
-            if(q.role==='operator'){
-                if(global.queue[q.trans][q.email] && global.queue[q.trans][q.email].length > 0) {
-                    let uid = global.queue[q.trans][q.email][0];
-                    global.queue[q.trans][q.email].splice(0,1);
-
-                    Peer(caller, q, uid);
-                }
-            }else if(q.role==='user') {
-                for (let uid in global.rtcPull[q.trans]) {
-
-                    if (!global.rtcPull[q.trans][uid].res || global.rtcPull[q.trans][uid].res.finished) {
-                        delete global.rtcPull[q.trans][uid];
-                        continue;
-                    }
-
-                    if (uid === q.uid)
-                        continue;
-                    if (q.call)
-                        if (q.call !== global.rtcPull[q.trans][uid].email) {
-                            continue;
-                        }
-
-                    if (q.phone)
-                        if (q.phone !== global.rtcPull[q.trans][uid].phone)
-                            continue;
-
-                    if (global.rtcPull[q.trans][uid].peer)
-                        if (global.rtcPull[q.trans][uid].peer !== q.uid) {
-                            continue;
-                        }
-
-                    if (global.rtcPull[q.trans][uid].email !== q.email)
+            for (let em in global.rtcPull[q.role][trans]) {
+                for (let uid in global.rtcPull[q.role][em]) {
+                    if (global.rtcPull[q.role][trans][em][uid] !== 'operator')
                         continue;
 
-                    this.SendQueueUsers(q, global.queue[q.trans][q.email]);
-                    global.queue[q.trans][q.email].splice(0,1);
-                    //this.SendQueueOperator(uid,q, global.queue[q.trans][q.email].length);
+                    let email = global.rtcPull[q.role][trans][em][uid].email;
 
-                    Peer(caller, q, uid);
-
-                    if (global.rtcPull[q.trans][uid].desc === 'offer' && q.desc && q.cand) {
-                        remAr = {
-                            "desc": q.desc,
-                            "cand": q.cand,
-                            "trans": q.trans,
-                            "abonent": uid
+                    var domain = em.split("@")[1];
+                    let req_dom = q.email.split("@")[1];
+                    let status = global.rtcPull[q.role][trans][em][uid].status;
+                    if (domain === req_dom) {
+                        operators[uid] = {
+                            trans: trans,
+                            status: status,
+                            queue: global.queue[q.role][trans][em][global.rtcPull[q.role][trans][em][uid].uid]
                         }
-                        global.rtcPull[q.trans][uid].res.write(utils.formatSSE(remAr));
-
-                        global.rtcPull[q.trans][q.uid].peer = uid;
-                        global.rtcPull[q.trans][uid].peer = q.uid;
-
-                        global.rtcPull[q.trans][q.uid].status = 'busy';
-                        global.rtcPull[q.trans][uid].status = 'busy';
-
-                        this.BroadcastOperatorStatus(q, 'busy');
                     }
                 }
             }
         }
 
-        function Peer(caller,q,uid) {
-
-            if (global.rtcPull[q.trans][uid].desc && global.rtcPull[q.trans][uid].cand) {
-                let remAr = {
-                    "desc": global.rtcPull[q.trans][uid].desc,
-                    "cand": global.rtcPull[q.trans][uid].cand,
-                    "trans": q.trans,
-                    "abonent": uid
-                }
-
-                caller.res.write(utils.formatSSE(remAr));
-
-                global.rtcPull[q.trans][q.uid].peer = uid;
-                global.rtcPull[q.trans][uid].peer = q.uid;
-
-                global.rtcPull[q.trans][q.uid].status = 'busy';
-                global.rtcPull[q.trans][uid].status = 'busy';
-                this.BroadcastOperatorStatus(q, 'busy');
-
-            }
-        }
-
+        ws.send(JSON.stringify({operators: operators}));
     }
 
-    translate(q, res){
+    RemoveAbonent(q){
+        global.rtcPull[q.role][q.trans][q.em][q.uid]= _.omit(global.rtcPull[q.role][q.trans][q.em][q.uid], q.uid);
+    }
 
-        let data = JSON.parse(q.data);
-        let to = q.to;
-        let cnt = 0;
+    SetParams(req, q, ws){
+        let that = this;
 
-        var curriedDoWork = function(obj,trans) {
-            cnt++;
-            console.log(trans.text + obj.key);
-            obj.data[obj.key][obj.to] = trans.text;
-            obj.data[obj.key][trans.from.language.iso] = obj.src;
-            if(obj.length===cnt) {
-                obj.res.end(JSON.stringify(obj.data));
+        if(!global.rtcPull[q.role][q.trans])
+            global.rtcPull[q.role][q.trans] = {};
+
+        if(!global.rtcPull[q.role][q.trans][q.em])
+            global.rtcPull[q.role][q.trans][q.em] = [];
+
+        let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+        if(!item) {
+            item = {};
+            global.rtcPull[q.role][q.trans][q.em].push(item);
+        }
+
+        item.uid = q.uid;
+        item.ws = ws;
+        item.status = q.status;
+        item.abonent = q.abonent;
+        item.oper_uid = q.oper_uid;
+        if (q.desc)
+            item.desc = q.desc;
+        if (q.cand)
+            item.cand = q.cand;
+
+
+
+        ws.onclose = function (ev) {
+            if(q.role==='operator') {
+                let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+                item.status = 'close';
+                that.BroadcastOperatorStatus(q, 'close');
+
+                global.rtcPull[q.role][q.trans][q.em].splice(q.uid,1);
+
+            }else if(q.role="user"){
+                if(global.rtcPull[q.role][q.trans]){
+                    that.SendUserStatus(q);
+                    let index = _.indexOf(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+                    global.rtcPull[q.role][q.trans][q.em].splice(index,1);
+                }
             }
 
         };
+    }
 
-        for(let w=0; w<Object.keys(data).length; w++) {
-            let key = Object.keys(data)[w];
-            let from = Object.keys(data[key])[0];
-            let obj = {res:res,key:key, data:data, to:to, from:from, src:data[key][from],length:Object.keys(data).length};
-            //https://github.com/matheuss/google-translate-api
+    BroadcastOperatorStatus(q, status){
 
-            new translate(data[key][from], {to: to}).then(curriedDoWork.bind(null, obj),function (ev) {
-                console.log(ev);
-            });
+        try {
+            let queue = 0;
+            if(!global.rtcPull['user'][q.trans])
+                return;
+            for (let uid in global.rtcPull['user'][q.trans][q.em]) {
+                if (q.uid && global.rtcPull['user'][q.trans][q.em][uid]) {
+                    queue++;
+                }
+            }
+            let role = (q.role === 'operator' ? 'user' : 'operator');
 
+            let operators = {[q.em]:{}};
+            for (let uid in global.rtcPull['operator'][q.trans][q.em]) {
+                operators[q.em][uid] = {
+                    role: q.role,
+                    trans: q.trans,
+                    em: q.em,
+                    uid: q.uid,
+                    status: global.rtcPull['operator'][q.trans][q.em][uid].status,
+                    queue: queue
+                }
+            }
+
+            for (let em in global.rtcPull[role][q.trans]) {
+                for (let uid in global.rtcPull[role][q.trans][em]) {
+                    let item = global.rtcPull[role][q.trans][em][uid];
+                    let offer = _.find(operators[q.em],{status:'offer'});
+                    if (offer
+                        && item.abonent === q.em
+                        && item.uid !== q.uid) {
+                            if(item.status==='wait') {
+                                let oper = _.find(global.rtcPull['operator'][q.trans][q.em], {uid: q.uid});
+                                let remAr = {
+                                    trans: q.trans,
+                                    oper_uid: q.uid,
+                                    desc: oper.desc,
+                                    cand: oper.cand
+                                }
+                                item.ws.send(JSON.stringify(remAr));
+                            }else {
+                                item.ws.send(JSON.stringify({operators: operators}));
+                            }
+
+                        }else {
+                            item.ws.send(JSON.stringify({operators: operators}));
+                        }
+                    }
+            }
+        }catch(ex){
+            console.log(ex)
         }
+    }
 
+    SendOperatorStatus(q){
+        if (global.rtcPull['operator'] && global.rtcPull['operator'][q.trans]
+            && global.rtcPull['operator'][q.trans][q.abonent]){
+
+            for(let uid in global.rtcPull['operator'][q.trans][q.abonent]){
+                if(global.rtcPull['operator'][q.trans][q.abonent][uid].status==='offer') {
+                    let operator = {
+                        trans: q.trans,
+                        em: q.abonent,
+                        uid:uid,
+                        status: global.rtcPull['operator'][q.trans][q.abonent][uid].status,
+                        desc:global.rtcPull['operator'][q.trans][q.abonent][uid].desc,
+                        cand:global.rtcPull['operator'][q.trans][q.abonent][uid].cand
+                    }
+
+                    if (q.role === 'user') {
+                        let item = _.find(global.rtcPull['user'][q.trans][q.em],{uid:q.uid})
+                        item.ws.send(JSON.stringify({operator: operator}));
+                    }
+                }
+
+            }
+        }
+    }
+
+    SendUserStatus(q){
+        let item = _.find(global.rtcPull[q.role][q.trans][q.em],{uid:q.uid});
+        let user = {
+            func:'mute',
+            uid:q.abonent,
+            trans:q.trans
+        }
+        let oper = _.find(global.rtcPull['operator'][q.trans][q.abonent],{uid:q.oper_uid});
+        if(oper)
+            oper.ws.send(JSON.stringify(user));
+    }
+
+
+    HandleCall(req, q){
+        if(q.role === 'user'){
+            if(q.desc || q.cand){
+                let remAr = {
+                    "desc": q.desc,
+                    "cand": q.cand,
+                    "trans": q.trans,
+                    "abonent": q.em
+                }
+                let item = _.find(global.rtcPull['operator'][q.trans][q.abonent],{uid:q.oper_uid});
+                item.ws.send(JSON.stringify(remAr));
+
+            }else{
+                let item = _.find(global.rtcPull['user'][q.trans][q.em],{uid:q.uid})
+                if (item.abonent === q.abonent) {
+                    let k = '';
+                    try {
+                        for (k in global.rtcPull['operator'][q.trans][q.abonent]) {
+                            if (global.rtcPull['operator'][q.trans][q.abonent][k].status === 'offer' &&
+                                global.rtcPull['operator'][q.trans][q.abonent][k].ws.readyState === 1) {
+                                break;
+                            } else
+                                k = '';
+                        }
+                    }catch(ex){
+
+                    }
+
+                    if(k) {
+                        let remAr = {
+                            trans: q.trans,
+                            oper_uid: global.rtcPull['operator'][q.trans][q.abonent][k].uid,
+                            desc: global.rtcPull['operator'][q.trans][q.abonent][k].desc,
+                            cand: global.rtcPull['operator'][q.trans][q.abonent][k].cand
+                        }
+                        item.ws.send(JSON.stringify(remAr));
+                        //console.log('after HandleCall:user '+JSON.stringify(remAr));
+                    }else{
+                        item.status='wait';
+                        let remAr = {
+                            trans: q.trans,
+                            status:'wait'
+                        }
+                        item.ws.send(JSON.stringify(remAr));
+                    }
+                }
+            }
+        }
     }
 
 }

@@ -1,83 +1,120 @@
-'use strict'
+// 'use strict'
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-
+require('jquery-ui-touch-punch');
 require('bootstrap');
 require('bootstrap-select');
-
 
 require("../../lib/jquery-comments-master/js/jquery-comments.js")
 require("../../lib/bootstrap-rating/bootstrap-rating.min.js")
 
 require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
-require('tablesorter/dist/js/widgets/widget-scroller.min.js');
-// require('tablesorter/dist/js/widgets/widget-grouping.min.js');
+require('tablesorter/dist/js/widgets/widget-filter.min.js');
+require ('tablesorter/dist/js/widgets/widget-pager.min.js');
+//
+// import 'tablesorter/dist/css/theme.default.min.css';
+// import 'tablesorter/dist/css/widget.grouping.min.css';
 
-import 'tablesorter/dist/css/theme.default.min.css';
-import 'tablesorter/dist/css/widget.grouping.min.css';
-
-import proj from 'ol/proj';
-
-import {Dict} from '../dict/dict.js';
-import {ProfileSupplier} from "../profile/profile.supplier";
-
+import comment_obj from "../../dist/assets/vendor/jquery-comments/params.json";
 
 import {Utils} from "../utils/utils";
-let utils = new Utils();
 
+import {CategoriesOffer} from "../categories/categories.offer";
+
+
+let utils = new Utils();
 let _ = require('lodash');
 let md5 = require('md5');
 
+$(window).on('load', () => {
+    let iOSdevice = !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform)
+    if (iOSdevice)
+        $('[role="tablist"] .nav-link').each((i,e) => {
+            if (!$(e).attr('href'))
+                $(e).attr('href', $(e).data('target'))
+        });
+
+});
 
 $(document).on('readystatechange', function () {
 
-    if (!window.EventSource) {
-        window.parent.alert('В этом браузере нет поддержки EventSource.');
+     if (document.readyState !== 'complete') {
         return;
     }
 
-    if (document.readyState !== 'complete') {
-        return;
-    }
-
-    (function($) {
-        $.fn.isInViewport = function() {
-            var elementTop = $(this).offset().top;
-            var elementBottom = elementTop + $(this).outerHeight();
-
-            var viewportTop = $(window).scrollTop();
-            var viewportBottom = viewportTop + $(window).height();
-
-            return elementBottom > viewportTop && elementTop < viewportBottom;
-        }
-    })(jQuery);
-
-    (function($) {
-        $.fn.longTap = function(longTapCallback) {
-            return this.each(function(){
-                var elm = this;
-                var pressTimer;
-                $(elm).on('touchend mouseup', function (e) {
-                    clearTimeout(pressTimer);
-                });
-                $(elm).on('touchstart mousedown', function (e) {
-                    // Set timeout
-                    pressTimer = window.setTimeout(function () {
-                        longTapCallback.call(elm);
-                    }, 1000)
-                });
+    window.InitSupplierOffer = function () {
+        if(!window.order ) {
+            window.order = new SupplierOffer();
+            window.order.InitTabsByCategories(function () {
+                window.order.OpenOffer();
             });
+
+        }else{
+            $(window.frameElement).css('height','100%')
         }
-    })(jQuery);
+    };
+
+    // if(window.parent.sets.css)
+    //     $('#cus_link').attr('href', '../css/' + window.parent.sets.css+'.css?v='+String(Date.now()));
+
+    let readURL = function(input) {
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+
+            reader.onload = function (e) {
+                $('.avatar').attr('src',e.target.result);
+                $('.avatar').siblings('input:file').attr('changed',true);
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    $(".file-upload").on('change', function(e){
+        let el = this;
+        try {
+            loadImage(
+                e.target.files[0],
+                function (img, data) {
+                    if (img.type === "error") {
+                        console.error("Error loading image ");
+                    } else {
+
+                        let this_img = img.toDataURL();
+
+                        setTimeout(function () {
+
+                            $('.avatar').attr('src', this_img);
+
+                            $('.avatar').siblings('input:file').attr('changed', true);
+                            console.log("Original image width: ", data.originalWidth);
+                            console.log("Original image height: ", data.originalHeight);
+                        },200)
+
+                    }
+                },
+                {
+                    orientation: true,
+                    maxWidth: 600,
+                    maxHeight: 300,
+                    minWidth: 400,
+                    minHeight: 200,
+                    canvas: true
+                }
+            );
+        } catch (ex) {
+            console.log(ex);
+        }
+    });
+
 
     (function($) {
         $.fn.doubleTap = function(doubleTapCallback) {
             return this.each(function(){
                 var elm = this;
                 var lastTap = 0;
-                $(elm).on('touchstart click', function (e) {
+                $(elm).on('touchstart', function (e) {
                     var now = (new Date()).valueOf();
                     var diff = (now - lastTap);
                     lastTap = now ;
@@ -92,155 +129,19 @@ $(document).on('readystatechange', function () {
         }
     })(jQuery);
 
-    window.InitDeliverOffer = function () {
-        if(!window.sup_off )
-            window.sup_off = new DeliverOffer();
-        window.sup_off.OpenOffer();
-    };
 
-    if(window.parent.sets.css)
-        $('#cus_link').attr('href', '../css/' + window.parent.sets.css+'.css?v='+String(Date.now()));
-
-    $(".file-upload").on('change', function(e){
-        setTimeout(function () {
-            try {
-                loadImage(
-                    e.target.files[0],
-                    function (img, data) {
-                        e.target = null;
-                        if (img.type === "error") {
-                            alert("Error loading image ");
-                        } else {
-                            $('.avatar').attr('src', img.toDataURL());
-                            img = null;
-                            //$('.avatar').siblings('input:file').attr('changed',true);
-                        }
-                    },
-                    {
-                        orientation: true,
-
-                        maxHeight: 300,//!
-                        // maxWidth: 400,
-                        // minWidth: 100,
-                        minHeight: 50,
-                        canvas: false
-                    }
-                );
-            }catch(ex){
-
-            }
-        },200);
-    });
+    window.OnClickCheck  = function(el){
+        let ch = $(el).prop('checked');
+        $('.tr_item[cusuid='+$(el).attr('cusuid') +'] .approve').prop('checked', ch);
+    }
 
 });
 
-export class DeliverOffer{
+export class SupplierOffer{
     constructor(){
         let that = this;
-        that.profile_tab_changed = false;
-        this.ovc = $('body');
-        this.ovc.find('.close').off();
-        this.ovc.find('.close').on('click touchstart', this, function (ev) {
-            ev.preventDefault();
-            ev.stopPropagation();
 
-            let that = ev.data;
-            function closeWindow() {
-                $('.menu_item').remove();
-                $('.tab_inserted').remove();
-                $(frameElement).parent().css('display', 'none');
-            };
-
-            let items = that.GetOfferItems(window.parent.sets.lang);
-
-            let profile = {
-                type: window.parent.user.profile.profile.type,
-                email: $('#email').val().toLowerCase(),
-                avatar: $('.avatar')[0].src.split('/')[5],
-                lang: window.parent.user.profile.profile.lang,
-                name: $('#name').val(),
-                worktime: $('#worktime').val(),
-                mobile: $('#mobile').val(),
-                place: $('#place').val(),
-                delivery: $('#delivery').val()
-            }
-
-            if(!that.offer || md5(JSON.stringify(items['local'])) !== md5(JSON.stringify(that.offer)) ||
-                md5(JSON.stringify(profile)) !== md5(JSON.stringify(that.profile))) {
-
-                let confirm = window.confirm(window.parent.sysdict.getValByKey(window.parent.sets.lang, "8f11493a45b374d08387a61c85b288ef"));
-                if (confirm) {
-                    $('.loader', $(window.parent.document).contents()).css('display', 'block');
-                    $.each($(':checkbox:checked.approve'), function (i, el) {
-                        window.parent.db.GetOrder(window.parent.user.date, window.parent.user.uid, $(el).attr('cusuid'), function (obj) {
-                            window.parent.user.ApproveOrder(obj, $(el).attr('title'));
-                        });
-                    });
-                    if (that.profile_tab_changed) {
-                        that.SaveProfile(function (ev_prof) {
-                            if (!ev_prof) {
-                                alert(window.parent.sysdict.getValByKey(window.parent.sets.lang, "03870ff3038eb6709c2c0ab02bac5563"));
-                            } else {
-
-                                window.parent.user.PublishOffer(items['remote'], window.parent.user.date, ev.data, function (obj) {
-                                    if ($(window.parent.document).find(".category[state='1']").length ===0 || !items) {
-                                        closeWindow();
-                                        return false;
-                                    }
-                                    try {
-                                        window.parent.user.offer.stobj.published = obj.published;
-                                        window.parent.user.offer.stobj.data = items['local'];
-                                        let local = {data:items['local'], date:window.parent.user.offer.stobj.date,longitude:window.parent.user.offer.stobj.longitude,latitude:window.parent.user.offer.stobj.latitude,
-                                            radius:window.parent.user.offer.stobj.radius};
-                                        window.parent.user.offer.SetOfferDB(local);
-                                    } catch (ex) {
-                                        console.log(ex);
-                                    }
-
-                                    let ind = $("li.tab_inserted.active").val();
-                                    let active = $($("li.active").find('img')[ind]).text();
-
-                                    // if(active) {
-                                    //     items = this.getTabItems(active, lang);
-                                    // }
-
-                                    closeWindow();
-                                });
-
-                            }
-
-                        });
-                    }
-                }
-            }
-            closeWindow();
-        });
-
-
-
-        $('.nav-tabs a').on('shown.bs.tab', function(event){
-            var x = $(event.target).text();         // active tab
-            that.profile_tab_changed =true;
-            // var y = $(event.relatedTarget).text();  // previous tab
-            // if($(event.currentTarget).attr('href')==='#editor_pane' || $(event.currentTarget).attr('href')==='#profile')
-            //     $('#add_item').css('display','block');
-            // else
-            //     $('#add_item').css('display','none')  ;
-        });
-
-    }
-
-    OpenOffer() {
-        $('.menu_item').off();
-        $('.menu_item').remove();
-        $('.tab_inserted').remove();
-        $('.div_tab_inserted').remove();
-
-        this.path  ="http://localhost:63342/d2d/server";
-        if(host_port.includes('nedol.ru'))
-            this.path = host_port;
-
-        let that = this;
+        this.path = host_port;
         this.uid = window.parent.user.uid;
         this.profile = window.parent.user.profile.profile;
         this.offer = window.parent.user.offer.stobj.data;
@@ -248,7 +149,176 @@ export class DeliverOffer{
         this.prolong = window.parent.user.prolong;
         this.rating = window.parent.user.rating;
 
-        let date = window.parent.user.date;
+        this.date = window.parent.user.date;
+
+        this.body = $('body');
+
+        $('#splash',$(window.parent.document).contents()).css('display','none');
+
+        // $('#lang_sel').draggable(
+        //     { delay:200,containment:"body"},
+        //     { start: function (ev) {
+        //     },
+        //         drag: function (ev) {
+        //
+        //         },
+        //         stop: function (ev) {
+        //
+        //         }
+        //     });
+        // $('#lang_sel').draggable("enable");
+        //$( ".ui-draggable" ).disableSelection();
+
+        $('.dt_val').replaceWith($('.dt_val', $(window.parent.document).contents()));
+        $('.dt_val').on('click',(ev)=>{
+            $('#add_item').css('display','none')
+            $('.show_map').parent().css('display','none')
+            $(window.frameElement).css('height','45px')
+            $('#dtp_container', $(window.parent.document).contents()).css('display','block');
+
+        })
+
+        this.body.find('.show_map').off();
+        this.body.find('.show_map').on('click touchstart', this, function (ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            $('#dtp_container', $(window.parent.document).contents()).css('display','none');
+
+            $('.loader', $(window.parent.document).contents()).css('display', 'block');
+
+            that.saveFrame($('.nav-link.active').attr('href'));
+
+            $('.nav-tabs')[0].scrollIntoView();
+
+            // $('#ordtable tbody').empty();
+
+
+            $('.loader', $(window.parent.document).contents()).css('display', 'none');
+            // $('#supplier_frame',$(window.parent.document).contents()).css('display','none');
+            $('#add_item').css('display','none')
+            $('.show_map').parent().css('display','none')
+            $(window.frameElement).css('height','45px')
+        });
+
+        $('.nav-item').on('click', function () {
+            if($(this).find('.dt_val')[0])
+                return;
+            $('#add_item').css('display','')
+            $('.show_map').parent().css('display','')
+            $(window.frameElement).css('height','100%')
+
+        });
+
+        $('.nav-tabs a').on('shown.bs.tab', function(ev){
+
+            var targ_href = $(ev.target).attr('href');         // active tab
+            var rel_href = $(ev.relatedTarget).attr('href');  // previous tab
+
+            $('.collapse').addClass('show');
+
+            $(ev.target).attr('pane_hash', md5($(targ_href)[0].innerHTML));
+
+            if(!$(ev.relatedTarget).attr('pane_hash'))
+                return;
+
+            if($(ev.relatedTarget).attr('pane_hash') === md5($(rel_href)[0].innerHTML))
+                return;
+
+            that.saveFrame(rel_href);
+
+        });
+    }
+
+
+    saveFrame(rel_href) {
+        let that = this;
+        if(rel_href==="#orders_pane") {
+            $.each($('.cus_foot :checked'), function (i, el) {
+                window.parent.db.GetOrder(window.parent.user.date, window.parent.user.uid, $(el).attr('cusuid'), function (obj) {
+
+                    obj.number = $(el).closest('td').siblings('[number]').text();
+                    window.parent.user.ApproveOrder(obj);
+                });
+            });
+        }
+        else if(rel_href==="#profile_pane") {
+            that.SaveProfile(function (ev_prof) {
+                if (!ev_prof) {
+                    alert(window.parent.sysdict.getValByKey(window.parent.sets.lang, "03870ff3038eb6709c2c0ab02bac5563"));
+                }
+                $('.loader').css('display', 'none');
+            });
+
+        }
+        else if(rel_href==="#editor_pane") {
+            let items = that.GetOfferItems(window.parent.sets.lang);
+            $('.loader').css('display', 'block');
+
+            window.parent.user.offer.stobj.dict = window.parent.dict;
+
+            window.parent.user.PublishOffer(items['remote'], window.parent.user.date, that, function (obj,data_obj) {
+                $('.loader').css('display', 'none');
+                if (!items) {
+                    return false;
+                }
+                try {
+                    window.parent.user.offer.stobj.published = obj.published;
+                    window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+                    let local = {
+                        data: JSON.parse(obj.offer),
+                        date: window.parent.user.offer.stobj.date,
+                        longitude: data_obj.location[0],
+                        latitude: data_obj.location[1],
+                    };
+
+                    window.parent.user.offer.SetOfferDB(local);
+                } catch (ex) {
+                    console.log(ex);
+                }
+
+                let ind = $("li.tab_inserted.active").val();
+                let active = $($("li.active").find('img')[ind]).text();
+            });
+        }
+    }
+
+    addTab(cat_tab, state){
+        let that = this;
+        let cat_str = '';
+        if(state==='0')
+            return;
+        if($(window.parent.document).contents().find('#'+cat_tab).closest('.cat_div')[0])
+            cat_str = $(window.parent.document).contents().find('#'+cat_tab).closest('.cat_div')[0].outerHTML;
+        else if(!cat_str)// let cat_str = cat_img?'<img class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#tab_' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">':
+            cat_str =
+            '<span class="cat_div  text-center" data-toggle="tab" href="#tab_'+cat_tab+'">'+
+            '<span id="'+cat_tab+'" class="category icofont-brand-natgeo"  extra="true" title="'+cat_tab+'" state="0"></span>'+
+            '<h5 class="title" contenteditable="true">'+cat_tab+'</h5>'+
+            '<h6><span class="cat_cnt badge badge-pill badge-secondary">0</span></h6>'+
+            '</div>';
+        if ($('[href="#tab_' + cat_tab + '"]').length === 0) {
+            //$('#menu_tabs').prepend(cat_str);
+            $(cat_str ).insertBefore(that.body.find('#add_tab_li'));
+            $('<div id="tab_' + cat_tab + '" class="div_tab_inserted tab-pane" '+state+'>' +
+                '<div class="filter_div collapse show"></div>'+
+                '</div>').insertBefore($('#add_tab_div'));
+            $('.icofont-filter').css('display','');
+
+        }
+    }
+
+    OpenOffer() {
+        let that = this;
+
+        if($('.kolmi').length===0) {
+
+            let kolmi = $('iframe.kolmi_tmplt').clone();
+            $(kolmi).css('display', 'block')
+                .attr('class', 'kolmi')
+                .attr('src', '../kolmi/kolmi.html?trans=all&role=operator&em=' + window.parent.user.email);
+            $('#kolmi_pane').append(kolmi);
+        }
 
         if(this.profile.name || this.profile.email)
             $('.name').css('display','block').text(this.profile.name?this.profile.name:this.profile.email.split('@')[0]);
@@ -256,29 +326,26 @@ export class DeliverOffer{
             that.appr = res;
         });
 
-        window.parent.dict.set_lang(window.parent.sets.lang,this.ovc[0]);
+        window.parent.dict.set_lang(window.parent.sets.lang,this.body[0]);
 
         this.dict = window.parent.dict;
+
+        $('#lang_sel').val(window.parent.sets.lang);
+        $('#lang_sel [role=langitem]').on('click',function () {
+            window.parent.sets.lang = $(this).attr('value');
+            //window.parent.sysdict.set_lang(window.parent.sets.lang,that.body[0]);
+            that.dict.set_lang(window.parent.sets.lang,$('.menu_item'))
+            $('#lang_sel button').html(($(this).find('span')[0].outerHTML));
+            $('#lang_sel button').trigger("click")
+        });
 
         let cats= [];
         for (let tab in that.offer) {
             cats.push($('.category[cat="'+tab+'"]', window.parent.document).attr('id'));
         }
 
-        if(cats.length>0 && window.parent.user.offer.stobj.location) {
-            let lonlat = window.parent.user.offer.GetOfferLonLat(window.parent.user.offer.stobj.location);
-            $('#map_link').attr('href',"https://nedol.ru/d2d/dist/customer.html?lang="+window.parent.sets.lang+"&lat=" + lonlat[1] + "&lon=" + lonlat[0] + "&zoom=25&cat=" + JSON.stringify(cats));
-
-        }
-
-        if(that.profile.type==='marketer')
-            this.ovc.find('.address').css('display','block');
-        else
-            this.ovc.find('.address').css('display','block');
-
-
         if(window.parent.user.profile.address)
-            that.ovc.find('.address').val(window.parent.user.profile.address);
+            that.body.find('.address').val(window.parent.user.profile.address);
 
         if(window.parent.user.settings){
             for(let par in window.parent.user.settings){
@@ -292,613 +359,19 @@ export class DeliverOffer{
             });
 
 
-        function initOrder() {
+        $('#add_tab_li').on('click', function (ev) {
 
-            $(".category[state=\"1\"]",window.parent.document).each(function (i, cat) {
-                let extra = $(cat).attr('extra');
-                let cat_tab = $(cat).attr('cat');
-                let cat_img = $(cat).attr('src');
-                let state = $(cat).attr('state')==='0'?'style=\"display: none;\"':'';
-                if ($('[href="#' + cat_tab + '"]').length === 0) {
-                    $('<li class="tab_inserted nav-item " '+state+'>' +
-                        '<img class="nav-link" data-toggle="tab"  contenteditable="false" data-translate="' + md5(cat_tab) + '"  href="#' + cat_tab + '" src="'+cat_img+'"  title="'+cat_tab+'">' +
-                        '</li>').insertBefore(that.ovc.find('#add_tab_li'));
-                    $('<div id="' + cat_tab + '" class="div_tab_inserted tab-pane" '+state+'>' +
-                        '</div>').insertBefore($('#add_tab_div'));
-                }
+            let text = "Введите наименование категории";
+            let hint = "";
+            let cat_tab = prompt(text, hint);
+            let img = null;
 
+            window.order.addTab(cat_tab,1);
+        });
 
-                $('.dropdown').css('visibility', 'visible');
-                $('#order_menu_button').css('visibility', 'visible');
+        // setTimeout(function () {
 
-                $('#add_tab_li').css('visibility', 'visible');
-
-                let isEditable = true;
-
-                //$("#offer_pane").resizable();
-
-                function selectText(el) {
-                    $(el).focus();
-                    document.execCommand('selectAll', false, null);
-                }
-
-                this.lang = window.parent.sets.lang;
-                window.parent.sysdict.set_lang(window.parent.sets.lang, $("#menu_item_tmplt"));
-                window.parent.sysdict.set_lang(window.parent.sets.lang, $("#editor_pane"));
-
-                $('#add_tab_li').css('display', 'block');
-
-                $('#promo').val(that.promo);
-
-                $('#prolong option[value="'+that.prolong+'"]').prop('selected',true);
-
-                for (let tab in that.offer) {
-                    if (cat_tab !== tab)
-                        continue;
-                    if(tab=== Object.keys(that.offer)[0])
-                        openTab(tab);
-                    else {
-                        setTimeout(function () {
-                            openTab(tab);
-                        }, 0);
-                    }
-                }
-
-                function openTab(tab) {
-
-                    for (let i in that.offer[tab]) {
-                        if(i=== '0')
-                            openOffer(tab,i)
-                        else {
-                            setTimeout(function (i) {
-                                openOffer(tab,i)
-                            }, 0,i);
-                        }
-                    }
-
-
-                    $('#' + tab).disableSelection();
-
-                    $('[href="#' + tab + '"]').on('show.bs.tab', function (ev) {
-                        if (ev.relatedTarget) {
-                            //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
-                            //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
-                        }
-                    });
-
-                    $('[href="#' + tab + '"]').on('hide.bs.tab', function (ev) {
-                        if (event.target) {
-                            //let items = that.getTabItems($(ev.target).text(), window.sets.lang);
-                            //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
-                        }
-                    });
-                }
-
-                function openOffer(tab, i) {
-                    let menu_item = $('#menu_item_tmplt').clone();
-                    $(menu_item).attr('id', tab + '_' + i);
-                    $(menu_item).attr("class", 'menu_item');
-                    $(menu_item).css('display', 'block');
-
-                    $(menu_item).find('.publish:checkbox').attr('id', 'item_cb_' + i);
-                    $(menu_item).find('.publish:checkbox').attr('pos', i);
-                    $(menu_item).find('.publish:checkbox').attr('tab', tab);
-
-                    $(menu_item).find('.item_cb').css('visibility', 'visible');
-
-                    if (that.offer[tab][i].checked == 'true') {
-                        $(menu_item).find('.publish:checkbox').prop('checked', true);
-                        if (that.published)
-                            isEditable = false;
-                    } else {
-                        isEditable = true;
-                    }
-
-
-                    if (that.offer[tab][i].title) {
-                        $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
-                    }
-
-                    if(that.profile.type==='supplier') {
-                        if (that.offer[tab][i].dict_name) {
-                            that.dict.dict[that.offer[tab][i].title] = that.offer[tab][i].dict_name;
-                            $(menu_item).find('.owner').css('display','block');
-                            $(menu_item).find('.owner').val(that.offer[tab][i].place);
-                        }
-                    }else {
-                        $(menu_item).find('.owner').css('display', 'none');
-                    }
-
-                    $(menu_item).find('.item_title').attr('data-target', '#content_' + tab + '_' + i);
-                    // $(menu_item).find('.item_title').attr('contenteditable', 'true');
-                    $(menu_item).find('.item_title').attr('contenteditable', isEditable);
-
-                    $(menu_item).find('.item_price').attr('contenteditable', isEditable);
-                    $(menu_item).find('.item_price').val(that.offer[tab][i].price);
-
-                    $(menu_item).find('.item_content').attr('id', 'content_' + tab + '_' + i);
-
-
-
-                    $(menu_item).find('.item_title').longTap(function (el) {
-                        $(menu_item).find('.item_content').collapse("toggle");
-                    });
-
-                    $(menu_item).find('.item_content').on('shown.bs.collapse', function (e) {
-                        let h = $(this).closest('.content_div')[0].scrollHeight;
-                        $(this).find('.content').off();
-                        $(this).find('.content').on('change keyup keydown paste cut', 'textarea', function () {
-                            $(this).height(0).height(h);//this.scrollHeight);
-                        }).find('textarea').change();
-                        $(this).find('.content_text').focus();
-                    });
-
-                    $(menu_item).find('.content_text').attr('contenteditable', 'true');
-                    if (that.offer[tab][i].content_text)
-                        $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
-
-                    if (that.offer[tab][i].brand){
-                        $(menu_item).find('.brand').css('visibility', 'visible');
-                        let src = '';
-                        if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
-                            src = that.offer[tab][i].brand.logo;
-                        else {
-                            src = that.path+'/images/' + that.offer[tab][i].brand.logo;
-                        }
-
-                        src = src.replace('http://localhost:63342', '..');
-                        $(menu_item).find('.brand').attr('src', src);
-                    }
-
-                    that.fillPacklist(menu_item, tab, i);
-
-
-                    $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(that.offer[tab][i].packlist));
-                    $(menu_item).find('.item_price').on('focusout', {that: that, mi: $(menu_item)}, function (ev) {
-                        $(menu_item).find('.add_pack').css('visibility', 'hidden');
-                        that.OnClickAddPack(ev);
-                    });
-
-                    $(menu_item).find('.item_price').on('click touchstart', that, function (ev) {
-                        //$(menu_item).find('.add_pack').css('visibility', 'visible');
-                        //$(this).focus();
-                    });
-
-                    $(menu_item).find('.item_qnty').on('focusout', {that: that, mi: $(menu_item)}, function (ev) {
-                        that.OnClickAddPack(ev);
-                    });
-
-                    for (let c in that.offer[tab][i].cert) {
-                        let src = that.offer[tab][i].cert[c].src;;
-                        if(!that.offer[tab][i].cert[c].src.includes('data:image') )
-                            src = that.path + "/images/" + that.offer[tab][i].cert[c].src;
-                        if($(menu_item).find('img[src="'+src+'"]').length===0) {
-                            $(menu_item).find('.carousel-inner').append(
-                                '<div class="carousel-item">' +
-                                // '<img  class="img-fluid mx-auto d-block" src=' + src + '>' +
-                                '<img  class="carousel-img img-fluid" src=' + src + '>' +
-                                '</div>');
-                        }
-
-                        $(menu_item).find('.cert_container').find('img').attr('drag_left',that.offer[tab][i].cert[c].left);
-                        $(menu_item).find('.cert_container').find('img').attr('drag_top',that.offer[tab][i].cert[c].top);
-
-                        $(menu_item).find('.cert_container').find('img').draggable();
-                        if(that.offer[tab][i].cert[c].left)
-                            $(menu_item).find('.cert_container').find('img').css('left',that.offer[tab][i].cert[c].left);
-                        if(that.offer[tab][i].cert[c].top)
-                            $(menu_item).find('.cert_container').find('img').css('top',that.offer[tab][i].cert[c].top);
-                        $(menu_item).find('.cert_container').find('img').draggable('destroy');
-
-                        $(menu_item).find('.cert_container').find('img').longTap(function () {
-                            let active = $(menu_item).find('.cert_container').find('.active');
-                            active.removeClass('carousel-item');
-                            $(menu_item).find('.cert_container').find('img').draggable(
-                                {delay:0},
-                                {cursor: "crosshair"},
-                                {
-                                    start: function (ev) {
-                                    },
-                                    drag: function (ev) {
-                                        //$(el).attr('drag', true);
-                                    },
-                                    stop: function (ev) {
-                                        // $(menu_item).find('.cert_container').find('img').draggable('destroy');
-                                        //$(menu_item).find('.active').addClass('carousel-item');
-                                        $(menu_item).find('.cert_container').find('img').attr('drag_left',$(ev.target).css('left'));
-                                        $(menu_item).find('.cert_container').find('img').attr('drag_top',$(ev.target).css('top'));
-                                    }
-                                });
-                        });
-                    }
-
-                    $($(menu_item).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
-                    //$(menu_item).find('.carousel').carousel({interval: 3000});
-                    $(menu_item).find('.carousel').attr('id','carousel_'+ tab + '_' + i);
-                    $(menu_item).find('.carousel').append(
-                        '<a class="carousel-control-prev" href="#carousel_'+ tab + '_' + i+'">'+
-                        '<span class="carousel-control-prev-icon"></span>'+
-                        '</a>'+
-                        '<a class="carousel-control-next" href="#carousel_'+ tab + '_' + i+'">'+
-                        '<span class="carousel-control-next-icon"></span>'+
-                        '</a>');
-
-                    // Enable Carousel Controls
-                    $(menu_item).find(".carousel-control-prev").click(function(ev){
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        $('#carousel_'+ tab + '_' + i).carousel("prev");
-                        menu_item.find('.carousel').carousel('pause');
-                    });
-
-                    $(menu_item).find(".carousel-control-next").click(function(ev){
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                        $('#carousel_'+ tab + '_' + i).carousel("next");
-                        menu_item.find('.carousel').carousel('pause');
-                    });
-
-                    menu_item.find('img').doubleTap(function (ev) {
-                        if(confirm({'ru':'Удалить изображение?','en':'Remove image?'}[that.lang])){
-                            $(this).closest('.carousel-item').remove();
-                            menu_item.find('.carousel').carousel("next");
-                            $($(menu_item).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
-                            menu_item.find('.carousel').carousel('pause');
-                        }
-                    });
-
-
-                    if(that.offer[tab][i].haggle==='true'){
-                        $(menu_item).find('.haggle:checkbox').prop('checked',"true");
-                    }
-
-                    if(extra==='true'){
-                        $(menu_item).find("[data-target='.extras']").css('display','block');
-                        $(menu_item).find('.extras').attr('id','extra'+ tab + '_' + i);
-                        $(menu_item).find("[data-target='.extras']").attr('data-target','#extra'+ tab + '_' + i);
-                    }
-
-                    $.each(that.offer[tab][i].extra, function (e, el){
-                        if(!el)
-                            return;
-                        let row = $($(menu_item).find('.add_div')[0]).closest('.row').clone();
-                        $(row).find('.extra_title').val(el.title);
-                        $(row).find('.extra_price').val(el.price);
-                        $(row).find('.add_extra_div').remove();
-                        if(el.title)
-                            $($(menu_item).find('.add_div')[0]).closest('.row').parent().append(row);
-                    });
-
-
-                    $('#' + tab).append(menu_item);//добавить продукт в закладку
-
-                    that.lang = window.parent.sets.lang;
-                    window.parent.dict.set_lang(window.parent.sets.lang, $("#"+menu_item.attr('id')));
-
-                    $(menu_item).find('input:file').on('change', menu_item, that.onImportImage);
-
-                    $(menu_item).find('.img-fluid').attr('id', 'ap_' + tab + '_' + i);
-                    $(menu_item).find('.fa-image').on('click touchstart', menu_item, function (ev) {
-                        let menu_item = $(this).closest('.menu_item');
-                        //let vis = $(menu_item).find('.img-fluid').css('visibility');
-                        ev.target = $(menu_item).find('.img-fluid')[0];
-                        ev.mi = $(menu_item).attr('id');
-                        that.OnClickImport(ev);
-
-                    });
-
-                    if (that.offer[tab][i].owner) {
-                        $(menu_item).find('.owner').val(that.offer[tab][i].owner);
-                    }
-
-                    if (that.offer[tab][i].brand) {
-                        $(menu_item).find('.brand_img').css('visibility', 'visible');
-                        let src = '';
-                        if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
-                            src = that.offer[tab][i].brand.logo;
-                        else {
-                            src = that.path+'/images/' + that.offer[tab][i].brand.logo;
-                        }
-
-                        src = src.replace('http://localhost:63342', '..');
-                        $(menu_item).find('.brand_img').attr('src', src);
-
-
-                    }
-
-                    $(menu_item).find('.brand_img').attr('id', 'brand_' + tab + '_' + i);
-                    $(menu_item).find('.brand').on('click touchstart', menu_item, function (ev) {
-                        let menu_item = $(this).closest('.menu_item');
-                        //let vis = $(menu_item).find('.img-fluid').css('visibility');
-                        ev.target = $(menu_item).find('.brand_img')[0];
-                        ev.mi = $(menu_item).attr('id');
-                        that.OnClickImport(ev);
-                    });
-
-                    $(menu_item).find('.brand_img').on('dragend', function () {
-                        $('.brand_img').remove();
-                    });
-
-                    $(menu_item).find('.brand_img').on('click touchstart', menu_item, function (ev) {
-                        ev.preventDefault();
-                        ev.stopPropagation();
-                    });
-
-                    $(menu_item).find('.brand_img').doubleTap(function (ev) {
-                        $(this).remove();
-                    });
-
-                    $(menu_item).find('.img_cert').on('click touchstart', menu_item, function (ev) {
-                        let menu_item = $(this).closest('.menu_item');
-                        ev.target = $(menu_item).find('.cert_container')[0];
-                        ev.mi = $(menu_item).attr('id');
-                        that.OnClickAddCert(ev);
-                    });
-
-
-                    $(menu_item).find('.toolbar').css('display', 'block');
-
-                    $(menu_item).find('.orders').attr('id', 'orders' + tab + '_' + i);
-                    $(menu_item).find('.order_ctrl').attr('data-toggle', 'collapse');
-                    $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
-
-                    $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + that.offer[tab][i].title);
-
-                    $(menu_item).find('a[role=packitem]').on('click touchstart', {
-                        that: that,
-                        mi: $(menu_item)
-                    }, that.OnClickPack);
-
-                    $('a[href="#' + tab + '"]').css('color', 'blue');
-
-                    $(menu_item).find('.item_title').collapse('hide');
-
-                    // $(menu_item).find('.cert_container').sortable({
-                    //     connectWith: "div",
-                    //     placeholder: "ui-state-highlight"
-                    // });
-
-                    $(menu_item).find('.add_extra').on('click', that.onAddExtra);
-                }
-
-            });
-
-
-            $('li.active a').on('show.bs.tab', function (ev) {
-                if (ev.relatedTarget) {
-                    //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
-                    //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
-                }
-                // $('.tab_inserted  img:first').tab('show');
-                // $('.tab_inserted img:first').addClass('active');
-
-            });
-
-            $('li.active a').tab('show');
-
-            $('.tab_inserted  img:first').trigger('click');
-
-            if (window.parent.user.date.getDate() === new Date().getDate()) {
-                $('.notoday').removeClass('notoday');
-            }
-
-            window.parent.db.GetSupOrders(new Date(date), window.parent.user.uid, function (res) {
-
-                $.each(res, function (i, item) {
-
-                    let data = res[i].data;
-                    let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
-                    if (res[i].period !== that.offer.period) {
-                        inv_period = "style='color:red'";
-                    }
-                    let kAr = Object.keys(data);
-                    let calcDistance = new Promise(
-                        function (resolve, reject) {
-                            if (!that.location)
-                                resolve('undefined');
-                            window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
-                                resolve(res);
-                            });
-                        }
-                    );
-                    //calcDistance.then(function (dist) {
-                    function setOwner(k){
-
-                        window.parent.db.GetOffer(new Date(date), function (off) {
-                            if (off.length>=1) {
-                                let ar = off[0].data[res[i].data[k].cat]
-                                let r = _.find(ar, 'title', k);
-                                if(r)
-                                    $(".owner[title='" + k + "']").text(r.owner?r.owner:'');
-                            }
-                        });
-                    }
-
-                    for (let k in kAr) {
-
-                        for (let o in data[kAr[k]].ordlist) {
-
-                            $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
-
-                            if (data[kAr[k]].deleted) {//deleted
-                                inv_qnty = "title='deleted' style='color:red'";
-                                tr_style = "color:red;text-decoration:line-through";
-                                tr_disabled = "disabled";
-
-                            }
-
-                            let mi = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item');
-                            let price = mi.find('.item_price').val();
-                            if (data[kAr[k]].price !== price) {
-                                tr_class += " inv_price";
-                            }
-                            let num = data[kAr[k]].num?data[kAr[k]].num:'na';
-
-                            let rsrv, remain;
-                            try {
-                                rsrv = that.offer[data[kAr[k]].cat][i].packlist[o]['rsrv']?
-                                    that.offer[data[kAr[k]].cat][i].packlist[o]['rsrv'] : 0;
-                                remain = parseInt(that.offer[data[kAr[k]].cat][i].packlist[o]['qnty']) - rsrv;
-                            }catch(ex){
-
-                            }
-                            let tr = "<tr class='tr_item' style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
-                                "<td>" + num + "</td>" +
-                                "<td>" +
-                                "<input type='checkbox'  class='checkbox-inline approve' title='" + kAr[k] + "' cusuid=" + res[i].cusuid + " " +
-                                "style='transform: scale(2);-webkit-transform: scale(2);'>" +
-                                "<a style='font-size: x-small; margin-left:7px;'>"+remain+"</a>"+
-                                "</td>" +
-                                "<td>" + data[kAr[k]].cat + "</td>" +
-                                "<td style='word-break:break-all;'>" + that.dict.getValByKey(that.lang, kAr[k]) + "</td>" +
-                                "<td>" + o+ "</td>" +
-                                "<td " + inv_qnty + ">" + data[kAr[k]].ordlist[o].qnty + "</td>" +
-                                "<td>" + String(data[kAr[k]].ordlist[o].price) + "</td>" +
-                                "<td>" +
-                                (data[kAr[k]].email ? data[kAr[k]].email : 'no email') + "<br>" + (data[kAr[k]].mobile ? data[kAr[k]].mobile : 'no mobile') +
-                                "</td>" +
-                                "<td class='owner' title='" + kAr[k] + "'>" + setOwner(kAr[k]) + "</td>" +
-                                "<td " + inv_period + ">" + res[i].period + "</td>" +
-                                "<td class='tablesorter-no-sort'>" +
-                                (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
-                                "</td>" +
-                                "<td  class='marketer'>" +
-                                //      "<script src=\"https://nedol.ru/rtc/common.js\"></script>" +
-                                //      "<script src=\"https://nedol.ru/rtc/host.js\"></script>" +
-                                //      "<script src=\"https://nedol.ru/rtc/loader.js\"></script>" +
-                                //      "<object   abonent=\"nedol@narod.ru\" components=\"audio browser video\"></object>" +
-                                "</td>" +
-                                "<td>" + "0" + "</td>" +
-
-                                // "<td class='tablesorter-no-sort'>" +
-                                // "<label  class=\"btn\">" +
-                                // "<input type='checkbox' disabled class='notoday checkbox-inline complete'>" +
-                                // "<i class='fa fa-square-o fa-2x'  style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                                // "<i class='fa fa-check-square-o fa-2x'  style='position:relative; color: #7ff0ff; top:-10px;'></i>" +
-                                // "</label>" +
-                                // "</td>" +
-
-                                "</tr>";
-
-                            $(tr).appendTo($('tbody'));
-
-
-                            $('.approve').on('click',function (ev) {
-                                let pl = JSON.parse(mi.find('.item_pack').attr('packlist'));
-                                pl[o]['rsrv'] = pl[o]['rsrv']? pl[o]['rsrv']:0;
-
-                                if ($(this)[0].checked == true) {
-                                    $(this).closest('td').find('a').text(remain - data[kAr[k]].ordlist[o].qnty);
-                                    pl[o]['rsrv'] = pl[o]['rsrv'] - data[kAr[k]].ordlist[o].qnty;
-                                }else {
-                                    $(this).closest('td').find('a').text(remain);
-                                    pl[o]['rsrv'] = pl[o]['rsrv'] + data[kAr[k]].ordlist[o].qnty;
-                                }
-                                mi.find('.item_pack').attr('packlist', JSON.stringify(pl));
-
-                            });
-
-                            if (window.parent.user.profile.profile.type === 'marketer') {
-                                $('.marketer').css('display', 'none');
-                                $('.complete').attr('disabled', 'true');
-                            }
-                            window.parent.db.GetApproved(new Date(date), window.parent.user.uid, res[i].cusuid, kAr[k], function (appr) {
-                                if (appr && appr.data.qnty === res[i].data[kAr[k]].qnty &&
-                                    appr.data.price === res[i].data[kAr[k]].price) {
-                                    $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('checked', 'checked');
-                                    $(".approve[title='" + kAr[k] + "'][cusuid=" + res[i].cusuid + "]").attr('disabled', 'true');
-
-                                }
-                            });
-                        }
-                    }
-                });
-
-                $('.tablesorter').tablesorter({
-                    theme: 'blue',
-                    headers: {
-                        0: { sorter: "checkbox" }
-                        //3: { sorter: "select" }
-                        // 6: { sorter: "inputs" }
-                        // 7: defaults to "shortDate", but set to "weekday-index" ("group-date-weekday") or "time" ("group-date-time")
-                    },
-                    widgets: ['group', 'zebra', 'column'],
-                    usNumberFormat: false,
-                    sortReset: true,
-                    sortRestart: true,
-                    sortInitialOrder: 'desc',
-                    widthFixed: true,
-                    widgetOptions: {
-                        group_collapsible: true,  // make the group header clickable and collapse the rows below it.
-                        group_collapsed: false, // start with all groups collapsed (if true)
-                        group_saveGroups: true,  // remember collapsed groups
-                        group_saveReset: '.group_reset', // element to clear saved collapsed groups
-                        group_count: " ({num})", // if not false, the "{num}" string is replaced with the number of rows in the group
-
-                        // apply the grouping widget only to selected column
-                        group_forceColumn: [],   // only the first value is used; set as an array for future expansion
-                        group_enforceSort: true, // only apply group_forceColumn when a sort is applied to the table
-
-                        // checkbox parser text used for checked/unchecked values
-                        group_checkbox: ['checked', 'unchecked'],
-
-                        // change these default date names based on your language preferences (see Globalize section for details)
-                        group_months: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                        group_week: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"],
-                        group_time: ["AM", "PM"],
-
-                        // use 12 vs 24 hour time
-                        group_time24Hour: false,
-                        // group header text added for invalid dates
-                        group_dateInvalid: 'Invalid Date',
-                    },
-                    // this function is used when "group-date" is set to create the date string
-                    // you can just return date, date.toLocaleString(), date.toLocaleDateString() or d.toLocaleTimeString()
-                    // reference: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Date#Conversion_getter
-                    group_dateString: function (date) {
-                        return date.toLocaleString();
-                    },
-
-                    group_formatter: function (txt, col, table, c, wo, data) {
-                        // txt = current text; col = current column
-                        // table = current table (DOM); c = table.config; wo = table.config.widgetOptions
-                        // data = group data including both group & row data
-                        if (col === 7 && txt.indexOf("GMT") > 0) {
-                            // remove "GMT-0000 (Xxxx Standard Time)" from the end of the full date
-                            // this code is needed if group_dateString returns date.toString(); (not localeString)
-                            txt = txt.substring(0, txt.indexOf("GMT"));
-                        }
-                        // If there are empty cells, name the group "Empty"
-                        return txt === "" ? "Empty" : txt;
-                    }
-                });
-
-                $('.order_amnt').text($('.tr_item').length);
-
-                that.orders = res;
-
-            });
-
-
-            $('#add_item').off();
-            $('#add_item').on('click touchstart', that, that.AddOfferItem);
-
-            $('.input').click(function (ev) {
-                $(this).focus();
-            });
-
-            $("#editor_pane").find('.publish_offer_ctrl').off('click touchstart');
-            $("#editor_pane").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
-                window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], date, ev.data, function (obj) {
-
-                });
-            });
-
-            $('[data-toggle="popover"]').popover();
-        }
-
-        setTimeout(function () {
-            initOrder();
+            that.InitOrderByOffer();
             $('#supplier_frame_container',window.parent.document).css('height','100%');
 
             let isDown = false, isScroll = false ;
@@ -940,8 +413,767 @@ export class DeliverOffer{
             });
 
             //
+        // },500);
+    }
+
+
+
+    InitOrderByOffer() {
+
+        $('.menu_item').off();
+        $('.menu_item').remove();
+        $('.tab_inserted').remove();
+
+        let that = this;
+        let isEditable = true;
+        for (let t in that.offer){
+            //
+            // let img = $(".category#"+t,window.parent.document).attr('src');
+            // if(that.offer[t].img)
+            //     img = that.offer[t].img;
+            // window.order.addTab(t,$(".category#"+t,window.parent.document).attr('state'));
+            openTab(t);
+        }
+
+        // $($('.cat_div')[0]).addClass('active');
+        // $($($('.cat_div')[0]).attr('href')).addClass('active');
+
+        function openTab(tab) {
+
+            for (let i in that.offer[tab]) {
+                if(i=== '0')
+                    openOffer(tab,i)
+                else {
+                    setTimeout(function (i) {
+                        openOffer(tab,i)
+                    }, 0,i);
+                }
+            }
+
+            $('[href="#tab_' + tab + '"]').on('show.bs.tab', function (ev) {
+                if (ev.relatedTarget) {
+                    //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                    //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
+                }
+            });
+
+            $('[href="#tab_' + tab + '"]').on('hide.bs.tab', function (ev) {
+                if (ev.target) {
+                    //let items = that.getTabItems($(ev.target).text(), window.sets.lang);
+                    //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, this.status);
+                }
+            });
+
+        }
+
+        function openOffer(tab, i) {
+
+            let extra = $(".category#" + tab, window.parent.document).attr('extra');
+            let menu_item = $('#menu_item_tmplt').clone();
+            $(menu_item).attr('id', tab + '_' + i);
+            $(menu_item).attr('cat', tab);
+            $(menu_item).attr("class", 'menu_item');
+            $(menu_item).css('display', 'block');
+
+            $(menu_item).find('.publish:checkbox').attr('id', 'item_cb_' + i);
+            $(menu_item).find('.publish:checkbox').attr('pos', i);
+            $(menu_item).find('.publish:checkbox').attr('tab', tab);
+
+            $(menu_item).find('.item_cb').css('visibility', 'visible');
+
+            let val = parseInt($('.cat_div[href="#tab_'+tab+'"]').find('.cat_cnt').text());
+            $('.cat_div[href="#tab_'+tab+'"]').find('.cat_cnt').text(val+1)
+
+            if (that.offer[tab][i].checked == 'true') {
+                $(menu_item).find('.publish:checkbox').prop('checked', true);
+                if (that.published)
+                    isEditable = false;
+            } else {
+                isEditable = true;
+            }
+
+            if (that.offer[tab][i].title) {
+                $(menu_item).find('.item_title').attr('data-translate', that.offer[tab][i].title);
+            }
+
+            if (that.profile.type === 'supplier') {
+                if (that.offer[tab][i].dict_name) {
+                    that.dict.dict[that.offer[tab][i].title] = that.offer[tab][i].dict_name;
+                }
+            }
+
+            $(menu_item).find('.item_body_coll').attr('data-target', '#content_' + tab + '_' + i);
+            $(menu_item).find('.item_body').attr('id', 'content_' + tab + '_' + i);
+
+            $(menu_item).find('.item_title').attr('contenteditable', isEditable);
+
+            $(menu_item).find('.item_price').attr('contenteditable', isEditable);
+            // $(menu_item).find('.item_price').val(that.offer[tab][i].packlist[0].price?that.offer[tab].price:that.offer[tab].price.price);
+
+            if (that.offer[tab][i].brand) {
+                $(menu_item).find('.brand').css('visibility', 'visible');
+                let src = '';
+                if (that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
+                    src = that.offer[tab][i].brand.logo;
+                else {
+                    src = that.path + '/images/' + that.offer[tab][i].brand.logo;
+                }
+
+                src = src.replace('http://localhost:63342', '..');
+                $(menu_item).find('.brand').attr('src', src);
+            }
+
+            that.fillPacklist(menu_item, tab, i);
+
+            // $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(that.offer[tab][i].packlist));
+            // $(menu_item).find('.item_price').on('focusout', {that: that, mi: $(menu_item)}, function (ev) {
+            //     $(menu_item).find('.add_pack').css('visibility', 'hidden');
+            //     that.OnClickAddPack(ev);
+            // });
+            //
+            // $(menu_item).find('.item_price').on('click touchstart', that, function (ev) {
+            //     //$(menu_item).find('.add_pack').css('visibility', 'visible');
+            //     //$(this).focus();
+            // });
+            //
+            // $(menu_item).find('.item_qnty').on('focusout', {that: that, mi: $(menu_item)}, function (ev) {
+            //     that.OnClickAddPack(ev);
+            // });
+
+            for (let c in that.offer[tab][i].cert) {
+                let src = that.offer[tab][i].cert[c].src;
+
+                if (!that.offer[tab][i].cert[c].src.includes('data:image'))
+                    src = that.path + "/images/" + that.offer[tab][i].cert[c].src;
+                if ($(menu_item).find('img[src="' + src + '"]').length === 0) {
+                    $(menu_item).find('.carousel-inner').append(
+                        '<div class="carousel-item">' +
+                        // '<img  class="img-fluid mx-auto d-block" src=' + src + '>' +
+                        '<img  class="carousel-img img-fluid" src=' + src + '>' +
+                        '</div>');
+                }
+
+                $(menu_item).find('.cert_container').find('img').longTap(function () {
+                    // let active = $(menu_item).find('.cert_container').find('.active');
+                    // active.removeClass('carousel-item');
+                    // $(menu_item).find('.cert_container').find('img').draggable(
+                    //     {delay: 0},
+                    //     {cursor: "crosshair"},
+                    //     {
+                    //         start: function (ev) {
+                    //         },
+                    //         drag: function (ev) {
+                    //             //$(el).attr('drag', true);
+                    //         },
+                    //         stop: function (ev) {
+                    //             // $(menu_item).find('.cert_container').find('img').draggable('destroy');
+                    //             //$(menu_item).find('.active').addClass('carousel-item');
+                    //             // $(menu_item).find('.cert_container').find('img').attr('drag_left', $(ev.target).css('left'));
+                    //             // $(menu_item).find('.cert_container').find('img').attr('drag_top', $(ev.target).css('top'));
+                    //         }
+                    //     });
+                });
+            }
+
+            $($(menu_item).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
+            //$(menu_item).find('.carousel').carousel({interval: 3000});
+            $(menu_item).find('.carousel').attr('id', 'carousel_' + tab + '_' + i);
+            $(menu_item).find('.carousel').append(
+                '<a class="carousel-control-prev" href="#carousel_' + tab + '_' + i + '">' +
+                '<span class="carousel-control-prev-icon"></span>' +
+                '</a>' +
+                '<a class="carousel-control-next" href="#carousel_' + tab + '_' + i + '">' +
+                '<span class="carousel-control-next-icon"></span>' +
+                '</a>');
+
+            // Enable Carousel Controls
+            $(menu_item).find(".carousel-control-prev").click(function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                $('#carousel_' + tab + '_' + i).carousel("prev");
+                menu_item.find('.carousel').carousel('pause');
+            });
+
+            $(menu_item).find(".carousel-control-next").click(function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                $('#carousel_' + tab + '_' + i).carousel("next");
+                menu_item.find('.carousel').carousel('pause');
+            });
+
+
+            if(!$('#tab_' + tab).find('.pub_div')[0]) {
+                $('#tab_' + tab).find('.filter_div').append(
+                    '<div class="pub_div form-check">' +
+                    '     <input type="checkbox" checked class="form-check-input"  value="published"' +
+                    '         style="transform: scale(1.5);-webkit-transform: scale(1.5);">' +
+                    '    <label class="form-check-label">опубликовано</label>' +
+                    '</div>');
+                $('#tab_' + tab).find('.filter_div').append(
+                    '<div class="pub_div form-check">' +
+                    '     <input type="checkbox" checked class="form-check-input"  value="unpublished"' +
+                    '         style="transform: scale(1.5);-webkit-transform: scale(1.5);">' +
+                    '    <label class="form-check-label">н/опубликовано</label>' +
+                    '</div>');
+            }
+
+            if(that.offer[tab][i].prop) {
+                $('#tab_' + tab).find('.filter_div').css('visibility','visible');
+
+                $('<div>').load("../html/tmplt/prop.tmplt.html",function (el) {
+                    $('.filter_div').draggable();
+                    for(let p in that.offer[tab][i].prop) {
+                        if (!$('#tab_' + tab).find('.filter_div').find('#prop_' + p)[0])
+                            $('#tab_' + tab).find('.filter_div').append('<div id="prop_' + p.replace(/\s+/g, '') + '" class="prop_name">' + p + '</div>');
+
+                        for (let v in that.offer[tab][i].prop[p]) {
+
+                            if ($('#tab_' + tab).find('.filter_div').find('label:contains(' + that.offer[tab][i].prop[p][v] + ')')[0])
+                                continue;
+                            let cpy = $(el).clone();
+                            cpy.find('.prop_check').val(that.offer[tab][i].prop[p][v]);
+                            cpy.find('label').text(that.offer[tab][i].prop[p][v]);
+
+                            $(cpy).find(':checkbox').on('change', function (ev) {
+
+                               $('.menu_item').css('display', 'none');
+
+                               $.each( $('input.prop_check'), function (i,el ) {
+                                   if($(el).prop('checked')){
+                                       $('.prop_val[value="'+$(el).val()+'"]').closest('.menu_item').css('display', 'block');
+                                   }
+                               })
+                            });
+                            $('#tab_' + tab).find('.filter_div').find('#prop_' + p.replace(/\s+/g, '')).append(cpy);
+                        }
+                    }
+                });
+            }
+
+            if(that.offer[tab][i].content_text)
+                if (that.offer[tab][i].content_text.value &&
+                    window.parent.dict.getValByKey(window.parent.sets.lang,that.offer[tab][i].content_text.value)) {
+                    $(menu_item).find('.item_title').siblings('span').css('display','block');
+                    // $(menu_item).find('.content_text').attr('contenteditable', 'false');
+                    $(menu_item).find('.content_text').attr('data-translate', that.offer[tab][i].content_text.value);
+                }
+
+
+            $(':checkbox').on('change', function (ev) {
+
+                if($(ev.target).prop('checked')) {
+                    if ($(ev.target).attr('value')==='published') {
+                        $.each($('.publish:checked').closest('.menu_item'), function (i, item) {
+                            $(item).css('display','block');
+                        });
+                    }else if($(ev.target).attr('value')==='unpublished'){
+                        $.each($('.publish:not(:checked)').closest('.menu_item'), function (i, item) {
+                            $(item).css('display','block');
+                        });
+                    }
+                }else {
+                    if ($(ev.target).attr('value')=== 'published') {
+                        $.each($('.publish:checked').closest('.menu_item'), function (i, item) {
+                            $(item).css('display', 'none');
+                        });
+                    } else if ($(ev.target).attr('value')=== 'unpublished') {
+                        $.each($('.publish:not(:checked)').closest('.menu_item'), function (i, item) {
+                            $(item).css('display', 'none');
+                        });
+                    }
+                }
+            });
+            //menu_item.find('.prop.container').empty();
+            for(let k in that.offer[tab][i].prop){
+                for(let v in that.offer[tab][i].prop[k]) {
+                    let row = menu_item.find('.row.prop_tmplt').clone();
+                    row.removeClass('prop_tmplt');
+                    row.addClass('prop');
+                    row.find('.add_prop_div').remove();
+                    row.find('.input').attr("contenteditable", true);
+                    row.find('.prop_key').val(k);
+                    row.find('.prop_val').val(that.offer[tab][i].prop[k][v]);
+                    row.find('.prop_val').attr('value',that.offer[tab][i].prop[k][v]);
+                    menu_item.find('.prop.container').prepend(row);
+                }
+            }
+
+            if(that.offer[tab][i].bargain==='true'){
+                $(menu_item).find('.bargain:checkbox').prop('checked',"true");
+            }
+
+            if(extra==='true'){
+                $(menu_item).find("[data-target='.extras']").css('display','block');
+                $(menu_item).find('.extras').attr('id','extra'+ tab + '_' + i);
+                $(menu_item).find("[data-target='.extras']").attr('data-target','#extra'+ tab + '_' + i);
+            }
+
+            $.each(that.offer[tab][i].extra, function (e, el){
+                if(!el)
+                    return;
+                let row = $($(menu_item).find('.add_title_div')[0]).closest('.add_row').clone();
+                row.addClass('extra');
+                row.find('.extra_title').attr('data-translate',e);
+                row.find('.extra_price').val(el.price);
+                row.find('.input').attr('contenteditable',true);
+                row.find('.add_extra_div').remove();
+                $($(menu_item).find('.add_title_div')[0]).closest('.extras').prepend(row);
+            });
+
+
+            menu_item.insertBefore($('#editor_pane .empty_div'));//добавить продукт в закладку
+
+            that.lang = window.parent.sets.lang;
+            window.parent.dict.set_lang(window.parent.sets.lang, $("#"+menu_item.attr('id')));
+
+            $(menu_item).find('input:file').on('change', menu_item, that.onLoadImage);
+
+            $(menu_item).find('.img-fluid').attr('id', 'ap_' + tab + '_' + i);
+            $(menu_item).find('.fa-image').on('click touchstart', menu_item, function (ev) {
+                let menu_item = $(this).closest('.menu_item');
+                //let vis = $(menu_item).find('.img-fluid').css('visibility');
+                ev.target = $(menu_item).find('.img-fluid')[0];
+                ev.mi = $(menu_item).attr('id');
+                that.OnClickImport(ev);
+
+            });
+
+            if (that.offer[tab][i].brand) {
+                $(menu_item).find('.brand_img').css('visibility', 'visible');
+                let src = '';
+                if(that.offer[tab][i].brand.logo.includes('http') || that.offer[tab][i].brand.logo.includes('base64'))
+                    src = that.offer[tab][i].brand.logo;
+                else {
+                    src = that.path+'/images/' + that.offer[tab][i].brand.logo;
+                }
+
+                src = src.replace('http://localhost:63342', '..');
+                $(menu_item).find('.brand_img').attr('src', src);
+            }
+
+            $(menu_item).find('.brand_img').attr('id', 'brand_' + tab + '_' + i);
+            $(menu_item).find('.brand').on('click touchstart', menu_item, function (ev) {
+                let menu_item = $(this).closest('.menu_item');
+                //let vis = $(menu_item).find('.img-fluid').css('visibility');
+                ev.target = $(menu_item).find('.brand_img')[0];
+                ev.mi = $(menu_item).attr('id');
+                that.OnClickImport(ev);
+            });
+
+            $(menu_item).find('.brand_img').on('dragend', function () {
+                $('.brand_img').remove();
+            });
+
+            $(menu_item).find('.brand_img').on('click touchstart', menu_item, function (ev) {
+                ev.preventDefault();
+                ev.stopPropagation();
+            });
+
+            $(menu_item).find('.brand_img').doubleTap(function (ev) {
+                $(this).remove();
+            });
+
+            $(menu_item).find('.img_cert').on('click touchstart', menu_item, function (ev) {
+                let menu_item = $(this).closest('.menu_item');
+                ev.target = $(menu_item).find('.cert_container')[0];
+                ev.mi = $(menu_item).attr('id');
+                that.OnClickAddCert(ev);
+            });
+
+            $(menu_item).find('img').doubleTap(function (ev) {
+                if (confirm({
+                        'ru': 'Удалить изображение?',
+                        'en': 'Remove image?',
+                        'fr': 'Supprimer l\'image ?'
+                    }[that.lang])) {
+                    $(this).closest('.carousel-item').remove();
+                    menu_item.find('.carousel').carousel("next");
+                    $($(menu_item).find('.carousel-inner').find('.carousel-item')[0]).addClass('active');
+                    menu_item.find('.carousel').carousel('pause');
+                }
+            });
+
+            $(menu_item).find('.toolbar').css('display', 'block');
+
+            $(menu_item).find('.orders').attr('id', 'orders' + tab + '_' + i);
+            $(menu_item).find('.order_ctrl').attr('data-toggle', 'collapse');
+            $(menu_item).find('.order_ctrl').attr('data-target', '#orders' + tab + '_' + i)
+
+            $(menu_item).find('.tablesorter').attr('id', 'ordtable_' + that.offer[tab][i].title);
+
+            $(menu_item).find('a[role=packitem]').on('click touchstart', {
+                that: that,
+                mi: $(menu_item)
+            }, that.OnClickPack);
+
+            $('a[href="#' + tab + '"]').css('color', 'blue');
+
+            $(menu_item).find('.item_title').collapse('hide');
+
+            // $(menu_item).find('.cert_container').sortable({
+            //     connectWith: "div",
+            //     placeholder: "ui-state-highlight"
+            // });
+            $(menu_item).find('.add_extra').on('click', that.onAddExtra);
+            $(menu_item).find('.add_prop').on('click', that.onAddProp);
+            $(menu_item).find('.add_pack').on('click', that.onAddPack);
+        }
+
+        $('li.active a').on('show.bs.tab', function (ev) {
+            if (ev.relatedTarget) {
+                //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
+            }
+            // $('.tab_inserted  img:first').tab('show');
+            // $('.tab_inserted img:first').addClass('active');
+
+        });
+
+
+        if (window.parent.user.date.getDate() === new Date().getDate()) {
+            $('.notoday').removeClass('notoday');
+        }
+
+
+        $('#add_item').off();
+        $('#add_item').on('click touchstart', that, that.AddOfferItem);
+
+        $('.input').click(function (ev) {
+            $(this).focus();
+        });
+
+        $("#editor_pane").find('.publish_offer_ctrl').off('click touchstart');
+        $("#editor_pane").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
+            window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], that.date, ev.data, function (obj, data_obj) {
+                try {
+                    window.parent.user.offer.stobj.published = obj.published;
+                    window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+                    let local = {
+                        data: JSON.parse(obj.offer),
+                        date: window.parent.user.offer.stobj.date,
+                        longitude: data_obj.location[0],
+                        latitude: data_obj.location[1],
+                    };
+                    window.parent.user.offer.SetOfferDB(local);
+                } catch (ex) {
+                    console.log(ex);
+                }
+            });
+        });
+
+        $('[data-toggle="popover"]').popover();
+
+        try {
+            window.parent.sysdict.set_lang(window.parent.sets.lang, this.body[0]);
+        }catch (ex){
+
+        }
+
+
+
+        setTimeout(function () {
+            that.ord_items = '';//that.GetOfferItems(that.lang);
+            $('.extra_ctrl').css('display','');
+            $('.collapse:not(#collapse_lang, .item_body)').addClass('show');
+            //$('.item_title').trigger("click");
+            $('[href="#editor_pane"]').attr('pane_hash', md5($("#editor_pane")[0].innerHTML));
+
+            $('#'+$($('.menu_item')[0]).attr('cat')).trigger('click');
+            $('textarea, input, :checkbox, .form-control').on('change', function (ev) {
+                that.saveFrame( $('.nav-link.active').attr('href'));
+            });
+
+            // $('.category#'+$($('.menu_item')[0]).attr('cat')).siblings('.cat_cnt').text($('.category#'+$('.menu_item')).length);
         },500);
 
+    }
+
+    InitTabsByCategories(cb) {
+
+        let that = this;
+        let market = 'food';
+
+        $('#menu_tabs').load('../html/categories/'+market+'.html?v='+String(Date.now())+' #cat_incl',()=> {
+            window.db = window.parent.db;
+            that.categories = new CategoriesOffer();
+            $('#cat_incl').css('bottom', 'auto');
+            if(cb)
+                cb();
+        });
+
+        // $('.category[state="1"]',window.parent.document).each(function (i, cat) {
+        //     let extra = $(cat).attr('extra');
+        //     let cat_tab = $(cat).attr('id');
+        //     let cat_img = $(cat).attr('src');
+        //
+        //     that.addTab(cat_tab,cat_img,'1');
+        //
+        //     $('.dropdown').css('visibility', 'visible');
+        //     $('#order_menu_button').css('visibility', 'visible');
+        //
+        //     $('#add_tab_li').css('visibility', 'visible');
+        //
+        //     $('.cat_div').on('click',function () {
+        //         $('.cat_div').removeClass('active');
+        //     });
+        //     //$("#offer_pane").resizable();
+        //
+        //     function selectText(el) {
+        //         $(el).focus();
+        //         document.execCommand('selectAll', false, null);
+        //     }
+        //
+        //     this.lang = window.parent.sets.lang;
+        //     window.parent.sysdict.set_lang(window.parent.sets.lang, $("#menu_item_tmplt"));
+        //     window.parent.sysdict.set_lang(window.parent.sets.lang, $("#editor_pane"));
+        //
+               $('#promo').val(that.promo);
+        //
+        //     $('#prolong option[value="'+that.prolong+'"]').prop('selected',true);
+        //
+        // });
+
+
+        $('li.active a').on('show.bs.tab', function (ev) {
+            if (ev.relatedTarget) {
+                //let items = that.getTabItems($(ev.relatedTarget).text(), window.sets.lang);
+                //window.user.UpdateOfferLocal($(ev.relatedTarget).text(), items, this.location, window.dict.dict, 'published');
+            }
+            // $('.tab_inserted  img:first').tab('show');
+            // $('.tab_inserted img:first').addClass('active');
+
+        });
+
+        //$('li.active a').tab('show');
+
+        //$('.tab_inserted  img:first').trigger('click');
+
+        if (window.parent.user.date.getDate() === new Date().getDate()) {
+            $('.notoday').removeClass('notoday');
+        }
+
+        window.parent.db.GetSupOrders(new Date(that.date), window.parent.user.uid, function (res) {
+
+            $.each(res, function (i, item) {
+
+                let data = res[i].data;
+                let inv_period = '', inv_qnty = '', tr_class = '', tr_disabled = '', tr_style = '';
+                if (res[i].period !== that.offer.period) {
+                    inv_period = "style='color:red'";
+                }
+                let kAr = Object.keys(data);
+                let calcDistance = new Promise( function (resolve, reject) {
+                        if (!that.location)
+                            resolve('undefined');
+                        window.parent.user.map.geo.GetDistanceToPlace(that.location, res[i].address, function (res) {
+                            resolve(res);
+                        });
+                    }
+                );
+
+                //calcDistance.then(function (dist) {
+                function setOwner(k){
+
+                    window.parent.db.GetOffer(new Date(that.date), function (off) {
+                        if (off.length>=1) {
+                            let ar = off[0].data[res[i].data[k].cat]
+                            let r = _.find(ar, 'title', k);
+                            if(r)
+                                $(".owner[title='" + k + "']").text(r.owner?r.owner:'');
+                        }
+                    });
+                }
+
+
+                let total = 0, qnty = 0;
+
+                for (let k in kAr) {
+                    let tr =
+                    "<tr class='cus_head' style='text-align: center;'  cusuid=" + res[i].cusuid +">" +
+                        "<td></td>" +
+                        "<td>" + res[i].period + "</td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td style='text-align: center;'>" +
+                        // kolmi[0].outerHTML+
+                        "</td>" +
+                    "</tr>";
+                    if(!$('tr.cus_head[cusuid="'+res[i].cusuid +'"]')[0])
+                        $(tr).appendTo($('tbody'));
+
+                    for (let o in data[kAr[k]].ordlist) {
+
+                        $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item').find('.order_ctrl').css('visibility', 'visible');
+
+                        if (data[kAr[k]].ordlist[o].qnty==0) {//deleted
+                            inv_qnty = "title='deleted' style='color:red'";
+                            tr_style = "color:red;text-decoration:line-through";
+                            tr_disabled = "disabled";
+
+                        }
+
+                        let mi = $('.item_title[data-translate=' + kAr[k] + ']').closest('.menu_item');
+                        let price = mi.find('.item_price').val();
+                        if (data[kAr[k]].price !== price) {
+                            tr_class += " inv_price";
+                        }
+                        let num = data[kAr[k]].num?data[kAr[k]].num:'na';
+
+                        let rsrv, remain = '&nbsp;'
+                        try {
+                            rsrv = that.offer[data[kAr[k]].cat][i].packlist[o]['rsrv']?
+                                that.offer[data[kAr[k]].cat][i].packlist[o]['rsrv'] : 0;
+                            remain = parseInt(that.offer[data[kAr[k]].cat][i].packlist[o]['qnty']) - rsrv;
+                            if(remain==='NaN')
+                                remain = '';
+                        }catch(ex){
+
+                        }
+
+                        let kolmi = $('iframe.kolmi_tmplt').clone();
+                        $(kolmi).css('display', 'block')
+                            .css('margin', '0 auto')
+                            .attr('class', 'kolmi')
+                            .attr('src', '../kolmi/kolmi.html?&role=user&uid=' + md5(res[i].cusuid) + '&abonent='+res[i].cusuid);
+                        total+=data[kAr[k]].ordlist[o].price*data[kAr[k]].ordlist[o].qnty;
+                        let cat = $('.category#'+data[kAr[k]].cat, window.parent.document).attr('cat');
+
+                        let tr =
+                        "<tr class='tr_item' cusuid="+res[i].cusuid+
+                            " style='text-align: center;" + tr_style + "' " + tr_disabled + ">" +
+                            "<td></td>" +
+                            "<td>"+
+                                // "<input  type='checkbox'  class='checkbox-inline approve' " +
+                                // "cusuid="+res[i].cusuid+" title="+kAr[k]+
+                                // "  style='transform: scale(1.5);-webkit-transform: scale(1.5);'>" +
+                            "</td>"+
+                            "<td>" + cat + "</td>" +
+                            "<td title style='word-break:break-all;'>" + that.dict.getValByKey(that.lang, kAr[k]) + "</td>" +
+                            "<td>" +o+ "</td>" +
+                            "<td qnty>" + data[kAr[k]].ordlist[o].qnty + "</td>" +
+                            "<td price>" + String(data[kAr[k]].ordlist[o].price) + "</td>" +
+                            "<td class='tablesorter-no-sort'>" +
+                            (res[i].comment ? "<span class='tacomment'>" + res[i].comment + "</span>" : '') +
+                            "</td>" +
+                        "</tr>";
+
+                        $(tr).insertAfter($('tr.cus_head[cusuid="'+res[i].cusuid +'"]'));
+
+                        // $('.approve').on('click',function (ev) {
+                        //     //if(remain==='&nbsp;')
+                        //     //    return; TODO: remains
+                        //     let pl = JSON.parse(mi.find('.item_pack').attr('packlist'));
+                        //     pl[o]['rsrv'] = pl[o]['rsrv']? pl[o]['rsrv']:0;
+                        //
+                        //     if ($(this)[0].checked == true) {
+                        //         $(this).closest('td').find('a').text(remain - data[kAr[k]].ordlist[o].qnty);
+                        //         pl[o]['rsrv'] = pl[o]['rsrv'] - data[kAr[k]].ordlist[o].qnty;
+                        //     }else {
+                        //         $(this).closest('td').find('a').text(remain);
+                        //         pl[o]['rsrv'] = pl[o]['rsrv'] + data[kAr[k]].ordlist[o].qnty;
+                        //     }
+                        //     mi.find('.item_pack').attr('packlist', JSON.stringify(pl));
+                        //
+                        // });
+
+                        if (window.parent.user.profile.profile.type === 'marketer') {
+                            $('.marketer').css('display', 'none');
+                            $('.complete').attr('disabled', 'true');
+                        }
+                        window.parent.db.GetApproved(new Date(that.date), window.parent.user.uid, res[i].cusuid, function (appr) {
+                            if (appr && appr.data[kAr[k]].ordlist[o].qnty === res[i].data[kAr[k]].ordlist[o].qnty &&
+                                appr.data[kAr[k]].ordlist[o].price === res[i].data[kAr[k]].ordlist[o].price) {
+                                $(".cus_foot[cusuid=" + res[i].cusuid +"] .approve[title='" + kAr[k] + "']").prop('checked', true);
+                                $(".cus_foot[cusuid=" + res[i].cusuid +"] .approve[title='" + kAr[k] + "']").attr('disabled', 'true');
+
+                            }
+                        });
+                    }
+
+                    for (let e in data[kAr[k]].extralist) {
+
+                        let tr = "<tr class='tr_item'>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td  style='text-align: center;'>" + e+ "</td>" +
+                            "<td  style='text-align: center;'>" + data[kAr[k]].extralist[e].qnty + "</td>" +
+                            "<td  style='text-align: center;'>" + String(data[kAr[k]].extralist[e].price) + "</td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "<td></td>" +
+                            "</tr>";
+
+                        $(tr).appendTo($('tbody'));
+                    }
+
+                    tr =
+                    "<tr class='cus_foot' style='text-align: center;'  cusuid=" + res[i].cusuid +">" +
+                        "<td number>"+window.parent.user.uid.slice(0, 2)+res[i].cusuid.slice(0, 2) +"/"+(new Date(that.date)).getDate()+"</td>" +
+                        "<td style='text-align: center;'>" +
+                            "<input type='checkbox'  class='checkbox-inline approve' title='"+kAr[k]+"' cusuid=" + res[i].cusuid +
+                            " onclick='window.OnClickCheck(this)'" +
+                            "  style='transform: scale(1.5);-webkit-transform: scale(1.5);'>" +
+                        "</td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td></td>" +
+                        "<td>"+total+"</td>" +
+                        "<td style='text-align: center;'>" +
+                        // kolmi[0].outerHTML+
+                        "</td>" +
+                    "</tr>";
+
+                    if(!$('tr.cus_foot[cusuid="'+res[i].cusuid +'"]')[0])
+                        $(tr).appendTo($('tbody'));
+                    else
+                        $('tr.cus_foot[cusuid="'+res[i].cusuid +'"]').replaceWith(tr);
+
+                }
+            });
+
+            $('.order_amnt').text($('.tr_item').length);
+
+            that.orders = res;
+
+        });
+
+
+        $('#add_item').off();
+        $('#add_item').on('click touchstart', that, that.AddOfferItem);
+
+        $('.input').click(function (ev) {
+            $(this).focus();
+        });
+
+        $("#editor_pane").find('.publish_offer_ctrl').off('click touchstart');
+        $("#editor_pane").find('.publish_offer_ctrl').on('click touchstart', this, function (ev) {
+            window.parent.user.PublishOffer(ev.data.GetOfferItems(ev.data.lang, true)['remote'], that.date, ev.data, function (obj, data_obj) {
+                try {
+                    window.parent.user.offer.stobj.published = obj.published;
+                    window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+                    let local = {
+                        data: JSON.parse(obj.offer),
+                        date: window.parent.user.offer.stobj.date,
+                        longitude: data_obj.location[0],
+                        latitude: data_obj.location[1],
+                    };
+                    window.parent.user.offer.SetOfferDB(local);
+                } catch (ex) {
+                    console.log(ex);
+                }
+            });
+        });
+
+        $('[data-toggle="popover"]').popover();
     }
 
     fillPacklist(menu_item, tab,i){
@@ -951,42 +1183,28 @@ export class DeliverOffer{
             pl = utils.ReverseObject(that.offer[tab][i].packlist);
         else return;
 
-        $(menu_item).find('.pack_list').empty();
         for (let l in pl) {
-            if (!l) {
-                delete that.offer[tab][i].packlist[l];
-                continue;
-            }
-            let price = pl[l].price;
-            let qnty = pl[l].qnty;
-            let rsrv = pl[l].rsrv;
-            $(menu_item).find('.pack_container').css('visibility', 'visible');
-            $(menu_item).find('.pack_list').append("<a class='dropdown-item' href='#' role='packitem' >" + l + "</a>");
-            $(menu_item).find('.item_pack').text(l);
-            $(menu_item).find('.item_pack').attr('pack', l);
-            $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
-                let that = ev.data;
-                let pack = $(menu_item).find('.item_pack').attr('pack');
-                if ($(this).val() === '') {
-                    $(menu_item).find('a:contains(' + pack + ')').remove();
-                    let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
-                    delete pl[pack];
-                    $(this).attr('packlist', JSON.stringify(pl));
-                }
-            });
+            let row = $(menu_item).find('.pack_tmplt').clone();
+            row.removeClass('pack_tmplt');
+            row.find('.add_pack_div').remove();
+            row.find('.bargain_div').remove();
+            row.find('input').prop("contenteditable", true);
+            row.find('.item_pack').attr('data-translate',l);
+            row.find('.item_price').val(pl[l].price);
+            row.find('.item_qnty').val(pl[l].qnty);
 
-            $(menu_item).find('.item_price').val(price);
-            $(menu_item).find('.item_qnty').val(qnty);
+            $(menu_item).find('.pack').before(row);
         }
     }
 
     FillProfile(profile){
+
         // $('input').prop('readonly', true);
         // $('input').attr('placeholder', '');
         if(profile.avatar)
             $('.avatar').attr('src',this.path+'/images/'+profile.avatar);
         else
-             $('.avatar').attr('src', 'https:///nedol.ru/d2d/dist/images/user.png');
+             $('.avatar').attr('src', 'https://delivery-angels.com/d2d/dist/images/user.png');
         $('input').attr('title', '');
         $('#name').val(profile.name);
         $('#email').val(profile.email);
@@ -994,11 +1212,7 @@ export class DeliverOffer{
         $('#address').val(profile.address);
         $('#place').val(profile.place);
         $('#worktime').val(profile.worktime);
-        if(profile.type==='supplier') {
-            $('#delivery').parent().css('display','block');
-            if (profile.delivery)
-                $('#delivery').val(profile.delivery);
-        }
+        $('#delivery').val(profile.delivery);
 
     }
 
@@ -1007,56 +1221,50 @@ export class DeliverOffer{
         // this.profile_sup = new ProfileSupplier(user);
         this.InitComments(user, settings);
         this.InitRating();
+
+        if(window.parent.user) {
+            $('#map_link').css('display','block');
+            $('#map_link').attr('href',"https://delivery-angels.com/d2d/dist/customer.store.html?lang="+window.parent.sets.lang+"&market=food&supuid="+window.parent.user.uid);
+
+        }
     }
 
     InitSupplierReview(sup){
 
-       this.InitProfileSupplier({supuid:sup.uid,user:window.parent.user.constructor.name},
-            {   //comments settings
-                readOnly: (sup.appr && sup.appr.cusuid===window.parent.user.uid)?false:true,
-                profilePictureURL:sup.profile.avatar? this.path+'/images/'+ sup.profile.avatar:'https:///nedol.ru/d2d/dist/images/user.png',
-                enableEditing: true,
-                enableDeleting:false,
-                enableReplying: false,
-                textareaPlaceholderText: 'Оставить комментарий',
-                newestText: 'Новые',
-                oldestText: 'Старые',
-                popularText: 'Популярные',
-                sendText: 'Послать',
-                replyText: 'Ответить',
-                editText: 'Изменить',
-                editedText: 'Измененный',
-                youText: 'Я',
-                saveText: 'Сохранить',
-                hideRepliesText: 'Скрыть'
-            });
+        let par = {
+            readOnly: (sup.appr && sup.appr.cusuid === window.parent.user.uid) ? false : true,
+            profilePictureURL: sup.profile.avatar ? this.path + '/images/' + sup.profile.avatar : 'https:///delivery-angels.com/d2d/dist/images/user.png',
+            enableEditing: true,
+            enableDeleting: false,
+            enableReplying: false
+        }
+        Object.assign(par,comment_obj.supplier[window.parent.sets.lang]);
+       this.InitProfileSupplier({supuid:sup.uid,user:window.parent.user.constructor.name},par);
     }
 
     InitComments(obj, settings){
         let this_obj = obj;
         $('img.avatar').attr('src', settings.profilePictureURL);
         //settings.profilePictureURL = this.path+'/images/'+this.profile.avatar;
+
         $('#comments-container').comments(Object.assign(settings,{
             getComments: function(success, error) {
                 let par = {
-                    proj:'d2d',
-                    user:window.parent.user.constructor.name.toLowerCase(),
-                    func:'getcomments',
-                    supuid:obj.supuid
+                    proj: "d2d",
+                    user: window.parent.user.constructor.name.toLowerCase(),
+                    func: 'getcomments',
+                    supuid: obj.supuid
                 }
-                window.parent.network.postRequest(par, function (data) {
 
-                    if(data) {
-                        var commentsArray = [];
-                        for(let i in data) {
-                            let com = JSON.parse(data[i].data);
+                window.parent.network.SendMessage(par, function (data) {
+                    var commentsArray = [];
+                    if(data.resAr) {
+                        for(let i in data.resAr) {
+                            let com = JSON.parse(data.resAr[i].data);
                             commentsArray.push(com);
                         }
-
-                        success(commentsArray);
-                    }else{
-                        success(data);
                     }
+                    success(commentsArray);
                 })
             },
             postComment: function(data, success, error) {
@@ -1077,7 +1285,7 @@ export class DeliverOffer{
                     cusuid:window.parent.user.uid,
                     data:data
                 }
-                window.parent.network.postRequest(par, function (res) {
+                window.parent.network.SendMessage(par, function (res) {
                     if(!res.err) {
                         data['created_by_current_user'] = true;
                         success(saveComment(data));
@@ -1094,7 +1302,7 @@ export class DeliverOffer{
                     cusuid:window.parent.user.uid,
                     data:data
                 }
-                window.parent.network.postRequest(par, function (res) {
+                window.parent.network.SendMessage(par, function (res) {
                     data['created_by_current_user'] = true;
                     success(saveComment(data));
                 });
@@ -1126,13 +1334,13 @@ export class DeliverOffer{
             psw: window.parent.user.psw,
             supuid: window.parent.user.uid
         }
-        window.parent.network.postRequest(data_obj, function (data) {
-            if (data.rating)
-                $('.rating').rating('rate', data.rating);
+        window.parent.network.SendMessage(data_obj, function (data) {
+            if (data.resAr && data.resAr.rating)
+                $('.rating').rating('rate', data.resAr.rating);
         });
     }
 
-    OnClickAddPack(ev) {
+    _OnClickAddPack(ev) {
 
         let menu_item = ev.data.mi;
         let that = ev.data.that;
@@ -1140,7 +1348,7 @@ export class DeliverOffer{
         $('.add_pack').css('visibility', 'hidden');
         let pack = $(menu_item).find('.item_pack').val();
         let price = $(menu_item).find('.item_price').val();
-        let qnty = $(menu_item).find('.item_qnty').val()
+        let qnty = $(menu_item).find('.item_qnty').text()
 
         let pl = $(menu_item).find('.item_pack').attr('packlist');
         if (pl)
@@ -1175,9 +1383,11 @@ export class DeliverOffer{
         $(menu_item).find('.item_pack').attr('packlist', JSON.stringify(pl));
         $(menu_item).find('.item_pack').val(pack);
         $(menu_item).find('.item_price').val(price);
-        $(menu_item).find('.item_qnty').val(qnty);
+        $(menu_item).find('.item_qnty').text(qnty);
 
         $(menu_item).find('.item_pack').dropdown("toggle");
+
+        that.saveFrame('#editor_pane');
 
     }
 
@@ -1191,7 +1401,7 @@ export class DeliverOffer{
         $(menu_item).find('.item_pack').val($(ev.target).text());
         $(menu_item).find('.item_pack').attr('pack',$(ev.target).text());
         $(menu_item).find('.item_price').val(price);
-        $(menu_item).find('.item_qnty').val(qnty);
+        $(menu_item).find('.item_qnty').text(qnty);
 
     }
 
@@ -1203,8 +1413,8 @@ export class DeliverOffer{
         //    return true;
         // }
 
-        let tab = $('.tab_inserted img.nav-link.active').attr('title');
-        // alert('tab:'+tab+$('.tab_inserted img.nav-link.active').length);
+        let tab = $('.category[state=1]').attr('id');
+
         if (!tab)
             return;
 
@@ -1219,98 +1429,87 @@ export class DeliverOffer{
             tmplt = $($('.menu_item[id^="'+tab+'"]')[pos-1]).clone();
         }
 
-        let menu_item = $('#menu_item_tmplt').clone();
-        $(menu_item).attr('id', tab+'_'+ pos);
-        $(menu_item).attr('class', 'menu_item');
-        $(menu_item).css('display', 'block');
+        let menu_item = tmplt;//$('#menu_item_tmplt').clone();
+        menu_item.insertBefore($('#editor_pane .empty_div'));
 
-        $(menu_item).find('.pack_container').replaceWith($(tmplt).find('.pack_container')[0]);
-        $(menu_item).find('.price_div').replaceWith($(tmplt).find('.price_div')[0]);
+        menu_item.attr('cat', tab);
+        menu_item.attr('id', tab+'_'+ pos);
+        menu_item.attr('class', 'menu_item');
+        menu_item.css('display', 'block');
+        menu_item.attr('cat', tab);
 
-        $(menu_item).find('.publish:checkbox').attr('id', 'item_cb_' + pos);
-        $(menu_item).find('.publish:checkbox').attr('pos', pos);
-        $(menu_item).find('.publish:checkbox').attr('tab', tab);
+
+        menu_item.find('.item_title').text('');
+        menu_item.find('.carousel-img').remove();
+
+        menu_item.find('.extra_ctrl').attr('data-target','#extra_'+ tab + '_' + pos);
+        menu_item.find('.extra_ctrl').css('display','');
+        // menu_item.find('.pack_container').replaceWith($(tmplt).find('.pack_container')[0]);
+        // menu_item.find('.price_div').replaceWith($(tmplt).find('.price_div')[0]);
+
+        menu_item.find('.publish:checkbox').attr('id', 'item_cb_' + pos);
+        menu_item.find('.publish:checkbox').attr('pos', pos);
+        menu_item.find('.publish:checkbox').attr('tab', tab);
         $('.btn').css('visibility', 'visible');
 
-        $(menu_item).find('.content_text').attr('contenteditable', 'true');
-        // $(menu_item).find('.item_title').attr('contenteditable', 'true');
-        $(menu_item).find('.item_price').attr('contenteditable', 'true');
+        menu_item.find('.content_text').attr('contenteditable', 'true');
+        // menu_item.find('.item_title').attr('contenteditable', 'true');
+        menu_item.find('.item_price').attr('contenteditable', 'true');
 
-        if($(".category[id=\""+tab+"\"]",window.parent.document).attr('extra')==='true'){
-            $(menu_item).find("[data-target='.extras']").css('display','block');
-            $(menu_item).find('.extras').attr('id','extra_'+ tab + '_' + pos);
-            $(menu_item).find("[data-target='.extras']").attr('data-target','#extra_'+ tab + '_' + pos);
-        }
-
-        //$(menu_item).find('.item_title').text($('#item_title').text());
+        //menu_item.find('.item_title').text($('#item_title').text());
         let hash = md5(new Date().getTime());
         //window.dict.dict[hash] = {};
-        //$(menu_item).find('.item_title').attr('data-translate',hash);
+        //menu_item.find('.item_title').attr('data-translate',hash);
 
-        $(menu_item).find('.item_content').attr('id', 'content_'+tab.replace('#','')+ pos);
-        $(menu_item).find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
+        menu_item.find('.item_title').attr('data-target','#content_' +tab.replace('#','') + pos);
+        menu_item.find('.item_body').attr('id', 'content_' + tab + '_' + i);
+        // function focusOut(ev) {
+        //     let res =$.grep($(".item_title"), function (n, i) {
+        //         return (n.value && n.value === ev.target.value)
+        //     });
+        //     if(res.length>1) {
+        //         $(ev.currentTarget).off('focusout');
+        //         alert({ru:"Названия продуктов не должны повторяться",en:"Name of product should be unique"}[window.parent.sets.lang]);
+        //         $(this).select();
+        //         setTimeout(function () {
+        //             $(ev.currentTarget).on('focusout',focusOut);
+        //         },200);
+        //     }
+        // }
+        // menu_item.find('.item_title').on('focusout', focusOut);
 
-        $(menu_item).find('.item_title').longTap(function (el) {
-            $(menu_item).find('.item_content').collapse("toggle");
-        });
-        $(menu_item).find('.item_content').on('shown.bs.collapse', function (e) {
-            let h = $(this).closest('.content_div')[0].scrollHeight;
-            $(this).find('.content').off();
-            $(this).find('.content').on('change keyup keydown paste cut', 'textarea', function () {
-                $(this).height(0).height(h);//this.scrollHeight);
-            }).find('textarea').change();
-            $(this).find('.content_text').focus();
-        });
 
-        $(menu_item).find('.item_title').on('dblclick', function () {
-            $(menu_item).find('.item_content').collapse('show');
-        });
-
-        $(menu_item).find('.item_title').on('focus', function () {
-            $(menu_item).find('.item_content').collapse('hide');
-        });
-
-        function focusOut(ev) {
-            let res =$.grep($(".item_title"), function (n, i) {
-                return (n.value!=='' && n.value === ev.target.value)
-            });
-            if(res.length>1) {
-                $(ev.currentTarget).off('focusout');
-                alert({ru:"Названия продуктов не должны повторяться",en:"Name of product should be unique"}[window.parent.sets.lang]);
-                $(this).select();
-                setTimeout(function () {
-                    $(ev.currentTarget).on('focusout',focusOut);
-                },200);
-            }
-        }
-        $(menu_item).find('.item_title').on('focusout', focusOut);
-
-        hash = md5(new Date().getTime()+1);
         //window.dict.dict[hash] = {};
-        // $(menu_item).find('.content_text').attr('data-translate', hash);
-        $(menu_item).find('.img-fluid').attr('id','img_'+tab.replace('#','')+'_'+pos);
+        menu_item.find('.content_text').attr('data-translate', hash);
+        menu_item.find('.img-fluid').attr('id','img_'+tab.replace('#','')+'_'+pos);
 
-        $(menu_item).find('.put_image').css('display', 'block');
+        menu_item.find('.put_image').css('display', 'block');
 
         that.mi_id = menu_item.attr('id');
 
-        $(menu_item).find('input:file').on('change',menu_item, that.onImportImage);
+        menu_item.find('input:file').on('change',menu_item, that.onLoadImage);
 
-        $(menu_item).find('.fa-image').on('click touchstart', menu_item, function (ev) {
+        if($(".category[id=\""+tab+"\"]",window.parent.document).attr('extra')==='true'){
+            menu_item.find("[data-target='.extras']").css('display','block');
+            menu_item.find('.extras').attr('id','extra_'+ tab + '_' + pos);
+            menu_item.find("[data-target='.extras']").attr('data-target','#extra_'+ tab + '_' + pos);
+        }
+
+        menu_item.find('.fa-image').on('click touchstart', menu_item, function (ev) {
             let menu_item = $(ev.data);
-            let vis = $(menu_item).find('.img-fluid').css('visibility');
+            let vis = menu_item.find('.img-fluid').css('visibility');
 
-            ev.target = $(menu_item).find('.img-fluid')[0];
+            ev.target = menu_item.find('.img-fluid')[0];
             ev.mi = menu_item.attr('id');
             that.OnClickImport(ev);
         });
 
-        $(menu_item).find('.item_price').on('focusout',{that:that, mi:$(menu_item)}, function (ev) {
-            $(menu_item).find('.add_pack').css('visibility', 'hidden');
+        menu_item.find('.item_price').on('focusout',{that:that, mi:menu_item}, function (ev) {
+            menu_item.find('.add_pack').css('visibility', 'hidden');
             that.OnClickAddPack(ev);
         });
 
-        $(menu_item).find('.add_content').on('click touchstart',function () {
+        menu_item.find('.add_content').on('click touchstart',function () {
             $(this).closest('.menu_item').find('.item_content').slideDown("slow");
             let vis = $(this).closest('.menu_item').find('.content_text').css('visibility');
             if (vis === 'visible'){
@@ -1323,68 +1522,107 @@ export class DeliverOffer{
         });
 
 
-        $(menu_item).find('.item_pack').on('focusout', that, function (ev) {
-            let that = ev.data;
-            let pack = $(menu_item).find('.item_pack').attr('pack');
-            if ($(this).val() === '') {
-                $(menu_item).find('a:contains(' + pack + ')').remove();
-                let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
-                delete pl[pack];
-                $(this).attr('packlist', JSON.stringify(pl));
-            }
-        });
+        // menu_item.find('.item_pack').on('focusout', that, function (ev) {
+        //     let that = ev.data;
+        //     let pack = menu_item.find('.item_pack').attr('pack');
+        //     if ($(this).val() === '') {
+        //         menu_item.find('a:contains(' + pack + ')').remove();
+        //         let pl = JSON.parse(menu_item.find('.item_pack').attr('packlist'));
+        //         delete pl[pack];
+        //         $(this).attr('packlist', JSON.stringify(pl));
+        //     }
+        // });
 
 
-        $(menu_item).find('.brand_img').attr('id', 'brand_' + tab + '_' + $('.brand_img').length);
-        $(menu_item).find('.brand').on('click', menu_item, function (ev) {
+        menu_item.find('.brand_img').attr('id', 'brand_' + tab + '_' + $('.brand_img').length);
+        menu_item.find('.brand').on('click', menu_item, function (ev) {
             let menu_item = $(this).closest('.menu_item');
-            //let vis = $(menu_item).find('.img-fluid').css('visibility');
-            ev.target = $(menu_item).find('.brand_img')[0];
-            ev.mi = $(menu_item).attr('id');
+            //let vis = menu_item.find('.img-fluid').css('visibility');
+            ev.target = menu_item.find('.brand_img')[0];
+            ev.mi = menu_item.attr('id');
             that.OnClickImport(ev);
         });
 
-        $(menu_item).find('.brand').on('dragend', function () {
+        menu_item.find('.brand').on('dragend', function () {
             $(this).remove();
         });
 
-        $(menu_item).find('.cert_container').attr('id', 'gallery_' + tab.replace('#','') + '_' + pos);
+        menu_item.find('.cert_container').attr('id', 'gallery_' + tab.replace('#','') + '_' + pos);
 
-        $(menu_item).find('.add_pack').attr('id', 'pack_' + tab.replace('#','') );
-        $(menu_item).find('.add_pack').on('click touchstart', {mi:$(menu_item),that:that},that.OnClickAddPack);
+        menu_item.find('.add_pack').attr('id', 'pack_' + tab.replace('#','') );
+        menu_item.find('.add_pack').on('click touchstart', {mi:menu_item,that:that},that.OnClickAddPack);
 
-        if(pos>1) {
-            $(menu_item).find('.pack_container').replaceWith( $('div#' + tab + '_' + String(pos - 1)).find('.pack_container').clone());
-            $(menu_item).find('.price_div').replaceWith( $('div#' + tab + '_' + String(pos - 1)).find('.price_div').clone());
-            $(menu_item).find('a[role=packitem]').on('click touchstart', {
-                that: that,
-                mi: $(menu_item)
-            }, that.OnClickPack);
-        }
+        // if(pos>1) {
+        //     menu_item.find('.pack_container').replaceWith( $('div#' + tab + '_' + String(pos - 1)).find('.pack_container').clone());
+        //     menu_item.find('.price_div').replaceWith( $('div#' + tab + '_' + String(pos - 1)).find('.price_div').clone());
+        //     menu_item.find('a[role=packitem]').on('click touchstart', {
+        //         that: that,
+        //         mi: menu_item
+        //     }, that.OnClickPack);
+        // }
+         menu_item.find('.add_prop').on('click', that.onAddProp);
 
-        $(menu_item).find('.add_extra').on('click', that.onAddExtra);
+         menu_item.find('.add_extra').on('click', that.onAddExtra);
 
-         $('#'+tab).append(menu_item[0]);
+         //$('#editor_pane .tab-content').append(menu_item[0]);
 
-        // $(menu_item).find('.item_title').focus();
 
-        $(menu_item).find('.toolbar').css('display', 'block');
+        menu_item.find('.item_title').focus();
+        menu_item.find('.item_title')[0].scrollIntoView();
 
-        if ($(menu_item).find('.item_content').css('display') == 'block')
-            $(menu_item).find('.item_content').slideToggle("fast");
+        menu_item.find('.toolbar').css('display', 'block');
 
-        //$(tmplt).insertAfter('#editor_pane');
+        if (menu_item.find('.item_content').css('display') == 'block')
+            menu_item.find('.item_content').slideToggle("fast");
 
-        // window.parent.dict.set_lang(window.parent.sets.lang, $(menu_item));
-
+        //window.parent.dict.set_lang(window.parent.sets.lang, $(menu_item));
+        $('textarea, input, :checkbox, .form-control',menu_item).on('change', function (ev) {
+            that.saveFrame( $('.nav-link.active').attr('href'));
+        });
     }
 
-    onClickImage(ev) {
-        // ev.preventDefault();
-        // ev.stopPropagation();
-        //let mi = $('#'+ev.data.id);
-        //$(mi).find('.img-fluid').attr('src',this.src);
-        //$(mi).find('.img-fluid').focus();
+    onAddProp(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        let row = $(ev.target).closest('.row').clone();
+        row.find('.input').prop("contenteditable", true);
+        row.find('.input').text('');
+        row.find('.add_prop_div').remove();
+        $(ev.target).closest('.prop.container').append(row);
+        // setTimeout(function(){
+        //     row.find('.prop_key[contenteditable=true]').focus();
+        // },100);
+    };
+
+    onAddPack(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        let row = $(ev.target).closest('.pack_tmplt').clone();
+        row.removeClass('pack_tmplt');
+        row.find('.input').prop("contenteditable", true);
+        row.find('.input').text('');
+        row.find('.add_prop_div').remove();
+        row.find('.bargain_div').remove();
+        //$(ev.target).closest('.pack_tmplt').after(row);
+        row.insertBefore($(ev.target).closest('.pack_tmplt'))
+        // setTimeout(function(){
+        //     row.find('.item_pack[contenteditable=true]').focus();
+        // },100);
+
+    };
+
+    onAddExtra(ev) {
+        ev.preventDefault();
+        ev.stopPropagation();
+        let row = $(ev.target).closest('.add_row').clone();
+        row.find('.add_extra_div').remove();
+        row.addClass('extra');
+        row.find('.input').prop("contenteditable", true);
+        row.find('.input').text('');
+        $(ev.target).closest('.add_row').parent().append(row);
+        setTimeout(function () {
+            $(row).find('.extra_title').focus();
+        },100);
     };
 
     OnClickImport(ev){
@@ -1395,28 +1633,19 @@ export class DeliverOffer{
         //$(menu_item).find('.fa-image').css('visibility', 'hidden');
     }
 
-    onAddExtra(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-        let row = $(ev.target).closest('.row').clone();
-        $(row).find('.add_extra_div').remove();
-        $(ev.target).closest('.row').parent().append(row);
-    };
 
-    onImportImage(ev) {
-        let menu_item = $(ev.data);
-        let el = JSON.parse($(menu_item).find('input:file').attr('menu_item'));
-        let file = ev.target.files[0];
-        setTimeout(function () {
+
+    onLoadImage (ev) {
+            let menu_item = $(ev.data);
+            let el = JSON.parse($(menu_item).find('input:file').attr('menu_item'));
             try {
                 loadImage(
-                    file,
+                    ev.target.files[0],
                     function (img, data) {
                         if (img.type === "error") {
                             console.error("Error loading image ");
                         } else {
 
-                            file = null;
                             if (el.target[0] === "brand_img") {
                                 $("#" + el.id).find('.brand_img').attr('src', img.toDataURL());
 
@@ -1438,24 +1667,24 @@ export class DeliverOffer{
                             //$(menu_item).find('.cert_container').find('img').draggable('destroy');
 
                             $(img).longTap(function () {
-                                let active = $(menu_item).find('.cert_container').find('.active');
-                                active.removeClass('carousel-item');
-                                $(img).draggable(
-                                    {delay: 0},
-                                    {cursor: "crosshair"},
-                                    {
-                                        start: function (ev) {
-                                        },
-                                        drag: function (ev) {
-                                            //$(el).attr('drag', true);
-                                        },
-                                        stop: function (ev) {
-                                            $(img).draggable('destroy');
-                                            $(menu_item).find('.active').addClass('carousel-item');
-                                            $(menu_item).find('.active').attr('drag_left', $(ev.target).css('left'));
-                                            $(menu_item).find('.active').attr('drag_top', $(ev.target).css('top'));
-                                        }
-                                    });
+                                // let active = $(menu_item).find('.cert_container').find('.active');
+                                // active.removeClass('carousel-item');
+                                // $(img).draggable(
+                                //     {delay: 0},
+                                //     {cursor: "crosshair"},
+                                //     {
+                                //         start: function (ev) {
+                                //         },
+                                //         drag: function (ev) {
+                                //             //$(el).attr('drag', true);
+                                //         },
+                                //         stop: function (ev) {
+                                //             $(img).draggable('destroy');
+                                //             $(menu_item).find('.active').addClass('carousel-item');
+                                //             // $(menu_item).find('.active').attr('drag_left', $(ev.target).css('left'));
+                                //             // $(menu_item).find('.active').attr('drag_top', $(ev.target).css('top'));
+                                //         }
+                                //     });
                             });
 
                             //$(menu_item).find('.carousel').carousel({interval: 3000});
@@ -1488,7 +1717,8 @@ export class DeliverOffer{
                             $(img).doubleTap(function (ev) {
                                 if (confirm({
                                         'ru': 'Удалить изображение?',
-                                        'en': 'Remove image?'
+                                        'en': 'Remove image?',
+                                        'fr': 'Supprimer l\'image ?'
                                     }[window.parent.sets.lang])) {
                                     $(this).closest('.carousel-item').remove();
                                     menu_item.find('.carousel').carousel("next");
@@ -1502,7 +1732,8 @@ export class DeliverOffer{
                                 ev.stopPropagation();
                                 if (confirm({
                                         'ru': 'Удалить изображение?',
-                                        'en': 'Remove image?'
+                                        'en': 'Remove image?',
+                                        'fr': 'Supprimer l\'image ?'
                                     }[window.parent.sets.lang])) {
                                     $(this).closest('.carousel-item').remove();
                                     menu_item.find('.carousel').carousel("next");
@@ -1528,11 +1759,11 @@ export class DeliverOffer{
                         canvas: true
                     }
                 )
-            }catch(ex){
+            } catch (ex) {
 
             }
-        },300);
     }
+
 
     RedrawOrder(obj){
         let that = this;
@@ -1579,36 +1810,35 @@ export class DeliverOffer{
 
     GetOfferItems(lang){
         let that = this;
-        let offerObj = {local:{}, remote:{}};
+        let offerObj = {remote:{}};
         that.arCat = [];
 
-        $('.item_title').trigger('click');
+        //$('.item_title').click();
 
-        $('#editor_pane').find('.div_tab_inserted').each((index, val)=> {
+            //
+            // if (value) {
+            //     if (!window.parent.dict.dict[md5(value)]) {
+            //         window.parent.dict.dict[md5(value)] = {};
+            //     }
+            //     window.parent.dict.dict[md5(value)][lang] = value;
+            // } else {
+            //     $(val).empty();
+            //     return true;
+            // }
 
-            $(val).addClass('active');
-            let tab = $(val).attr('id');
-            let value = tab;//$('img[href="#'+tab+'"]').attr('title');
-            let cat;
-            if(value) {
-                if(!window.parent.dict.dict[md5(value)]){
-                    window.parent.dict.dict[md5(value)] = {};
-                }
-                window.parent.dict.dict[md5(value)][lang] = value;
-            }else{
-                $(val).empty();
-                return true;
-            }
+            // let checked = $(val).find('.menu_item').find('.publish:checkbox').prop('checked');
 
-            let checked = $(val).find('.menu_item').find('.publish:checkbox').prop('checked');
-
-            let miAr = $(val).find('.menu_item');
-            offerObj['local'][value] = [];
-            offerObj['remote'][value] = [];
+            let miAr = $('.menu_item');
 
             for (let i = 0; i < miAr.length; i++) {
 
                 let item = {};
+
+                let value = $(miAr[i]).attr('cat');
+                // offerObj['local'][value] = [];
+                if( !offerObj['remote'][value])
+                    offerObj['remote'][value] = [];
+
                 item.checked = JSON.stringify($(miAr[i]).find('.publish:checkbox').prop('checked'));
 
                 let title = $(miAr[i]).find('.item_title');
@@ -1622,91 +1852,148 @@ export class DeliverOffer{
                     window.parent.dict.dict[key] = {};
                 }
 
+                item.cert = [];
+                $.each($(miAr[i]).find('.carousel-inner').find('.img-fluid'), function (i, el){
+                    let src = el.src?el.src:el.toDataURL();
+                    if(src.includes('empty.png'))
+                        return;
+
+                    if(src.includes("http://") || src.includes("https://")) {
+                        item.cert.push ({src: src.split('/').pop()});
+                    }else {
+                        item.cert.push({src: src});
+                    }
+                });
+
                 if (text !== window.parent.dict.dict[key][lang]) {
                     let obj = Object.assign({},window.parent.dict.dict[key]);
-                    delete window.parent.dict.dict[key];
-                    key = md5(text);
+                    delete  window.parent.dict.dict[key];
+                    key = md5('title_'+miAr[i].id + $(miAr[i]).find('.item_price').val()+i);//
                     window.parent.dict.dict[key] = obj;
                     window.parent.dict.dict[key][lang] = text;
                     $(title).attr('data-translate',key);
+                    window.parent.db.SetObject('dictStore',{hash:key,obj:window.parent.dict.dict[key]},()=>{})
+
                 }
                 item.title = key;
 
                 if($(miAr[i]).find('.content_text').css('visibility')==='visible') {
                     let cont_text = $(miAr[i]).find('.content_text');
                     key = $(cont_text).attr('data-translate');
-                    text = $(cont_text).val();//.replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
+                    text = $(cont_text).val().replace(/'/g,'%27').replace(/\n/g,'%0D').replace(/"/g,'%22');
                     if(!window.parent.dict.dict[key]) {
                         window.parent.dict.dict[key] = {};
                     }
                     if (text !== window.parent.dict.dict[key][lang]) {
                         let obj = Object.assign({},window.parent.dict.dict[key]);
                         delete window.parent.dict.dict[key];
-                        key = md5(text);
+                        window.parent.db.DeleteObject('dictStore',key, ()=>{})
+                        key = md5('content_text_'+miAr[i].id+text);
                         window.parent.dict.dict[key] = obj;
                         window.parent.dict.dict[key][lang] = text;
-                        $(cont_text).attr('data-translate',key);
+                        window.parent.db.SetObject('dictStore',{hash:key,obj:window.parent.dict.dict[key]}, ()=>{})
                     }
+                    $(cont_text).attr('data-translate',key);
                     item.content_text = {value:key};
 
                 }else{
                     if(item.content)
                         delete item.content;
                 }
-                // item.width = $(miAr[i]).width()>0?$(miAr[i]).width():$('#offer_editor').width();
 
-                if($(miAr[i]).find('.owner').val()) {
-                    item.owner = $(miAr[i]).find('.owner').val();
-
-                }else {
-                    delete item.owner;
-                }
-
-                if($(miAr[i]).find('.brand_img').attr('src')) {
-                    item.brand = {logo:$(miAr[i]).find('.brand_img').attr('src')};
+                if($(miAr[i]).find('.brand_img').attr('src')){
+                    if($(miAr[i]).find('.brand_img').attr('src').includes('http')) {
+                        item.brand = {logo: $(miAr[i]).find('.brand_img').attr('src').split('/').pop()};
+                    }else {
+                        item.brand = {logo: $(miAr[i]).find('.brand_img').attr('src')};
+                    }
 
                 }else {
                     delete item.brand;
                 }
 
-                item.packlist = $(miAr[i]).find('.item_pack').attr('packlist');
-                if(item.packlist) {
-                    item.packlist = JSON.parse(item.packlist);
-                }
 
-                item.haggle = JSON.stringify($(miAr[i]).find('.haggle:checkbox').prop('checked'));
-
-                item.cert = [];
-                $.each($(miAr[i]).find('.carousel-inner').find('.img-fluid'), function (i, el){
-                    let src = el.src?el.src:el.toDataURL();
-                    if(src.includes('empty.png') || src.includes('http://localhost'))
-                        return;
-
-                    if(src.includes("http://") || src.includes("https://")) {
-                        item.cert.push ({src: src.split('/').pop(), left:$(el).closest('img').attr('drag_left'),top:$(el).closest('img').attr('drag_top')});
-                    }else {
-                        item.cert.push({src: src, left:$(el).closest('img').attr('drag_left'),top:$(el).closest('img').attr('drag_top')});
+                $.each($(miAr[i]).find('.prop .row'), function (i,el) {
+                    if($(el).find('.prop_key').val() && $(el).find('.prop_val').val()) {
+                        if(!item.prop) {
+                            item.prop = {};
+                        }
+                        if(!item.prop[$(el).find('.prop_key').val()])
+                            item.prop[$(el).find('.prop_key').val()] = [];
+                        item.prop[$(el).find('.prop_key').val()].push($(el).find('.prop_val').val());
                     }
                 });
 
 
-                cat = $(window.parent.document).find('.category[cat="'+value+'"]').attr('id');
-                if(!cat)
-                    cat='1000';
-                if(!_.includes(that.arCat,parseInt(cat)))
-                    that.arCat.push(parseInt(cat));
+                $.each($(miAr[i]).find('.pack_row'), function (p,el) {
+                    if($(el).find('.item_pack').val() && $(el).find('.item_price ').val()) {
+                        if(!item.packlist)
+                            item.packlist = {};
+                        key = $(el).find('.item_pack').attr('data-translate');
+                        let text = $(el).find('.item_pack').val();
+                        if(!window.parent.dict.dict[key]) {
+                            window.parent.dict.dict[key] = {};
+                        }
+                        if (text !== window.parent.dict.dict[key][lang]) {
+                            let obj = Object.assign({}, window.parent.dict.dict[key]);
+                            delete window.parent.dict.dict[key];
+                            window.parent.db.DeleteObject('dictStore',key, ()=>{})
+                            key = md5('item_pack_' + miAr[i].id+p+text);
+                            window.parent.dict.dict[key] = obj;
+                            window.parent.dict.dict[key][lang] = text;
+                            $(el).find('.item_pack').attr('data-translate', key);
+                            window.parent.db.SetObject('dictStore',{hash:key,obj:window.parent.dict.dict[key]}, ()=>{})
 
-                offerObj['local'][value].push(item);
+                        }
 
-                if(item.checked==='true') {
-                    offerObj['remote'][value].push(item);
-                }
+                        if (!item.packlist [key])
+                            item.packlist [key] = {};
+                        item.packlist[key].qnty = $(el).find('.item_qnty').val();
+                        item.packlist[key].price = $(el).find('.item_price').val();
+                    }
+                });
+
+                item.bargain = JSON.stringify($(miAr[i]).find('.bargain:checkbox').prop('checked'));
+
+                item.extra = {};
+                $.each($(miAr[i]).find('.add_row'), function (e, el){
+                    if(!$(el).find('.extra_title').val())
+                        return;
+                    key = $(el).find('.extra_title').attr('data-translate');
+                    let text = $(el).find('.extra_title').val();
+                    if(!window.parent.dict.dict[key]) {
+                        window.parent.dict.dict[key] = {};
+                    }
+                    if (text !== window.parent.dict.dict[key][lang]) {
+                        let obj = Object.assign({}, window.parent.dict.dict[key]);
+                        delete window.parent.dict.dict[key];
+                        window.parent.db.DeleteObject('dictStore',key, ()=>{})
+                        key = md5('extra_title' + miAr[i].id+e+text);
+                        window.parent.dict.dict[key] = obj;
+                        window.parent.dict.dict[key][lang] = text;
+                    }
+                    $(el).find('.extra_title').attr('data-translate', key);
+                    window.parent.db.SetObject('dictStore',{hash:key,obj:window.parent.dict.dict[key]}, ()=>{})
+                    if(!item.extra[key])
+                        item.extra[key] = {};
+                    item.extra[key].price = $(el).find('.extra_price').val();
+
+                });
+
+                if(!_.includes(that.arCat,value))
+                    that.arCat.push(value);
+
+                //offerObj['local'][value].push(item);
+
+
+                offerObj['remote'][value].push(item);
+
             }
-            if(offerObj['remote'][value].length==0)
-                delete offerObj['remote'][value];
-            if(offerObj['local'][value].length==0)
-                delete offerObj['local'][value];
-        });
+            // if(offerObj['remote'][value].length==0)
+            //     delete offerObj['remote'][value];
+            // if(offerObj['local'][value].length==0)
+            //     delete offerObj['local'][value];
+
 
         return offerObj;
     }
@@ -1719,7 +2006,8 @@ export class DeliverOffer{
         // if(active) {
         //     items = this.getTabItems(active, lang);
         // }
-        window.parent.user.UpdateOfferLocal(this.offer,items['local'], window.parent.user.offer.stobj.location , window.parent.dict.dict);
+        if(items['local'])
+            window.parent.user.UpdateOfferLocal(this.offer,items['local'], window.parent.user.offer.stobj.location , window.parent.dict.dict);
     }
 
     SaveProfile(cb){
@@ -1730,18 +2018,16 @@ export class DeliverOffer{
 
             let k = 200/  $('.avatar').height();
             utils.createThumb_1($('.avatar')[0],$('.avatar').width()*k, $('.avatar').height()*k, function (avatar) {
-                uploadProfile(that,avatar.src,cb);
-
+                uploadProfile(avatar.src,cb);
             });
         }else{
-            uploadProfile(that,window.parent.user.profile.profile.avatar,cb);
+            uploadProfile(window.parent.user.profile.profile.avatar,cb);
         }
 
 
-        function uploadProfile(that,avatar,cb) {
+        function uploadProfile(avatar,cb) {
 
-            let data_post = '';
-            data_post = {
+            let data_post = {
                 proj: 'd2d',
                 user: window.parent.user.constructor.name,
                 func: 'updprofile',
@@ -1762,7 +2048,7 @@ export class DeliverOffer{
                 prolong: $('#prolong  option:selected').val()
             }
 
-            window.parent.network.postRequest(data_post, function (res) {
+            window.parent.network.SendMessage(data_post, function (res) {
 
                 let res_ = res.profile;
 
@@ -1822,7 +2108,7 @@ export class DeliverOffer{
             }
             data_obj['settings'] = settings;
             //data_obj['profile'] = set.profile;
-            window.parent.network.postRequest(data_obj, function (data) {
+            window.parent.network.SendMessage(data_obj, function (data) {
 
             });
         });

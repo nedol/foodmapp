@@ -4,6 +4,13 @@ import proj from 'ol/proj';
 var md5 = require('md5');
 var urlencode = require('urlencode');
 
+onmessage = function(e) {
+    console.log('Message received from main script');
+    var workerResult = 'Result: ' + (e.data[0] * e.data[1]);
+    console.log('Posting message back to main script');
+    postMessage(workerResult);
+}
+
 class Import {
 
     constructor(map){
@@ -13,6 +20,8 @@ class Import {
             this.areasAr = [];
 
         });
+
+        this.prom = true;
     }
 
     ImportDataByLocation(event) {
@@ -32,7 +41,7 @@ class Import {
                     });
                 else
                     $(".category[state='1']").each(function (i, cat) {
-                        cats.push(parseInt(cat.id));
+                        cats.push(cat.id);
                     });
 
                 let area = [
@@ -100,7 +109,7 @@ class Import {
                 key: key
             };
 
-            window.network.postRequest(data_obj, function (data) {
+            window.network.SendMessage(data_obj, function (data) {
                 if(data) {
                     that.processResult(data, cb);
                     //that.map.GetObjectsFromStorage(area);
@@ -129,9 +138,9 @@ class Import {
                 areas: area
             };
 
-            window.network.postRequest(data_obj, function (data) {
-                if(data) {
-                    that.processResult(data, cb);
+            window.network.SendMessage(data_obj, function (data) {
+                if(data.resAr) {
+                    that.processResult(data.resAr, cb);
                     //that.map.GetObjectsFromStorage(area);
                 }
 
@@ -159,9 +168,9 @@ class Import {
                 areas: area
             };
 
-            window.network.postRequest(data_obj, function (data) {
-                if(data) {
-                    that.processResult(data, cb);
+            window.network.SendMessage(data_obj, function (data) {
+                if(data.resAr) {
+                    that.processResult(data.resAr, cb);
                     //that.map.GetObjectsFromStorage(area);
                 }
 
@@ -176,10 +185,9 @@ class Import {
     processResult(res, cb) {
         let that = this;
         try {
-            res = JSON.parse(urlencode.decode(res));
 
             if (res) {
-                cb(true);
+
                 for (let i in res) {
                     let obj = res[i];
                     if(!obj || !obj.profile)
@@ -206,10 +214,11 @@ class Import {
                         continue;
                     }
 
-                    window.db.SetObject('supplierStore',obj, function (success) {
+                    window.db.SetObject('supplierStore', obj, (success) => {
                         that.map.SetFeatures([obj]);
                     });
                 }
+
 
             }else{
                 cb(false);
@@ -230,7 +239,7 @@ class Import {
             latitude: obj.lat,
             radius:obj.radius,
             logo: "../dist/images/truck.png",
-            data: JSON.parse(obj.data),
+            data: JSON.parse(obj.data.replace(new RegExp('https://nedol.ru/server/images/', 'g'),'')),
             dict: obj.dict?JSON.parse(obj.dict):{},
             rating: obj.rating?JSON.parse(obj.rating).value:'',
             profile: obj.profile?JSON.parse(obj.profile):'',
@@ -251,7 +260,7 @@ class Import {
             date: window.user.date
         };
 
-        window.network.postRequest(data_obj, function (data) {
+        window.network.SendMessage(data_obj, function (data) {
 
             if(data){
                 processResult(data);
@@ -300,7 +309,7 @@ class Import {
             date: date
         };
 
-        window.network.postRequest(data_obj, function (data) {
+        window.network.SendMessage(data_obj, function (data) {
             if(data) {
                 processResult(data);
             }
@@ -308,12 +317,12 @@ class Import {
 
         function processResult(res) {
             try {
-                if (res) {
-                    for(let i in res) {
-                        res[i].data = JSON.parse(res[i].data);
-                        res[i].date = new Date(res[i].date);
-                        res[i].date.setHours(3);
-                        window.db.SetObject('approvedStore',res[i],function (res) {
+                if (res.result) {
+                    for(let i in res.result) {
+                        let data = res.result[i];
+                        data.date = new Date(data.date);
+                        data.date.setHours(3);
+                        window.db.SetObject('approvedStore',data,function (res) {
 
                         });
                     }
@@ -336,7 +345,7 @@ class Import {
             date: date
         };
 
-        window.network.postRequest(data_obj, function (data) {
+        window.network.SendMessage(data_obj, function (data) {
             if(data) {
                 processResult(data);
             }
@@ -377,7 +386,7 @@ class Import {
                 date: date
             };
 
-            window.network.postRequest(data_obj, function (data) {
+            window.network.SendMessage(data_obj, function (data) {
 
 
             });

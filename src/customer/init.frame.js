@@ -64,13 +64,17 @@ class OfferOrder {
         $('.loader').css('display','block');
         $('.client_frame_tmplt').attr('src','./customer/customer.frame.'+window.sets.lang+'.html?v='+new Date().valueOf());
         let client_frame = $('.client_frame_tmplt').clone();
+        client_frame.attr('src','./customer/customer.frame.'+window.sets.lang+'.html?v='+new Date().valueOf());
         $(client_frame).removeClass('client_frame_tmplt');
         $(client_frame).addClass('client_frame');
 
-
-        $(client_frame).on('load', function () {
+        if(that.off_frame[0].contentWindow.InitCustomerOrder) {
             client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
-        });
+        }else{
+            client_frame.on('load', function () {
+                client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
+            });
+        }
 
         $(client_frame).css('display', 'inline-block');
         $('#client_frame_container').css('display', 'inline');

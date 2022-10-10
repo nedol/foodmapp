@@ -67,8 +67,6 @@ class OfferOrder {
         $(client_frame).removeClass('client_frame_tmplt');
         $(client_frame).addClass('client_frame');
 
-
-
         $(client_frame).on('load', function () {
             client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
         });

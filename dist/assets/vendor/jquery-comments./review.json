@@ -1,0 +1,36 @@
+{
+  "ru":{
+    proj:'d2d',
+    user:window.parent.user.constructor.name.toLowerCase(),
+    func:'getcomments',
+    supuid:obj.supuid
+    "textareaPlaceholderText": "Оставить комментарий",
+    "newestText": "Новые",
+    "oldestText": "Старые",
+    "popularText": "Популярные",
+    "sendText": "Послать",
+    "replyText": "Ответить",
+    "editText": "Изменить",
+    "editedText": "Измененный",
+    "youText": "Я",
+    "saveText": "Сохранить",
+    "hideRepliesText": "Скрыть"
+  },
+  "en":{
+    
+  },
+  "fr":{
+    proj:"d2d",
+    user:window.parent.user.constructor.name.toLowerCase(),
+    func:'getcomments',
+    supuid:obj.supuid,
+    "textareaPlaceholderText": "Laissez un commentaire",
+    "newestText": "Nouveau",
+    "oldestText": "Ancien",
+    "popularText": "Populaire",
+    "sendText": "Envoyer",
+    "replyText": "Réponse",
+    "editText": "Modifier",
+    "editedText": "Modifié"
+  }
+}

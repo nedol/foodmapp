@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+
+    <meta charset="utf-8">
+    <meta name="description" content="RTC User">
+    <meta name="viewport" content="width=device-width, user-scalable=yes, initial-scale=1, maximum-scale=1">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta id="theme-color" name="theme-color" content="#ffffff">
+
+    <title>RTC User</title>
+    <link rel="stylesheet" type="text/css" href="https://nedol.ru/rtc/lib/bootstrap/css/bootstrap.min.css">
+    <link rel="icon" sizes="192x192" href="https://nedol.ru/rtc/img/webrtc-icon-192x192.png">
+    <!--<link href="//fonts.googleapis.com/css?family=Roboto:300,400,500,700" rel="stylesheet" type="text/css">-->
+    <!--<link rel="stylesheet" href="main.css" />-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+
+
+</head>
+<body>
+
+<style>
+    .column {
+        float: left;
+        width: 50%;
+    }
+
+    /* Clear floats after the columns */
+    .row:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    .hangup{
+        -webkit-animation: rotation 1s 1 linear;
+    }
+    .call{
+        -webkit-animation: rotation 1s 1 linear;
+    }
+</style>
+
+    <script>
+        var uid = location.search.split('uid=')[1];
+        var end = uid.indexOf('&',0);
+        uid = uid.substring(0,end);
+        var iframe = location.search.split('iframe=')[1];
+        end = iframe.indexOf('&',end);
+        iframe = iframe.substring(0,end);
+
+        var abonent = location.search.split('abonent=')[1];
+
+        function OnCallClick(el) {
+            if(el.style.transform!=='rotate(0deg)') {
+                el.style.transform = 'rotate(0deg)';
+                window.top.postMessage({email:abonent,iframe:iframe,uid:uid,event:'call'},'*')
+            }else {
+                el.style.transform = 'rotate(130deg)';
+                window.top.postMessage({email:abonent,iframe:iframe,uid:uid,event:'close'},'*')
+            }
+        }
+
+        function OnLoad(el) {
+
+            window.top.postMessage({email:abonent,uid:uid,iframe:iframe,event:'load'},'*')
+            var callObj = document.getElementsByClassName("callObject");
+            callObj.id = "callObject_"+iframe;
+            var callBut = document.getElementsByClassName("callButton");
+            callBut.id = "callButton_"+iframe;
+            function listener(event) {
+
+                if (event.origin !== 'http://localhost:63342' && event.origin !== 'https://nedol.ru') {
+                    // что-то прислали с неизвестного домена - проигнорируем..
+                    return;
+                }
+
+                if (event.data.email) {
+                    if (event.data.email !== abonent)
+                        return;
+                }
+
+                if (event.data.visibility) {
+                    iframe.style.visibility = event.data.visibility;
+                }
+
+                if (event.data.width) {
+                    iframe.style.width = event.data.width;
+                }
+                if (event.data.height) {
+                    iframe.style.height = event.data.height;
+                }
+                if(event.data.element){
+                    if(event.data.attr){
+                        for(var a in event.data.attr) {
+                            $(event.data.element).attr(a,event.data.attr[a]);
+                        }
+                    }
+                    if(event.data.style) {
+                        for(var s in event.data.style) {
+                            $(event.data.element).css(s,event.data.style[s]);
+                        }
+                    }
+                    if(event.data.html){
+                        $(event.data.element).html(event.data.html);
+                        if(event.data.element==='.call-queue') {
+                            if (event.data.html === '0') {
+                                $(event.data.element).css('display', 'none');
+                            } else {
+                                $(event.data.element).css('display', 'block');
+                            }
+                        }
+                    }
+                }
+            }
+
+            if (window.addEventListener) {
+                window.addEventListener("message", listener);
+            }
+
+        }
+
+
+    </script>
+
+    <div class="callObject" style="display: block;visibility: hidden">
+        <img class="callButton" src='https://nedol.ru/rtc/img/outline-phone-24px.svg'  onclick="OnCallClick(this)"  onload="OnLoad()"
+             style="display:inline-block;position: absolute;right: 0px;bottom: 0px;height: 100%;width:100%;" alt="callButton">
+        <b class="call_cnt"  style="display:block;position: absolute;right:40%;bottom:30%;color:#0e0cff;font-size: 12px;" >5</b>
+        <span class="badge badge-primary badge-pill call-queue"
+              style="display:inline-block;position: fixed;right:0px;bottom:0px;color:#0e0cff;font-size: 12px;opacity:1">0</span>
+    </div>
+
+</body>
+</html>

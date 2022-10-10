@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset='utf-8'>
+	<meta name='viewport' content='width=device-width,initial-scale=1'>
+
+	<title>Svelte User</title>
+
+	<link rel='icon' type='image/png' href='/favicon.png'>
+	<link rel='stylesheet' href='./global.css'>
+	<link rel='stylesheet' href='./bundle.css?v=4'>
+
+	<!-- <script src="http://localhost:5000/build/assets/blueimp-load-image/js/load-image.all.min.js"></script> -->
+	<script>
+		function OnLoad(){
+			if(window.frameElement && window.frameElement.previousElementSibling){
+				if( window.frameElement.previousElementSibling.tagName.toLowerCase() ==="img"){
+					window.frameElement.style.width = window.frameElement.previousElementSibling.width+'px';
+					window.frameElement.style.height = window.frameElement.previousElementSibling.height+'px';
+				}else if( window.frameElement.previousElementSibling.tagName.toLowerCase() ==="svg"){
+					window.frameElement.style.width = window.frameElement.previousElementSibling.width.baseVal.valueAsString+'px';
+					window.frameElement.style.height = window.frameElement.previousElementSibling.height.baseVal.valueAsString+'px';
+				}else{
+					window.frameElement.style.maxWidth = '100px'
+					window.frameElement.style.maxHeight = '100px'
+			}
+		}
+	}
+
+	</script>
+	<script defer src='./bundle.js?v=4'></script>
+
+
+</head>
+
+<body onload="OnLoad()">
+</body>
+</html>

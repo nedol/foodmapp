@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+    <meta name="description" content="Продуктовая карта Москвы">
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Покупатель</title>
+
+</head>
+<!-- for datetimepicker-->
+<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+
+<!--<link href="../node_modules/flag-icon-css/css/flag-icon.css" rel="stylesheet">-->
+<link rel="stylesheet" href="../lib/style.css">
+<link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link rel="stylesheet" href="../lib/bootstrap-rating/bootstrap-rating.css">
+<link rel="stylesheet" href="../lib/datetimepicker/bootstrap-datetimepicker.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+<link id="cus_link" rel="stylesheet" href="./css/customer.css" type='text/css'>
+<!--<script  type="text/javascript" src="../lib/indexeddbshim.min.js"></script>-->
+<script src="http://kit.fontawesome.com/5b7c1e8e8a.js" crossorigin="anonymous"></script>
+ <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
+<script type="text/javascript" src="./host.js"></script>
+<script type="text/javascript" src="customer.js?v=142"></script>
+
+
+
+<body>
+<!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-WDBR26D"
+                  height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<noscript><div><img src="https://mc.yandex.ru/watch/54717046" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+
+<!-- /Yandex.Metrika counter -->
+<div id="map" class="map"></div>
+
+<!--<section id="marker" title="kolobot">-->
+<!--<img  src="https://delivery-angels.com/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--</section>-->
+
+<!--<div id="splash" style="display:none;position:absolute; background-color: black; align-content: center;width:100%; height: 100%; z-index: 50">-->
+    <!--<img src="../src/images/ic_splash.png" align="middle" width="20%" style="position: absolute;-->
+        <!--margin: auto;-->
+        <!--top: 0;-->
+        <!--left: 0;-->
+        <!--right: 0;-->
+        <!--bottom: 0;"/>-->
+<!--</div>-->
+
+
+<div>
+    <address style="display:inline-block;position: fixed;right: 5px;bottom: 5%;padding: 5px;z-index: 50">
+        <a href="mailto:d2d@delivery-angels.com">
+            <span class="mail glyphicon glyphicon-envelope" title="mail@дотудо.рф" style="font-size:2em"></span>
+        </a>
+        <br>
+    </address>
+</div>
+
+
+<div id="deliver_container" style="display:none;position:absolute;left:1%;top:15%;width:40px;text-align: center;background-color:rgba(240, 240, 240,0.5)">
+    <span data-translate="b41e026d993eee7ba620c2177c4fa0e0" style="color: #4f4f4f">Delivery</span>
+</div>
+
+
+
+<!--<iframe class="browser"  style="display:none;position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>-->
+<span id="locText" style="display:none;font-family: serif">Lat Lon</span>
+
+
+<img id="search_but"  src="https://delivery-angels.com/d2d/dist/images/ic_map_search.png" title="Search">
+<section id="loc_ctrl"  title="Location">
+    <img id="location_img" src="https://delivery-angels.com/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://delivery-angels.com/d2d/dist/images/ic_pin.png">
+</section>
+<h1 id="zoom_but"  title="Zoom">
+    <i class="icofont-dotted-up"></i>
+    <i class="icofont-dotted-down"></i>
+</h1>
+
+
+<div id="main_window">
+
+    <div class="date_ctrl"  style="position:fixed;top:5px;left:0px">
+
+        <style>
+            #period_list{background-color: whitesmoke}
+            #period_list .ui-selecting { background: #FECA40; }
+            #period_list .ui-selected { background: #F39814; color: white; }
+            #period_list { list-style-type: none; margin: 0; padding: 0; width: 50%; }
+            #period_list li { margin: 0px; padding: 0.2em; font-size: 1.4em; height: 20px; }
+        </style>
+
+        <div class="d-inline-block">
+            <div class="dt_val d-inline-block btn btn-block" style="background-color:white;text-align:center;float:left;font-size: small"></div>
+        </div>
+        <div class="dropdown  d-inline-block">
+            <div class="sel_period btn btn-block dropdown-toggle" data-toggle="dropdown"
+                style="float:left;background-color:white;font-size: small">
+                <span class="caret"></span>
+            </div>
+            <div id="period_list" class="dropdown-menu">
+                <a class="dropdown-item" href="#">06:00 - 08:00</a>
+                <a class="dropdown-item" href="#">08:00 - 10:00</a>
+                <a class="dropdown-item" href="#">10:00 - 12:00</a>
+                <a class="dropdown-item" href="#">12:00 - 14:00</a>
+                <a class="dropdown-item" href="#">14:00 - 16:00</a>
+                <a class="dropdown-item" href="#">16:00 - 18:00</a>
+                <a class="dropdown-item" href="#">18:00 - 20:00</a>
+                <a class="dropdown-item" href="#">20:00 - 22:00</a>
+                <a class="dropdown-item" href="#">22:00 - 24:00</a>
+            </div>
+
+        </div>
+    </div>
+    <div  style="position:fixed;top:1px;right:100px">
+        <iframe class="kolmi_tmplt"  frameborder="0" scrolling="no"
+                style="display:none;width:50px;height:40px;z-index: 100">
+        </iframe>
+    </div>
+    <div  style="position:fixed;top:1px;right:50px">
+        <button id="profile_but" class="btn btn-default" type="button" title="Мой профиль">
+            <span class="glyphicon glyphicon-user" style="color: #5776ff;font-size:2em"></span>
+        </button>
+
+    </div>
+
+    <div  style="position:fixed;top:1px;right:5px">
+        <button id="cart_but" class="btn btn-default" type="button" title="Моя корзина">
+
+            <span class="glyphicon glyphicon-shopping-cart" style="color: #5776ff;font-size:2em"></span>
+
+        </button>
+        <h5><span class="ord_cnt badge badge-pill badge-secondary">0</span></h5>
+    </div>
+    <style>
+        #dtp_container {
+            display: none;
+            position: absolute;
+            /*left:50%;*/
+            right:65%;
+            top:15%;
+            z-index: 11;
+        }
+
+    </style>
+    <div id="dtp_container" class="center-block scaled">
+        <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
+    </div>
+</div>
+
+<div id="category_include" style="display:none;">
+    <div id="category_container" ></div>
+</div>
+
+<div>
+    <div id="client_frame_container"
+         class=""
+         style="display:none;
+             z-index:2000;
+             position: absolute;
+             max-height: 100% !important;
+             /*min-height: 50% !important;*/
+             width: 100%;
+             -webkit-overflow-scrolling: touch;
+             overflow-y: scroll;
+             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    </div>
+
+    <iframe class="client_frame_tmplt"
+            src=""
+            style="
+            display:none;
+            position:absolute;
+            overflow: hidden;
+            z-index: 10;
+            width:100%;
+            height: 100%">
+    </iframe>
+
+</div>
+
+    <style>
+
+        .ui-resizable-se {
+            cursor: se-resize;
+            width: 50px;
+            height: 50px;
+            bottom: -5px;
+        }
+        .ui-resizable-sw {
+            cursor: sw-resize;
+            width: 20px;
+            height: 20px;
+            left: -5px;
+            bottom: -5px;
+        }
+        .ui-resizable-nw {
+            cursor: nw-resize;
+            width: 20px;
+            height: 20px;
+            left: -5px;
+            top: -5px;
+        }
+        .ui-resizable-ne {
+            cursor: ne-resize;
+            width: 20px;
+            height: 20px;
+            right: -5px;
+            top: -5px;
+        }
+    </style>
+    <div id="profile_frame_div"
+         style="display:none;position:absolute;
+         overflow: visible; z-index:2000;
+          -webkit-overflow-scrolling: auto;
+         height: 90%;
+         max-height: 90% !important;
+         min-height: 50% !important;
+         width:90%; left: 5%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+        <iframe class="profile_frame"  src=""
+                 style="overflow: hidden;z-index: 10; width:100%; height:100%;top:0"></iframe>
+    </div>
+
+    <div id="cart_frame_div"
+         style="display:none;
+         z-index:2000;
+         position: absolute;
+         height: 70% !important;
+         /*min-height: 50% !important;*/
+         width: 90%;
+         -webkit-overflow-scrolling: touch;
+         overflow: hidden;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+        <iframe class="cart_frame"  src=""
+                style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;">
+        </iframe>
+    </div>
+
+<div class=""
+     style="display:none;
+         overflow: visible; z-index:2000;
+         position: absolute;
+         -webkit-overflow-scrolling: auto;
+         height: 90%;
+         max-height: 90% !important;
+         min-height: 50% !important;
+         width:90%; left: 5%;
+         border: solid 0px lightslategrey;
+         box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <iframe class="search_browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
+</div>
+
+
+<div id="items_carousel">
+    <ul class="nav nav-tabs nav-justified"  style="color: rgb(57,137,206); ">
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#pickup"><i class="icofont-food-cart icofont-2x"></i></a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#delivery"><i class="icofont-fast-delivery icofont-2x"></i></a>
+        </li>
+    </ul>
+    <div  class="tab-content">
+        <div id="pickup" class="tab-pane">
+            <div class="carousel slide carousel-fade"  data-interval="2000">
+                <div class="carousel-inner"></div>
+            </div>
+        </div>
+        <div id="delivery" class="tab-pane">
+            <div class="carousel slide carousel-fade"  data-interval="2000">
+                <div class="carousel-inner"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="alert_container  center-block" style="display:none;position:fixed;top:30%;white-space:pre;">
+    <div class="span4">
+        <div class="alert alert-primary">
+            <button type="button" class="close">×</button>
+            <h4><a></a></h4>
+        </div>
+    </div>
+</div>
+
+<data class="qnty"  data-translate="ee4a528dce8d6fa440db5ab1cf78f939" style="display: none">Qnty </data>
+
+<data class="alerts input_address"  data-translate="c5db61ffb92f10e3e72921a57b3ec421" style="display: none">Input Address</data>
+
+<data  class="alerts ord_status_change" data-translate="83c8df3b0f629b145b6591621db97cc7"  style="display: none">Status change alert</data>
+
+<data class="tariff" id="price_editable" value="true"></data>
+<div id="debug" style="display: block;position: fixed;bottom: 0;left: 0;width: 100px"></div>
+
+<div id="foodtrucks">
+    <iframe  id="fd_frame_tmplt"  src="./html/type/foodtruck.html" scrolling="no"
+             onload='javascript:(function(o){o.style.height=o.contentWindow.document.body.scrollHeight+"px";}(this));'
+             style="display: none; position:absolute;border:none;overflow:hidden; left:0; top:0;z-index: 1000"></iframe>
+    <!--style="height:200px;width:100%;border:none;overflow:hidden;"-->
+</div>
+
+<div class="loader"></div>
+</body>
+
+<script type="text/javascript" src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.7.0/js/bootstrap.min.js"></script>-->
+</html>
