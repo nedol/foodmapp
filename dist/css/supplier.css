@@ -1,16 +1,19 @@
+::-webkit-scrollbar {
+    /*display:none ;*/
+}
+
 html, body{
     padding: 0px;
     margin: 0px;
     height: 100%;
     width: 100%;
-    scrollbar-width: none;
-    scroll-behavior: smooth;
 }
 
-::-webkit-scrollbar {
-    width: 0;
-
+.dropdown-menu{
+    transform: translate3d(0px, -6px, 0px) !important;
 }
+
+
 .scaled{
     transform: scale(1.5)
 }
@@ -107,6 +110,7 @@ li.dropdown {
 .dropdown:hover .dropdown-content {
     display: block;
 }
+
 .close {
     color: #1d2124;
     font-size: xx-large;
@@ -198,7 +202,7 @@ li.active a{
 }
 textarea{
     color: #0088bb;
-    text-align: center;
+    text-align: left;
     font-weight:normal;
     font-size:24px;
     width:100%;

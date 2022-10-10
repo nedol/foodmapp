@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
+    <meta name="description" content="Продуктовая карта Москвы">
+    <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <title>ДоТуДо Покупатель</title>
+
+</head>
+
+<!-- Latest compiled and minified CSS -->
+
+
+<link href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css' rel='stylesheet' type='text/css'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.2/css/bootstrap-select.min.css' rel='stylesheet' type='text/css'>
+<link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
+<!--<script  type="text/javascript" src="../lib/indexeddbshim.min.js"></script>-->
+
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.6.2/js/bootstrap-select.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+<script>
+
+$(document).on('readystatechange', function () {
+
+    if (document.readyState !== 'complete') {
+        return;
+    }
+
+    $(function () {
+        $('select').selectpicker();
+        $('select').on('change', function(e){
+            console.log(this.value,
+                    this.options[this.selectedIndex].value,
+                    $(this).find("option:selected").val(),);
+            window.location.replace("./customer.html?lang="+$(this).find("option:selected").val()+"&market=food&css=order.3");
+        });
+    });
+
+});
+
+</script>
+
+<style>
+    .center-block{
+      margin: auto;
+      max-width: 200px;
+      padding: 10px;
+    }
+</style>
+
+<body>
+
+    <div class="center-block">
+        <select class="selectpicker" data-width="fit">
+            <option data-content=' Select Language'></option>
+            <option data-content='<span class="flag-icon flag-icon-us"></span> English'>en</option>
+            <option data-content='<span class="flag-icon flag-icon-fr"></span> Francais'>fr</option>
+            <!--option data-content='<span class="flag-icon flag-icon-de"></span> Deutch'>de</option-->
+            <option data-content='<span class="flag-icon flag-icon-ru"></span> Русский'>ru</option>
+            <!--option  data-content='<span class="flag-icon flag-icon-mx"></span> Español'>es</option-->
+        </select>
+    </div>
+
+</body>
+
+</html>

@@ -2,7 +2,7 @@ export {Geo};
 import Geolocation from 'ol/geolocation';
 import proj from 'ol/proj';
 import {Utils} from "../../utils/utils";
-
+import {Marker} from "../marker/marker"
 
 class Geo {
 
@@ -35,7 +35,7 @@ class Geo {
                 // localStorage.setItem("cur_loc","{\"lon\":"+coordinates[0]+","+
                 //     "\"lat\":"+coordinates[1]+", \"time\":"+time+"}");
                 if (coordinates)
-                    window.postMessage(coordinates, '*');//http://nedol.ru');
+                    window.postMessage(coordinates, '*');//http://delivery-angels.ru');
 
             }, function (positionError) {
                 console.log("Error: " + positionError);
@@ -50,7 +50,7 @@ class Geo {
             //do_something(position.coords.latitude, position.coords.longitude);
             var coordinates = proj.fromLonLat([position.coords.longitude, position.coords.latitude]);
             if (coordinates)
-                window.postMessage(coordinates, '*');//http://nedol.ru');
+                window.postMessage(coordinates, '*');//http://delivery-angels.ru');
         }
 
         function geo_error() {
@@ -100,7 +100,7 @@ class Geo {
             }
         }
 
-        var loc_interval = setInterval(request, 1000);
+        var loc_interval = setInterval(request, 1200);
 
 
         // for(let l in that.map.ol_map.getLayers().array_) {
@@ -121,6 +121,11 @@ class Geo {
         if(window.sets.coords.cur===coor)
             return;
         window.sets.coords.gps = coor;
+
+        if(!window.user.marker) {
+            window.user.marker = new Marker(that.map, $('#marker')[0]);
+            $('#marker img').css('display','block')
+        }
         //TODO: поиск текущего места
         // let cur_loc = JSON.parse(localStorage.getItem("cur_loc"));
         // if(!cur_loc.address) {
@@ -148,33 +153,36 @@ class Geo {
                 "\"lat\":" + lonlat[1] + ", \"time\":" + time + "}");
 
             var size = that.map.ol_map.getSize();// @type {ol.Size}
-            //alert(loc.toString());
             
             if(window.sets.loc_mode && (that.map.ol_map.getView().getCenter()[0]!==coor[0] ||
                 that.map.ol_map.getView().getCenter()[1]!==coor[1])) {
 
-                if(!that.isTileLoaded) {
-                    that.isTileLoaded = true;
-                    that.map.MoveToLocation(coor, "SetCurPosition", function () {
-                        for(let l in that.map.ol_map.getLayers().array_) {
-                            if (that.map.ol_map.getLayers().array_[l].type === 'TILE') {
-                                that.map.ol_map.getLayers().array_[l].getSource().on('tileloadend', function () {
-
-                                    that.isTileLoaded = '';
-                                    this.un('tileloadend');
-                                });
-                            }
-                            let time = new Date().getTime();
-                            localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
-                                "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":" + that.map.ol_map.getView().getZoom() + "}");
-                            break;
-                        }
-                     });
-
-                }
+                that.map.MoveToLocation(coor, null, function () {
+                    $("#marker").trigger("change:gps_pos");
+                });
 
             }
 
+            let cur_loc = JSON.parse(localStorage.getItem("cur_loc"));
+            if (!cur_loc.lat || !cur_loc.lon) {
+                setTimeout(function () {
+                    that.map.MoveToLocation(coor, "SetCurPosition", function () {
+                    for(let l in that.map.ol_map.getLayers().array_) {
+                        if (that.map.ol_map.getLayers().array_[l].type === 'TILE') {
+                            that.map.ol_map.getLayers().array_[l].getSource().on('tileloadend', function () {
+
+                                that.isTileLoaded = '';
+                                this.un('tileloadend');
+                            });
+                        }
+                        let time = new Date().getTime();
+                        localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
+                            "\"lat\":" + lonlat[1] + ", \"time\":" + time + ",\"zoom\":" + that.map.ol_map.getView().getZoom() + "}");
+                        break;
+                    }
+                });
+                },0);
+            }
             // var pixel = that.map.ol_map.getPixelFromCoordinate(coordinate);
             //
             // var feature = that.map.ol_map.forEachFeatureAtPixel(pixel, function (feature, layer) {
@@ -189,7 +197,7 @@ class Geo {
 
     }
 
-    StartLocation() {
+    ToggleLocation() {
 
         if ($("#loc_ctrl").attr('drag') === 'true') {
             $("#loc_ctrl").attr('drag', false);
@@ -330,7 +338,7 @@ class Geo {
             dataType: "json",
             success: function (data) {
                 let resp = JSON.stringify(data, null, 4);
-                let obj = {city:data.address.state,street: data.address.road,house:data.address.house_number?data.address.house_number:''};
+                let obj = {city:data.address.city?data.address.city:data.address.state,street: data.address.road,house:data.address.house_number?data.address.house_number:''};
                 cb(obj);
             },
             error: function (data) {

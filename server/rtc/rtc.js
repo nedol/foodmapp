@@ -23,11 +23,11 @@ module.exports = class RTC {
     }
 
 
-    dispatch(req, q , ws) {
+    dispatch(q , ws) {
         console.log("func:"+q.func+" "+q.role+":"+q.uid);
         switch (q.func) {
             case 'check':
-                this.SetParams(req, q, ws);
+                this.SetParams(q, ws);
 
                 if(q.role==='user'){
                     let cnt_queue = 0;
@@ -45,10 +45,10 @@ module.exports = class RTC {
                     }catch(ex){
 
                     }
-                    item.ws.send(JSON.stringify({
+                    item.ws.send(encodeURIComponent(JSON.stringify({
                             check: true,
                             queue: String(cnt_queue)
-                        }));
+                        })));
 
                     this.SendOperatorStatus(q);
 
@@ -58,14 +58,14 @@ module.exports = class RTC {
 
             case 'offer':
 
-                this.SetParams(req, q, ws);
+                this.SetParams( q, ws);
                 this.BroadcastOperatorStatus(q, 'offer');
 
                 break;
 
             case 'call':
-                this.SetParams(req, q, ws);
-                this.HandleCall(req, q);
+                this.SetParams( q, ws);
+                this.HandleCall( q);
 
                 break;
 
@@ -88,21 +88,20 @@ module.exports = class RTC {
                     break;
                 }
 
-                this.SetParams(req, q, ws);
+                this.SetParams( q, ws);
                 
                 break;
-            
-            case 'datach':
-                this.SetParams(req, q, ws);
-                this.HandleCall(req, q, ws);
-                ws.send(JSON.stringify({msg: 'empty'}));
 
+            case 'datach':
+                this.SetParams( q, ws);
+                this.HandleCall( q, ws);
+                ws.send(encodeURIComponent(JSON.stringify({msg: 'empty'})));
                 break;
         }
 
     }
 
-    SendOperators(req, q , ws){
+    SendOperators( q , ws){
 
         let operators = {};
 
@@ -128,14 +127,14 @@ module.exports = class RTC {
             }
         }
 
-        ws.send(JSON.stringify({operators: operators}));
+        ws.send(encodeURIComponent(JSON.stringify({operators: operators})));
     }
 
     RemoveAbonent(q){
         global.rtcPull[q.role][q.trans][q.em][q.uid]= _.omit(global.rtcPull[q.role][q.trans][q.em][q.uid], q.uid);
     }
 
-    SetParams(req, q, ws){
+    SetParams(q, ws){
         let that = this;
 
         if(!global.rtcPull[q.role][q.trans])
@@ -221,13 +220,13 @@ module.exports = class RTC {
                                     desc: oper.desc,
                                     cand: oper.cand
                                 }
-                                item.ws.send(JSON.stringify(remAr));
+                                item.ws.send(encodeURIComponent(JSON.stringify(remAr)));
                             }else {
-                                item.ws.send(JSON.stringify({operators: operators}));
+                                item.ws.send(encodeURIComponent(JSON.stringify({operators: operators})));
                             }
 
                         }else {
-                            item.ws.send(JSON.stringify({operators: operators}));
+                            item.ws.send(encodeURIComponent(JSON.stringify({operators: operators})));
                         }
                     }
             }
@@ -253,10 +252,9 @@ module.exports = class RTC {
 
                     if (q.role === 'user') {
                         let item = _.find(global.rtcPull['user'][q.trans][q.em],{uid:q.uid})
-                        item.ws.send(JSON.stringify({operator: operator}));
+                        item.ws.send(encodeURIComponent(JSON.stringify({operator: operator})));
                     }
                 }
-
             }
         }
     }
@@ -267,14 +265,16 @@ module.exports = class RTC {
             func:'mute',
             uid:q.abonent,
             trans:q.trans
+        };
+        if(global.rtcPull['operator'][q.trans]) {
+            let oper = _.find(global.rtcPull['operator'][q.trans][q.abonent], {uid: q.oper_uid});
+            if (oper)
+                oper.ws.send(encodeURIComponent(JSON.stringify(user)));
         }
-        let oper = _.find(global.rtcPull['operator'][q.trans][q.abonent],{uid:q.oper_uid});
-        if(oper)
-            oper.ws.send(JSON.stringify(user));
     }
 
 
-    HandleCall(req, q){
+    HandleCall( q){
         if(q.role === 'user'){
             if(q.desc || q.cand){
                 let remAr = {
@@ -284,7 +284,7 @@ module.exports = class RTC {
                     "abonent": q.em
                 }
                 let item = _.find(global.rtcPull['operator'][q.trans][q.abonent],{uid:q.oper_uid});
-                item.ws.send(JSON.stringify(remAr));
+                item.ws.send(encodeURIComponent(JSON.stringify(remAr)));
 
             }else{
                 let item = _.find(global.rtcPull['user'][q.trans][q.em],{uid:q.uid})
@@ -309,7 +309,7 @@ module.exports = class RTC {
                             desc: global.rtcPull['operator'][q.trans][q.abonent][k].desc,
                             cand: global.rtcPull['operator'][q.trans][q.abonent][k].cand
                         }
-                        item.ws.send(JSON.stringify(remAr));
+                        item.ws.send(encodeURIComponent(JSON.stringify(remAr)));
                         //console.log('after HandleCall:user '+JSON.stringify(remAr));
                     }else{
                         item.status='wait';
@@ -317,7 +317,7 @@ module.exports = class RTC {
                             trans: q.trans,
                             status:'wait'
                         }
-                        item.ws.send(JSON.stringify(remAr));
+                        item.ws.send(encodeURIComponent(JSON.stringify(remAr)));
                     }
                 }
             }

@@ -1,0 +1,77 @@
+{
+  "supplier": {
+    "ru": {
+      "textareaPlaceholderText": "Оставить комментарий",
+      "newestText": "Новые",
+      "oldestText": "Старые",
+      "popularText": "Популярные",
+      "sendText": "Послать",
+      "replyText": "Ответить",
+      "editText": "Изменить",
+      "editedText": "Измененный",
+      "youText": "Я",
+      "saveText": "Сохранить",
+      "hideRepliesText": "Скрыть"
+    },
+    "en": {
+    },
+    "fr": {
+      "textareaPlaceholderText": "Laissez un commentaire",
+      "newestText": "Nouveau",
+      "oldestText": "Ancien",
+      "popularText": "Populaire",
+      "sendText": "Envoyer",
+      "replyText": "Réponse",
+      "editText": "Modifier",
+      "editedText": "Modifié"
+    }
+  },
+  "user": {
+    "ru": {
+      "textareaPlaceholderText": "Оставить отзыв",
+      "newestText": "Новые",
+      "oldestText": "Старые",
+      "popularText": "Популярные",
+      "sendText": "Послать",
+      "deleteText": "Удалить",
+      "replyText": "Ответить",
+      "editText": "Измененный",
+      "editedText": "Изменить",
+      "youText": "Я",
+      "saveText": "Сохранить",
+      "hideRepliesText": "Скрыть",
+      "noCommentsText": "Отзывы отсутствуют"
+    },
+    "en": {
+      "textareaPlaceholderText": "Leave Review",
+      "newestText": "New",
+      "oldestText": "Old",
+      "popularText": "Popular",
+      "sendText": "Send",
+      "deleteText": "Delete",
+      "replyText": "Reply",
+      "editText": "Changed",
+      "editedText": "Change",
+      "youText": "Me",
+      "saveText": "Save",
+      "hideRepliesText": "hide",
+      "noCommentsText": "No Reviews"
+    },
+    "fr": {
+      "textareaPlaceholderText": "Laisser une révision",
+      "newestText": "Nouveau",
+      "oldestText": "Ancien",
+      "popularText": "Populaire",
+      "sendText": "Envoyer",
+      "deleteText": "Supprimer",
+      "replyText": "Réponse",
+      "editText": "Modifié",
+      "editedText": "Changer",
+      "youText": "Moi",
+      "saveText": "Sauvez",
+      "hideRepliesText": "cacher",
+      "noCommentsText": "Pas d\"avis"
+    }
+  }
+}
+

@@ -1,11 +1,10 @@
-export {Overlay};
+
 
 import {Utils} from "../../utils/utils";
 
 //import {User} from "../menu/user";
-import _ol_Overlay_  from "ol/overlay";
-import layerVector from 'ol/layer/vector';
-import srcVector from 'ol/source/vector';
+import Overlay  from "ol/overlay";
+
 import Collection from 'ol/collection';
 
 import Feature from 'ol/feature';
@@ -15,9 +14,10 @@ import Draw from 'ol/interaction/draw';
 import Snap from 'ol/interaction/snap';
 import Circle from 'ol/geom/circle';
 
-import _ol_style_Style_ from 'ol/style/style';
-import _ol_style_Fill_ from 'ol/style/fill';
-import _ol_style_Stroke_ from 'ol/style/stroke';
+import Style from 'ol/style/style';
+import Stroke from 'ol/style/stroke';
+
+import proj from 'ol/proj';
 
 let utils = new Utils();
 
@@ -45,7 +45,7 @@ let utils = new Utils();
 
 
 
-class Overlay {
+export class OverlayItem {
 
     constructor(map, element, offer) {
 
@@ -56,14 +56,14 @@ class Overlay {
         this.snap; // global so we can remove them later
         this.offer = offer;
 
-        let domRect = $(element)[0].getBoundingClientRect();
-        this.overlay = new _ol_Overlay_({
+        let domRect = element.getBoundingClientRect();
+        this.overlay = new Overlay({
             element: element,
             position: offer.location,
             positioning: 'center-center',//'top-left'//'bottom-right',//'center-center',//'bottom-right',//'top-left',//'bottom-left',
-            offset: [-parseInt($(element).css('width'))/2,-parseInt($(element).css('height'))/2],
+            offset: [-parseInt($(element).css('width'))/4,-parseInt($(element).css('height'))/2],
             //offset: [0,0],
-            // anchor: [-150,50],
+            //anchor: [-150,50],
             autoPan:true
         });
 
@@ -154,11 +154,11 @@ class Overlay {
         if(window.user.map.layers.circleLayer) {
             layer = window.user.map.layers.circleLayer;
         }else{
-            let style =  new _ol_style_Style_({
+            let style =  new Style({
                 // fill: new _ol_style_Fill_({
                 //     color: 'rgba(255, 255, 255, .2)'
                 // }),
-                stroke: new _ol_style_Stroke_({
+                stroke: new Stroke({
                     color: 'rgba(255, 0, 0, 1)',
                     width: 1
                 })
@@ -170,26 +170,32 @@ class Overlay {
 
         var source = layer.getSource();
 
-        var radiusFeature = new Feature({
-            geometry: new Circle(offer.location,offer.radius?offer.radius:1000),
+        that.radiusFeature = new Feature({
+            geometry: new Circle(proj.fromLonLat([offer.longitude, offer.latitude]),offer.radius?offer.radius:1000),
             //name: cursor.value.title ? cursor.value.title : "",
             //tooltip: cursor.value.title ? cursor.value.title : "",
-            type:offer.profile.type,
+            type:window.user.profile.type,
             object: offer
         });
 
-        radiusFeature.un('click', function (ev) {
+        setTimeout(function () {
+            let extent = that.radiusFeature.values_.geometry.getExtent();
+            //ol.extent.applyTransform(extent, transformFn, opt_extent)
+            window.user.map.ol_map.getView().fit(extent, {duration: window.sets.animate_duration});
+        },200)
+
+        that.radiusFeature.un('click', function (ev) {
 
         });
 
-        radiusFeature.setId('radius_'+offer.uid);
-        radiusFeature.supuid = offer.uid;
-        source.addFeature(radiusFeature);
+        that.radiusFeature.setId('radius_'+window.user.uid);
+        that.radiusFeature.supuid = window.user.uid;
+        source.addFeature(that.radiusFeature);
 
 
         if(!this.collection)
             this.collection = new Collection();
-        this.collection.push(radiusFeature);
+        this.collection.push(that.radiusFeature);
         that.draw = new Draw({
             geometryName:'circle',
             source: source,
@@ -204,14 +210,10 @@ class Overlay {
             that.modify = new Modify({source: source});
             that.modify.addEventListener('modifyend', function (ev) {
                 let radius = parseFloat(ev.features.array_[0].values_.geometry.getRadius().toFixed(2));
-                window.db.GetOffer(new Date(window.user.date),function (of) {
-                    if(of[0]) {
-                        of[0].radius = radius;
-                        window.db.SetObject('offerStore', of[0], res => {
-                            window.user.offer.stobj.radius = radius;
-                        });
-                    }
-                })
+                window.user.offer.stobj.radius = radius;
+                window.db.SetObject('offerStore', window.user.offer.stobj, res => {
+
+                });
             });
             that.map.ol_map.addInteraction(that.modify);
         }
@@ -229,83 +231,69 @@ class Overlay {
     DownloadOverlay(url, obj) {
 
         var id_str = GetObjId(obj.latitude, obj.longitude);
-        if ($("[id='" + id_str + '_ovl_container' + "']").length === 0)
-            $.ajax({
+        if ($("[id='" + id_str + '_ovl_container' + "']").length === 0){
+            let data_obj = {
                 url: url + "?v=" + Date.now(),
                 obj: obj,
-                method: "GET",
-                dataType: 'text',
-                processData: false,
-                async: true,   // asynchronous request? (synchronous requests are discouraged...)
-                cache: false,
-                crossDomain: true,
-                success: function (data) {
+            }
 
-                    var id_str = GetObjId(this.obj.latitude, this.obj.longitude);
-                    var replacements = {
-                        '_id_': id_str,
-                        '_lat_': this.obj.latitude,
-                        '_lon_': this.obj.longitude,
-                        '_cat_': this.obj.category
-                    }
+            window.network.SendMessage(data_obj, function (data) {
+                var id_str = GetObjId(this.obj.latitude, this.obj.longitude);
+                var replacements = {
+                    '_id_': id_str,
+                    '_lat_': this.obj.latitude,
+                    '_lon_': this.obj.longitude,
+                    '_cat_': this.obj.category
+                }
 
-                    if (obj.logo)
-                        replacements["logo"] = obj.logo;
+                if (obj.logo)
+                    replacements["logo"] = obj.logo;
 
-                    var newNode = data.replace(/_\w+_/g, function (all) {
-                        return all in replacements ? replacements[all] : all;
+                var newNode = data.replace(/_\w+_/g, function (all) {
+                    return all in replacements ? replacements[all] : all;
+                });
+
+                if ($("[id='" + id_str + '_ovl_container' + "']").length === 0) {
+
+                    $(document).on("overlay", function (e) {
+                        //console.log("InitLayers");
                     });
 
-                    if ($("[id='" + id_str + '_ovl_container' + "']").length === 0) {
+                    var div_ovl = $("#ovl_container").clone();
+                    $(div_ovl).attr('id', id_str + '_ovl_container');
+                    $(div_ovl).attr('ovl_cat', this.obj.category);
+                    $(div_ovl).attr('class', 'overlay');
+                    $(div_ovl).attr('src', data);
 
-                        $(document).on("overlay", function (e) {
-                            //console.log("InitLayers");
-                        });
+                    $(newNode).appendTo(div_ovl);
+                    $(div_ovl).appendTo("#html_container");
 
-                        var div_ovl = $("#ovl_container").clone();
-                        $(div_ovl).attr('id', id_str + '_ovl_container');
-                        $(div_ovl).attr('ovl_cat', this.obj.category);
-                        $(div_ovl).attr('class', 'overlay');
-                        $(div_ovl).attr('src', data);
-
-                        $(newNode).appendTo(div_ovl);
-                        $(div_ovl).appendTo("#html_container");
-
-                        var logo = $(div_ovl).find('.logo');
-                        if (logo) {
-                            var logo_id = localStorage.getItem(obj.logo_id);
-                            $(logo).attr('src', logo_id);
-                        }
-
-                        var lon = parseFloat(this.obj.longitude);
-                        var lat = parseFloat(this.obj.latitude);
-
-                        jQuery.fn.InitOverlay =
-                            function () {
-                                var ovl = new Overlay(
-                                    id_str,
-                                    $('#' + id_str + '_ovl_container')[0],
-                                    ol.proj.fromLonLat([lon, lat]));
-                            }();
-
-                        var zoom = d2d_map.ol_map.getView().getZoom();
-
-                        $("#" + this.obj.id + "_include").find('.overlay_img').css('height', String(zoom * 4) + 'px');
-                        $("#" + this.obj.id + "_include").find('.overlay_img').css('width', String(zoom * 4) + 'px');
-
+                    var logo = $(div_ovl).find('.logo');
+                    if (logo) {
+                        var logo_id = localStorage.getItem(obj.logo_id);
+                        $(logo).attr('src', logo_id);
                     }
-                },
 
-                error: function (xhr, status, error) {
-                    //var err = eval("(" + xhr.responseText + ")");
-                    console.log(error.Message);
-                },
-                complete: function (data) {
-                    flag = true;
-                    if ($.isFunction('AddOverlayRecurs'))
-                        eval('AddOverlayRecurs()');
-                },
+                    var lon = parseFloat(this.obj.longitude);
+                    var lat = parseFloat(this.obj.latitude);
+
+                    jQuery.fn.InitOverlay =
+                        function () {
+                            var ovl = new OverlayItem(
+                                id_str,
+                                $('#' + id_str + '_ovl_container')[0],
+                                proj.fromLonLat([lon, lat]));
+                        }();
+
+                    var zoom = d2d_map.ol_map.getView().getZoom();
+
+                    $("#" + this.obj.id + "_include").find('.overlay_img').css('height', String(zoom * 4) + 'px');
+                    $("#" + this.obj.id + "_include").find('.overlay_img').css('width', String(zoom * 4) + 'px');
+
+                }
             });
+
+        }
     }
 
     DownloadOverlayIFrame(url, obj) {
@@ -328,10 +316,10 @@ class Overlay {
 
             jQuery.fn.InitOverlay =
                 function () {
-                    var ovl = new Overlay(
+                    var ovl = new OverlayItem(
                         id_str,
                         $('#' + id_str + '_ovl_container')[0],
-                        ol.proj.fromLonLat([lon, lat]));
+                        proj.fromLonLat([lon, lat]));
                 }();
 
 
@@ -436,10 +424,10 @@ class Overlay {
             jQuery.fn.InitOverlay =
                 function () {
                     setTimeout(function () {
-                        var ovl = new Overlay(
+                        var ovl = new OverlayItem(
                             id_str,
                             $('#' + id_str + '_ovl_frame')[0],
-                            ol.proj.fromLonLat([lon, lat]));
+                            proj.fromLonLat([lon, lat]));
                         flag = true;
                         AddOverlayRecurs();
 

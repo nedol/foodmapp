@@ -680,7 +680,7 @@ export class StoreOrder extends CustomerOrder{
     InitProfileSupplier(user) {
 
         if(!user.supplier.profile.avatar) {
-            utils.LoadImage("https://delivery-angels.com/d2d/dist/images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://delivery-angels.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('#sup_avatar').attr('src', src);
             });
         }else{

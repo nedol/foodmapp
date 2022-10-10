@@ -1,35 +1,22 @@
-export {Categories};
+'use strict'
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
+
+import {Categories} from "../../src/categories/categories.js"
+
 import {MPCustomer} from "../customer/customer.mp.js";
 import {Utils} from "../utils/utils";
 let utils = new Utils();
 
-(function($) {
-    $.fn.longTap = function(longTapCallback) {
-        return this.each(function(){
-            var elm = this;
-            var pressTimer;
-            $(elm).on('touchend mouseup', function (e) {
-                clearTimeout(pressTimer);
-            });
-            $(elm).on('touchstart mousedown', function (e) {
-                // Set timeout
-                pressTimer = window.setTimeout(function () {
-                    longTapCallback.call(elm);
-                }, 500)
-            });
-        });
-    }
-})(jQuery);
 
-class Categories {
+export class CategoriesMap extends Categories{
 
     constructor(map) {
+        super();
         this.map = map;
-
+        this.initCategories()
     }
 
     initCategories(){

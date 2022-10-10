@@ -1,0 +1,132 @@
+
+.carousel {
+    width: 100%;
+    /*border: 1px solid #d6d6d6;*/
+    border-radius: 5px;
+}
+
+.discount{
+    position: absolute;
+    color: red;
+    background-color: white;
+    bottom: 40px;
+    left: 5px;
+    font-size: xx-large;
+    font-weight: 500;
+    font-family: 'Open Sans', sans-serif;
+    font-family: 'Oswald', sans-serif;
+}
+.dscnt_price{
+    color: red;
+    font-size: larger;
+    font-weight: 700;
+}
+.carousel {
+    border: 0px solid #a2a2a2;
+    border-radius: 5px;
+}
+
+#items_carousel {
+    display: none;
+    background-color: white;
+    border-radius: 5px;
+    position: absolute;
+    height: auto;
+    width: 50%;
+    left: 220px;
+
+}
+
+.carousel_img_div {
+    height: 150px;
+    position: relative;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    background-color: white;
+}
+
+.carousel_img {
+    position: relative;
+    /* left: 15%; */
+    /* top: 70px; */
+    max-width: 96%;
+    max-height: 100%;
+    background-color: rgba(255, 255, 255, 1);
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.carousel_title {
+    text-align: center;
+    font-size: 2em;
+    -webkit-text-stroke: .5px white;
+    color: #0717ff;
+    height: 65px;
+}
+
+.carousel_price {
+    font-family: 'Montserrat', serif;
+    font-weight: 100;
+    font-size: 2em;
+    /* font-weight: bold; */
+    /* -webkit-text-stroke: 1px #c4c4c4; */
+    color: #6c757d;
+    margin-right: 5px;
+}
+
+.carousel_price.badge {
+    position: relative;
+    background-color: #f8f9fa;
+    text-align: right;
+    border-radius: 15px;
+    float: right;
+    margin: 10px;
+}
+/*.carousel-inner > .carousel-item {*/
+/*position: relative;*/
+/*display: none;*/
+/*-webkit-transition: 2.6s ease-in-out left;*/
+/*-moz-transition: 2.6s ease-in-out left;*/
+/*-o-transition: 2.6s ease-in-out left;*/
+/*transition: 2.6s ease-in-out left;*/
+/*}*/
+
+/*.carousel-fade .active.carousel-item-left,*/
+/*.carousel-fade .active.carousel-item  {*/
+/*opacity: 0;*/
+/*transition: transform 2s ease;!* transform 3s ease;*!*/
+/*}*/
+
+/*.carousel-fade .carousel-item:not(.active)  {*/
+/*opacity: 1;*/
+/*transition: transform 2s ease;!* transform 3s ease;*!*/
+/*}*/
+.carousel.carousel-fade .carousel-item {
+    display: block;
+    opacity: 0;
+    transition: opacity ease-out 1.7s;
+    left: 0;
+    top: 0;
+    position: absolute;
+}
+.carousel.carousel-fade .carousel-item.active {
+    opacity: 1 !important;
+}
+.carousel.carousel-fade .carousel-item:first-child {
+    top: auto;
+    position: relative;
+    transition: opacity ease-out 1.7s;
+}
+.carousel.carousel-fade .carousel-item:second-child {
+    top: auto;
+    position: relative;
+    transition: opacity ease-out 1.7s;
+}
+.carousel-item .img-fluid {
+    margin: 0 auto;
+}
+.carousel img {
+    opacity: 1;
+    filter: alpha(opacity=50);
+}

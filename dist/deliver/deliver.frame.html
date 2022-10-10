@@ -19,7 +19,7 @@
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Constantia:400,700' rel='stylesheet' type='text/css'>
-<link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
+    <link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../../lib/style.css"  type='text/css'>
 
     <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -29,34 +29,33 @@
 
     <script type="text/javascript" src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
     <script type="text/javascript" src="../host.js"></script>
-    <script type="text/javascript" src="../supplier_offer.js?v=34"></script>
+    <script type="text/javascript" src="../deliver_offer.js?v=28"></script>
 
     <script type='application/javascript'>
         document.addEventListener("touchstart", function() {}, false);
-
     </script>
 
     <!-- KOLMI-->
     <script>
           function listener(event) {
-            if (event.origin !== 'https://delivery-angels.com' && event.origin !== 'http://localhost:63342') {
+            if (event.origin !== 'https://delivery-angels.ru' && event.origin !== 'http://localhost:63342') {
               return;
             }
 
-            if(JSON.parse(event.data)['append']){
-                let obj = JSON.parse(event.data)['append'];
-                document.body.insertAdjacentHTML('beforeend', obj);
-                document.getElementById("user_profile").style.display = "block";
-            }
-            if(JSON.parse(event.data)['remove']){
-                 document.getElementById(JSON.parse(event.data)['remove']).remove();
-                 let arr = document.getElementsByClassName('kolmi');
-                 for(let fr in arr){
-                     if(arr[fr].tagName && arr[fr].tagName.toLowerCase() === 'iframe'){
-                          arr[fr].contentWindow.postMessage(JSON.stringify({onclose:'profile'}),"*");
+                if(JSON.parse(event.data)['append']){
+                    let obj = JSON.parse(event.data)['append'];
+                    document.body.insertAdjacentHTML('beforeend', obj);
+                    document.getElementById("user_profile").style.display = "block";
+                }
+                if(JSON.parse(event.data)['remove']){
+                     document.getElementById(JSON.parse(event.data)['remove']).remove();
+                     let arr = document.getElementsByClassName('kolmi');
+                     for(let fr in arr){
+                         if(arr[fr].tagName && arr[fr].tagName.toLowerCase() === 'iframe'){
+                              arr[fr].contentWindow.postMessage(JSON.stringify({onclose:'profile'}),"*");
+                         }
                      }
-                 }
-            }
+                }
           }
 
           if (window.addEventListener) {
@@ -94,11 +93,12 @@
     </li>
 
     <li class="nav-item">
-        <div class="d-inline-block dt_val btn btn-block"
-            style="background-color:white;text-align:center;float:left;font-size: small">
-        </div>
+        <input type="date" class="dt_val"
+             style="width:120px; height: 30px;
+                        background-color:white;text-align:center;float:left;height:34px;font-size: small;
+                        border-width: 0; border-radius: 5px;outline: none">
+        </input>
     </li>
-
 </ul>
 
 
@@ -133,7 +133,7 @@
         <div class="categories" id="menu_tabs" style="overflow-x: auto;white-space:nowrap">
 
         </div>
-        <span id="add_item" class="fa fa-plus" style="position:fixed;bottom:0;right:50%;color: black;opacity:.5;font-size: 30px;z-index:10000"></span>
+        <span id="add_item" class="fa fa-plus" style="display:none;position:relative;top:10px;left:5%;color: black;opacity:.5;font-size: 30px;z-index:10000"></span>
 
         <div class="text-center" id="add_tab_li" title="add tab" style="display: inline-block;position: relative;">
             <span id="add_tab" class="add_tab fa fa-plus" style="visibility: hidden;"></span>
@@ -142,35 +142,37 @@
             <div class="empty_div" style="height:200px;"></div>
             <div id="add_tab_div"  class="tab-pane" style="width:100%;border: none;"></div>
         </div>
-        <div id="menu_item_tmplt">
-            <div class="brand" style="position: absolute; top: 0px; right: 10px; color: red; font-size: 2em; z-index: 1001; visibility: visible;">
-                    &trade;
-                <img class="brand_img brand" style="position:absolute;right:0;pointer-events: none;image-orientation:from-image;border-width: 0; max-height:40px;max-width:40px;z-index: 1002;" src="">
 
+      <div id="menu_item_tmplt">
+            <div class="item_body_coll"   data-toggle="collapse" data-target=".item_body" style="position: absolute; top: 20px; right: 10px; color: grey; font-size: 1.5em; z-index: 1001; visibility: visible;">
+                 <i class="icofont-collapse icofont-1x"></i>
             </div>
-
-           <div class="content_div">
-                <div class="row"  style="height: 70px">
-                    <label class="item_cb col-1 col-lg-1" title="Publish" style="visibility: visible;">
-                        <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="item_cb_0" pos="0" tab="Drinks">
+            <div class="content_div">
+                <div class="d-flex p-3 "  style="height: 70px">
+                    <label class="item_cb" title="Publish" style="position: relative;visibility: visible;left: -20px;">
+                        <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="item_cb_0" pos="0">
                         <i class="fa fa-square-o fa-2x"></i>
                         <i class="fa fa-check-square-o fa-2x"></i>
                         <div>
-                            <i style="position:absolute;color:grey; top:23px;z-index: 1000; font-size: small" data-translate="23d285609698e41e54306c4189c90569">опубл</i>
+                            <i style="position:absolute;color:grey; top:30px;z-index: 1000; font-size: small" data-translate="23d285609698e41e54306c4189c90569">опубл</i>
                         </div>
                     </label>
 
-                    <textarea class="item_title form-control"  data-toggle="collapse" data-target=".item_body" aria-required="true" spellcheck="false"  contenteditable
+                    <textarea class="item_title form-control" aria-required="true" spellcheck="false"  contenteditable
                         data-translate  placeholder="0ad4f20d1443d9529ab35534c1ba505b"></textarea>
 
                 </div>
 
                 <div class="item_body collapse" style="position:relative; top:-2px; width: 100%; text-align: left">
+                    <div class="brand" style="position: absolute; top: 0px; right: 50px; color: red; font-size: 2em; z-index: 1001; visibility: visible;">
+                            &trade;
+                        <img class="brand_img brand" style="position:absolute;right:0;pointer-events: none;image-orientation:from-image;border-width: 0; max-height:40px;max-width:40px;z-index: 1002;" src="">
+                    </div>
+
                     <div class="row">
                         <div class="col-sm-6">
                             <i class="fa fa-image fa-3x" style="position:absolute; z-index:10;top:40%; right: 50%; left: 50%; color:grey; background-color: white"></i>
                             <div class="cert_container carousel slide col"  data-ride="carousel">
-
                                 <div class="carousel-inner mx-auto">
                                     <img class="img-fluid"   src="../images/empty.png" alt="">
                                 </div>
@@ -209,13 +211,13 @@
                         <div class="pack_tmplt pack_row" style="
                           display: flex;
                           flex-wrap: nowrap;">
-                            <div style="width: 50%;">
+                            <div style="width: 40%;">
                                 <ul class="pack_list dropdown-menu" role="menu" style=""></ul>
-                                <textarea class="item_pack form-control " rows="1" data-translate="" placeholder="единица"
+                                <textarea class="item_pack form-control " rows="1" data-translate="" placeholder="cc52dc21eb25996e8feaf3939d1f3ffe"
                                     aria-expanded=""></textarea>
                             </div>
-                            <div class="price_div" style="width:22%;">
-                                  <textarea class="item_price form-control" rows="1" contenteditable="true" data-translate="" placeholder="цена"></textarea>
+                            <div class="price_div" style="width:18%;">
+                                  <textarea class="item_price form-control" rows="1" contenteditable="true" data-translate="" placeholder="252d601fadd75eba972d2dc0bfb22e67"></textarea>
                                   <div class="bargain_div">
                                       <label class="item_cb btn" title="bargain" data-toggle="tooltip" data-placement="top" style="visibility: visible;">
                                           <input type="checkbox" class="bargain checkbox-inline" style="display: none;" title="">
@@ -225,17 +227,18 @@
                                       </label>
                                   </div>
                              </div>
+                             <div class="markup_div" style="width:18%;">
+                                   <textarea class="item_markup form-control" rows="1" contenteditable="true" data-translate="" placeholder="52f584c59900f50d69e49c005e2c0fe5"></textarea>
+                             </div>
 
-                              <div class="qnty_div" style="width:22%;">
-                                  <textarea class="item_qnty form-control" rows="1" contenteditable="true" data-translate="" placeholder="кол-во"></textarea>
+                              <div class="qnty_div" style="width:18%;">
+                                  <textarea class="item_qnty form-control" rows="1" contenteditable="true" data-translate="" placeholder="b7bb52d46441267cf30ffd51668e311e"></textarea>
                               </div>
                              <div class="add_pack_div">
                                  <span class="add_pack fa fa-plus-circle"></span>
                              </div>
                           </div>
                     </div>
-
-
 
                     <span class="extra_ctrl" data-toggle="collapse" data-target=".extras"
                            style="display:none;position: relative; z-index: 1000;color: grey">
@@ -263,6 +266,7 @@
             </div>
             <input type="file" class="file" multiple accept="image/*" style="display: none"/>
         </div>
+
     </div>
 
     <div class="tab-pane" id="orders_pane">
@@ -294,7 +298,6 @@
                     <th scope="col">
                         <span class="fa fa-user"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
                     </th>
-
                     <th  scope="col">
                         <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
                     </th>
@@ -362,12 +365,20 @@
                                         </div>
                                     </div>
                                      <div class="form-group">
+                                        <div class="col-xs-12">
+                                            <form class="form-inline">
+                                                 <input  type="text" id="del_price_per_dist" class="form-control" contenteditable="true" data-translate placeholder="c1ddbc83a4c932f915f50d509a60bee0"
+                                                     style="width: 50%; height:auto; text-align: left;">
+                                                 </input>
+                                                 <input  type="number" min="1"  id="del_no_less_than" class="form-control" contenteditable="true" data-translate placeholder="911ed573e704044ec9e3c9c697011d4c"
+                                                     style="width: 50%; height:auto; text-align: left;">
+                                                 </input>
+                                             </form>
+                                        </div>
                                         <div class="col-xs-6">
-                                            <div>
-                                                <textarea id="delivery" class="form-control" contenteditable="true" data-translate placeholder="5c0c182f1e55e5bda0e95835c934489e"
-                                                    style="width: 100%; height:auto; text-align: left;">
-                                                </textarea>
-                                            </div>
+                                            <textarea id="delivery" class="form-control" contenteditable="true" data-translate placeholder="5c0c182f1e55e5bda0e95835c934489e"
+                                                style="width: 100%; height:auto; text-align: left;">
+                                            </textarea>
                                         </div>
                                     </div>
 

@@ -35,7 +35,6 @@ import Collection from 'ol/collection';
 import Feature from 'ol/feature';
 import {Geo} from './location/geolocation';
 
-
 import {Animate} from "./animate/animate";
 import {Layers} from './layers/layers';
 
@@ -46,6 +45,10 @@ import {OverlayItem} from "../map/overlay/overlay";
 import {Carousel} from "./carousel/carousel";
 import {UtilsMap} from "../utils/utils.map.js";
 
+// import proj4 from 'ol/proj/proj4';
+// import {register} from 'ol/proj/proj4';
+// import {get as getProjection} from 'ol/proj';
+
 export class OLMap {
 
     constructor() {
@@ -53,7 +56,12 @@ export class OLMap {
         //full_screen.setTarget('full_screen');
         window.sets.app_mode = 'd2d';
 
-        this.path = host_port;
+ 
+        this.path  ="http://localhost:5500/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = "https://delivery-angels.ru/server";
+        else
+            this.path = host_port;
 
         window.sets.app_mode = 'd2d';
 
@@ -103,7 +111,7 @@ export class OLMap {
 
         this.carousel = new Carousel();
 
-        this.carousel.CarouselEvents();
+        this.carousel.CarouselEvents(this);
 
         this.featureAr = {};
 
@@ -120,11 +128,15 @@ export class OLMap {
 
             let time = new Date().getTime();
 
-            if(utils.getParameterByName('lat') && utils.getParameterByName('lon')){
+            if (utils.getParameterByName('lat') && utils.getParameterByName('lon')) {
                 let lat = utils.getParameterByName('lat');
                 let lon = utils.getParameterByName('lon');
                 window.sets.coords.cur = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
 
+            }else if(lat && lon){
+                localStorage.setItem("cur_loc", "{\"lon\":" + lon + "," +
+                    "\"lat\":" + lat + ", \"time\":" + time + ",\"zoom\":\"15\"}");
+                window.sets.coords.cur = proj.fromLonLat([parseFloat(lon), parseFloat(lat)]);
             }else {
 
                 let c = '';
@@ -135,8 +147,6 @@ export class OLMap {
                     that.lon_param = lonlat[0];
                     if(window.sets.coords.gps[0]!=0 && window.sets.coords.gps[1]!=0) {
                         lonlat = window.sets.coords.gps;
-                        that.lat_param = lonlat[1];
-                        that.lon_param = lonlat[0];
                     }
                     //
                     localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
@@ -152,6 +162,13 @@ export class OLMap {
 
                 window.sets.coords.cur = proj.fromLonLat([parseFloat(c.lon), parseFloat(c.lat)]);
             }
+
+            // proj4.defs('EPSG:21781',
+            //     '+proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 ' +
+            //     '+x_0=600000 +y_0=200000 +ellps=bessel ' +
+            //     '+towgs84=660.077,13.551,369.344,2.484,1.783,2.939,5.66 +units=m +no_defs');
+            // register(proj4);
+            // const swissProjection = getProjection('EPSG:21781');
 
 
             that.ol_map.setView(new View({
@@ -255,8 +272,9 @@ export class OLMap {
                 if(objs[o].profile.type==='deliver' && window.user.constructor.name ==='Supplier')
                     continue;
 
-                if (!source.getFeatureById(objs[o].uid) ||
-                    source.getFeatureById(objs[o].uid).values_.object.date.valueOf() !== objs[o].date.valueOf()){
+                if (!source.getFeatureById(objs[o].uid)
+                    ||source.getFeatureById(objs[o].uid).values_.object.date.valueOf() !== objs[o].date.valueOf()
+                ){
 
 
                     feature.uid = objs[o].uid;
@@ -265,7 +283,7 @@ export class OLMap {
                     if (objs[o].profile.type && objs[o].profile.type.toLowerCase() === 'marketer') {
                         objs[o].img = "./images/ic_" + tab + ".png";
                         let clusterSource = new Cluster({
-                            distance: 20,
+                            distance: 50,
                             source: source
                         });
 
@@ -274,11 +292,11 @@ export class OLMap {
                     }else if(objs[o].profile.type.toLowerCase() === 'deliver' && window.user.constructor.name==="Customer"){
 
                         objs[o].img = objs[o].profile.thmb;
-                        let clusterSource = new  Cluster({
-                            distance: 150,
-                            source: source
-                        });
-                        layer.setSource(clusterSource);
+                        // let clusterSource = new  Cluster({
+                        //     distance: 150,
+                        //     source: source
+                        // });
+                        // layer.setSource(clusterSource);
 
                         let ColorHash = require('color-hash');
                         var colorHash = new ColorHash();
@@ -289,13 +307,12 @@ export class OLMap {
                             //     color: 'rgba(255, 255, 255, 0)'
                             // }),
                             stroke: new Stroke({
-                                color: 'rgba('+clr[0]+','+clr[1]+','+clr[2]+', .5)',
+                                color: 'rgba('+clr[0]+','+clr[1]+','+clr[2]+', .1)',
                                 width: 1
                             })
                         });
 
-                        // if(window.user.profile.profile.type==="deliver")
-                        //     return;
+
                         if(!that.layers.circleLayer){
                             that.layers.CreateCircleLayer(style);
                         }
@@ -327,10 +344,8 @@ export class OLMap {
                                 features: col,
                                 style: style
                             });
-                            if (!circle_source.getFeatureById(objs[o].uid))
-                                circle_source.addFeature(radiusFeature);
-
-                            let util = new UtilsMap();
+                            // if (!circle_source.getFeatureById(objs[o].uid))
+                            //     circle_source.addFeature(radiusFeature);
 
                             that.layers.PutDeliversOnMap();
                         }
@@ -623,7 +638,7 @@ export class OLMap {
                         });
                         $('#user', $(fd_frame).contents()).attr('src', that.path + '/images/' + obj.profile.avatar);
 
-                    }, 1500);
+                    }, 2000);
                 }
             });
 

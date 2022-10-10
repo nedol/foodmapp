@@ -21,7 +21,7 @@ let email = new Email();
 var md5 = require('md5.js');
 
 
-const translate = require('google-translate-api');//ISO 639-1
+//const translate = require('google-translate-api');//ISO 639-1
 
 let con_param = globaljs.con_param;//change every 8 min
 
@@ -37,102 +37,49 @@ String.prototype.replaceAll = function(search, replace){
 
 module.exports = {
 
-    GetTokenLoop(server) {
+    HandleRequest( q, ws) {
 
-        return;
+            try {
 
-        let headers = {
-            'Accept':'application/jwt',
-            'Ocp-Apim-Subscription-Key':'4ce4aa35b9c546d0beadfd95802da8d2',
-            'Content-Length': 0,
-            'Content-Type':'application/json',
-            'Access-Control-Request-Headers':'content-type,ocp-apim-subscription-key'
-        };
+                switch (q.proj) {
+                    case'rtc':
+                        let RTC = require('./rtc/rtc');
+                        try {
+                            let rtc = new RTC();
+                            rtc.dispatch(q, ws);
+                        } catch (ex) {
+                            //res.end(JSON.stringify({error:'ServerError'}));
+                            return;
+                        }
+                        break;
 
-        let options = {
-            hostname: 'api.cognitive.microsoft.com',
-            path:'/sts/v1.0/issueToken',
-            method: 'POST',
-            headers: headers
-        };
+                    case'd2d':
 
-        var timerId = setTimeout(function tick() {
-            utils.QueryMethod( 'https',options, null, null, function (resp) {
-                if(resp==='error'){
-                    timerId = setTimeout(tick, 1000);
-                }else{
-                    bing_api_token =  resp;
-                    timerId = setTimeout(tick, 1000*60*8);
+                        let D2D = require('./d2d/d2d');
+                        let Supplier = require('./d2d/supplier');
+                        let Customer = require('./d2d/customer');
+                        let d2d = '';
+
+                        if (q.user && q.user.toLowerCase() === 'supplier') {
+                            d2d = new Supplier();
+                        } else if (q.user && q.user.toLowerCase() === 'deliver') {
+                            d2d = new Supplier();
+                        } else if (q.user && (q.user.toLowerCase() === 'customer')) {
+                            d2d = new Customer();
+                        } else {
+                            d2d = new D2D();
+                        }
+                        StartConnection(function (mysql_con) {
+                            d2d.dispatch(q, ws, global.mysql_pool);
+                        });
+                        break;
+                    default:
+                        console.log();
+                        break;
                 }
-            });
-        }, 1000);
+            }catch(ex){
 
-    },
-
-    HandleRequest(req, q, res) {
-
-        StartConnection(function (mysql_con) {
-
-            switch(q.proj) {
-                // case'rtc':
-                //     let RTC = require('./rtc/rtc');
-                //     try {
-                //         let rtc = new RTC();
-                //         rtc.dispatch(req, q, res);
-                //     }catch(ex){
-                //         res.end(JSON.stringify({error:'ServerError'}));
-                //         return;
-                //     }
-                //     break;
-                // case'vr':
-                //     let VReport = require('./vreport/vreport.js');
-                //     try{
-                //         let vr = new VReport();
-                //         vr.dispatch(req, q, res);
-                //     }catch(ex)
-                //     {
-                //         //res.writeHead(200, {'Content-Type': 'application/json'});
-                //         res.end('end');
-                //         return;
-                //     }
-                //     break;
-                // case'bm':
-                //     let BonMenu = require('./bonmenu/bonmenu');
-                //     let bm = new BonMenu();
-                //     bm.dispatch(q,res);
-                //     break;
-                // case'id':
-                //
-                //     let Infodesk = require('./infodesk/infodesk');
-                //     let id = new Infodesk();
-                //     id.dispatch(req, q,res);
-                //     break;
-
-                case'd2d':
-
-                    let D2D = require('./d2d/d2d');
-                    let Supplier = require('./d2d/supplier');
-                    let Deliver = require('./d2d/deliver');
-                    let Customer = require('./d2d/customer');
-                    let d2d = '';
-
-                    if (q.user && q.user.toLowerCase() === 'supplier') {
-                        d2d = new Supplier();
-                    } else if (q.user && q.user.toLowerCase() === 'deliver') {
-                        d2d = new Deliver();
-                    } else if (q.user && q.user.toLowerCase() === 'customer') {
-                        d2d = new Customer();
-                    } else{
-                        d2d = new D2D();
-                    }
-
-                    d2d.dispatch(q,res,req,mysql_con);
-                    break;
-                default:
-                    console.log();
-                    break;
             }
-        });
 
     }
 }
@@ -141,25 +88,44 @@ module.exports = {
 
 function StartConnection(cb) {
 
-    console.error('CONNECTING');
     if(!global.mysql_pool) {
+
+        console.error('CONNECTING');
         global.mysql_pool = mysql.createPool(con_param);
+
+        global.mysql_pool.getConnection(function (err, connection) {
+            if (err) {
+                console.error('CONNECT FAILED', err.code);
+                if(connection) {
+                    connection.end(function (err) {
+                        if (err) {
+                            console.log(err.message);
+                        }
+                        console.log("пул закрыт");
+                        StartConnection(cb);
+                    });
+                }else{
+                    StartConnection(cb);
+                }
+
+            }
+            else {
+                console.error('CONNECTED');
+                cb();
+            }
+        });
+        global.mysql_pool.on('error', function (err) {
+            this.end(function(err) {
+                if (err) {
+                    console.log(err.message);
+                }
+                console.log("пул закрыт");
+                StartConnection(cb);
+            });
+        });
+    }else{
+        cb();
     }
-    global.mysql_pool.getConnection(function (err, connection) {
-        if (err) {
-            console.error('CONNECT FAILED', err.code);
-            con_obj.destroy();
-            throw err;
-        }
-        else {
-            con_obj = connection;
-            console.error('CONNECTED');
-            cb(con_obj);
-        }
-    });
-    global.mysql_pool.on('error', function (err) {
-        con_obj = '';
-    });
 
 }
 

@@ -64,12 +64,13 @@
         }
         .main_category{
 
-            /*margin-left: 25px;*/
-            /*margin-right: 25px;*/
+            margin-left: 25px;
+            margin-right: 25px;
             /*padding-left: 10px;*/
             /*padding-right: 10px;*/
             height: 45px;
             width: 45px;
+            font-size:4em;
         }
         .category{
 
@@ -79,6 +80,7 @@
             /*padding-right: 10px;*/
             height: 45px;
             width: 45px;
+             font-size:4em;
         }
 
         .category:hover{
@@ -131,394 +133,58 @@
     <div id="categories"  data-toggle="tooltip" data-placement="top" title="Выбрать товарную категорию">
 
         <div  class="dropup  text-center">
-            <input type="image" class="main_category" data-toggle="dropdown" title="Еда" src="https://delivery-angels.com/d2d/dist/images/ic_0.0.png" state="0"/>
-            <h5 class="title  text-center">Еда</h5>
+            <span class="main_category icofont-laptop-alt" data-toggle="dropdown" title="Бытовая электроника" state="0"/>
+            <h5 class="title  text-center">Бытовая<br/>электроника</h5>
             <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
             <ol class="dropdown-menu">
-                <div class="cat_div   text-center">
-                    <input type="image" id="0" class="category" cat="Пицца" extra="true" title="Пицца" src="https://delivery-angels.com/d2d/dist/images/ic_0.png" state="0" />
-                    <h5 class="title">Пицца</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" id="1" class="category"  extra="true" cat="Суши" title="Суши" src="https://delivery-angels.com/d2d/dist/images/ic_1.png" state="0" />
-                    <h5 class="title">Суши</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" id="2" class="category"  extra="true" cat="Фастфуд" title="Фастфуд" src="https://delivery-angels.com/d2d/dist/images/ic_2.png" state="0" />
-                    <h5 class="title">Фастфуд</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image"  class="category" cat="Мороженое" id="3" title="Мороженое" src="https://delivery-angels.com/d2d/dist/images/ic_3.png" state="0" />
-                    <h5 class="title">Мороженое</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </ol>
-        </div>
-
-
-        <div  class="dropup text-center">
-            <input type="image"   class="main_category" data-toggle="dropdown"  title="Овощи" src="https://delivery-angels.com/d2d/dist/images/ic_10.png"/>
-            <h5 class="title">Овощи</h5>
-            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <ol class="dropdown-menu">
-                <div class="cat_div   text-center">
-                    <input type="image" id="10" class="category" cat="Овощи" title="Овощи" src="https://delivery-angels.com/d2d/dist/images/ic_10.png" state="0"/>
-                    <h5 class="title">Овощи</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" id="14" class="category"  cat="Зелень" title="Зелень" src="https://delivery-angels.com/d2d/dist/images/ic_14.png" state="0"/>
-                    <h5 class="title">Зелень</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
                 <div class="cat_div  text-center">
-                    <input type="image" id="15" class="category  stretched-link"  cat="Дары_природы" title="Дары природы" src="https://delivery-angels.com/d2d/dist/images/ic_15.png" state="0"/>
-                    <h5 class="title">Дары<br/>природы</h5>
+                    <span id="1500" class="category icofont-video" cat="Аудио и видео" extra="true" title="Аудио и видео" state="0" />
+                    <h5 class="title">Аудио<br/>видео</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" id="19" class="category"  cat="Соленья" title="Соленья" src="https://delivery-angels.com/d2d/dist/images/ic_19.png" state="0"/>
-                    <h5 class="title">Соленья</h5>
+                    <span id="1501" class="icofont-game-controller category"  extra="true" cat="Игры, приставки, программы" title="Игры, приставки, программы" state="0" />
+                    <h5 class="title">Игры<br/>приставки</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="ОвощКонсервы" id="18" title="Овощные консервы" src="https://delivery-angels.com/d2d/dist/images/ic_18.png" state="0"/>
-                    <h5 class="title">Овощные<br>консервы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-            </ol>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image" id="30" class="main_category" data-toggle="dropdown"   title="Фрукты" src="https://delivery-angels.com/d2d/dist/images/ic_30.png" state="0"/>
-            <h5 class="title">Фрукты</h5>
-            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <ol class="dropdown-menu">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Яблоки" id="31" title="Яблоки, груши" src="https://delivery-angels.com/d2d/dist/images/ic_30.png" state="0"/>
-                    <h5 class="title">Фрукты</h5>
+                    <span id="1502" class="icofont-computer category"  extra="true" cat="Настольные компьютеры" title="Настольные компьютеры" state="0" />
+                    <h5 class="title">Настольные<br/>компьютеры</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Ягоды" id="32" title="Ягоды" src="https://delivery-angels.com/d2d/dist/images/ic_32.png" state="0"/>
-                    <h5 class="title">Ягоды</h5>
+                    <span  id="1503" class="icofont-laptop-alt category" cat="Ноутбуки"  title="Ноутбуки"  state="0" />
+                    <h5 class="title">Ноутбуки</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Бахчевые" id="33" title="Бахчевые" src="https://delivery-angels.com/d2d/dist/images/ic_33.png" state="0"/>
-                    <h5 class="title">Бахчевые</h5>
+                    <span id="1504" class="icofont-printer category" cat="Оргтехника и расходники"  title="Оргтехника и расходники"  state="0" />
+                    <h5 class="title">Оргтехника<br/>расходники</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Экзотика" id="34" title="Экзотические фрукты" src="https://delivery-angels.com/d2d/dist/images/ic_34.png" state="0"/>
-                    <h5 class="title">Экзотика</h5>
+                    <span id="1504"   class="icofont-drawing-tablet category" cat="Планшеты и электронные книги" title="Планшеты и электронные книги"  state="0" />
+                    <h5 class="title">Планшеты<br/>эл.книги</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="ФруктКонсервы" id="35" title="Консервированные фрукты" src="https://delivery-angels.com/d2d/dist/images/ic_35.png" state="0"/>
-                    <h5 class="title">Консервы<br>из фруктов</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image" class="main_category" data-toggle="dropdown"  title="Молочка" src="https://delivery-angels.com/d2d/dist/images/ic_20.0.png" state="0" />
-            <h5 class="title">Молочные<br/>продукты</h5>
-            <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <ol class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Молоко" id="20" title="Молоко" src="https://delivery-angels.com/d2d/dist/images/ic_20.png" state="0"/>
-                    <h5 class="title">Молоко<br/>Кефир</h5>
+                    <span  id="1505" class="icofont-ui-touch-phone category" cat="Телефоны" title="Телефоны"  state="0" />
+                    <h5 class="title">Телефоны</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сметана" id="21" title="Сметана,йогурты" src="https://delivery-angels.com/d2d/dist/images/ic_21.png" state="0"/>
-                    <h5 class="title">Сметана<br/>Йогурты</h5>
+                    <span  id="1506"  class="icofont-keyboard-alt category" cat="Товары для компьютера" title="Товары для компьютера"  state="0" />
+                    <h5 class="title">Для<br/>компьютера</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
                 <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Творог" id="22" title="Творог" src="https://delivery-angels.com/d2d/dist/images/ic_22.png" state="0"/>
-                    <h5 class="title">Творог</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сыр" id="24" title="Сыры" src="https://delivery-angels.com/d2d/dist/images/ic_24.png" state="0"/>
-                    <h5 class="title">Сыр</h5>
-                    <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Яйцо" id="29" title="Яйца" src="https://delivery-angels.com/d2d/dist/images/ic_29.png" state="0"/>
-                    <h5 class="title">Яйцо</h5>
+                    <span  id="1507"  class="icofont-photobucket category" cat="Фототехника" title="Фототехника"  state="0" />
+                    <h5 class="title">Фототехника</h5>
                     <h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
                 </div>
             </ol>
         </div>
 
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category" data-toggle="dropdown" title="Мясо" src="https://delivery-angels.com/d2d/dist/images/ic_40.png" state="0"/>
-            <h5 class="title">Мясные<br/>продукты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Говядина" id="40" title="Говядина" src="https://delivery-angels.com/d2d/dist/images/ic_40.png" state="0"/>
-                    <h5 class="title">Говядина</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Свинина" id="41" title="Свинина" src="https://delivery-angels.com/d2d/dist/images/ic_41.png" state="0"/>
-                    <h5 class="title">Свинина</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Баранина" id="42" title="Баранина" src="https://delivery-angels.com/d2d/dist/images/ic_42.png" state="0"/>
-                    <h5 class="title">Баранина</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Полуфабрикаты" id="45" title="Полуфабрикаты" src="https://delivery-angels.com/d2d/dist/images/ic_45.png" state="0"/>
-                    <h5 class="title">Полу<br/>фабрикаты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Колбаса" id="46" title="Колбасные изделия" src="https://delivery-angels.com/d2d/dist/images/ic_46.png" state="0"/>
-                    <h5 class="title">Колбаса</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сосиски" id="47" title="Сосиски" src="https://delivery-angels.com/d2d/dist/images/ic_47.png" state="0"/>
-                    <h5 class="title">Сосиски<br/>Сардельки</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="МясКонсервы" id="48" title="Мясные Консервы" src="https://delivery-angels.com/d2d/dist/images/ic_86.png" state="0"/>
-                    <h5 class="title">Мясные<br>консервы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category" data-toggle="dropdown" title="Рыба" src="https://delivery-angels.com/d2d/dist/images/ic_50.png" state="0"/>
-            <h5 class="title">Рыба</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Рыба" id="50" title="Рыба" src="https://delivery-angels.com/d2d/dist/images/ic_50.png" state="0"/>
-                    <h5 class="title">Рыба</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Морепродукты" id="52" title="Морепродукты" src="https://delivery-angels.com/d2d/dist/images/ic_52.png" state="0"/>
-                    <h5 class="title">Морепродукты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div">
-                    <input type="image" class="category" cat="Икра" id="53" title="Икра" src="https://delivery-angels.com/d2d/dist/images/ic_53.png" state="0"/>
-                    <h5 class="title">Икра</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="РыбКонсервы" id="54" title="Рыбные консервы" src="https://delivery-angels.com/d2d/dist/images/ic_54.png" state="0"/>
-                    <h5 class="title">Рыбные<br>консервы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-        <div  class="dropup text-center">
-            <input type="image"  cat="Птица"  title="Птица" class="main_category" data-toggle="dropdown" src="https://delivery-angels.com/d2d/dist/images/ic_60.png" state="0">
-            <h5 class="title">Птица</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Курица" id="60" title="Курица" src="https://delivery-angels.com/d2d/dist/images/ic_60.png" state="0"/>
-                    <h5 class="title">Курица</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Индейка" id="61" title="Индейка" src="https://delivery-angels.com/d2d/dist/images/ic_61.png" state="0"/>
-                    <h5 class="title">Индейка</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Утка" id="62" title="Утка" src="https://delivery-angels.com/d2d/dist/images/ic_62.png" state="0"/>
-                    <h5 class="title">Утка</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="ПтицКонсервы" id="63" title="Консервы из мяса птицы" src="https://delivery-angels.com/d2d/dist/images/ic_86.png" state="0"/>
-                    <h5 class="title">Консервы<br>из птицы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image" cat="Напитки" class="main_category "  title="Напитки" data-toggle="dropdown" src="https://delivery-angels.com/d2d/dist/images/ic_70.0.png">
-            <h5 class="title">Напитки</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu">
-                <div class="cat_div text-center">
-                    <input type="image" class="category" cat="Минералка" id="70" title="Минеральная вода" src="https://delivery-angels.com/d2d/dist/images/ic_70.png" state="0"/>
-                    <h5 class="title">Минеральная<br/>вода</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-                <div class="cat_div text-center">
-                    <input type="image" class="category" cat="Лимонад" id="73" title="Лимонад" src="https://delivery-angels.com/d2d/dist/images/ic_73.png" state="0"/>
-                    <h5 class="title">Кола<br/>Лимонад</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сок" id="75" title="Сок" src="https://delivery-angels.com/d2d/dist/images/ic_75.png" state="0"/>
-                    <h5 class="title">Сок</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Энергетик" id="76" title="Энергетик" src="https://delivery-angels.com/d2d/dist/images/ic_76.png" state="0"/>
-                    <h5 class="title">Энергетик</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Пиво" id="78" title="Пиво" src="https://delivery-angels.com/d2d/dist/images/ic_78.png" state="0"/>
-                    <h5 class="title">Пиво</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category " data-toggle="dropdown"  title="Кондитерка" src="https://delivery-angels.com/d2d/dist/images/ic_90.png" state="0"
-                   class="dropdown-toggle" data-toggle="dropdown" />
-            <h5 class="title">Кондитер.<br/>изделия</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Торты" id="91" title="Торты, Пироженое" src="https://delivery-angels.com/d2d/dist/images/ic_90.png" state="0"/>
-                    <h5 class="title">Торты<br/>Пироженое</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Печенье" id="92" title="Печенье" src="https://delivery-angels.com/d2d/dist/images/ic_92.png" state="0"/>
-                    <h5 class="title">Печенье<br/>Крекеры<h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Зефир" id="93" title="Зефир, мармелад" src="https://delivery-angels.com/d2d/dist/images/ic_93.png" state="0"/>
-                    <h5 class="title">Зефир<br/>Мармелад</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Конфеты" id="94" title="Конфеты" src="https://delivery-angels.com/d2d/dist/images/ic_94.png" state="0"/>
-                    <h5 class="title">Конфеты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Шоколад" id="95" title="Шоколад" src="https://delivery-angels.com/d2d/dist/images/ic_95.png" state="0"/>
-                    <h5 class="title">Шоколад</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сладости" id="96" title="Восточные сладости" src="https://delivery-angels.com/d2d/dist/images/ic_96.png" state="0"/>
-                    <h5 class="title">Восточные<br/>сладости</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-                <div class="cat_div   text-center">
-                    <input type="image"  class="category" cat="Варенье" id="98" title="Варенье, джемы" src="https://delivery-angels.com/d2d/dist/images/ic_98.png" state="0" />
-                    <h5 class="title">Варенье</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image"  class="category" cat="Мед" id="99" title="Мед" src="https://delivery-angels.com/d2d/dist/images/ic_99.png" state="0" />
-                    <h5 class="title">Мед</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category " data-toggle="dropdown"  title="Бакалея" src="https://delivery-angels.com/d2d/dist/images/ic_80.png" state="0"
-                   class="dropdown-toggle" data-toggle="dropdown" />
-            <h5 class="title">Бакалея</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Макароны" id="81" title="Макароны, паста" src="https://delivery-angels.com/d2d/dist/images/ic_81.png" state="0"/>
-                    <h5 class="title">Паста<br/>Макароны</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Крупы" id="82" title="Крупы" src="https://delivery-angels.com/d2d/dist/images/ic_82.png" state="0"/>
-                    <h5 class="title">Крупы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Орехи" id="83" title="Орехи" src="https://delivery-angels.com/d2d/dist/images/ic_83.png" state="0"/>
-                    <h5 class="title">Орехи</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Сухофрукты" id="84" title="Сухофрукты" src="https://delivery-angels.com/d2d/dist/images/ic_84.png" state="0"/>
-                    <h5 class="title">Сухофрукты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Масло" id="85" title="Масло" src="https://delivery-angels.com/d2d/dist/images/ic_85.png" state="0"/>
-                    <h5 class="title">Масло</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Соусы" id="87" title="Соусы, Приправы" src="https://delivery-angels.com/d2d/dist/images/ic_87.png" state="0"/>
-                    <h5 class="title">Соусы<br/>Приправы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-
-            </div>
-        </div>
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category " data-toggle="dropdown"  title="Чай Кофе" src="https://delivery-angels.com/d2d/dist/images/ic_130.png" state="0"/>
-            <h5 class="title">Чай<br>Кофе</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Чай" id="130" title="Чай" src="https://delivery-angels.com/d2d/dist/images/ic_88.png" state="0"/>
-                    <h5 class="title">Чай</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Кофе" id="135" title="Кофе" src="https://delivery-angels.com/d2d/dist/images/ic_135.png?v=1" state="0"/>
-                    <h5 class="title">Кофе</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-
-        <div  class="dropup text-center">
-            <input type="image"  class="main_category " data-toggle="dropdown"  title="Выпечка" src="https://delivery-angels.com/d2d/dist/images/ic_110.png" state="0"/>
-            <h5 class="title">Выпечка</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Хлеб" id="111" title="Хлеб" src="https://delivery-angels.com/d2d/dist/images/ic_110.png" state="0"/>
-                    <h5 class="title">Хлеб</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Выпечка" id="112" title="Выпечка" src="https://delivery-angels.com/d2d/dist/images/ic_111.png" state="0"/>
-                    <h5 class="title">Выпечка</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-        <div  class="dropup text-center">
-            <input type="image" class="main_category " data-toggle="dropdown" title="Bio" src="https://delivery-angels.com/d2d/dist/images/ic_120.png" state="0"/>
-            <h5 class="title">Био<br/>продукты</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Био" id="120" title="Био" src="https://delivery-angels.com/d2d/dist/images/ic_120.png" state="0"/>
-                    <h5 class="title">Био</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="ЗОЖ" id="121" title="ЗОЖ" src="https://delivery-angels.com/d2d/dist/images/ic_121.png" state="0"/>
-                    <h5 class="title">ЗОЖ</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Веган" id="122" title="Веган" src="https://delivery-angels.com/d2d/dist/images/ic_122.png" state="0"/>
-                    <h5 class="title">Веган</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Без_глютена" id="123" title="Без глютена" src="https://delivery-angels.com/d2d/dist/images/ic_123.png" state="0"/>
-                    <h5 class="title">Без<br/>глютена</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Пост" id="124" title="Постная" src="https://delivery-angels.com/d2d/dist/images/ic_124.png" state="0"/>
-                    <h5 class="title">Постная<br/>кухня</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Халяль" id="125" title="Халяль" src="https://delivery-angels.com/d2d/dist/images/ic_125.png" state="0"/>
-                    <h5 class="title">Халяль</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
-        <div  class="dropup text-center">
-            <input type="image" class="main_category " data-toggle="dropdown" title="Разное" src="https://delivery-angels.com/d2d/dist/images/ic_150.png" state="0"/>
-            <h5 class="title">Разное</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-            <div class="dropdown-menu ">
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Наборы" id="150" title="Наборы" src="https://delivery-angels.com/d2d/dist/images/ic_151.png" state="0"/>
-                    <h5 class="title">Наборы</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Посуда" id="155" title="Посуда" src="https://delivery-angels.com/d2d/dist/images/ic_155.png" state="0"/>
-                    <h5 class="title">Посуда</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-                <div class="cat_div   text-center">
-                    <input type="image" class="category" cat="Упаковка" id="156" title="Упаковка" src="https://delivery-angels.com/d2d/dist/images/ic_156.png" state="0"/>
-                    <h5 class="title">Упаковка</h5><h5><span class="cat_cnt badge badge-pill badge-secondary">0</span></h5>
-                </div>
-            </div>
-        </div>
     </div>
 
 </div>

@@ -1,17 +1,16 @@
 'use strict'
 export {DOMEvents};
 
-import {Overlay} from "../overlay/overlay";
+
 var moment = require('moment/moment');
 
 
 
-import Extent from 'ol/extent';
+//import Extent from 'ol/extent';
 import {Dict} from '../../dict/dict.js';
 
 class DOMEvents {
-    constructor(map) {
-        this.map = map;
+    constructor() {
 
         let that = this;
 
@@ -32,21 +31,17 @@ class DOMEvents {
         });
 
         $('#loc_ctrl').on('click', this, ev=> {
-            window.user.map.geo.StartLocation(ev);
+            window.user.map.geo.ToggleLocation(ev);
             if(window.user.SendLocation && !window.user.isShare_loc){
-                if (window.user.date === moment().format('YYYY-MM-DD') &&
-                    window.user.store[window.user.date].status) {
-                    if (confirm("Share Your Location?")) {
-                        window.user.isShare_loc = true;
-                    }
-                }
+                // if (window.user.date === moment().format('YYYY-MM-DD') &&
+                //     window.user.store[window.user.date].status) {
+                //     if (confirm("Share Your Location?")) {
+                //         window.user.isShare_loc = true;
+                //     }
+                // }
             }
         });
 
-        $('#pin').on('click', this, ev=>{
-            window.user.map.geo.StopLocation(ev);
-            window.user.isShare_loc = false;
-        });
 
         let hint = '', search_text='';
 
@@ -68,7 +63,7 @@ class DOMEvents {
             let search = prompt(search_text, hint);
             $('#search_but').attr('hint', search);
 
-            if (search.split(',').length>=1) {
+            if (search && search.split(',').length>=1) {
 
                 hint = search;
                 window.user.map.geo.SearchLocation(search, function (loc) {
@@ -162,8 +157,8 @@ class DOMEvents {
                 }, 10);
 
                 function SetMapZoomInRec() {
-                    var zoom = parseInt(that.map.ol_map.getView().getZoom());
-                    that.SetMapZoom(zoom + 1, that.map.ol_map.getView().getCenter(), function () {
+                    var zoom = parseInt(window.user.map.ol_map.getView().getZoom());
+                    that.SetMapZoom(zoom + 1, window.user.map.ol_map.getView().getCenter(), function () {
                         // Map.render();
                         var to = setTimeout(function () {
                             if (drag_zoom)
@@ -175,8 +170,8 @@ class DOMEvents {
                 }
 
                 function SetMapZoomOutRec() {
-                    var zoom = parseInt(that.map.ol_map.getView().getZoom());
-                    that.SetMapZoom(zoom - 1, that.map.ol_map.getView().getCenter(), function () {
+                    var zoom = parseInt(window.user.map.ol_map.getView().getZoom());
+                    that.SetMapZoom(zoom - 1, window.user.map.ol_map.getView().getCenter(), function () {
                         var to = setTimeout(function () {
                             if (drag_zoom)
                                 SetMapZoomOutRec();
@@ -207,10 +202,10 @@ class DOMEvents {
         var rt = this.map.ol_map.getCoordinateFromPixel([rect.right, rect.top]);
         var lt = this.map.ol_map.getCoordinateFromPixel([rect.left, rect.top]);
         var coordinates = [lb, rb, rt, lt];
-        var bucket_ext = Extent.boundingExtent(coordinates);
+        var bucket_ext = ol.Extent.boundingExtent(coordinates);
         var feature_ext = feature.getGeometry().getExtent();
-        var ext = Extent.getIntersection(bucket_ext, feature_ext);
-        if (!Extent.isEmpty(ext)) {
+        var ext = ol.Extent.getIntersection(bucket_ext, feature_ext);
+        if (!ol.Extent.isEmpty(ext)) {
             var hash = feature.values_.features[0].getId();
             if (hash) {
                 var obj = JSON.parse(localStorage.getItem(hash));
@@ -224,7 +219,7 @@ class DOMEvents {
 
     SetMapZoom(zoom, coor, callback) {
 
-        this.map.ol_map.getView().animate({
+        window.user.map.ol_map.getView().animate({
             zoom: zoom,
             duration: window.sets.animate_duration,
             center: coor
@@ -233,7 +228,7 @@ class DOMEvents {
         });
 
         if (parseInt($("#zoom_but").text) !== parseInt(zoom))
-            $("#zoom_but").text(parseInt(zoom));
+            $("#zoom_but").val(parseInt(zoom));
         if (zoom >= 14)
             $("#zoom_but").css('color', 'blue');
         else
@@ -241,4 +236,6 @@ class DOMEvents {
 
 
     }
+
+
 }

@@ -1,33 +1,28 @@
 'use strict'
-export {Customer};
 
-import {OrderViewer} from "../order/order.viewer";
+import {UtilsMap} from "../utils/utils.map.js";
 import {Dict} from '../dict/dict.js';
 import {Events} from '../map/events/events';
 import {OLMap} from '../map/map';
-import proj from 'ol/proj';
-import Extent from 'ol/extent';
-import '../../lib/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min';
-import '../../lib/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.css';
+
 import {Profile} from "../profile/profile";
 import {Import} from "../import/import";
 import {OfferOrder} from "./init.frame";
+import {Utils} from "../utils/utils";
+import {CategoriesMap} from "../categories/categories.map";
+
+import proj from 'ol/proj';
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
 require('bootstrap');
-require('bootstrap-select');
+
 require('../../lib/bootstrap-rating/bootstrap-rating.min.js');
+var moment = require('moment/moment');
 
-//import {RTCOperator} from "../rtc/rtc_operator"
-// var ColorHash = require('color-hash');
-
-
-import {Utils} from "../utils/utils";
-import {Categories} from "../categories/categories";
 let utils = new Utils();
-
+let util_map = new UtilsMap();
 
 window.TriggerEvent = function (el, ev) {
     $(el).trigger(ev);
@@ -58,12 +53,12 @@ jQuery.longTap = function(longTapCallback) {
     });
 }
 
-
-
-class Customer{
+export class Customer{
 
     constructor() {
-        this.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
+        this.date = moment().format('YYYY-MM-DD');
+        $('.dt_val').val(this.date);
+        this.isShare_loc = true;
     }
 
     SetParams(uObj){
@@ -74,97 +69,117 @@ class Customer{
             this.email = uObj['profile'].email;
         this.profile = new Profile(uObj.profile);
 
-        this.orders = '';
+        this.orders = [];
     }
 
-    IsAuth_test(cb){
+    async InitUser(cb){
         let that = this;
 
         console.log(navigator.userAgent);
 
-        if(!this.profile.profile.email && !this.profile.profile.mobile) {
-
-            setTimeout(function () {
-                $(that.map.ol_map).trigger('moveend');
-            },3000);
-
-            this.map = new OLMap();
-            this.import = new Import(this.map);
-
-            this.events = new Events(this.map);
-
-            that.import.LoadDataByKey(window.user.uid, 'demo', function (res) {
+        let promise = new Promise((resolve, reject) => {
+            $.getJSON('../src/dict/sys.dict.json?v=' + v, function (data) {
+                window.sysdict = new Dict(data);
+                window.db.GetStorage('dictStore', function (rows) {
+                    window.dict = new Dict(rows);
+                    resolve(window.dict);
+                });
 
             });
-
-            that.map.Init(0,0);
-
-            that.map.EmptyMap();
-            that.import.GetApprovedCustomer(that.uid);
-            that.map.ol_map.on('click', function (event) {
-                if(!event.loc_mode)
-                    event.loc_mode = false;
-                that.OnMapClick(event);
-            });
-        }
-
-        $('#category_container').load('./html/categories/food.'+window.sets.lang+'.html?v='+String(Date.now())+' #cat_incl',()=> {
-            this.categories = new Categories(this);
-
         });
 
-        $('#profile_but').on('click touchstart',{data:'orders'}, this.OnClickUserProfile);
+        let res = await promise;
 
-        that.MakeDraggableCarousel($('#items_carousel')[0]);
+        window.sysdict.set_lang(window.sets.lang, $('body'));
 
-        window.network.InitSSE(this,function () {
+        window.sets.store = utils.getParameterByName('store');
 
-        });
+        setTimeout(function () {
 
-        $.getJSON('../src/dict/sys.dict.json?v='+new Date().valueOf(), function (data) {
-            window.sysdict = new Dict(data);
-            window.sysdict.set_lang(window.sets.lang, $('body'));
-            window.sysdict.set_lang(window.sets.lang, $('#categories'));
+            if($('.kolmi').length===0) {
 
-            window.db.GetStorage('dictStore', function (rows) {
-                window.dict = new Dict(rows);
-            });
-            cb();
-        });
-
-        $( "#period_list" ).selectable({
-            stop: function() {
-                let result = '';
-                $( ".ui-selected", this ).each(function(i) {
-                    let index = $( "#period_list a" ).index( this );
-                    if(i===0)
-                    result = $($( "#period_list a")[index]).text().split(' - ')[0];
-                    if($( ".ui-selected").length===i+1)
-                        result+=" - "+ $($( "#period_list a")[index]).text().split(' - ')[1];
-                });
-                $('.sel_period').text(result);
-
-                let layers = that.map.ol_map.getLayers();
-                layers.forEach(function (layer, i, layers) {
-                    if(layer.constructor.name==="_ol_layer_Vector_") {
-                        layer.getSource().refresh();
-                    }
-                });
-                //not offer but selected period store
-                window.db.SetObject('offerStore',{date:that.date,period:result},function (res) {
-
-                });
+                let kolmi = $('iframe.kolmi_tmplt').clone();
+                $(kolmi).css('display', 'block')
+                    .attr('class', 'kolmi')
+                    .attr('src', './kolmi/kolmi.html?trans=all&role=operator&em=' + window.user.email);
+                $('iframe.kolmi_tmplt').after(kolmi);
             }
+
+        },3000);
+
+
+        that.SetOrders(function () {});
+
+        let market = 'food';
+        if(utils.getParameterByName('market'))
+            market = utils.getParameterByName('market');
+
+        $('#category_container').load('./html/categories/'+market+'.html?v='+v+' #cat_incl',()=> {
+            this.categories = new CategoriesMap(this);
+            $('#category_include').css('display', 'block');
+            window.sysdict.set_lang(window.sets.lang, $('#categories'));
         });
+
+        // $('#profile_frame_div').resizable();
+
+        $('#profile_but').on('click', this.OnClickUserProfile);
+        $('#cart_but').on('click', this.OnClickUserCart);
+
+        $('.collapse_link').on('click touchstart', function (ev) {
+            $('.collapse').collapse("toggle");
+        });
+
+        $('.nav-link').on('click touchstart', function (ev) {
+            $('.collapse').collapse("show");
+        });
+
+
+        $('.cart_frame').attr('src','./customer/cart.customer.html?v='+v);
+        $('.cart_frame').on('load', function () {
+            window.sysdict.set_lang(window.sets.lang,$('body', $('.cart_frame').contents()));
+        });
+
+        $('#cart_frame_div').resizable();
+
 
         this.DateTimePickerEvents();
 
-        $('#datetimepicker').trigger("dp.change");
+        $('.dt_val').trigger("change");
 
+        that.map = new OLMap();
+        that.map.Init(0,0, function () {
+            $('#splash').css('display','none');
+        });
 
+        that.map.ol_map.on('click', function (event) {
+            if(!event.loc_mode)
+                event.loc_mode = false;
+            that.OnMapClick(event);
+        });
+
+        this.import = new Import(this.map);
+        that.import.GetOrderCustomer(()=>{});
+        // that.import.GetApprovedCustomer(that.uid);
+
+        this.events = new Events(this.map);
+
+        that.import.LoadDataByKey(window.user.uid, 'demo', function (res) {
+
+        });
 
 
     }
+
+    // SendLocation(loc){
+    //
+    //     if (this.isShare_loc) {
+    //
+    //         if (window.user.user_ovl) {
+    //             window.user.user_ovl.overlay.setPosition(loc);
+    //         }
+    //     }
+    //
+    // }
 
 
     OnMapClick(event) {
@@ -190,8 +205,6 @@ class Customer{
 
         window.sets.coords.cur = event.coordinate;
 
-        $('#datetimepicker').data("DateTimePicker").hide();
-
         var time = new Date().getTime();
 
         localStorage.setItem("cur_loc", "{\"lon\":" + lonlat[0] + "," +
@@ -212,20 +225,19 @@ class Customer{
 
         that.map.ol_map.forEachFeatureAtPixel(event.pixel, function (feature, layer) {
         // that.map.ol_map.getFeaturesAtPixel(event.pixel, null, function (feature, layer) {
-            let date = $('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD');
 
             let closest = feature.getGeometry().getClosestPoint(event.pixel);
 
-            if(feature.values_)
-                if(feature.values_.features && feature.values_.features.length >1) {//cluster
+            if(feature) {
+                if (feature.features && feature.features.length > 1) {//cluster
 
                     var coordinates = [];
-                    $.each(feature.values_.features, function (key, feature) {
+                    $.each(feature.features, function (key, feature) {
                         coordinates.push(feature.getGeometry().flatCoordinates);
                     });
 
-                    var extent = Extent.boundingExtent(coordinates);
-                    var buf_extent = Extent.buffer(extent, 5);
+                    var extent = extent.boundingExtent(coordinates);
+                    var buf_extent = extent.buffer(extent, 5);
                     //ol.extent.applyTransform(extent, transformFn, opt_extent)
                     that.map.ol_map.getView().fit(buf_extent, {duration: window.sets.animate_duration});
 
@@ -235,34 +247,59 @@ class Customer{
                         function () {
 
                         });
-                }else {
-
-                    if(feature){
-                        if(feature.values_.features && feature.values_.features.length === 1)
-                            feature = feature.values_.features[0];
-
-                        if (feature.values_.type === 'supplier') {
-                            window.db.GetSupplier(new Date(window.user.date), feature.values_.object.uid, function (obj) {
-                                if (obj !== -1) {
-                                    if (window.user.constructor.name === 'Customer') {
-                                        if (!window.user.viewer) {
-                                            window.user.viewer = new OfferOrder();
+                } else {
+                    if(!feature.values_.features || !feature.values_.features[0].values_.object){
+                        return;
+                        if(that.map.ol_map.getLayers().array_) {
+                            for (let l in that.map.ol_map.getLayers().array_) {
+                                let src = that.map.ol_map.getLayers().array_[l].getSource();
+                                if (src && src.getClosestFeatureToCoordinate) {
+                                    let feat = src.getClosestFeatureToCoordinate(closest);
+                                    if(feat.values_ && feat.values_.features && feat.values_.features[0].values_.object.profile.type==='marketer') {
+                                        let ln_clos = proj.toLonLat(closest);
+                                        let ln_feat = proj.toLonLat(feat.values_.features[0].values_.geometry.flatCoordinates);
+                                        const distanceBetweenPoints = function(latlng1, latlng2){
+                                            var line = new ol.geom.LineString([latlng1, latlng2]);
+                                            return Math.round(line.getLength() * 100) / 100;
+                                        };
+                                        let dist = distanceBetweenPoints(ln_clos,ln_feat);
+                                        if(dist<0.1) {
+                                            feature = feat;
+                                            break;
+                                        }else{
+                                            return;
                                         }
-                                        window.user.viewer.InitCustomerOrder(obj);
                                     }
-                                }
-                            });
-                        } else if (feature.values_.type === 'customer') {
-                            window.db.GetSupOrders(date, feature.values_.object.supuid, function (objs) {
-                                let orderViewer = new OrderViewer();
-                                orderViewer.InitOrders(objs);
-                            });
-                        }else if(feature.values_.type === 'foodtruck'){
-                            that.map.Carousel([feature.values_.object]);
+                                }else
+                                    continue;
+                            }
+                        }else{
+                            return;
                         }
                     }
-                }
 
+
+                    if (feature.values_.features[0] && feature.values_.features.length === 1)
+                        feature = feature.values_.features[0];
+
+                    if (feature.values_.type === 'supplier') {
+                        window.db.GetSupplier(window.user.date, feature.values_.object.uid, function (obj) {
+                            if (obj !== -1) {
+                                if (window.user.constructor.name === 'Customer') {
+                                    if (!window.user.viewer) {
+                                        window.user.viewer = new OfferOrder();
+                                    }
+                                    window.user.viewer.InitCustomerOrder(obj);
+                                }
+                            }
+                        });
+
+                    } else if (feature.values_.type === 'foodtruck') {
+                        that.map.Carousel([feature.object]);
+                    }
+                }
+            }
+            return true;
         });
 
     }
@@ -270,67 +307,9 @@ class Customer{
     DateTimePickerEvents(){
         let that = this;
 
-        $('#dt_from').on("dp.change",this, function (ev) {
-            let moment = require('moment/moment');
-            let date_from =  new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
-            let date = moment($(this).data("DateTimePicker").date().format('HH:mm'), 'HH:mm');
-            if(date.isBefore(date_from)) {
-                $(this).data("DateTimePicker").toggle();
-                return true;
-            }
-            $('#period_1').find('.from')[0].setAttribute('text', 'value', $(this).data("DateTimePicker").date().format('HH:00'));
-            //$('#period_1').find('.to')[0].setAttribute('text', 'value', mom.add(4, 'h').format('HH:00'));
+        $('.dt_val').on("change",this, function (ev) {
 
-            let time = $('.sel_period').text();
-
-            $(this).data("DateTimePicker").toggle();
-        });
-
-        $('.sel_period').on("dp.change",this,function (ev) {
-            let from = ev.target[ev.target.selectedIndex].value.split(' ')[0];
-            let to = ev.target[ev.target.selectedIndex].value.split(' ')[1];
-            $('#dt_from').val(from);
-            $('#dt_to').val(to);
-
-        });
-
-        $('#dt_to').on("dp.change",this, function (ev) {
-
-            let date_to = new moment($('#period_1').find('.to')[0].getAttribute('text').value, 'HH:mm');//;
-            let date_from = new moment($('#period_1').find('.from')[0].getAttribute('text').value, 'HH:mm');
-            if(date_to.isBefore(date_from)) {
-                $(this).data("DateTimePicker").toggle();
-                return true;
-            }
-            $('#period_1').find('.to')[0].setAttribute('text', 'value', date_to.format('HH:00'));
-
-            $(this).data("DateTimePicker").toggle();
-        });
-
-        $('#date').on("click",this,function (ev) {
-            $('#datetimepicker').data("DateTimePicker").toggle();
-        });
-
-        $('.period').find('.from').on("click",this,function (ev) {
-            if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
-                $('#dt_from').data("DateTimePicker").toggle();
-        });
-
-        $('.period').find('.to').on("click", this,function (ev) {
-            if($(ev.delegateTarget.parentEl).attr('id')==='period_1')
-                $('#dt_to').data("DateTimePicker").toggle();
-        });
-
-        $('#datetimepicker').on("dp.change",this, function (ev) {
-
-            that.date = new Date($('#datetimepicker').data("DateTimePicker").date().format('YYYY-MM-DD'));
-
-            $('.dt_val').text($('#datetimepicker').data("DateTimePicker").date().format('LL'));
-
-            $('.sel_period').find('option').css('visibility','visible');
-            $('.sel_period').text('06:00 - 24:00');
-
-            $(this).data("DateTimePicker").toggle();
+            that.date = moment($(this).val()).format('YYYY-MM-DD');
 
             if(that.import)
                 that.import.GetApprovedCustomer(that.uid);
@@ -348,34 +327,17 @@ class Customer{
         });
     }
 
-    OnClickTimeRange(ev){
+
+    UpdateOrderLocal(obj, cb){
         let that = this;
-        let from = $(ev).text().split(' - ')[0];
-        let to = $(ev).text().split(' - ')[1];
-        $('.sel_period').text($(ev).text());
-        $('#dt_from').val(from);
-        $('#dt_to').val(to);
-        let layers = this.map.ol_map.getLayers();
-        layers.forEach(function (layer, i, layers) {
-            if(layer.type==="VECTOR") {
-                layer.getSource().refresh();
-            }
-        });
-        //not offer but selected period store
-        window.db.SetObject('offerStore',{date:that.date,period:$(ev).text()},function (res) {
-
-        });
-    }
-
-
-    UpdateOrderLocal(obj){
-        let that = this;
-        obj.date = new Date(obj.date);
+        obj.date = moment(obj.date).format('YYYY-MM-DD');
         window.db.SetObject('orderStore',obj,(res)=>{
+            this.SetOrders(function () {
+                cb();
+            });
             that.SetOrdCnt();
         });
 
-        this.viewer.order = obj.data;
     }
 
     UpdateDict(dict, cb){
@@ -423,8 +385,10 @@ class Customer{
         obj.psw = that.psw;
         obj.cusuid = that.uid;
         obj.supuid = obj.supuid;
+        obj.date = moment(obj.date).format('YYYY-MM-DD');
 
-        window.network.postRequest(obj, function (data) {
+
+        window.network.SendMessage(obj, function (data) {
             if (data && data.published) {
                 obj.proj = '';
                 obj.func = '';
@@ -433,7 +397,6 @@ class Customer{
             }
         });
     };
-
 
     DeleteOrder(date,title,cb){
         let that = this;
@@ -446,8 +409,9 @@ class Customer{
         obj.cusuid = that.uid;
         obj.date = moment(date).format('YYYY-MM-DD');
         obj.order = title;
+        obj.status = 'deleted'
 
-        window.network.postRequest(obj, function (data) {
+        window.network.SendMessage(obj, function (data) {
             if (data.result.affectedRows>0) {
                 cb(data);
             }
@@ -456,7 +420,7 @@ class Customer{
     //layers
     OnClickDeliver(el){
 
-        window.db.GetSupplier(new Date(window.user.date), el.attributes.supuid.value, function (obj) {
+        window.db.GetSupplier(window.user.date, el.attributes.supuid.value, function (obj) {
             if (obj !== -1) {
                 if (!window.user.viewer) {
                     window.user.viewer = new OfferOrder();
@@ -469,84 +433,49 @@ class Customer{
 
     OnClickUserProfile(ev){
 
-        let tab = ev.data.data;
-        $('#my_profile_container iframe').attr('src','./customer/profile.customer.'+window.sets.lang+'.html?v='+new Date().valueOf());
+        $('#profile_frame').css('display','block');
 
-        $('#my_profile_container').css('display','block');
+        $('#profile_frame').attr('src','./customer/profile.customer.html?v='+v);
+        $('#profile_frame').on('load', function () {
 
-        $('#my_profile_container iframe').on('load', function () {
+        });
 
-            $('#my_profile_container iframe').off();
+        // $('.close_browser',$('.profile_frame').contents()).off('touchstart click');
+        // $('.close_browser',$('.profile_frame').contents()).on('touchstart click', function (ev) {
+        //     ev.preventDefault();
+        //     ev.stopPropagation();
+        //     $('.close_browser',$('.profile_frame').contents().contentDocument)
+        //     $('#profile_frame_div').css('display', 'none');
+        //     $('.loader').css('display','none');
+        //
+        // });
+    }
 
-            $('#my_profile_container iframe')[0].contentWindow.InitProfileUser();
+    OnClickUserCart(ev){
 
-            $('.tab-pane', $('#my_profile_container iframe').contents()).removeClass('active');
-            $('.tab-pane', $('#my_profile_container iframe').contents()).addClass('fade');
+        $('#cart_frame_div').css('display','block');
+        //$('cart_frame').on('load', function () {
+            //$('.cart_frame').off();
 
-            $('#' + tab, $('#my_profile_container iframe').contents()).addClass('active');
-            $('#' + tab, $('#my_profile_container iframe').contents()).removeClass('fade');
+            $('.cart_frame')[0].contentWindow.InitCartCustomer();
 
-
-            //$('#' + tab, $('#my_profile_container iframe').contents()).trigger('click touchstart');
-
-            $('.close_browser',$('#my_profile_container iframe').contents()).off('touchstart click');
-            $('.close_browser',$('#my_profile_container iframe').contents()).on('touchstart click', function (ev) {
+            $('.close_browser',$('.cart_frame').contents()).off('touchstart click');
+            $('.close_browser',$('.cart_frame').contents()).on('touchstart click', function (ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
-                $('#my_profile_container iframe')[0].contentWindow.profile_cus.Close(function () {
-                    $('#my_profile_container').css('display', 'none');
+                $('.cart_frame')[0].contentWindow.cart_cus.Close(function () {
+                    $('#cart_frame_div').css('display', 'none');
                     $('.loader').css('display','none');
                 });
             });
-        })
+        //})
     }
 
-    MakeDraggableCarousel(el){
-        let that = this;
-
-            let carus_pos = JSON.parse(localStorage.getItem("carousel_pos"));
-            if (carus_pos)
-                $(el).offset({top: carus_pos.top, left: carus_pos.left});
-            $(el).draggable(
-                {delay: 100},
-                {
-                    start: function (ev) {
-                        console.log("drag start");
-                        $(el).find('.carousel-item').attr('drag', 'true');
-                        $(el).find('.nav-link').attr('drag', 'true');
-                    },
-                    drag: function (ev) {
-
-                    },
-                    stop: function (ev) {
-
-                        let left = $(el).position().left;
-                        // $(el).css('right', rel_x + '%');
-                        let top = $(el).position().top;
-                        // $(el).css('bottom', rel_y + '%');
-                        $(el).find('.carousel-item').attr('drag', 'false');
-                        $(el).find('.nav-link').attr('drag', 'false');
-                        localStorage.setItem("carousel_pos", JSON.stringify({top: top, left: left}));
-                        $(el).draggable("disable")
-                    }
-                });
-
-            $(el).draggable("disable");
-
-            $('.carousel-inner').on('click touchstart', function (ev) {
-                let el = this;
-                setTimeout(function () {
-                    if ($(el).attr('drag') !== 'true')
-                        that.map.OnItemClick($(el).find('.carousel-item')[0]);
-                }, 200);
-            });
-
-    }
 
     OnMessage(data){
         let that = this;
         if(data.func ==='approved'){
-            data.order.date = new Date(data.order.date.split('T')[0]);
+            data.order.date = moment(data.order.date).format('YYYY-MM-DD');
             window.db.GetOrder(data.order.date, data.order.supuid,data.order.cusuid, function (ord) {
                 if(ord===-1)
                     return;
@@ -580,10 +509,10 @@ class Customer{
                     let catAr = JSON.parse(obj.categories);
                     for (let c in catAr) {
                         let l = layers.get(catAr[c])
-                        let feature = l.values_.vector.getFeatureById(obj.hash);
+                        let feature = l.vector.getFeatureById(obj.hash);
                         if (feature) {
                             let point = feature.getGeometry();
-                            let loc = proj.fromLonLat([obj.longitude, obj.latitude]);
+                            let loc = ol.fromLonLat([obj.longitude, obj.latitude]);
                             if (point.flatCoordinates[0] !== loc[0] && point.flatCoordinates[1] !== loc[1])
                                 window.user.map.SetFeatureGeometry(feature, loc);
                         }
@@ -605,10 +534,10 @@ class Customer{
                     let catAr = JSON.parse(obj.categories);
                     for (let c in catAr) {
                         let l = layers.get(catAr[c])
-                        let feature = l.values_.vector.getFeatureById(obj.hash);
+                        let feature = l.vector.getFeatureById(obj.hash);
                         if (feature) {
                             let point = feature.getGeometry();
-                            let loc = proj.fromLonLat([obj.longitude, obj.latitude]);
+                            let loc = ol.proj.fromLonLat([obj.longitude, obj.latitude]);
                             if (point.flatCoordinates[0] !== loc[0] && point.flatCoordinates[1] !== loc[1])
                                 window.user.map.SetFeatureGeometry(feature, loc);
                         }
@@ -619,67 +548,40 @@ class Customer{
     }
 
     SetOrdCnt() {
-        window.db.GetCusOrders(window.user.date,(res)=> {
-            this.orders = res;
-            let cnt = 0;
-            $('.ord_cnt').text(cnt);
-            for(let i in res){
-                let order = res[i];
-                for(let item in order.data) {
-                    if(order.data[item] && order.data[item].ordlist) {
-                        let num = 0;
-                        _.findKey(order.data[item].ordlist, function(o){
-                            num+=o.qnty;
-                        });
-                        $('.ord_cnt').text(num);
-                    }
+        let that = this;
+
+        let cnt = 0; let num = 0;
+        $('.ord_cnt').text(cnt);
+        for(let i in this.orders){
+            let order = this.orders[i];
+            for(let item in order.data) {
+                if(order.data[item] && order.data[item].ordlist) {
+                    _.findKey(order.data[item].ordlist, function(o){
+                        num+=o.qnty;
+                    });
+                    $('.ord_cnt').text(num);
+                    $('#cart_but').parent().css('display','block')
                 }
             }
-        });
+        }
+
     }
 
 
+    SetOrders(cb) {
+
+        window.db.GetCusOrders(window.user.date,(res)=> {
+            this.orders = [];
+            for(let i in res){
+                this.orders.push(res[i]);
+            }
+
+            this.SetOrdCnt();
+            cb();
+        });
+    }
 }
 
-
-class UserRegistry {
-    constructor(){
-
-
-    }
-
-    OpenRegistry(){
-
-        $("#auth_dialog").modal({
-            show: true,
-            keyboard:true
-        });
-
-        $("#auth_dialog").find(':submit').on('click', function () {
-            $('#register').submit(function(e) {
-                e.preventDefault(); // avoid to execute the actual submit of the form.
-
-                let email = $(this).find('input[type="email"]').val();
-
-                var data_obj ={
-                    proj:"d2d",
-                    func:"auth",
-                    lang: window.sets.lang,
-                    uid: this.uid,
-                    email:email
-                }
-
-                window.network.postRequest(data_obj, function (data) {
-                    let str = JSON.stringify({"email": email});//JSON.stringify()
-                    localStorage.setItem('d2d_user',str);//
-                });
-
-                return false;
-            });
-        });
-    }
-
-}
 
 
 

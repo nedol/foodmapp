@@ -40,11 +40,11 @@ $(document).on('readystatechange', function () {
             $('select').selectpicker();
             $('select').on('change', function(e){
                 localStorage.setItem('d2d_lang',$(this).find("option:selected").val());
-                window.location.replace("./customer.html?lang="+$(this).find("option:selected").val()+"&market=food&css=order.3");
+                window.location.replace("./dist/customer.html?lang="+$(this).find("option:selected").val()+"&market=food&css=order.3");
             });
         });
     }else{
-        window.location.replace("./customer.html?lang="+lang+"&market=food&css=order.3");
+        window.location.replace("./dist/customer.html?lang="+lang+"&market=food&css=order.3");
     }
 
 });

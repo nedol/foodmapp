@@ -41,18 +41,18 @@ class OfferOrder {
 
     }
 
-    InitCustomerOrder(obj, targ_title){
+    InitSupplierOffer(obj, targ_title){
         let that = this;
         $('.loader').css('display','block');
 
         if(this.supplier_frame[0].contentWindow.InitCustomerOrder) {
             this.supplier_frame.css('height','100%');
-            this.supplier_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
+            this.supplier_frame[0].contentWindow.InitSupplierOffer(obj, targ_title);
         }else{
-            this.supplier_frame.attr('src','./deliver/customer.frame.html?v='+28);
+            this.supplier_frame.attr('src','./deliver/supplier.frame.html?v='+28);
 
             this.supplier_frame.on('load', function () {
-                this.contentWindow.InitCustomerOrder(obj, targ_title);
+                this.contentWindow.InitSupplierOffer(obj, targ_title);
             });
         }
 

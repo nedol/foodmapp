@@ -1,12 +1,13 @@
 'use strict'
 export {Offer}
 import {OrderViewer} from "../order/order.viewer";
+let _ = require('lodash');
 
 import proj from 'ol/proj';
 
 class Offer{
 
-    constructor(date,uObj){
+    constructor(uObj){
 
         this.stobj = uObj;//db stored object
         this.viewer = new OrderViewer();
@@ -28,8 +29,7 @@ class Offer{
     SetOfferDB(items) {
         let that = this;
         window.db.SetObject('offerStore',items,function (res) {
-            items.date="tmplt";
-            window.db.SetObject('offerStore',items);
+
         });
         if(that.stobj.dict.dict){
             for(let i in that.stobj.dict.dict){
@@ -87,8 +87,17 @@ class Offer{
 
     }
 
-    DeleteOffer(){
-        //TODO:
+    DeleteOfferItem(date, cat, item){
+        window.db.GetOffer(date, (arOf)=>{
+            let ind = _.findIndex(arOf.data[cat], {title:item.title});
+            if(ind!==-1) {
+                arOf.data[cat].splice(ind, 1);
+                window.db.SetObject('offerStore', arOf, function (res) {
+
+                });
+            }
+
+        });
     }
 
     GetOfferLonLat(loc){

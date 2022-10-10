@@ -7,111 +7,21 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 
 <!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">-->
-
+ <link href="../assets/vendor/icofont/icofont.min.css" rel="stylesheet">
 <link rel="stylesheet" href="../../lib/style.css">
+<link rel="stylesheet" href="../css/cart.css">
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
+<script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
 
 <!-- Libraries -->
 <script src="../host.js"></script>
 
-<script src="../customer_cart.js?v=17"></script>
-
-    <style>
-    .container{
-        -webkit-overflow-scrolling: touch;
-    }
-    .label{
-        text-align: center;
-        white-space: nowrap;
-    }
-    .ctrl{
-        font-family: "arial";
-        font-size: x-large;
-        padding: 10px;
-    }
-    .menu_item{
-        position: relative;
-        border-radius: 5px;
-        border: 0px solid #343434;
-        padding-left: 5px;
-        margin: 5px;
-        width: 98.7%;
-        height: auto;
-        box-shadow: 2px 4px 8px 0 rgba(0, 0, 0, 0.2), 4px 6px 20px 0 rgba(0, 0, 0, 0.19);
-    }
-
-    .item_title:focus{
-        outline: none !important;
-        border-color: #719ECE;
-        box-shadow: 0 0 10px #719ECE;
-    }
-    .item_title{
-        display: inline-block;
-        position: absolute;
-        width: 50%;
-        top:5px;
-        background-color: transparent;
-        font-family:"Courier New";
-        font-weight:bold;
-        font-size: x-large;
-        color:#0088bb;
-        border-width: 0px;
-    }
-
-    .content_text{
-        color: grey;
-        width: 100%;
-        overflow-y: scroll;
-        font-family:'Segoe Script';
-        font-size: medium;
-        margin-left:10px;
-        background-color: transparent;
-        border-width: 0;
-        -webkit-appearance: textarea;
-        -webkit-box-sizing: border-box; /* Safari/Chrome, other WebKit */
-        -moz-box-sizing: border-box;    /* Firefox, other Gecko */
-        box-sizing: border-box;         /* IE 8+ */
-    }
-
-    .item_price{
-        color: #0088bb;
-        position: relative;
-        font-weight:normal;
-        font-size:24px;
-        word-wrap:normal
-    }
-    .item_pack{
-        color: #0088bb;
-        position: relative;
-        font-weight:normal;
-        font-size:24px;
-        word-wrap:normal
-    }
-    .qnty{
-        color: #0088bb;
-        position: relative;
-        font-weight:normal;
-        font-size:18px;
-    }
-    [contentEditable=true]:empty:not(:focus):before{
-        content:attr(placeholder);
-        color:gray;
-    }
-    /* Extra selectors needed to override the default styling */
-    table.tablesorter tbody tr.normal-row td {
-        background: #888;
-        color: #fff;
-    }
-    table.tablesorter tbody tr.pay_supuid td {
-        background: #c8c8c8;
-        color: #fff;
-    }
-
-</style>
+<script src="../customer_cart.js"></script>
 
 
+<body>
     <div class="dropdown" style="display: none">
         <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
                 data-width="fit" type="button" style="background-color: #ffffff">
@@ -124,90 +34,46 @@
         </ul>
     </div>
     <div class="bootstrap snippet" style="padding: 5px">
-        <div style="display: block; position:fixed; right: 10px; top:50%; font-size:xx-large;z-index:100">
+
+        <div style="display: block; position:fixed; right:5%; bottom:5%; font-size:xx-large;z-index:100">
             <span class="close_browser  fa fa-times-circle-o"></span>
         </div>
 
-        <style>
-            th {
-                text-align: center;
-                font-size: 20px;
-                padding-right: 50px;
-                padding-left: 50px
-            }
-            td{
-                white-space: normal;
-            }
-            ::placeholder {
-                color: grey;
-                font-weight: lighter;
-                font-size: small;
-                font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-            }
-
-            .item_cb{
-                width: 4%;
-            }
-
-            .notoday{
-                display:none;!important;
-            }
-            [contentEditable=true]:empty:not(:focus):before{
-                content:attr(placeholder);
-                color: #c8c8c8;
-            }
-
-        </style>
         <!--Мои заказы-->
         <div class="tab-pane" id="orders">
             <!--<div class="ord_container"></div>-->
             <div  class="table-responsive  text-nowrap">
-                <table cellspacing="0" width="100%">
+                <table class="tablesorter" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>
-                            <span class="fa fa-handshake-o"   style="text-align: center" data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
+                            <span class="">#</span>
                         </th>
                         <th>
-                            <span class="fa fa-home"  data-translate title="884d9804999fc47a3c2694e49ad2536a"></span>
+                            <span class="fa fa-square-o"><i class="tip" data-translate>c944d745b377880c6e3a2f851bb3510a</i></span>
                         </th>
                         <th>
-                            <span class="fa fa-history" data-translate title="a0acfa46d86f7610b2c73dbb28f64701"></span>
-                        </th>
-                        <th>
-                            <span class="fa fa-square-o"  data-translate title="31d1b8ef5ed469f7618d76144fffaa06"></span>
-                        </th>
-                        <th>
-                            <span class="fa fa-columns"></span>
-                        </th>
-                        <th>
-                            <span class="fa fa-clone"></span>
+                            <span class="fa fa-clone"><i class="tip" data-translate>b7bb52d46441267cf30ffd51668e311e</i></span>
                         </th>
 
                         <th>
-                            <span class="fa fa-ruble"  data-translate title="3601146c4e948c32b6424d2c0a7f0118"></span>
+                            <span class="fa fa-ruble"><i class="tip" data-translate>252d601fadd75eba972d2dc0bfb22e67</i></span>
+                        </th>
+                        <th>
+                            <span class="fa fa-commenting-o"><i class="tip" data-translate>2eaf1074f07aa11c39a919c930c40b88</i></span>
                         </th>
 
-                        <th>
-                            <span class="fa fa-commenting-o" data-translate title="a5d491060952aa8ad5fdee071be752de"></span>
-                        </th>
-                        <th class="marketer">
-                            <span class="fa fa-phone"  data-translate title="9f121d1bcc2b246d18ba60b3390f8f4e"></span>
-                        </th>
-                        <th class="trash">
-                            <span class="fa fa-trash"></span>
-                        </th>
                     </tr>
                     </thead>
+                    <tbody style="background-color: #e6e6e6"></tbody>
                     <tfoot>
-                    <tr>
+                    <tr style="height: 200px">
                     </tr>
                     </tfoot>
-                    <tbody style="background-color: #e6e6e6"></tbody>
                 </table>
             </div>
-        </div></div>
-
+        </div>
+    </div>
     <div id="menu_item_tmplt" style="display:none"></div>
 
 <style>
@@ -241,4 +107,5 @@
     }
 </style>
 <div class="loader"></div>
+</body>
 </html>

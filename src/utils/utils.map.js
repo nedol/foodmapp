@@ -1,20 +1,13 @@
 export {UtilsMap}
 import proj from 'ol/proj';
-// import Sphere from 'ol/sphere';
+import Sphere from 'ol/sphere';
 class UtilsMap{
 
     GetCoordsDistance(map,firstPoint, secondPoint, projection) {
         projection = projection || 'EPSG:4326';
 
-        length = 0;
-        var sourceProj = map.getView().getProjection();
-        var c1 = proj.transform(firstPoint, sourceProj, projection);
-        var c2 = proj.transform(secondPoint, sourceProj, projection);
-
         var wgs84Sphere = new Sphere(6378137);
-        length += wgs84Sphere.haversineDistance(c1, c2);
-
-        return length;
+        return wgs84Sphere.haversineDistance(firstPoint, secondPoint);
     }
     getDistanceFromLatLonInKm(lat1,lon1,lat2,lon2){
 

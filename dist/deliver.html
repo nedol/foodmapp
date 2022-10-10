@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="utf-8">
 
@@ -14,7 +14,7 @@
     <link rel="icon" type="image/png" sizes="192x192"  href="./images/favicon/android-icon-192x192.png">
     <link rel="icon" type="image/png" sizes="32x32" href="./images/favicon/favicon-96x96.png">
     <link rel="icon" type="image/png" sizes="16x16" href="./images/favicon/favicon-16x16.png">
-    <link rel="manifest" href="./images/favicon/manifest.json">
+
     <meta name="msapplication-TileColor" content="#ffffff">
     <meta name="msapplication-TileImage" content="./ms-icon-144x144.png">
     <meta name="theme-color" content="#ffffff">
@@ -25,48 +25,27 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
     <meta http-equiv="Expires" content="0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>D2D</title>
+    <title>FoodMap</title>
 
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript" >
-        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})
-        (window, document, "script", "https://mc.yandex.ru/metrika/tag.js", "ym");
-
-        ym(54717073, "init", {
-            clickmap:true,
-            trackLinks:true,
-            accurateTrackBounce:true
-        });
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/54717073" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
-    <script type='application/javascript'>
-        document.addEventListener("touchstart", function() {}, false);
-    </script>
 </head>
 
-<link rel="stylesheet" href="../lib/add-to-homescreen/dist/style/addtohomescreen.css">
-<script src="../lib/add-to-homescreen/dist/addtohomescreen.min.js"></script>
 
 <!-- for datetimepicker-->
 <link rel="stylesheet "type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-<link rel="stylesheet" href="../lib/style.css">
 <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
+<link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
+<link rel="stylesheet" href="../lib/style.css"  type='text/css'>
+<link id="cus_link" rel="stylesheet" href="./css/supplier.css" type='text/css'>
 
+<script type="text/javascript" src="../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+ <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 
-
-<!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
-
-
-<script type="text/javascript" src="./supplier.js?v=57"></script>
 <script type="text/javascript" src="./host.js"></script>
 
-<!--<script src="../lib/jquery.ui.touch-punch.min.js"></script>-->
+<script type="text/javascript" src="./deliver.js?v=36"></script>
 
 <style>
     .unpublished{
@@ -207,23 +186,24 @@
     }
 
     #zoom_but{
-        display:block;
-        position: fixed;
+        display: block;
+        position: absolute;
         /*z-index:30;*/
         color: #1b1b1b;
         top: 50%;
-        right: .6%;
+        right: 5px;
         width: 40px;
-        height: 28px;
+        /*height: 28px;*/
         /*line-height: auto;*/
-        border: solid 1px grey;
-        text-align:center;
+        border: solid 0px grey;
+        text-align: center;
         font-size: 200%;
         font-weight: bold;
         border-radius: 5px;
         background-color: whitesmoke;
         cursor: n-resize;
     }
+
 
     #search_but{
         display: block;
@@ -291,81 +271,60 @@
 <!--</section>-->
 
 
-<div id="main_window" class="container">
-    <div class="date_ctrl"  style="position:fixed;top:1px;right: 0">
+<div id="splash" style="position: absolute;background-color: white;text-align: center;width: 100%;height: 100%;z-index: 50;">
+    <label for="splash_img" style="position: absolute;top: 135px;right: 50%;font-family: 'Roboto';font-size: xx-large;">FoodMap</label>
+    <img src="./images/pineapple-food-globe.png" id="splash_img" align="middle" width="50%" style="position: absolute;
+        margin: auto;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;">
+</div>
 
-        <div class="d-inline-block">
-            <div class="d-inline-block dt_val btn btn-block" style="background-color:white;text-align:center;float:left;font-size: medium"></div>
-        </div>
-    </div>
-    <style>
-        #dtp_container {
-            display: none;
-            position: absolute;
-            /*left:50%;*/
-            right:65%;
-            top:15%;
-            z-index: 11;
-        }
-    </style>
-    <div id="dtp_container" class="center-block scaled">
-        <div id="datetimepicker" style="display: block;position: absolute;top:10%;"></div>
-    </div>
 
+<div class="date_ctrl"  style="display:inline-block;position:absolute;">
+    <div>
+        <input type="date" class="dt_val" style="width:120px; height: 30px;
+        background-color:white;text-align:center;float:left;height:34px;font-size: small;
+        border-width: 0; border-radius: 5px;outline: none">
+
+    </div>
 </div>
 
 <div id="category_include">
     <div id="category_container"></div>
 </div>
 
-<div>
-    <div id="client_frame_container"
-         class=""
-         style="display:none;
-             z-index:2000;
-             position: absolute;
-             max-height: 100% !important;
-             /*min-height: 50% !important;*/
-             width: 100%;
-             -webkit-overflow-scrolling: touch;
-             overflow-y: scroll;
-             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+   <div>
+        <iframe id="supplier_frame"
+                src=""
+                style="
+                    display:none;
+                    z-index:2000;
+                    position:absolute;
+                    overflow: hidden;
+                    width:100%;
+                    height: 100%;
+                    top:0";
+                    >
+        </iframe>
     </div>
-    <iframe class="client_frame_tmplt"
-        style="
-        display:none;
-        position:absolute;
-        overflow: hidden;
-        z-index: 10;
-        width:100%;
-        height: 100%">
-    </iframe>
-</div>
+
 
 <div>
-    <div id="supplier_frame_container"
-         style="display:none;
-             /*-webkit-transform: translateZ(0px);*/
-             z-index:2000;
-             position: absolute;
-             height: 100%;
-             max-height: 100% !important;
-             /*min-height: 50% !important;*/
-             width: 100%;
-              -webkit-overflow-scrolling: touch;
-             overflow: scroll;
-             /*border: solid 0px lightslategrey;*/
-             box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
-    </div>
-    <iframe id="supplier_frame"
+
+<div>
+    <iframe id="deliver_frame"
             src=""
             style="
-                display: none;
+                display:none;
+                z-index:1000;
                 position:absolute;
                 overflow: hidden;
-                z-index: 10;
                 width:100%;
-                height: 100%;">
+                height: 100%;
+                top:0";
+                >
     </iframe>
 </div>
 
@@ -406,20 +365,50 @@
     <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
 
-<img id="search_but"  src="https://nedol.ru/d2d/dist/images/ic_map_search.png" title="Search">
+<img id="search_but"  src="https://delivery-angels.ru/d2d/dist/images/ic_map_search.png" title="Search">
 
 <section id="loc_ctrl"  title="Моё местоположение">
-    <img id="location_img"  draggable="true" src="https://дотудо.рф/d2d/dist/images/ic_location.png">
-    <img id="pin" src="https://дотудо.рф/d2d/dist/images/ic_pin.png">
+    <img id="location_img"  draggable="true" src="https://delivery-angels.ru/d2d/dist/images/ic_location.png">
+    <img id="pin" src="https://delivery-angels.ru/d2d/dist/images/ic_pin.png">
 </section>
 
-<h1 id="zoom_but" class="ui-widget-content" title="Zoom">15</h1>
-
+<h1 id="zoom_but" title="Zoom">
+    <i class="icofont-dotted-up"></i>
+    <i class="icofont-dotted-down"></i>
+</h1>
 <span id="locText">Lat Lon</span>
 
-<div id="debug" style="display: none;position: fixed;bottom: 0;left: 0;width: 100px"></div>
+<style>
+    .loader {
+        display: none;
+        position: absolute;
+        left: 50%;
+        top: 50%;
+        z-index: 10;
+        width: 150px;
+        height: 150px;
+        margin: -75px 0 0 -75px;
+        vertical-align: middle;
+        border: 16px solid #f3f3f3;
+        border-radius: 50%;
+        border-top: 16px solid #3498db;
+        width: 120px;
+        height: 120px;
+        -webkit-animation: spin 2s linear infinite; /* Safari */
+        animation: spin 2s linear infinite;
+    }
+    /* Safari */
+    @-webkit-keyframes spin {
+        0% { -webkit-transform: rotate(0deg); }
+        100% { -webkit-transform: rotate(360deg); }
+    }
 
-
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
+<div class="loader"></div>
 
 <div class="alert_container center-block" style="display:none;position:fixed;white-space:pre;top:30%;left:40%;margin:0 auto;z-index: 1000">
     <div class="span4">
@@ -431,6 +420,11 @@
 
 </div>
 <style>
+    @media screen and (min-width: 120px) {
+        .word_ig{
+            width: 35%;
+        }
+    }
     @media screen and (min-width: 320px) {
         #datetimepicker{
             transform: scale(1.1);
@@ -443,7 +437,7 @@
             top:7%;
             z-index: 11;
         }
-        #supplier_frame_container{
+        #deliver_frame_container{
             max-width: 100%;
         }
         #client_frame_container{
@@ -462,11 +456,11 @@
             top:7%;
             z-index: 11;
         }
-        #supplier_frame_container{
-            max-width: 60%;
+        #deliver_frame_container{
+            max-width: 75%;
         }
         #client_frame_container{
-            max-width: 60%;
+            max-width: 75%;
         }
     }
     @media screen and (min-width: 960px) {
@@ -481,7 +475,7 @@
             top:7%;
             z-index: 11;
         }
-        #supplier_frame_container{
+        #deliver_frame_container{
             max-width: 30%;
         }
         #client_frame_container{
@@ -500,7 +494,7 @@
             top:7%;
             z-index: 11;
         }
-        #supplier_frame_container{
+        #deliver_frame_container{
             max-width: 30%;
         }
         #client_frame_container{
@@ -527,7 +521,7 @@
             top:7%;
             z-index: 11;
         }
-        #supplier_frame_container{
+        #deliver_frame_container{
             max-width:25%;
         }
         #client_frame_container{
@@ -550,6 +544,5 @@
              style="display: none; position:absolute;border:none;overflow:hidden; left:0; top:0;z-index: 1000"></iframe>
     <!--style="height:200px;width:100%;border:none;overflow:hidden;"-->
 </div>
-</body>
 
 </html>

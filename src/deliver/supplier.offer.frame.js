@@ -6,7 +6,6 @@ require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
 
 require('bootstrap');
-require('bootstrap-select');
 require("../../lib/bootstrap-rating/bootstrap-rating.js")
 require("../../lib/jquery-comments-master/js/jquery-comments.js");
 
@@ -47,19 +46,21 @@ $(document).on('readystatechange', function () {
 
     window.InitSupplierOffer = function (data, targ_title) {
 
-        window.order = new CustomerOrder();
-        window.order.openFrame(data,targ_title, function () {
+        if(!window.order) {
+            window.order = new SupplierOffer();
+            window.order.openFrame(data, targ_title, function () {
 
-        });
+            });
 
-        window.order.InitRating();
+            window.order.InitRating();
+        }
     };
 
 });
 
 
 
-export class CustomerOrder{
+export class SupplierOffer{
     constructor(){
 
         this.path = host_port;
@@ -113,14 +114,10 @@ export class CustomerOrder{
         let latlon = [obj.latitude,obj.longitude];
         let diff =  new Date().getTime() - new Date(obj.published).getTime();
         let days = Math.floor(diff / (1000 * 60 * 60 * 24));
-        let isDelayed =  days  - 180;//days after publication
+        let isDelayed =  -1;//days  - 180;//days after publication
         this.ovc.css('display','block');
         this.last = 0;
-        //TODO:
-        // let cat_incl = $("#cat_incl",window.parent.document);
-        // cat_incl.css('position','relative');
-        // cat_incl.find('#categories').css('display','block');
-        // cat_incl.insertAfter('#top_nav');
+
 
         $('#address').parent().css('display', 'none');
 
@@ -131,17 +128,30 @@ export class CustomerOrder{
             let kolmi = $('iframe.kolmi_tmplt').clone();
             $(kolmi).css('display', 'block')
                 .attr('class', 'kolmi')
-                .attr('src', '../kolmi/kolmi.html?trans=all&role=user&abonent='+obj.profile.email);
-            $('iframe.kolmi_tmplt').after(kolmi);
+                .attr('src', '../kolmit/operator/iframe.html?abonent=d2d@kolmit&em='+obj.profile.email);
+            //TODO: kolmit// $('iframe.kolmi_tmplt').after(kolmi);
         }
+
+        this.ovc.find('.actual_price').text('');
+
 
         let type= {'ru':'самовывоз ','en':'Pickup','fr':'Pickup'}[window.parent.sets.lang];
-        if(this.profile.type==="deliver") {
-            type = {'ru': 'доставку ', 'en': 'Delivery'}[window.parent.sets.lang];
-        }
+        if(this.profile.type.toLowerCase()==="deliver") {
+            type = {'ru': 'доставки ', 'en': 'delivery'}[window.parent.sets.lang];
+            this.ovc.find('.actual_price').text({
+                'ru': 'стоимость ' + type,
+                'en': type + ' cost ',
+                'fr': ' prix '
+            }[window.parent.sets.lang] + obj.profile.del_price_per_dist);
 
-        if(isDelayed)
-            this.ovc.find('.actual_price').text({'ru':'Цены на '+type ,'en': type+' Prices For ','fr':'prix '}[window.parent.sets.lang]+obj.published.split('T')[0]);
+        }else {
+            //if (isDelayed)
+            // this.ovc.find('.actual_price').text({
+            //     'ru': 'Цены на ' + type,
+            //     'en': type + ' Prices For ',
+            //     'fr': 'prix '
+            // }[window.parent.sets.lang] + obj.published.split('T')[0]);
+        }
 
         this.ovc.find('#shop_name').text(obj.profile.name);
 
@@ -158,38 +168,6 @@ export class CustomerOrder{
                 });
         });
 
-        this.ovc.find('.save').off();
-        this.ovc.find('.save').on('click touchstart', this, function (ev) {
-            let that = ev.data;
-
-            ev.preventDefault();
-            ev.stopPropagation();
-
-            let items = that.GetOrderItems();
-
-            if(md5(JSON.stringify(that.items)) !== md5(JSON.stringify(items))) {
-
-                let lang = window.parent.sets.lang;
-
-                let onSaveOrder = function (res) {
-                    if(res) {
-                        $('.menu_item').remove();
-                        $('.loader').css('display','none');
-                        $("#address").parent().css('display','none');
-                        $(frameElement).css('display','none');
-                        $('#customer_frame',window.parent.document).css('display','none');
-                        return;
-                    }else{
-                        setTimeout(function () {
-                            that.SaveOrder(items, onSaveOrder)
-                        }, 1000);
-                    }
-                }
-                that.SaveOrder(items,onSaveOrder);
-
-            }
-        });
-
         this.ovc.find('#close_frame').off();
         this.ovc.find('#close_frame').on('click touchstart', this, async function (ev) {
             let that = ev.data;
@@ -197,57 +175,7 @@ export class CustomerOrder{
             ev.preventDefault();
             ev.stopPropagation();
 
-            if(that.profile.type==='deliver' && !$('#address').val() && $('#address').parent().css('display')==='none') {
-
-                $('#address').parent().css('display', 'block');
-
-                $('#address').focus();
-
-                $('#address_loc').off();
-                $('#address_loc').on('click', this, (ev) => {
-                    ev.preventDefault();
-                    ev.stopPropagation();
-
-                    if (parseInt($('#customer_frame', window.parent.document).css('height')) < 200) {
-                        $('#customer_frame', window.parent.document).css('height', '100%');
-                        $('#menu_tabs').css('display', 'block');
-                        $('#locator', window.parent.document).css('display', 'none');
-                        $(window.parent.user.map.ol_map).off('moveend');
-                        if ($('#address').val().includes(';')) {
-                            let zoom = parseInt(window.parent.user.map.ol_map.getView().getZoom());
-                            window.parent.user.map.geo.SearchPlace($('#address').val().split(';'), zoom, function (res) {
-                                try {
-                                    $('#address').val(res.street + ',' + res.house);
-                                    $('#address').focus();
-                                    //$('#address')[0].select();
-                                    $('#address').trigger('click');
-                                    return false;
-                                } catch (ex) {
-
-                                }
-                            });
-                        }
-                    } else {
-                        $('#menu_tabs').css('display', 'none');
-                        let h = $('#address_loc').parent().offset().top + 8 + $('#address_loc').width() + 2;
-                        $('#customer_frame', window.parent.document).css('height', h);
-                        $('#locator', window.parent.document).css('display', 'block');
-                        window.parent.user.map.ol_map.getView().setZoom(19);
-                        window.parent.user.map.FlyToLocation(window.parent.sets.coords.gps);
-                        $(window.parent.user.map.ol_map).on('moveend', (ev) => {
-                            that.moveend = ev;
-                            let loc = proj.toLonLat(ev.target.focus_);
-                            $('#address').attr('loc', JSON.stringify([loc[1], loc[0]]));
-                            $('#address').val(String(loc[1].toFixed(6)) + ';' + String(loc[0].toFixed(6)));
-                            return false;
-                        });
-                    }
-                });
-
-                return false;
-            }
-
-            let items = that.GetOrderItems();
+            that.ImportItems();
 
             $('.icofont-filter').css('visibility','hidden');
             $('.card').remove();
@@ -256,42 +184,20 @@ export class CustomerOrder{
             // $('.filter_div').remove();
             $('.icofont-filter').remove();
 
-            //$('#customer_frame',window.parent.document).css('height','100%');
-            $('#locator', window.parent.document).css('display','none');
-            //
-            // if(Object.keys(items.data).length===0){
-            //     $(frameElement).css('display','none');
-            //     $('#customer_frame',window.parent.document).css('display','none');
-            //        return;
-            // }
 
-            if(md5(JSON.stringify(that.items)) !== md5(JSON.stringify(items))) {
+            let lang = window.parent.sets.lang;
 
-                let lang = window.parent.sets.lang;
-
-                that.SaveOrder(items,function (res) {
-                    if(res) {
-
-                        $('.filter_div').remove();
-                        $('.card').remove();
-                        $('.menu_item').remove();
-                        $('.loader').css('display','none');
-                        $('.kolmi')[0].contentWindow.CloseFrame();
-                        $(frameElement).css('display','none');
-                        $('#customer_frame',window.parent.document).css('display','none');
-                        $('#cart_but',window.parent.document).trigger('click');
-                    }
-                });
-
-            }else{
-
-                $('.filter_div').remove();
-                $('.card').remove();
+            $('.filter_div').remove();
+            $('.card').remove();
+            $('.menu_item').remove();
+            $('.loader').css('display','none');
+            if($('.kolmi')[0].contentWindow.CloseFrame)
                 $('.kolmi')[0].contentWindow.CloseFrame();
-                $('.loader').css('display','none');
-                $(frameElement).css('display','none');
-                $('#customer_frame',window.parent.document).css('display','none');
-            }
+            $(frameElement).css('display','none');
+            $('#customer_frame',window.parent.document).css('display','none');
+            $('#cart_but',window.parent.document).trigger('click');
+
+
         });//close
 
         this.ovc.find('.name').css('display','block').text(obj.profile.name?obj.profile.name:obj.profile.email.split('@')[0]);
@@ -300,7 +206,8 @@ export class CustomerOrder{
             that.FillProfile(obj);
         });
 
-        this.date = window.parent.user.date;
+        this.date = moment().format('YYYY-MM-DD');
+
         this.period = obj.period;
 
         try {
@@ -417,6 +324,12 @@ export class CustomerOrder{
 
                 $(menu_item).addClass('menu_item');
                 $(menu_item).css('display', 'block');
+
+                $(menu_item).find('.publish:checkbox').attr('id', 'item_cb_' + cat_tab + '_' + i);
+                $(menu_item).find('.publish:checkbox').attr('pos', i);
+                $(menu_item).find('.publish:checkbox').attr('tab', cat_tab);
+
+                $(menu_item).find('.item_cb').css('visibility', 'visible');
 
                 if(that.offer[cat_tab][i].brand){
 
@@ -560,11 +473,9 @@ export class CustomerOrder{
                             $(menu_item).find('.dropdown').css('visibility', 'visible');
                             // if(that.profile.type==='deliver' && (!that.offer[cat_tab][i].markuplist || !that.offer[cat_tab][i].markuplist[p]))
                             //     continue;
-                            $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem' pack='"+p+"'>"+
-                                that.dict.getValByKey(window.parent.sets.lang,p,that.profile.lang)+
-                                "</a>");
+                            $(menu_item).find('.pack_list').append("<a class='dropdown-item' role='packitem' pack='"+p+"' data-translate='"+p+"'></a>");
 
-                            $(menu_item).find('.pack_btn').text(that.dict.getValByKey(window.parent.sets.lang,p,that.profile.lang));
+                            $(menu_item).find('.pack_btn').attr('data-translate',p);
                             $(menu_item).find('.pack_btn').attr('pack', p);
 
                             data = parseFloat(data).toString();
@@ -593,7 +504,7 @@ export class CustomerOrder{
                         let deliver = $('.deliver_but', window.parent.document).attr('supuid');
 
                         if (deliver)
-                            window.parent.db.GetSupplier(window.parent.user.date, deliver, (obj)=> {
+                            window.parent.db.GetSupplier(this.date, deliver, (obj)=> {
                                 if(obj) {
                                     let key = _.findKey(obj.data, function (o) {
                                         for (let i in o) {
@@ -813,7 +724,6 @@ export class CustomerOrder{
 
         setTimeout(function (targ_title) {
             $('.loader', $(window.parent.document).contents()).css('display','none');
-            that.items = that.GetOrderItems();
             if(!$('[href]').hasClass('active'))
                 $('[href="#order_pane"]').trigger('click');
 
@@ -884,7 +794,7 @@ export class CustomerOrder{
         // this.profile_sup.InitRateSupplier();
 
         if(!user.supplier.profile.avatar) {
-            utils.LoadImage("https://delivery-angels.com/d2d/dist/images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://delivery-angels.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('#sup_avatar').attr('src', src);
             });
         }else{
@@ -1032,7 +942,7 @@ export class CustomerOrder{
 
         });
 
-        window.parent.db.GetOrder(new Date(this.date), uid, window.parent.user.uid, function (res) {
+        window.parent.db.GetOrder(this.date, uid, window.parent.user.uid, function (res) {
             if(res!==-1){
                 that.order = res;
 
@@ -1042,7 +952,7 @@ export class CustomerOrder{
                     if(keys[k]==='comment'){
                         $('.comment').text(that.dict.getDictValue(window.parent.user.lang, res.data.comment));
                     }else {
-                        window.parent.db.GetApproved(new Date(that.date),uid,window.parent.user.uid,function (appr) {
+                        window.parent.db.GetApproved(that.date,uid,window.parent.user.uid,function (appr) {
                             if(appr &&
                                 //res.period ===appr.period &&
                                 res.data[keys[k]].price===appr.data.price &&
@@ -1102,53 +1012,41 @@ export class CustomerOrder{
         });
     }
 
-    GetOrderItems(){
+    ImportItems(){
         let that = this;
 
-        let obj = {data:{}};
         $('.menu_item').each(function (i, el) {
 
-            let tab = $(el).closest('.tab-pane').attr('id');
-
-            let ordlist = {};
-            let ar = $(el).find('.dropdown-item').toArray();
-            for(let ddi in ar){
-                if($(ar[ddi]).attr('ordlist')) {
-                    let ol = JSON.parse($(ar[ddi]).attr('ordlist'));
-                    ordlist[$(ar[ddi]).text()] = {
-                        qnty: parseInt(ol.qnty),
-                        price: ol.price?parseFloat(ol.price):$(ar[ddi]).attr('placeholder')};
-                }
+            if (!$(el).find('.publish:checkbox').prop('checked')) {
+                return;
             }
-
-            let extralist={};
-            $(el).find('.extra_amount').each(function(i,el){
-                if(parseInt($(el).text())>0){
-                    extralist[$(el).closest('.row').find('.extra_title').text()] = {qnty: parseInt($(el).text()),price:parseFloat($(el).closest('.row').find('.extra_price').text())};
-                }
+            let tab = $(el).find('.publish:checkbox').attr('tab');
+            let ar = $(that.offer[$(el).find('.publish:checkbox').attr('tab')]);
+            let index = _.findIndex(ar, function (o) {
+                return o.title === $(el).find('.item_title').attr('data-translate');
             });
 
-            if(parseInt($(el).find('button.ord_amount').text())!==0 || $(el).hasClass('ordered') || $(el).hasClass('approved')){
-                obj.data[$(el).find('.item_title').attr('data-translate')] = {
-                    cat: tab.split('_')[1],
-                    ordlist: ordlist,
-                    extralist: extralist,
-                    status: $(this).hasClass('ordered') ? 'ordered' : $(el).hasClass('approved') ? 'approved' : 'checked',
-                    email: window.parent.user.profile.profile.email,
-                    mobile: window.parent.user.profile.profile.mobile
+            if (ar[index]) {
+                if (!window.parent.user.offer.stobj.data)
+                    window.parent.user.offer.stobj.data = {};
+                if (!window.parent.user.offer.stobj.data[tab])
+                    window.parent.user.offer.stobj.data[tab] = [];
+                ar[index].checked = 'false';
+                ar[index].imported = {supuid: that.uid , title:$(el).find('.item_title').attr('data-translate')};
+                let item = _.find(window.parent.user.offer.stobj.data[tab], ['title',$(el).find('.item_title').attr('data-translate')])
+                if(!item) {
+                    window.parent.user.offer.stobj.data[tab].unshift(ar[index]);
+                    $(el).find('[data-translate]').each(function (o, dt) {
+                        window.parent.dict.dict[$(dt).attr('data-translate')] = that.dict.dict[$(dt).attr('data-translate')];
+                    });
+                }else{
+                    let index_off = _.findIndex(window.parent.user.offer.stobj.data[tab], function (o) {
+                        return o.title === $(el).find('.item_title').attr('data-translate');
+                    });
+                    window.parent.user.offer.stobj.data[tab][index_off] = ar[index];
                 }
             }
-
-            if($('#order_pane').find('.comment')[0])
-                obj['comment'] = $('#order_pane').find('.comment')[0].value;
-            obj['supuid'] = that.uid;
-            obj['cusuid'] = window.parent.user.uid;
-            obj['date'] = that.date;
-            obj['period'] = that.profile.type==='foodtruck'? moment().add(30, 'm').format('HH:mm'):$(window.parent.document).find('.sel_period').text();
-            obj['address'] = that.profile.type==='deliver'? $('#address').val():'';
         });
-
-        return obj;
     }
 
     SaveOrder(items,cb) {

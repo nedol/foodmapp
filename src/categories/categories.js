@@ -1,7 +1,11 @@
-export {Categories};
+'use strict'
 
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
+
+import {MPCustomer} from "../customer/customer.mp.js";
 import {Utils} from "../utils/utils";
-
 let utils = new Utils();
 
 (function($) {
@@ -22,12 +26,14 @@ let utils = new Utils();
     }
 })(jQuery);
 
-class Categories {
+export class Categories {
 
-    constructor(map) {
-        this.map = map;
+    constructor() {
 
-        $('#category_include').css('display', 'block');
+
+    }
+
+    initCategories(){
 
         let inputs = $(".main_category");
 
@@ -61,10 +67,12 @@ class Categories {
                     $('[id="'+item+'"]').parents('.dropup').find('.main_category').css('opacity', 1);
                 }
 
-            if($('.category[state="1"]').length===0)
-                $('#categories[data-toggle="tooltip"]').tooltip("show");
+            if($('#loc_ctrl[data-toggle="tooltip"]').tooltip) {
+                if ($('.category[state="1"]').length === 0)
+                    $('#categories[data-toggle="tooltip"]').tooltip('show');
 
-            $('#loc_ctrl[data-toggle="tooltip"]').tooltip("show");
+                $('#loc_ctrl[data-toggle="tooltip"]').tooltip("show");
+            }
         });
 
         if (inputs.length > 0) {
@@ -145,6 +153,18 @@ class Categories {
         });
 
 
+        $('.mp_open').on('click', function (ev) {
+
+            $('#mp_frame_div').css('display', 'block');
+            $('.mp_frame').css('display', 'block');
+            $('.mp_frame').attr('src', './customer/mp.customer.html?v='+new Date().valueOf());
+
+            $('.loader').css('display','block');
+
+            window.user.mp = new MPCustomer($(ev.target).closest('.mp_open').attr('user_type'));
+        });
+
+
         $('.main_category').off();
         $('.main_category').longTap( function (ev) {
 
@@ -200,55 +220,6 @@ class Categories {
 
     }
 
-
-    OnClickCategory(ev) {
-        ev.preventDefault();
-        ev.stopPropagation();
-
-        try {
-            $('#categories[data-toggle="tooltip"]').tooltip("dispose");
-        }catch(ex){
-
-        }
-
-        let that = ev.data;
-        let el = ev.target;
-        $(el).attr('state', $(el).attr('state') === '1' ? '0' : '1');
-        $(el).css('opacity', $(el).attr('state') === '1' ? 1 : 0.3);
-
-        let layers = that.map.map.ol_map.getLayers().values_;
-        let id = $(el).attr('id');
-
-        for(let l in layers) {
-            if(parseInt(l) ===parseInt(id))
-                layers[l].setVisible(($(el).attr('state') === '0' ? false : true));
-        }
-
-        let state_category = JSON.parse(localStorage.getItem("state_category"));
-        let cat = _.find(state_category, {id:id});
-        if(!cat) {
-            cat = {id: id, state: $(el).attr('state')};
-            state_category.push(cat);
-        }
-        cat.state = $(el).attr('state');
-        localStorage.setItem("state_category", JSON.stringify(state_category));
-
-        if($(el).parent().find('[state=1]').length>0) {
-            $(el).parents('.dropup').find('.main_category').attr('state', 1);
-            $(el).parents('.dropup').find('.main_category').css('opacity', 1);
-        }else {
-            $(el).parents('.dropup').find('.main_category').attr('state', 0);
-            $(el).parents('.dropup').find('.main_category').css('opacity', 0.3);
-        }
-
-        if(window.user.profile.profile.type!=='marketer')
-            window.user.import.ImportDataByLocation(ev);
-
-        setTimeout(function (ev) {
-            that.map.map.ol_map.dispatchEvent('moveend');
-        },100)
-
-    }
 
     WordSearch() {
         let that = this;

@@ -9,28 +9,21 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <title>ДоТуДо Регистрация</title>
 
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <!--script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script-->
+    <script src="../deliver_settings.js?v=3"></script>
+    <script src="../host.js"></script>
 
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-
-<script src="../host.js"></script>
-
-<script src="../deliver_settings.js?v=1"></script>
 
 <body>
 <div class="container bootstrap snippet">
     <div class="row">
-        <div class="col-sm-10"><h1>Мой профиль</h1></div>
+        <div class="col-sm-10" data-translate="f280062e3e80695442590e7bf637fc40"><h1>Мой профиль</h1></div>
         <div class="col-sm-2"></div>
     </div>
     <div class="row">
         <div class="col-sm-12">
-            <ul class="nav nav-tabs">
-                <li class="active"><a data-toggle="tab" href="#profile">Общая информация</a></li>
-                <!--<li><a data-toggle="tab" href="#menu">Menu 2</a></li>-->
-            </ul>
 
             <div class="tab-content">
                 <form   accept-charset="ISO-8859-1">
@@ -41,64 +34,55 @@
                                      class="avatar img-circle img-thumbnail" alt="avatar"
                                      style="image-orientation: from-image;"
                                      onclick="$(this).siblings('.file-upload').trigger('click');">
-                                <h6>Загрузить моё фото...</h6>
                                 <input type="file" class="center-block file-upload" style="display: none">
+                                <div data-translate="9f2021284ca26bc3dc2862add9ca84c6"></div>
                             </div>
                             <div class="col-sm-9">
                                 <form>
                                 <div class="form-group">
                                     <div class="col-xs-6">
-                                        <label for="name"><h4>Имя</h4></label>
-                                        <input type="text" id="name" class="form-control" name="name"  placeholder="имя" title="Введите своё имя">
+                                        <input type="text" id="name" class="form-control" required  name="name" data-translate  placeholder="02aa853964a1542a8ee08c71a95bbf64">
                                     </div>
-
                                     <div class="col-xs-6">
-                                        <label for="email"><h4>Email</h4></label>
-                                        <input type="text"  id="email" class="form-control"  placeholder="Введите свой mail" title="you@email.com">
+                                         <input type="text" required id="email" class="form-control"
+                                         pattern="/^[a-zA-Z0-9.!#$%&’*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/"
+                                         data-translate placeholder="96c7b6402b3c977daed27d8692d472fc">
                                     </div>
                                 </div>
 
                                 <div class="form-group">
                                     <div class="col-xs-6">
-                                        <label for="mobile"><h4>Телефон</h4></label>
-                                        <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="номер телефона" title="Введите номер своего телефона">
+                                        <input type="phone" id="mobile" class="form-control" name="mobile" data-translate placeholder="9fdc3f131f7923e7bdd4ec60d465ae87">
                                     </div>
-
                                     <div class="col-xs-6">
                                    </div>
-
                                 </div>
 
                                 <div class="form-group" style="display: none">
-                                    <div class="col-xs-6">
-                                        <div class="form-check-inline">
-                                            <label class="form-check-label" for="radio2">
-                                                <input type="radio" class="form-check-input" id="radio2" name="opttype" value="deliver" checked>
-                                            </label>
-                                        </div>
-                                    </div>
-
+                                    <div class="col-xs-6"></div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-xs-6">
-                                        <label for="place"><h4>Адрес</h4></label>
-                                        <input type="text" required class="form-control"  id="place"   placeholder="Введите свой адрес" title=" ">
+                                             <input type="text" required class="form-control"  id="place" data-translate  placeholder="bec946b0e151ea413af70bbc0f36ab98">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-xs-6">
-
+                                    <select type="text" disabled id="market" class="form-control"  data-translate  placeholder="тип рынка">
+                                        <!--option  data-translate="924a7a6fc086fb471c267fb0b8e7bdeb">Тип рынка</option-->
+                                        <option value="food" data-translate>237c53c6108c8ef6cd840e62747a827c</option>
+                                        <option  data-translate value="electronics">fff1864930e6b95ef367dfe74f70386b</option>
+                                        <option  data-translate value="building">7b39377784fcbdacb1101eca8f5202ad</option>
+                                    </select>
                                     </div>
-
                                     <div class="col-xs-6">
-                                        <label for="promo"><h4>Промо</h4></label>
-                                        <input type="text" class="form-control"  id="promo"  placeholder="промо-код" title="введите промо-код">
+                                        <input type="text" class="form-control"  id="promo" data-translate  placeholder="fe50ca4a6ec9f8bcf1a8d66bad4c922d">
                                     </div>
                                 </div>
                                 <div class="form-group">
                                     <div class="col-xs-12">
                                         <br>
-                                        <input type="submit"  value="Регистрация">
+                                        <input type="submit" data-translate  value="0b93f81293f084dbfa4dbe93a8280555">
                                     </div>
                                 </div>
                                 </form>
@@ -139,19 +123,13 @@
         -webkit-animation: spin 2s linear infinite; /* Safari */
         animation: spin 2s linear infinite;
     }
-    /* Safari */
-    @-webkit-keyframes spin {
-        0% { -webkit-transform: rotate(0deg); }
-        100% { -webkit-transform: rotate(360deg); }
-    }
 
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
 </style>
 <div class="loader"></div>
 </body>
 <script src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
 </html>

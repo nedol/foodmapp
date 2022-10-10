@@ -1,6 +1,5 @@
 'use strict'
 
-export {SupplierSettings}
 
 import {Сетка} from "../../network";
 import {DB} from "../map/storage/db";
@@ -18,15 +17,13 @@ $(document).on('readystatechange', function () {
 
     window.network = new Сетка(host_ws);
 
-    window.cs = new SupplierSettings();
+    window.cs = new DeliverSettings();
 
     var readURL = function(input) {
         if (input.files && input.files[0]) {
 
         }
     }
-
-
 
     $.getJSON('../../src/dict/sys.dict.json?v=2', function (data) {
         window.sysdict = new Dict(data);
@@ -63,7 +60,7 @@ $(document).on('readystatechange', function () {
 
 
 
-class SupplierSettings {
+export class DeliverSettings {
     constructor(){
 
         // this.network = new Сетка(host_port);
@@ -80,7 +77,7 @@ class SupplierSettings {
         let that = this;
 
         $('input').on('change', function (ev) {
-           $(this).attr('changed', true);
+            $(this).attr('changed', true);
         });
     }
 
@@ -89,6 +86,10 @@ class SupplierSettings {
         let that = this;
         if (!$(form).find('#email').val()) {
             $(form).find('#email').focus();
+            return;
+        }
+        if (!$(form).find('#mobile').val()) {
+            $(form).find('#mobile').focus();
             return;
         }
         if (!$(form).find('#market').val()) {
@@ -100,7 +101,7 @@ class SupplierSettings {
         utils.createThumb_1($('.avatar')[0], $('.avatar').width() * k, $('.avatar').height() * k, function (avatar) {
             var data_post = {
                 proj: 'd2d',
-                user: "Supplier",
+                user: "Deliver",
                 func: 'confirmem',
                 host: location.origin,
                 promo: $(form).find('#promo').val(),
@@ -120,7 +121,7 @@ class SupplierSettings {
 
             window.network.SendMessage(data_post, function (obj) {
                 $('.loader').css('display', 'none');
-                if (obj.result.err) {
+                if (obj.err) {
                     alert(window.sysdict.getDictValue( utils.getParameterByName('lang'),obj.err));
                     return true;
                 }
@@ -138,11 +139,11 @@ class SupplierSettings {
                             promo: data_post.promo,
                             profile: data_post.profile
                         }, function (res) {
-                            alert(window.sysdict.getDictValue($('html').attr('lang'),'На указанный email-адрес была выслана ссылка для входа в программу'));
+                            alert(window.sysdict.getValByKey($('html').attr('lang'),'1a82a60f6461f27f40b6596c09ade00d'));
                             if (window.location.hostname === 'localhost') {
-                                window.location.replace("http://" + window.location.host + "/d2d/dist/supplier.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
+                                window.location.replace("http://" + window.location.host + "/d2d/dist/deliver.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
                             } else {
-                                window.location.replace("../supplier.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
+                                window.location.replace("../deliver.html?uid=" + obj.uid + "&lang=" + $('html').attr('lang') + "&market=" + $(form).find('#market').val());
                             }
 
                             obj = '';

@@ -1,10 +1,11 @@
 
 html, body{
-    padding: 0px;
+    padding: 10px;
     margin: 0px;
     height: 100%;
     width: 100%;
     scrollbar-width: none;
+    /*background-color: #e9e9e9;*/
 }
 /*::-webkit-scrollbar {*/
 /*width: 0;*/
@@ -58,9 +59,7 @@ custom-toggler .navbar-toggler-icon {
     /*border: 1px solid  #8f8f8f;*/
     /*border-radius: 5px;*/
 }
-.nav-link{
-    height:60px;
-}
+
 
 .modal-content{
     position: absolute;
@@ -78,22 +77,15 @@ textarea:focus {
     box-shadow: 0 0 10px #719ECE;
 }
 
-.tab-content{
-    height: 90%;
-    background-color: #ffffff;
-    /*position:relative;*/
-    /*-webkit-overflow-scrolling: touch;*/
-    /*overflow-y: scroll;*/
-}
-
-.tab_sticky{
-    position:relative;
-    /*-webkit-overflow-scrolling: touch;*/
-    overflow-y: scroll;
-}
 
 .tab-content::-webkit-scrollbar {
     width: 0 !important;
+}
+
+.tab_sticky{
+    position:absolute;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .tab-pane{
@@ -189,6 +181,7 @@ th {
 .flex-container {
     display: flex;
     flex-wrap: wrap;
+    background-color: transparent;
 }
 
 .menu_item{
@@ -197,8 +190,8 @@ th {
     border-radius: 5px;
     border: 1px solid #d1d1d1;
     /*border-style: outset;*/
-    margin-bottom: 10px;
-    width: 700px;
+    margin-top: 10px;
+    margin-left: 10px;
     /*box-shadow: 2px 4px 8px 0px rgba(0, 0, 0, 0.6), 4px 6px 20px 4px rgba(255, 0,255, 0.4);*/
 }
 .item_cb{
@@ -227,7 +220,7 @@ th {
 }
 .carousel-inner {
     position: relative;
-    height: 300px;
+    max-height: 300px;
     margin: 5px;
     background-color: transparent;
 }
@@ -260,6 +253,13 @@ li.active a{
     background-color:grey;
 }
 
+.card_img {
+    display: block;
+    max-height: 100%;
+    margin: 0 auto;
+}
+
+
 .item_price{
     display:block;
     position:relative;
@@ -278,10 +278,19 @@ li.active a{
 .actual_price{
     position: absolute;
     right: 0;
-    top: 40px;
+    /*top: 130px;*/
     font-size: x-small;
     color: #9da0a4
 }
+
+.rating_div{
+    position:absolute;
+    right: 5px;
+    top:0px;
+    width:100px;
+    color:red
+}
+
 .filter_div {
     position: fixed;
     overflow-y: auto;
@@ -318,17 +327,19 @@ li.active a{
 .order_container {
     position: relative;
     height: 50px;
-    border-radius:5px ;
-    background-color: #dfdfdf;
+    border-style: solid;
+    border-radius: 5px;
+    border-color: #dfdfdf;
 }
 
 
-/*.note-toolbar{*/
-/*word-wrap: normal;      !* IE 5.5-7 *!*/
-/*white-space: -moz-pre-wrap; !* Firefox 1.0-2.0 *!*/
-/*white-space: nowrap;      !* current browsers *!*/
-/*overflow-x: auto;*/
-/*}*/
+.title{
+    display: none;
+    position: absolute;
+    bottom: -20px;
+    left:0;
+}
+
 .note-editable{
     background-color: whitesmoke;
 }
@@ -394,8 +405,8 @@ li.active a{
     margin-right: 25px;
     /* padding-left: 10px; */
     /* padding-right: 10px; */
-    height: 45px;
-    width: 45px;
+    max-height: 45px;
+    /* width: 45px; */
 }
 
 .badge {
@@ -407,6 +418,7 @@ li.active a{
 .cat_div {
     display: inline-block;
     position: relative;
+    transform: scale(1);
 }
 
 .loader {
@@ -469,4 +481,24 @@ li.active a{
     .menu_item{
         width:100%
     }
+}
+
+@media screen and (min-width: 960px) {
+
+    .menu_item{
+        width:500px
+    }
+
+}
+@media screen and (min-width: 1200px) {
+    .menu_item{
+        width:480px
+    }
+
+}
+@media screen and (min-width: 1600px) {
+    .menu_item{
+        width:700px
+    }
+
 }

@@ -2,11 +2,8 @@ const path = require('path');
 
 const webpack = require('webpack'); //to access built-in plugins
 
-var HtmlWebpackPlugin = require('html-webpack-plugin');
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-const NODE_ENV = process.env.NODE_ENV //|| 'development';
+const NODE_ENV = process.env.NODE_ENV || 'development';
 
-var JavaScriptObfuscator = require('webpack-obfuscator');
 
 module.exports = {
 
@@ -14,25 +11,36 @@ module.exports = {
     // context: __dirname+'/js',
 
     entry: {
-        // 'supplier': __dirname+'/src/supplier/supplier.entry.js'
-        // ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
-        // ,'supplier_profile':__dirname+'/src/profile/profile.supplier.js'
-        // ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.js'
-        // ,'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js'
-        // ,
-        // 'deliver': __dirname+'/src/deliver/deliver.entry.js'
-        // ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
-        // ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
-        // ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
-        // ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js'
-        //
-        'customer': __dirname+'/src/customer/customer.entry.js'
-        ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'
-        ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
-        ,'customer_settings':__dirname+'/src/customer/customer.settings.js'
+        // 'supplier': __dirname+'/src/supplier/supplier.entry.js',
+        // 'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js',
+        // 'supplier_profile':__dirname+'/src/supplier/profile.supplier.js',
+        // 'supplier_settings':__dirname+'/src/supplier/supplier.settings.js',
+        // 'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js',
+        // // // //
+        'deliver': __dirname+'/src/deliver/deliver.entry.js',
+        'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js',
+        'deliver_settings':__dirname+'/src/deliver/deliver.settings.js',
+        'deliver_profile':__dirname+'/src/deliver/profile.deliver.js',
+        'deliver_supplier_frame': __dirname+'/src/deliver/supplier.offer.frame.js',
+        // // // ,
+        //  'customer': __dirname+'/src/customer/customer.entry.js',
+        //  'customer_order': __dirname+'/src/customer/customer.order.frame.js',
+        //  'customer_profile':__dirname+'/src/customer/profile.customer.js',
+        //  'customer_cart':__dirname+'/src/customer/customer.cart.js',
+        //  'customer_settings':__dirname+'/src/customer/customer.settings.js',
+
+        'store_init': __dirname+'/src/store/init.store.js',
+        'store_order': __dirname+'/src/store/store.order.js',
+
+        // 'kolmit':  __dirname+'/src/kolmi/kolmit.js',
+        //'import_worker': __dirname+'/src/workers/import.js',
+        // 'callcenter': __dirname+'/src/kolmi/callcenter/callcenter'
 
         // ,'foodtruck_order':__dirname+'/src/foodtruck/foodtruck.order.js'
         // ,'customer_search':__dirname+'/src/search/customer.search.js'
+    },
+    resolve: {
+        extensions: ['.tsx', '.ts', '.js'],
     },
     output: {
         path: path.resolve(__dirname, 'dist'),
@@ -44,16 +52,20 @@ module.exports = {
     //     aggregateTimeout:100
     // },
     module: {
-    noParse:/webpack-jquery-ui\/tabs.js/,
-    noParse:/jquery-ui\/dialog.js/,
-    noParse:/jquery-ui\/autocomplete.js/,
-    noParse:/jquery-ui\/sortable.js/,
-    noParse:/jquery-ui\/css.js/,
-    noParse:/jquery-ui\/index.js/,
-    noParse:/jquery-ui\/draggable.js/,
-    noParse:/lodash\/lodash.js/,
 
-rules: [
+    rules: [
+            {
+                test: /\.html$/,
+                use: [
+                    {
+                        loader: 'html-loader',
+                        options: {
+                            minimize: true,
+                            interpolation: false
+                        }
+                    }
+                ]
+            },
             {
                 test: /\.(jpe?g|png|gif)$/i,
                 loader:"file-loader",
@@ -93,8 +105,8 @@ rules: [
             $: 'jquery',
             '$': 'jquery',
             jquery: 'jquery',
-            jQuery: 'jquery',
-            ol:'ol'
+            jQuery: 'jquery'
+            //, ol:'ol'
         }),
         new webpack.DefinePlugin({
             NODE_ENV: JSON.stringify(NODE_ENV),
@@ -107,10 +119,6 @@ rules: [
         // new HtmlWebpackPlugin({
         //    template: './dist/main.tmplt.html'
         // }),
-
-        new webpack.NoEmitOnErrorsPlugin(),
-        new ExtractTextPlugin('./src/html/css/main.css'),
-
         //, new webpack.optimize.CommonsChunkPlugin({
         //     name:'common'
         // })

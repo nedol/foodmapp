@@ -1,7 +1,6 @@
 'use strict'
 export {Dict};
-var md5 = require('md5');
-var urlencode = require('urlencode');
+var _ = require('lodash');
 
 class Dict {
 
@@ -15,9 +14,10 @@ class Dict {
 
 
 // Function for swapping dictionaries
-    set_lang(lang, el) {
+    set_lang(lang, el, default_lang) {
         let keyAr = Object.keys(this.dict);
         let dtAr = $(el).find("[data-translate]");
+
         for (let i = 0; i < dtAr.length; i++) {
             let item = dtAr[i];
             let k = $(item).attr("data-translate").toLowerCase();
@@ -25,6 +25,7 @@ class Dict {
             //замена по ключу
             if(item.attributes.placeholder && this.dict[item.attributes.placeholder.value] && this.dict[item.attributes.placeholder.value][lang]){
                 $(item).attr('placeholder',this.dict[item.attributes.placeholder.value][lang]);
+                continue;
             }
             if(item.attributes.title && this.dict[item.attributes.title.value] && this.dict[item.attributes.title.value][lang]){
                 $(item).attr('title',this.dict[item.attributes.title.value][lang]);
@@ -37,11 +38,20 @@ class Dict {
             }
             //замена по аргументу
             if (this.dict[k]) {
-                let val = this.dict[k][lang] ? this.dict[k][lang] : this.dict[k]['en'];
-                if(!val)
-                    continue;
+                let def_lang = default_lang?default_lang:Object.keys(this.dict[k])[0];
+                let val = this.dict[k][lang] ? this.dict[k][lang] : this.dict[k][def_lang];
+                if(!val) {
+                    for(let l in this.dict[k]){
+                        if(this.dict[k][l]) {
+                            val = this.dict[k][l];
+                            break;
+                        }
+                    }
+                }
                 try {
-                    val = urlencode.decode(val);
+                    //val = urlencode.decode(val);
+                    val = val.replace(/\\n/g, String.fromCharCode(13, 10) )
+                    val = val.replace('%0D',String.fromCharCode(13, 10))
                 }catch(ex){
                     ;
                 }
@@ -49,10 +59,13 @@ class Dict {
                 if(item.isEntity)//a-frame
                     item.setAttribute('text','value',val);
 
-                // if(item.constructor.name==='HTMLInputElement')
+                if(item.tagName.toLowerCase()==='input' || item.tagName.toLowerCase()==='textarea')
                     $(item).val(val);
-                // else
+                else if(item.tagName.toLowerCase()==='div')
                     $(item).text(val);
+                else
+                    $(item).html(val);
+
                 if($(item).attr("title"))
                     $(item).attr("title", val);
                 if($(item).attr("value"))
@@ -62,12 +75,22 @@ class Dict {
         }
     }
 
-    getValByKey(lang, k) {
+    getValByKey(lang, k, default_lang) {
 
+        let dict = this.dict;
+        function findValue(k) {
+            for (let l in Object.keys(dict[k])){
+                if(dict[k][Object.keys(dict[k])[l]]) {
+                    return dict[k][Object.keys(dict[k])[l]];
+                    break;
+                }
+            }
+        }
         try {
-            return this.dict[k][lang] ?
+            let res = this.dict[k][lang] ?
                 this.dict[k][lang] :
-                (this.dict[k]['en'] ? this.dict[k]['en'] : '');
+                (this.dict[k][default_lang] ? this.dict[k][default_lang] : findValue(k));
+            return res.replace(/%0D/g,String.fromCharCode(13, 10)).replace(/%22/g,String.fromCharCode(22)).replace(/%10/g,String.fromCharCode(10));
         } catch (ex) {
             return '';
         }
@@ -84,6 +107,19 @@ class Dict {
             return res[0][lang];
         else
             return value;
+    }
+
+    getKeyByValue(lang, value) {
+        let res = $.grep(Object.values(this.dict), function (a) {
+            for (let l in Object.values(a))
+                if (a[Object.keys(a)[l]].toLowerCase() === value.toLowerCase())
+                    return Object.keys(a)[l];
+        });
+
+        if (res.length > 0)
+            return res[0];
+        else
+            return null;
     }
 
 

@@ -1,136 +1,72 @@
 'use strict'
 
-export {Сетка}
-import axios from 'axios';//
-//import axios from 'axios-cancel';
-//import io from 'socket.io-client';
+import {Utils} from "./src/utils/utils.js"
+let utils = new Utils()
+let log = utils.log;
+var urlencode = require('urlencode');
 
-
-class Сетка{
+export class Сетка{
 
     constructor(url) {
-        this.host = url;
-        this.work = true;
-        //this.CancelToken = axios.CancelToken;
-        this.cancel;
-        this.send_req_func;
-        this.cnt_post = 0;
 
-    }
-
-    Init(user, cb){
-        let par = {
-            proj:'d2d',
-            user:user
+        this.url = url;
+        if(!this.ws) {
+            this.ws = new WebSocket(this.url);
+            this.ws.callbacks = {};
+            this.ListenMessage();
         }
-        this.postRequest(par, function (res) {
-            cb();
+
+
+
+        $(this.ws).on('error', function (error) {
+            log('Connect Error: ' + error.toString());
+        });
+
+        $(this.ws).on('close',(ev)=> {
+            log('echo-protocol Connection Closed');
+            let cbs = this.ws.callbacks;
+            this.ws = new WebSocket(this.url);
+            this.ws.callbacks = cbs;
+            this.ListenMessage();
         });
     }
 
-    InitSSE(user, cb){
-        this.eventSource = new window.EventSource(host_port+'?proj=d2d&sse=1&uid='+user.uid+'&user='+user.constructor.name
-            //,{withCredentials: true}
-        );
-        this.eventSource.onerror = function(e) {
-            if (this.readyState == EventSource.CONNECTING) {
-                console.log("Соединение порвалось, пересоединяемся...");
-            } else {
-                console.log("Ошибка, состояние: " + this.readyState);
+    ListenMessage(){
+        $(this.ws).on('message', (message)=> {
+            if (message.type === 'message') {
+                //log("Received: '" + message.originalEvent.data + "'");
+                let data = JSON.parse(urlencode.decode(message.originalEvent.data));
+                this.ws.callbacks[data.func].cb(data);
             }
-        };
-        this.eventSource.onopen = function(e) {
-            console.log("Соединение открыто");
-            setTimeout(function () {
-                cb();
-            },100);
-
-        };
-        this.eventSource.onmessage = function (e) {
-            console.log(e.data);
-            window.user.OnMessage(JSON.parse(e.data));
-            //return Promise.resolve("Dummy response to keep the console quiet");
-        };
-        this.eventSource.addEventListener('sse', (e) => {
-            console.log(e.data);
-            // => Hello world!
         });
     }
 
-    Cancel(){
+    SendMessage(par,cb){
 
-        this.work = false;
-    }
-
-
-    postRequest(par, cb, no_more){
-        let that = this;
-        let post_par = JSON.stringify(par);
-        let cb_this = cb;
-
-        if(no_more) {
-            cb_this();
-            return;
-        }
-
-        axios.post(this.host, post_par,
-            {
-                crossDomain: true
+        let that= this;
+        
+        try {
+            if(this.ws.readyState>=2){
+                let cbs = this.ws.callbacks;
+                this.ws = new WebSocket(this.url);
+                this.ws.callbacks = cbs;
+                this.ListenMessage();
             }
-        )
-            .then(function (response) {
-                cb_this(response.data);
-                return;
-            })
-            .catch(function (error) {//waiting for rem_client
-                setTimeout(function () {
-                    that.postRequest(par, cb, true);
-                },300);
-
-            });
-
-    }
-
-    putRequest(par, cb, no_more){
-        let that = this;
-        let post_par = JSON.stringify(par);
-        let cb_this = cb;
-
-        if(no_more) {
-            cb_this();
-            return;
-        }
-
-        axios.put(this.host, post_par,
-            {
-                crossDomain: true
+            if(this.ws.readyState===1) {
+                this.ws.callbacks[par.func] = {cb:cb};
+                this.ws.send(urlencode.encode(JSON.stringify(par)));
+            }else {
+                setTimeout(()=> {
+                    this.ws.callbacks[par.func] = {cb: cb};
+                    that.SendMessage(par,cb);
+                }, 300);
             }
-        )
-            .then(function (response) {
-                cb_this(response.data);
-                return;
-            })
-            .catch(function (error) {//waiting for rem_client
-                setTimeout(function () {
-                    that.postRequest(par, cb, true);
-                },300);
 
-            });
-
+        }catch(ex){
+            return false;
+        }
+        return true;
     }
 
-    RegUser(obj, cb){
-        let post_obj = {};
-        post_obj.proj = 'd2d';
-        post_obj.uid = obj.uid;
-        post_obj.psw = obj.psw;
-        post_obj.user = obj.profile.user;
-        post_obj.func = 'reguser';
-        post_obj.profile = obj.profile;
-
-        this.postRequest(post_obj, function (res) {
-            cb(res);
-        });
-    }
 
 }

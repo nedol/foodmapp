@@ -43,9 +43,76 @@ window.alert_ = function(msg,type,fadeout){
 }
 
 
+$.fn.isInViewport = function() {
+    var elementTop = $(this).offset().top;
+    var elementBottom = elementTop + $(this).outerHeight();
+
+    var viewportTop = $(window).scrollTop();
+    var viewportBottom = viewportTop + $(window).height();
+
+    return elementBottom > viewportTop && elementTop < viewportBottom;
+}
+
+$.fn.longTap = function(longTapCallback) {
+        return this.each(function(){
+            var elm = this;
+            var pressTimer;
+            $(elm).on('touchend mouseup', function (e) {
+                clearTimeout(pressTimer);
+            });
+            $(elm).on('touchstart mousedown', function (e) {
+                // Set timeout
+                pressTimer = window.setTimeout(function () {
+                    longTapCallback.call(elm);
+                }, 1000)
+            });
+        });
+    }
+
+$.fn.doubleTap = function(doubleTapCallback) {
+        return this.each(function(){
+            var elm = this;
+            var lastTap = 0;
+            $(elm).on('touchstart click', function (e) {
+                var now = (new Date()).valueOf();
+                var diff = (now - lastTap);
+                lastTap = now ;
+                if (diff < 250) {
+                    if($.isFunction( doubleTapCallback ))
+                    {
+                        doubleTapCallback.call(elm);
+                    }
+                }
+            });
+        });
+    }
 
 
 export class Utils{
+
+    log(arg, that){
+        var now = (Date.now() / 1000).toFixed(3);
+        console.log(now + ': ', arg);
+        try{
+            if(that) {
+            // let par = {};
+            // par.proj = 'rtc';
+            // par.uid = that.uid;
+            // par.func = 'log';
+            // par.text = now + ': ' + arg;
+            // par.role = that.role;
+            // par.email = that.email.from;
+            // that.signch.SendMessage(par, function (data) {
+            //
+            // });
+
+            var data = $('#logs').val();
+            $('#logs').focus().val('').val(data + '\n' + arg);
+            }
+        }catch(ex){
+
+        }
+    }
 
     JSONParse(result) {
         try {
@@ -165,11 +232,11 @@ export class Utils{
 
     resizeBase64Img(base64, width, height) {
         var canvas = document.createElement("canvas");
-        canvas.width = width;
+        //canvas.width = width;
         canvas.height = height;
         var context = canvas.getContext("2d");
         var deferred = $.Deferred();
-        $("<img/>").attr("src", "data:image/gif;base64," + base64).load(function() {
+        $("<img/>").attr("src", base64).on('load', function() {
             context.scale(width/this.width,  height/this.height);
             context.drawImage(this, 0, 0);
             deferred.resolve($("<img/>").attr("src", canvas.toDataURL()));
@@ -201,6 +268,22 @@ export class Utils{
         }else{
             callback(base);
         }
+    }
+
+    resizeImg(src, w,h, cb){
+
+        var c = document.createElement("canvas"),    // create a canvas
+            ctx = c.getContext("2d"),
+            img = new Image();
+        img.src = src;
+        img.crossOrigin = "anonymous";
+        c.width = w;                                 // set size = thumb
+        c.height = h;
+        ctx.drawImage(src, 0, 0, w, h);             // draw in frame
+        img.onload = function () {                   // handle async loading
+            cb(this);                // provide image to callback
+        };
+        img.src = c.toDataURL();
     }
 
     resetOrientation(srcBase64, srcOrientation, callback) {
@@ -457,5 +540,49 @@ export class Utils{
         }
         return NewObj;
     }
+
+    getCaretPosition(ctrl) {
+        // IE < 9 Support
+        if (document.selection) {
+            ctrl.focus();
+            var range = document.selection.createRange();
+            var rangelen = range.text.length;
+            range.moveStart('character', -ctrl.value.length);
+            var start = range.text.length - rangelen;
+            return {
+                'start': start,
+                'end': start + rangelen
+            };
+        } // IE >=9 and other browsers
+        else if (ctrl.selectionStart || ctrl.selectionStart == '0') {
+            return {
+                'start': ctrl.selectionStart,
+                'end': ctrl.selectionEnd
+            };
+        } else {
+            return {
+                'start': 0,
+                'end': 0
+            };
+        }
+    }
+
+    setCaretPosition(ctrl, start, end) {
+        // IE >= 9 and other browsers
+        if (ctrl.setSelectionRange) {
+            ctrl.focus();
+            ctrl.setSelectionRange(start, end);
+        }
+        // IE < 9
+        else if (ctrl.createTextRange) {
+            var range = ctrl.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    }
+
+
 
 }

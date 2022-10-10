@@ -5,18 +5,15 @@
 
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-
-<!--<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">-->
-
+<link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
 <link rel="stylesheet" href="../../lib/style.css">
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
+
 
 <!-- Libraries -->
 <script src="../host.js"></script>
 
-<script src="../customer_profile.js?v=16"></script>
+<script src="../customer_profile.js"></script>
 
     <style>
     .container{
@@ -112,61 +109,68 @@
 </style>
 <div class="container">
 
-    <div class="dropdown" style="display: none">
-        <button class="btn btn-sm dropdown-toggle scaled"  data-toggle="dropdown"
-                data-width="fit" type="button" style="background-color: #ffffff">
-            <span class="glyphicon glyphicon-option-vertical"
-                style="color:black; background-color: white !important;margin: 10px"></span>
-        </button>
-        <ul class="dropdown-menu">
-            <li class="odr_ctrl" data-width="fit"><a href="#">Заказ</a>
-            </li>
-        </ul>
-    </div>
-
-        <div style="display: block; position:fixed; right: 10px; top:50%; font-size:xx-large;z-index:100">
-            <span class="close_browser  fa fa-times-circle-o"></span>
-        </div>
         <div class="row">
-
-            <div class="tab-pane active" id="profile">
-                <div class="row">
-                    <div class="col-sm-3 text-center">
-                        <img class="avatar img-circle img-thumbnail" src="https://delivery-angels.com/d2d/dist/images/avatar_2x.png" alt="avatar" onclick="$(this).siblings('.file-upload').trigger('click');">
-                        <h6>Загрузить мою фотографию...</h6>
-                        <input type="file" class="center-block file-upload" style="display: none">
-                    </div>
-                    <div class="col-sm-9">
-                        <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="name"><h4>Имя</h4></label>
-                                <input type="text" id="name" class="form-control" name="name"  placeholder="имя" title="Введите ваше имя.">
-                            </div>
-
-                            <div class="col-xs-6">
-                                <label for="email"><h4>Эл.почта</h4></label>
-                                <input type="email" id="email"  class="form-control" name="email"  placeholder="you@email.com" title="введите email." data-toggle="tooltip">
-                            </div>
+            <div class="col-sm-10"><h1 data-translate="a46c372347e02010f5ef45fe441e4349">Мой профиль</h1></div>
+            <div class="col-sm-2"></div>
+        </div>
+        <div class="col-sm-9">
+            <div class="form-group">
+                <div class="col-xs-6">
+                     <div class="dropdown">
+                        <button type="button" class="btn btn-light dropdown-toggle" data-toggle="dropdown" style="font-weight: 700">
+                          en
+                        </button>
+                        <div class="dropdown-menu">
+                          <a class="dropdown-item" href="#" role="langitem">ru</a>
+                          <a class="dropdown-item" href="#"  role="langitem">en</a>
+                          <a class="dropdown-item" href="#"  role="langitem">fr</a>
                         </div>
-
-                        <div class="form-group">
-                            <div class="col-xs-6">
-                                <label for="mobile"><h4>Телефон</h4></label>
-                                <input type="phone" id="mobile" class="form-control" name="mobile"  placeholder="введите номер телефона" title="введите номер телефона">
-                            </div>
-                            <div class="col-xs-6">
-                                <label for="address"><h4>Адрес доставки</h4></label>
-                                <input type="address" class="form-control"  id="address" placeholder="введите адрес доставки" title="введите адрес доставки">
-                            </div>
-                        </div>
-
+                      </div>
                     </div>
                 </div>
+
+                <div class="col-xs-6">
+
+                </div>
+            <div class="form-group">
+                <div class="col-xs-6">
+                     <input type="text" id="name" class="form-control" name="name" data-translate placeholder="02aa853964a1542a8ee08c71a95bbf64">
+                </div>
+
+                <div class="col-xs-6">
+                    <input type="email" id="email"  class="form-control" name="email" data-translate placeholder="96c7b6402b3c977daed27d8692d472fc">
+                </div>
             </div>
-        </div>
+
+            <div class="form-group">
+                <div class="col-xs-6">
+                    <input type="phone" id="mobile" class="form-control" name="mobile" data-translate placeholder="9fdc3f131f7923e7bdd4ec60d465ae87">
+                </div>
+                <div class="col-xs-6">
+                    <input type="address" class="form-control"  id="address"data-translate placeholder="bec946b0e151ea413af70bbc0f36ab98">
+                </div>
+            </div>
+
+    </div>
 
     <div id="menu_item_tmplt" style="display:none"></div>
 </div>
+
+
+    <span id="close_browser" class="close fa fa-times-circle-o"
+        style="
+            display: block;
+            position: fixed;
+            bottom: 5%;
+            right:5%;
+            font-size: xx-large;
+            color:#0088BB;
+            margin: 10px;
+            z-index: 10000;"
+        title="Publier">
+    </span>
+
+
 <style>
     .loader {
         display: none;

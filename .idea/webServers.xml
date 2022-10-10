@@ -10,19 +10,6 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
-      <webServer id="1868f4a3-4c50-4cfd-a708-1115bf1fb1be" name="infodesk (project level)" url="http://a07513cy.beget.tech">
-        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/nedol" username="a07513cy" password="dfc2dfc5dfdcdfcfdfd8df99df92df9c">
-          <option name="port" value="21" />
-        </fileTransfer>
-      </webServer>
-      <webServer id="3a39b14e-bfc8-476e-b299-3ad713b2fe43" name="nedol (project level)" url="http://a07513cy.beget.tech">
-        <fileTransfer host="a07513cy.beget.tech" port="21">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" />
-          </advancedOptions>
-          <option name="port" value="21" />
-        </fileTransfer>
-      </webServer>
       <webServer id="a5e25df8-2cca-4f55-861c-874bf07200af" name="reserve" url="http://a07513cy.beget.tech">
         <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/reserve">
           <advancedOptions>
@@ -31,28 +18,28 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
-      <webServer id="6dbdc10f-6a76-46fe-8025-02b37688fba0" name="d2d" url="http://a07513cy.beget.tech">
-        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/nedol/public_html/d2d">
+      <webServer id="041ee651-025b-4883-a997-a620835cae48" name="beget_server_root(u~R9zsGCKz!9)" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="21" />
+          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="b13ec357-d7d2-453f-9b5c-0f8ac622afa1" name="beget_server" url="http://a07513cy.beget.tech">
-        <fileTransfer host="a07513cy.beget.tech" port="21" rootFolder="/nedol/public_html/server">
+      <webServer id="5021dd25-7892-4ec9-81dc-2884ae0501f1" name="beget.nedol.ru" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/nedol/web/nedol.ru" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="21" />
+          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
-      <webServer id="c3765641-eaef-4ef2-85e4-316b90884d2b" name="a07513cy.bget.ru" url="http://a07513cy.bget.ru">
-        <fileTransfer host="a07513cy.bget.ru" port="21">
+      <webServer id="77fa8274-ef65-45ef-a22e-292f718af719" name="beget.d2d" url="http://193.200.74.37">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/admin/web/delivery-angels.ru" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
-          <option name="port" value="21" />
+          <option name="port" value="22" />
         </fileTransfer>
       </webServer>
     </option>

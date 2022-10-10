@@ -30,7 +30,7 @@
 
     <!-- Custom styles for this template -->
     <script type="text/javascript" src="../host.js"></script>
-    <script src="../deliver_customer_frame.js"></script>
+    <script src="../deliver_supplier_frame.js"></script>
     <!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
     <script type='application/javascript'>
         document.addEventListener("touchstart", function() {}, false);
@@ -41,7 +41,7 @@
  <!-- KOLMI-->
       <script>
           function listener(event) {
-            if (event.origin !== 'https://delivery-angels.com' && event.origin !== 'http://localhost:63342') {
+            if (event.origin !== 'https://delivery-angels.ru' && event.origin !== 'http://localhost:63342') {
               return;
             }
 
@@ -134,37 +134,40 @@
 
         <div id="menu_item_tmplt" class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3">
         <div style="padding: 10px;">
-           <label class="item_cb col-1 col-lg-1"  style="visibility: visible;">
-                <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="" pos="" tab="">
-                <i class="fa fa-square-o fa-2x"></i>
-                <i class="fa fa-check-square-o fa-2x"></i>
-                <div>
-                    <i style="position:absolute;color:grey; top:23px;z-index: 1000; font-size: small" data-translate="23d285609698e41e54306c4189c90569">опубл</i>
-                </div>
-            </label>
+            <div class="row"  style="height: 70px">
+                <label class="item_cb col-1 col-lg-1"  style="visibility: visible;">
+                    <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="" pos="" tab="">
+                    <i class="fa fa-square-o fa-2x"></i>
+                    <i class="fa fa-check-square-o fa-2x"></i>
+                    <div>
+                        <i style="position:absolute;color:grey; top:23px;left:5px;z-index: 1000; font-size: small" data-translate="93473a7344419b15c4219cc2b6c64c6f">импорт</i>
+                    </div>
+                </label>
+
+                <div class="item_title col"></div>
+            </div>
             <button class="item_desc" data-target="">
                 <i class="icofont-justify-center icofont-1x"></i>
             </button>
-            <div class="item_title"></div>
-                <i class="fa fa-spinner fa-spin" style="display:none;position:absolute;right:50%; top:50%;font-size:24px"></i>
+            <i class="fa fa-spinner fa-spin" style="display:none;position:absolute;right:50%; top:50%;font-size:24px"></i>
 
-                <div class="item_content collapse">
-                    <div class="row prop_tmplt">
-                    <div class="prop_name col"></div>
-                    <div class="prop_val col"></div>
-                    </div>
-                    <div class="content_text">
-                    </div>
+            <div class="item_content collapse">
+                <div class="row prop_tmplt">
+                <div class="prop_name col"></div>
+                <div class="prop_val col"></div>
                 </div>
-                <div class="cert_container carousel carousel-fade"
-                    data-interval="5000">
-                    <div class="carousel-inner">
-                    </div>
-                    <div>
-                        <div class="item_price" style="display: inline-block;">35</div>
-                        <div class="dscnt_price" style="display: inline-block; visibility: hidden">30</div>
-                    </div>
-                    <div class="discount"  style="display:none">-20%</div>
+                <div class="content_text">
+                </div>
+            </div>
+            <div class="cert_container carousel carousel-fade"
+                data-interval="5000">
+                <div class="carousel-inner">
+                </div>
+                <div>
+                    <div class="item_price" style="display: inline-block;">35</div>
+                    <div class="dscnt_price" style="display: inline-block; visibility: hidden">30</div>
+                </div>
+                <div class="discount"  style="display:none">-20%</div>
             </div>
             <div class="order_container">
                 <div class="row  align-items-center">

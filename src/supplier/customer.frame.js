@@ -3,7 +3,7 @@
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
-require('bootstrap');
+// require('bootstrap');
 require("../../lib/bootstrap-rating/bootstrap-rating.js")
 require("../../lib/jquery-comments-master/js/jquery-comments.js");
 
@@ -73,9 +73,7 @@ $(document).on('readystatechange', function () {
 export class CustomerOrder{
     constructor(){
 
-        this.path  ="http://localhost:63342/d2d/server";
-        if(host_port.includes('nedol.ru'))
-            this.path = host_port;
+        this.path = host_port;
 
         this.ovc = $('body');
 
@@ -317,16 +315,7 @@ export class CustomerOrder{
                     //$(menu_item).find('.item_price').attr('contenteditable', 'true');//TODO:for premium tariff
 
                     $(menu_item).find('.item_price').text(that.offer[cat_tab][i].price);
-
-                    $(menu_item).find('.item_content').attr('id', 'content_' + cat_tab + '_' + i);
                     $(menu_item).find('.item_title').attr('data-target', '#content_' + cat_tab + '_' + i);
-
-                    // $(menu_item).find('.item_title').longTap(function (el) {
-                    //     $(menu_item).find('.item_content').collapse('show');
-                    // });
-                    $(menu_item).find('.item_title').on('click',function (el) {
-                        $(menu_item).find('.item_content').collapse("toggle");
-                    });
 
                     if(window.parent.user.profile.profile.type==="deliver") {
                         $(menu_item).find('.copy_item').parent().css('display','block');
@@ -422,7 +411,7 @@ export class CustomerOrder{
 
                             let price  = {'ru':(data?data:""),'en':(data?data:"")}[window.parent.sets.lang];
 
-                            if(that.offer[cat_tab][i].haggle ==='true') {
+                            if(that.offer[cat_tab][i].bargain ==='true') {
                                 $(menu_item).find('.item_price').attr('contenteditable', 'true');
                                 $(menu_item).find('.item_price').attr('placeholder',price);
                             }else {
@@ -653,7 +642,7 @@ export class CustomerOrder{
         // this.profile_sup.InitRateSupplier();
 
         if(!user.supplier.profile.avatar) {
-            utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://delivery-angels.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('.avatar').attr('src', src);
             });
         }else{
@@ -726,7 +715,7 @@ export class CustomerOrder{
                     func:'getcomments',
                     supuid:obj.supplier.uid
                 }
-                window.parent.network.postRequest(par, function (data) {
+                window.parent.network.SendMessage(par, function (data) {
 
                     if(data) {
                         var commentsArray = [];
@@ -757,7 +746,7 @@ export class CustomerOrder{
                     cusuid:window.parent.user.uid,
                     data:data
                 }
-                window.parent.network.postRequest(par, function (res) {
+                window.parent.network.SendMessage(par, function (res) {
                     if(!res.err) {
                         data['created_by_current_user'] = true;
                         success(saveComment(data));
@@ -774,7 +763,7 @@ export class CustomerOrder{
                     cusuid:window.parent.user.uid,
                     data:data
                 }
-                window.parent.network.postRequest(par, function (res) {
+                window.parent.network.SendMessage(par, function (res) {
                     data['created_by_current_user'] = true;
                     success(saveComment(data));
                 });
@@ -806,7 +795,7 @@ export class CustomerOrder{
             func: "getrating",
             supuid: this.uid
         }
-        window.parent.network.postRequest(data_obj, function (data) {
+        window.parent.network.SendMessage(data_obj, function (data) {
             if (data.rating)
                 $('.rating').rating('rate', data.rating);
             that.InitRateSupplier();
@@ -828,7 +817,7 @@ export class CustomerOrder{
                 supuid: that.uid,
                 value: $('.rating').val()
             }
-            window.parent.network.postRequest(data_obj, function (data) {
+            window.parent.network.SendMessage(data_obj, function (data) {
                 if(data.rating)
                     $('.rating').rating('rate',data.rating);
             });
