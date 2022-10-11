@@ -4,6 +4,6 @@ grpc
 user.log
 mysql
 docs
-.idea
 server/demo
 website
+.idea

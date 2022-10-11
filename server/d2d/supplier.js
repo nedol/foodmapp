@@ -10,7 +10,7 @@ const shortid = require('shortid');
 // var isJSON = require('is-json');
 var urlencode = require('urlencode');
 // const translate = require('google-translate-api');//ISO 639-1
-var intersection = require('array-intersection');
+// var intersection = require('array-intersection');
 const _ = require('lodash');
 
 let moment = require('moment');

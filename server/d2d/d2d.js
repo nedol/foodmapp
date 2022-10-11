@@ -10,7 +10,7 @@ const shortid = require('shortid');
 
 var urlencode = require('urlencode');
 //const translate = require('google-translate-api');//ISO 639-1
-var intersection = require('array-intersection');
+// var intersection = require('array-intersection');//TODO: lodash
 
 var _ = require('lodash');
 
@@ -287,7 +287,8 @@ module.exports = class D2D {
 
                     for(let o in result){
                         let cats = JSON.parse(result[o].cats);
-                        if (intersection(cats.map(String), q.categories).length ===0)
+
+                        if (_.intersection(cats.map(String), q.categories).length ===0)
                             continue;
                         let offer = JSON.parse(result[o].data);
                         for(let c in offer) {
@@ -376,7 +377,7 @@ module.exports = class D2D {
                     }
                     result[i].data = JSON.stringify(offer);
 
-                    if (intersection(cats.map(String), q.categories).length === 0){
+                    if (_.intersection(cats.map(String), q.categories).length === 0){
                         continue;
                     }else{
                         result[i].date = q.date.split('T')[0];

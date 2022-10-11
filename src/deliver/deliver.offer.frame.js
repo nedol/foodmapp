@@ -225,7 +225,7 @@ export class DeliverOffer{
             if($(ev.relatedTarget).attr('pane_hash') === md5($(rel_href)[0].innerHTML))
                 return;
 
-            that.saveFrame(rel_href);
+            //that.saveFrame(rel_href);
 
         });
 
