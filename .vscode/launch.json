@@ -34,7 +34,7 @@
             "name": "MP Food City",
             "request": "launch",
             "type": "chrome",
-            "url": "http://localhost:5500/dist/customer.html?lang=en&lat=55.600587&lon=37.469248&zoom=15&cat=[22]"
+            "url": "http://localhost:5500/dist/customer.html?lang=en&lat=55.600587&lon=37.469248&zoom=15&cat=[20,22,24]"
         },
 
         {
