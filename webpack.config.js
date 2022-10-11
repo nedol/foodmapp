@@ -4,62 +4,29 @@ const webpack = require('webpack'); //to access built-in plugins
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-<<<<<<< HEAD
-=======
 // var JavaScriptObfuscator = require('webpack-obfuscator');
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
 
 module.exports = {
 
-    devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':false
+    devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':false,
 
     entry: {
-<<<<<<< HEAD
-        // 'supplier': __dirname+'/src/supplier/supplier.entry.js',
-        // 'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js',
-        // 'supplier_profile':__dirname+'/src/supplier/profile.supplier.js',
-        // 'supplier_settings':__dirname+'/src/supplier/supplier.settings.js',
-        // 'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js',
-        // // // //
-        'deliver': __dirname+'/src/deliver/deliver.entry.js',
-        'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js',
-        'deliver_settings':__dirname+'/src/deliver/deliver.settings.js',
-        'deliver_profile':__dirname+'/src/deliver/profile.deliver.js',
-        'deliver_supplier_frame': __dirname+'/src/deliver/supplier.offer.frame.js',
-        // // // ,
-        //  'customer': __dirname+'/src/customer/customer.entry.js',
-        //  'customer_order': __dirname+'/src/customer/customer.order.frame.js',
-        //  'customer_profile':__dirname+'/src/customer/profile.customer.js',
-        //  'customer_cart':__dirname+'/src/customer/customer.cart.js',
-        //  'customer_settings':__dirname+'/src/customer/customer.settings.js',
-
-        'store_init': __dirname+'/src/store/init.store.js',
-        'store_order': __dirname+'/src/store/store.order.js',
-
-        // 'kolmit':  __dirname+'/src/kolmi/kolmit.js',
-        //'import_worker': __dirname+'/src/workers/import.js',
-        // 'callcenter': __dirname+'/src/kolmi/callcenter/callcenter'
-
-        // ,'foodtruck_order':__dirname+'/src/foodtruck/foodtruck.order.js'
-        // ,'customer_search':__dirname+'/src/search/customer.search.js'
-=======
          'supplier': __dirname+'/src/supplier/supplier.entry.js'
          ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
          ,'supplier_profile':__dirname+'/src/profile/profile.supplier.js'
          ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.js'
-         ,'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js'
+         ,'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js',
         // ,
          'deliver': __dirname+'/src/deliver/deliver.entry.js'
          ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
          ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
          ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
-         ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js'
+         ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js',
         //
         'customer': __dirname+'/src/customer/customer.entry.js'
         ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'
         ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
         ,'customer_settings':__dirname+'/src/customer/customer.settings.js'
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
@@ -134,24 +101,11 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.browser': 'true'
         }),
-<<<<<<< HEAD
-        //new webpack.IgnorePlugin(/your_package_name_here/),
-        // new HtmlWebpackPlugin({
-        //    template: './dist/main.tmplt.html'
-        // }),
-        //, new webpack.optimize.CommonsChunkPlugin({
-        //     name:'common'
-        // })
-        // new JavaScriptObfuscator({
-        //     rotateUnicodeArray: true
-        // }, ['supplier.js,customer.js'])
-=======
 
-        new webpack.NoEmitOnErrorsPlugin(),
-        new ExtractTextPlugin('./src/html/css/main.css'),
+        // new webpack.NoEmitOnErrorsPlugin(),
+        // new ExtractTextPlugin('./src/html/css/main.css'),
 
 
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     ],
     resolve: {
         alias: {

@@ -7,15 +7,12 @@ let utils = require('../utils');
 let fs = require('fs');
 var md5 = require('md5');
 const shortid = require('shortid');
-<<<<<<< HEAD
 // var isJSON = require('is-json');
 var urlencode = require('urlencode');
 // const translate = require('google-translate-api');//ISO 639-1
 // var intersection = require('array-intersection');
-=======
 var urlencode = require('urlencode');
 
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
 const _ = require('lodash');
 
 let moment = require('moment');
@@ -28,10 +25,7 @@ const MSG_NO_REG = 0x0001;
 
 module.exports = class Supplier extends D2D{
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     constructor(){
         super();
     }
@@ -53,10 +47,7 @@ module.exports = class Supplier extends D2D{
 
     }
 
-<<<<<<< HEAD
 
-=======
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     ConfirmEmail(q, ws) {
 
         let that = this;
@@ -271,11 +262,8 @@ module.exports = class Supplier extends D2D{
                             that.updateOfferDB(q, ws, sql_upd, values, now);
                             if(sel[0].deliver) {
                                 //copy offer to deliver's offer
-<<<<<<< HEAD
                                 //that.updateOfferDeliver(q, ws, sel[0].deliver,offer);
-=======
                                 //that.updateOfferDeliver(q, ws, sel[0].deliver,offer);//TODO:
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
                             }
                         });
                     }
@@ -880,8 +868,5 @@ module.exports = class Supplier extends D2D{
 
 // ws.writeHead(200, {'Content-Type': 'application/json'});
 // ws.send(urlencode.encode(JSON.stringify(result));
-<<<<<<< HEAD
 // return;
-=======
 // return;
->>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
