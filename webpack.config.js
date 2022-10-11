@@ -4,13 +4,17 @@ const webpack = require('webpack'); //to access built-in plugins
 
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+<<<<<<< HEAD
+=======
+// var JavaScriptObfuscator = require('webpack-obfuscator');
+>>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
 
 module.exports = {
 
-    devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':false,
-    // context: __dirname+'/js',
+    devtool: NODE_ENV ==='development'?'cheap-inline-module-source-map':false
 
     entry: {
+<<<<<<< HEAD
         // 'supplier': __dirname+'/src/supplier/supplier.entry.js',
         // 'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js',
         // 'supplier_profile':__dirname+'/src/supplier/profile.supplier.js',
@@ -38,6 +42,24 @@ module.exports = {
 
         // ,'foodtruck_order':__dirname+'/src/foodtruck/foodtruck.order.js'
         // ,'customer_search':__dirname+'/src/search/customer.search.js'
+=======
+         'supplier': __dirname+'/src/supplier/supplier.entry.js'
+         ,'supplier_offer': __dirname+'/src/supplier/supplier.offer.frame.js'
+         ,'supplier_profile':__dirname+'/src/profile/profile.supplier.js'
+         ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.js'
+         ,'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js'
+        // ,
+         'deliver': __dirname+'/src/deliver/deliver.entry.js'
+         ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
+         ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
+         ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
+         ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js'
+        //
+        'customer': __dirname+'/src/customer/customer.entry.js'
+        ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'
+        ,'customer_profile':__dirname+'/src/profile/profile.customer.js'
+        ,'customer_settings':__dirname+'/src/customer/customer.settings.js'
+>>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     },
     resolve: {
         extensions: ['.tsx', '.ts', '.js'],
@@ -47,10 +69,7 @@ module.exports = {
         filename: '[name].js',
         library: '[name]'
     },
-    // watch: NODE_ENV ==='development',
-    // watchOptions: {
-    //     aggregateTimeout:100
-    // },
+
     module: {
 
     rules: [
@@ -115,6 +134,7 @@ module.exports = {
         new webpack.DefinePlugin({
             'process.browser': 'true'
         }),
+<<<<<<< HEAD
         //new webpack.IgnorePlugin(/your_package_name_here/),
         // new HtmlWebpackPlugin({
         //    template: './dist/main.tmplt.html'
@@ -125,6 +145,13 @@ module.exports = {
         // new JavaScriptObfuscator({
         //     rotateUnicodeArray: true
         // }, ['supplier.js,customer.js'])
+=======
+
+        new webpack.NoEmitOnErrorsPlugin(),
+        new ExtractTextPlugin('./src/html/css/main.css'),
+
+
+>>>>>>> 8be24054e8e773ec3668dfcc4fd5e30bc3c673de
     ],
     resolve: {
         alias: {
