@@ -17,11 +17,11 @@ module.exports = {
          ,'supplier_settings':__dirname+'/src/supplier/supplier.settings.js'
          ,'supplier_customer_frame': __dirname+'/src/supplier/customer.frame.js',
         // ,
-         'deliver': __dirname+'/src/deliver/deliver.entry.js'
-         ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
-         ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
-         ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
-         ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js',
+        //  'deliver': __dirname+'/src/deliver/deliver.entry.js'
+        //  ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
+        //  ,'deliver_settings':__dirname+'/src/deliver/deliver.settings.js'
+        //  ,'deliver_profile':__dirname+'/src/profile/profile.deliver.js'
+        //  ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js',
         //
         'customer': __dirname+'/src/customer/customer.entry.js'
         ,'customer_order': __dirname+'/src/customer/customer.order.frame.js'

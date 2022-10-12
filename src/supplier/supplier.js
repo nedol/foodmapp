@@ -40,11 +40,13 @@ require("../../lib/blueimp-load-image/js/load-image.all.min.js");
 export class Supplier{
 
     constructor(set, uObj) {
-        // this.path  ="http://localhost:63342/d2d/server";
-        // if(host_port.includes('nedol.ru'))
-        //     this.path = host_port;
-
-        this.path = host_port;
+ 
+        this.path  ="http://localhost:5500/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = "https://delivery-angels.ru/server";
+        else
+            this.path = host_port;
+            
         this.date = moment().format('YYYY-MM-DD');
 
         this.user_ovl;

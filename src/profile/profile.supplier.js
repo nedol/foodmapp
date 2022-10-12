@@ -24,7 +24,7 @@ window.InitProfileSupplier = function (user, settings) {
 
     if(user.constructor.name==='Supplier') {
         if(!user.profile.profile.avatar) {
-            utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://delivery-angels.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('.avatar').attr('src', src);
             });
         }else{

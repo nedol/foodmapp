@@ -1828,6 +1828,12 @@ export class SupplierOffer{
                         item.packlist = {};
                     key = $(el).find('.item_pack').attr('data-translate');
                     let text = $(el).find('.item_pack').val();
+
+                    if(key !== text){
+                        delete item.packlist[key];
+                        key = text;
+                    }
+  
                     if(!key) {
                         key = md5('item_pack_' + miAr[i].id + p + text);
                         $(el).find('.item_pack').attr('data-translate', key);
@@ -1854,8 +1860,14 @@ export class SupplierOffer{
 
                     if (!item.packlist [key])
                         item.packlist [key] = {};
+  
                     item.packlist[key].qnty = $(el).find('.item_qnty').val();
                     item.packlist[key].price = $(el).find('.item_price').val();
+
+                    // if(key!==text){
+                    //     item.packlist[text] = Object.assign({} , item.packlist[key]);
+                    //     delete item.packlist[key];
+                    // }
                 }
             });
 

@@ -267,15 +267,14 @@ module.exports = class D2D {
             " AND LCASE(sup.promo)=LCASE(promo.code)"+
             " AND of.latitude>="+ q.areas[0] +" AND of.latitude<="+q.areas[1] +
             " AND of.longitude>=" + q.areas[2] + " AND of.longitude<=" +q.areas[3]+
-            " AND DATE(published) BETWEEN DATE('"+moment(q.date).subtract(7, 'days').format('YYYY-MM-DD')+"')  AND DATE('"+moment(q.date).format('YYYY-MM-DD')+"')  "
-            // " AND (" +
-            // " (SELECT id  FROM offers WHERE supuid LIKE sup.uid AND DATE(published)<=DATE('"+moment(q.date).format('YYYY-MM-DD')+"') ORDER BY date DESC LIMIT 1)= of.id" +
-            // " OR " +
-            // " (SELECT id  FROM offers WHERE supuid LIKE sup.uid AND DATE(published)>=DATE('"+moment(q.date).subtract(7, 'days').format('YYYY-MM-DD')+"') ORDER BY date DESC LIMIT 1)= of.id" +
-            // " )"+
+            " AND (" +
+            " (SELECT id  FROM offers WHERE supuid LIKE sup.uid AND DATE(published)<=DATE('"+moment(q.date).format('YYYY-MM-DD')+"') ORDER BY date DESC LIMIT 1)= of.id" +
+            " OR " +
+            " (SELECT id  FROM offers WHERE supuid LIKE sup.uid AND published>=DATE('"+moment(q.date).subtract(7, 'days').format('YYYY-MM-DD')+"') ORDER BY date ASC LIMIT 1)= of.id" +
+            " )"+
             " AND of.deleted IS NULL "+
             " ORDER by uid, date ASC";
-        console.log(sql);
+        //console.log(sql);
 
         that.mysql_con.query(sql, async function (err, result) {
             if (err) {

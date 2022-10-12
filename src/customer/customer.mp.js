@@ -44,7 +44,13 @@ let md5 = require('md5');
 export class MPCustomer{
     constructor(type){
         let that = this;
-        this.path = host_port;
+        
+        this.path  ="http://localhost:5500/d2d/server";
+        if(host_port.includes('nedol.ru'))
+            this.path = "https://delivery-angels.ru/server";
+        else
+            this.path = host_port;
+
         this.type = type;
         this.items = {};
 

@@ -73,8 +73,10 @@ $(document).on('readystatechange', function () {
 export class CustomerOrder{
     constructor(){
 
-        this.path  ="http://localhost:63342/d2d/server";
+        this.path  ="http://localhost:5500/d2d/server";
         if(host_port.includes('nedol.ru'))
+            this.path = "https://delivery-angels.ru/server";
+        else
             this.path = host_port;
 
         this.ovc = $('body');
@@ -656,7 +658,7 @@ export class CustomerOrder{
         // this.profile_sup.InitRateSupplier();
 
         if(!user.supplier.profile.avatar) {
-            utils.LoadImage("https://nedol.ru/d2d/dist/images/avatar_2x.png", function (src) {
+            utils.LoadImage("https://delivery-angels.ru/d2d/dist/images/avatar_2x.png", function (src) {
                 $('.avatar').attr('src', src);
             });
         }else{

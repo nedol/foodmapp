@@ -221,9 +221,11 @@ class ProfileCustomer{
 
         });
 
-        that.path  ="http://localhost:63342/d2d/server";
+        this.path  ="http://localhost:5500/d2d/server";
         if(host_port.includes('nedol.ru'))
-            that.path = host_port;
+            this.path = "https://delivery-angels.ru/server";
+        else
+            this.path = host_port;
 
         that.FillOrders();
 
