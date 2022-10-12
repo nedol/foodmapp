@@ -1171,7 +1171,7 @@ export class SupplierOffer{
             row.find('.bargain_div').remove();
             row.find('input').prop("contenteditable", true);
             row.find('.item_pack').attr('data-translate',l);
-            row.find('.item_price').val(pl[l].price);
+            row.find('.item_price').val(pl[l].price?pl[l].price:pl[l]);//version conflist solution
             row.find('.item_qnty').val(pl[l].qnty);
 
             $(menu_item).find('.pack').before(row);
@@ -1823,9 +1823,11 @@ export class SupplierOffer{
 
 
             $.each($(miAr[i]).find('.pack_row'), async function (p,el) {
+                if(!item.packlist)
+                    item.packlist = {};
+
                 if($(el).find('.item_pack').val() && $(el).find('.item_price ').val()) {
-                    if(!item.packlist)
-                        item.packlist = {};
+
                     key = $(el).find('.item_pack').attr('data-translate');
                     let text = $(el).find('.item_pack').val();
 
