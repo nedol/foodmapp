@@ -15,7 +15,7 @@ html, body{
 
 .brand_img{
     max-height: 25px;
-    max-width: 40px;
+    max-width: 50px;
 }
 .card-header{
     height: 45px;
@@ -196,7 +196,7 @@ input::placeholder,textarea::placeholder, div::placeholder {
 }
 
 #menu_item_empty{
-    display: none;!important;
+    display: none !important;
     /*visibility: hidden;*/
 }
 
