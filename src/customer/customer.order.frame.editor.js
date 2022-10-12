@@ -304,8 +304,8 @@ export class CustomerOrderFrameEditor {
                     $(this).addClass('active');
                     $('.div_tab_inserted').removeClass('active');
                     $($(this).attr('href')).addClass('active');
-
-                    $('#tab_' + cat_tab ).find('.menu_item:first-child')[0].scrollIntoView();
+                    if($('#tab_' + cat_tab ).find('.menu_item:first-child')[0])
+                        $('#tab_' + cat_tab ).find('.menu_item:first-child')[0].scrollIntoView();
                     $('#top_nav')[0].scrollIntoView();
                 });
 

@@ -1824,7 +1824,7 @@ export class SupplierOffer{
 
             $.each($(miAr[i]).find('.pack_row'), async function (p,el) {
                 if(!item.packlist)
-                    item.packlist = {};
+                    item.packlist = {"price":"","qnty":""};
 
                 if($(el).find('.item_pack').val() && $(el).find('.item_price ').val()) {
 
