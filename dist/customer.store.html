@@ -1,15 +1,15 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <meta http-equiv="X-UA-Compatible" content="IE=EmulateIE9">
-    <meta name="description" content="Продуктовая карта Москвы">
+    <meta name="description" content="FoodMap">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
-    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2020 11:12:01 GMT">
+    <META HTTP-EQUIV="EXPIRES" CONTENT="Tue, 20 Mar 2022 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>ДоТуДо Магазин</title>
+    <title>FoodMap</title>
 
 </head>
 <!-- for datetimepicker-->
@@ -28,7 +28,7 @@
 <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 <script type="text/javascript" src="./store_init.js?v=3"></script>
-
+<script src="assets/vendor/qrcode/qrcode.js"></script>
 
 
 <body>
@@ -39,14 +39,22 @@
         position:absolute;
         background-color: transparent;
         align-content: center;
-        width:100%; height: 100%; z-index: 50;">
+        width:100%; height: 100%;">
     <img src="" align="middle" width="100px" style="position: absolute;
         margin: auto;
         top: 0;
         left: 0;
         right: 0;
         bottom: 0;">
+
+    <div id="qr_div" style="position:absolute;z-index: 10;">
+        <canvas id="qr_canvas"></canvas>
+    </div>
 </div>
+
+
+
+
 <div id="map" class="map"></div>
 <section id="locator" style="
                       display:none;
@@ -91,42 +99,44 @@
 
 <style>
 
-       #client_frame_container{
-           height:100%
-       }
-
-@media screen and (min-width: 480px) {
-    .nav-tabs > li > a
-    {
-        padding-top: 5px;
-        padding-bottom: 5px;
-    }
-
     #client_frame_container{
-        max-width: 100%;
+        height:100%
+    }
+
+    @media screen and (min-width: 480px) {
+        .nav-tabs > li > a
+        {
+            padding-top: 5px;
+            padding-bottom: 5px;
+        }
+
+        #client_frame_container{
+            max-width: 100%;
+        }
     }
 
 
-@media screen and (min-width: 960px) {
-    #client_frame_container{
-        max-width: 100%;
+    @media screen and (min-width: 960px) {
+        #client_frame_container{
+            max-width: 100%;
+        }
     }
-}
-@media screen and (min-width: 1200px) {
-    .nav-tabs > li > a
-    {
-        /* adjust padding for height*/
-        padding-top: 6px;
-        padding-bottom: 6px;
+    @media screen and (min-width: 1200px) {
+        .nav-tabs > li > a
+        {
+            /* adjust padding for height*/
+            padding-top: 6px;
+            padding-bottom: 6px;
+        }
+        #client_frame_container{
+            max-width: 100%;
+        }
     }
-    #client_frame_container{
-        max-width: 100%;
-    }
-}
-@media screen and (min-width: 1600px) {
+    @media screen and (min-width: 1600px) {
 
-    #client_frame_container{
-        max-width: 100%;
+        #client_frame_container{
+            max-width: 100%;
+        }
     }
 
 </style>
@@ -134,9 +144,4 @@
 
 <div class="loader"></div>
 </body>
-
-
-
-<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>-->
-<!--<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.7.0/js/bootstrap.min.js"></script>-->
 </html>

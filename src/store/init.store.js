@@ -15,6 +15,8 @@ import {Import} from "../import/import";
 
 var moment = require('moment/moment');
 
+
+
 $(document).on('readystatechange', function () {
     window.network = new Сетка(host_ws);
     window.sets = {};
@@ -59,9 +61,16 @@ export class Customer{
 
     constructor() {
         this.date = moment().format('YYYY-MM-DD');
-        this.path  ="http://localhost:63342/d2d/server/";
-        if(host_port.includes('delivery-angels.ru'))
+
+        this.load_paused = false;
+
+        this.path  ="http://localhost:5500/d2d/server";
+        if(host_port.includes('delivery-angels'))
+            this.path = "https://delivery-angels.ru/server";
+        else
             this.path = host_port;
+
+        this.image_path  = image_path;
     }
 
     SetParams(uObj){
@@ -114,7 +123,7 @@ export class Customer{
                         period: obj.period,
                         categories: obj.cats,
                         logo: "../dist/images/truck.png",
-                        data: JSON.parse(obj.data.replace(new RegExp('https://delivery-angels.ru/server/images/', 'g'),'')),
+                        data: JSON.parse(obj.data.replace(new RegExp('https://nedol.ru/server/images/', 'g'),'')),
                         dict: obj.dict?JSON.parse(obj.dict):{},
                         rating: obj.rating?JSON.parse(obj.rating).value:'',
                         profile: obj.profile?JSON.parse(obj.profile):''
@@ -187,30 +196,61 @@ export class Customer{
         let that = this;
         //$('.loader').css('display','block');
         $('#splash').css('display','block');
-        $('#splash').find('img').attr('src',that.path+'images/'+obj.profile.avatar);
-
-        let client_frame = $('.client_frame_tmplt').clone();
-        client_frame.attr('src','./customer/store.html?v='+new Date().valueOf());
-        $(client_frame).removeClass('client_frame_tmplt');
-        $(client_frame).addClass('client_frame');
+        $('#splash').find('img').attr('src',that.image_path+obj.profile.avatar);
 
 
-        client_frame.on('load', function () {
-            client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
+        QRCode.toCanvas(
+            $('#qr_canvas')[0], 
+            "https://delivery-angels.ru/d2d/dist/customer.store.html?lang="+window.parent.sets.lang+"&market=food&supuid="+window.parent.user.uid, 
+            function (error) {
+                if (error) console.error(error)
+                    console.log('success!');
+            }
+        );
 
-            that.map = new OLMap();
-            that.map.Init(0,0, function () {
+        $('#qr_div').click(()=>{
+            this.load_paused = !this.load_paused;
+            if(!this.load_paused)
+                load();
+        })
+
+        function load(){
+
+            let client_frame = $('.client_frame_tmplt').clone();
+            client_frame.attr('src','./customer/store.html?v='+new Date().valueOf());
+            $(client_frame).removeClass('client_frame_tmplt');
+            $(client_frame).addClass('client_frame');
+
+
+            client_frame.on('load', function () {
+                client_frame[0].contentWindow.InitCustomerOrder(obj, targ_title);
+
+                that.map = new OLMap();
+                that.map.Init(0,0, function () {
+                });
+
+                that.import = new Import();
+                that.import.GetOrderCustomer(()=>{});
             });
 
-            that.import = new Import();
-            that.import.GetOrderCustomer(()=>{});
-        });
 
-        client_frame.css('display', 'inline-block');
-        $('#client_frame_container').css('display', 'inline');
 
-        $('#client_frame_container').empty();
-        $('#client_frame_container').prepend(client_frame[0]);
+                client_frame.css('display', 'inline-block');
+                $('#client_frame_container').css('display', 'inline');
+
+                $('#client_frame_container').empty();
+                $('#client_frame_container').prepend(client_frame[0]);
+
+                $('#qr_div').css('display','none');
+            }
+        
+
+            setTimeout(()=>{
+                if(!this.load_paused)
+                    load();
+            }, 2000);
+  
+    
 
     }
 

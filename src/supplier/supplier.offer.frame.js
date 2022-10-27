@@ -16,6 +16,8 @@ require ('tablesorter/dist/js/widgets/widget-pager.min.js');
 //
 var urlencode = require('urlencode');
 
+let qr  = require("../../dist/assets/vendor/qrcode/qrcode.js")
+
 import comment_obj from "../../dist/assets/vendor/jquery-comments/params.json";
 
 import {Utils} from "../utils/utils";
@@ -84,7 +86,14 @@ export class SupplierOffer{
     constructor(){
         let that = this;
 
-        this.path = host_port;
+        this.path  ="http://localhost:5500/d2d/server";
+        if(host_port.includes('delivery-angels'))
+            this.path = "https://delivery-angels.ru/server";
+        else
+            this.path = host_port;
+
+        this.image_path  = image_path;
+
         this.uid = window.parent.user.uid;
         this.profile = window.parent.user.profile.profile;
         this.offer = window.parent.user.offer.stobj.data;
@@ -283,7 +292,7 @@ export class SupplierOffer{
             let kolmi = $('iframe.kolmi_tmplt').clone();
             $(kolmi).css('display', 'block')
                 .attr('class', 'kolmi')
-                .attr('src', '../kolmi/kolmi.html?trans=all&role=operator&em=' + window.parent.user.email);
+                .attr('src', '../kolmit/user/iframe.html?abonent=d2d@kolmit&em=' + window.parent.user.email);
             $('#kolmi_pane').append(kolmi);
         }
 
@@ -543,7 +552,7 @@ export class SupplierOffer{
                 let src = that.offer[tab][i].cert[c].src;
 
                 if (!that.offer[tab][i].cert[c].src.includes('data:image'))
-                    src = that.path + "/images/" + that.offer[tab][i].cert[c].src;
+                    src = that.image_path + that.offer[tab][i].cert[c].src;
                 if ($(menu_item).find('img[src="' + src + '"]').length === 0) {
                     $(menu_item).find('.carousel-inner').append(
                         '<div class="carousel-item">' +
@@ -1018,7 +1027,7 @@ export class SupplierOffer{
                         $(kolmi).css('display', 'block')
                             .css('margin', '0 auto')
                             .attr('class', 'kolmi')
-                            .attr('src', '../kolmi/kolmi.html?&role=user&uid=' + md5(res[i].cusuid) + '&abonent='+res[i].cusuid);
+                            .attr('src', '../kolmit/iframe.html?&role=user&uid=' + md5(res[i].cusuid) + '&abonent='+res[i].cusuid);
                         total+=data[kAr[k]].ordlist[o].price*data[kAr[k]].ordlist[o].qnty;
                         let cat = $('.category#'+data[kAr[k]].cat, window.parent.document).attr('cat');
 
@@ -1186,9 +1195,10 @@ export class SupplierOffer{
             if (profile.avatar.includes('base64'))
                 $('.avatar').attr('src',profile.avatar);
             else
-                $('.avatar').attr('src', this.path + '/images/' + profile.avatar);
+                $('.avatar').attr('src', this.image_path + profile.avatar);
         }else
             $('.avatar').attr('src', 'https://delivery-angels.ru/d2d/dist/images/user.png');
+
         $('input').attr('title', '');
         $('#name').val(profile.name);
         $('#email').val(profile.email);
@@ -1211,13 +1221,24 @@ export class SupplierOffer{
             $('#map_link').attr('href',"https://delivery-angels.ru/d2d/dist/customer.store.html?lang="+window.parent.sets.lang+"&market=food&supuid="+window.parent.user.uid);
 
         }
+
+  
+        QRCode.toCanvas(
+            document.getElementById('qr_canvas'), 
+            "https://delivery-angels.ru/d2d/dist/customer.store.html?lang="+window.parent.sets.lang+"&market=food&supuid="+window.parent.user.uid, 
+            function (error) {
+                if (error) console.error(error)
+                    console.log('success!');
+            }
+        );
+
     }
 
     InitSupplierReview(sup){
 
         let par = {
             readOnly: (sup.appr && sup.appr.cusuid === window.parent.user.uid) ? false : true,
-            profilePictureURL: sup.profile.avatar ? this.path + '/images/' + sup.profile.avatar : 'https://delivery-angels.ru/d2d/dist/images/user.png',
+            profilePictureURL: sup.profile.avatar ? this.image_path  + sup.profile.avatar : 'https://delivery-angels.ru/d2d/dist/images/user.png',
             enableEditing: true,
             enableDeleting: false,
             enableReplying: false
@@ -1824,7 +1845,7 @@ export class SupplierOffer{
 
             $.each($(miAr[i]).find('.pack_row'), async function (p,el) {
                 if(!item.packlist)
-                    item.packlist = {"price":"","qnty":""};
+                    item.packlist = {};
 
                 if($(el).find('.item_pack').val() && $(el).find('.item_price ').val()) {
 
@@ -1985,8 +2006,8 @@ export class SupplierOffer{
                             set.profile.avatar = res_.avatar;
                         }
                         window.parent.db.SetObject('setStore', set, function (res) {
-                            $('#user', window.parent.document).attr('src', that.path + '/images/' + res_.avatar);
-                            $('#user',$('#fd_frame_tmplt', window.parent.document).contents()).attr('src', that.path + '/images/' + res_.avatar);
+                            $('#user', window.parent.document).attr('src', that.image_path  + res_.avatar);
+                            $('#user',$('#fd_frame_tmplt', window.parent.document).contents()).attr('src', that.image_path  + res_.avatar);
                             that.profile = set.profile;
                             window.parent.user.profile.profile = set.profile;
                             window.parent.user.promo = data_post.promo;
