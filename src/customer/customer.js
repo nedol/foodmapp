@@ -355,7 +355,7 @@ export class Customer {
 
       if (that.import) that.import.GetApprovedCustomer(that.uid);
 
-      that.SetOrders(() => {});
+      that.SetOrdCnt();
 
       if (that.map) {
         that.map.EmptyMap();
@@ -641,3 +641,9 @@ export class Customer {
     });
   }
 }
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/customer/customer.js
+// module id = 744
+// module chunks = 2
