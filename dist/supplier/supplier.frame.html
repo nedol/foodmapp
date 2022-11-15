@@ -8,10 +8,11 @@
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
     <META HTTP-EQUIV="EXPIRES" CONTENT="Mon, 8 Apr 2019 11:12:01 GMT">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>FoodMap</title>
+    <title>FoodMapp</title>
 
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
     <link href="../assets/vendor/icofont/icofont.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="../../lib/bootstrap-rating/bootstrap-rating.css">
@@ -28,7 +29,7 @@
 
     <script type="text/javascript" src="../../lib/blueimp-load-image/js/load-image.all.min.js"></script>
     <script type="text/javascript" src="../host.js"></script>
-    <script type="text/javascript" src="../supplier_offer.js?v=34"></script>
+    <script type="text/javascript" src="../supplier_offer.js"></script>
 
     <script type='application/javascript'>
         document.addEventListener("touchstart", function() {}, false);
@@ -37,7 +38,7 @@
     <!-- KOLMI-->
     <script>
           function listener(event) {
-            if (event.origin !== 'https://delivery-angels.ru' && event.origin !== 'http://localhost:63342') {
+            if (event.origin !== 'https://nedol.ru' && event.origin !== 'http://localhost:5500') {
               return;
             }
 
@@ -162,7 +163,7 @@
                 </div>
 
                 <div class="item_body collapse" style="position:relative; top:-2px; width: 100%; text-align: left">
-                    <div class="brand" style="position: absolute; top: 0px; right: 50px; color: red; font-size: 2em; z-index: 1001; visibility: visible;">
+                    <div class="brand">
                             &trade;
                         <img class="brand_img brand" style="position:absolute;right:0;pointer-events: none;image-orientation:from-image;border-width: 0; max-height:40px;max-width:40px;z-index: 1002;" src="">
                     </div>
@@ -180,7 +181,7 @@
                             <div style="margin: 0 auto;">
                                 <div class="prop container">
                                     <div class="row prop_tmplt">
-                                        <div class="add_prop_div" style="position:absolute;right:-10px;top:0px;z-index: 1000;width:50px">
+                                        <div class="add_prop_div" style="position:absolute;right:0px;top:0px;z-index: 1000;width:50px">
                                             <span class="add_prop fa fa-plus-circle"></span>
                                         </div>
                                         <div class="prop_key_div">
@@ -270,10 +271,10 @@
                         <span class="fa fa-handshake-o"  data-translate title="6f8063417ab31f38d864c28302f3de2f"></span>
                     </th>
                     <th  scope="col">
-                        <span class="fa fa-square"  data-translate title=""></span>
+                        <i class="icofont-ui-home" data-translate title=""></i>
                     </th>
                     <th scope="col">
-                        <span class="fa fa-square"  data-translate title=""></span>
+                        <span  class="icofont-fruits"  data-translate title=""></span>
                     </th>
                     <th  scope="col">
                         <span class="fa fa-square"  data-translate title=""></span>
@@ -354,6 +355,12 @@
                                             </textarea>
                                         </div>
                                     </div>
+                                    <div class="form-group">
+                                        <div class="col-xs-6">                                        
+                                            <input type="checkbox" id="delivery" name="delivery">
+                                            <label for="delivery" data-translate>b41e026d993eee7ba620c2177c4fa0e0</label>
+                                        </div>
+                                    </div>
 
                                     <div class="w-50 p-3"></div>
                                     <div class="form-group">
@@ -385,19 +392,14 @@
                                                         data-toggle="tooltip" data-placement="top" title="Ссылка скопирована!" data-translate="265963d8bab475a3e5ff9e55ac7d5f76">Скопировать ссылку на олайн магазин</a>
                                                 </span>
                                             </label>
+
                                         </div>
                                     </div>
-
                                     <div class="form-group">
                                         <div class="col-xs-6">
-
-                                            <canvas id="qr_canvas"></canvas>
-
-                                            <script src="../assets/vendor/qrcode/qrcode.js"></script>
-                     
+                                            <canvas id="qr_canvas"></canvas>                     
                                         </div>
                                     </div>
-
                             </div>
                         </div><!--/tab-pane-->
 
