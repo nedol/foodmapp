@@ -18,7 +18,7 @@
     <link rel="stylesheet" type="text/css" href="../../lib/jquery-comments-master/css/jquery-comments.css">
     <link href='https://fonts.googleapis.com/css?family=Roboto:400,700' rel='stylesheet' type='text/css'>
     <link href='https://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Constantia:400,700' rel='stylesheet' type='text/css'>
+    <!-- <link href='https://fonts.googleapis.com/css?family=Constantia:400,700' rel='stylesheet' type='text/css'> -->
     <link href='https://cdnjs.cloudflare.com/ajax/libs/flag-icon-css/0.8.2/css/flag-icon.min.css' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../../lib/style.css"  type='text/css'>
 
@@ -66,7 +66,7 @@
 </head>
 <body>
 
-<ul class="nav nav-tabs nav-justified" style="overflow-x:auto;flex-wrap: nowrap;">
+<ul class="nav nav-tabs nav-justified" style="display:flex;   flex-direction: row; overflow-x:auto;flex-wrap: nowrap;">
     <li class="nav-item">
         <a  class="nav-link active" data-toggle="tab" href="#editor_pane">
         <img id="range_img" src="../images/product_range.png" style="height:25px" alt="Ассортимент">
@@ -84,47 +84,49 @@
         </a>
     </li>
 
-    <li class="nav-item">
+    <!-- <li class="nav-item">
         <div style="display: flex;justify-content: center;">
             <a id="" class="nav-link call_but_placeholder" data-toggle="tab" href="#kolmi_pane"
                 title="Kolmi" style="position: relative;height: 50px">
             </a>
         </div>
-    </li>
+ 
+    </li> -->
 
     <li class="nav-item">
         <input type="date" class="dt_val"
-             style="width:120px; height: 30px;
+             style="width:90px; height: 30px;
                         background-color:white;text-align:center;float:left;height:34px;font-size: small;
                         border-width: 0; border-radius: 5px;outline: none">
         </input>
+    </li>
+    <li class="nav-item">
+        <div>
+            <div id="lang_sel" style="
+                position: absolute;
+                right: 0;
+                z-index: 10000;
+                border-width:0;
+                background-color: #ffffff99;
+                border-radius: 5px;">
+            <button type="button" class="btn btn-primary" data-toggle="collapse"  data-target="#collapse_lang"
+                style="background-color:#00000054;border-width: 0; ">
+                <span class="flag-icon flag-icon-us"></span>
+            </button>
+            <ul id="collapse_lang" class="collapse list-group" >
+                <li class="list-group-item" role="langitem" value="ua" href="#"><span class="flag-icon flag-icon-ua"></span></li>
+                <li class="list-group-item" role="langitem" value="en" href="#"><span class="flag-icon flag-icon-us"></span></li>
+                <li class="list-group-item" role="langitem" value="fr" href="#"><span class="flag-icon flag-icon-fr"></span></li>
+                <li class="list-group-item" role="langitem" value="nl" href="#"><span class="flag-icon flag-icon-nl"></span></li>
+            </ul>
+            </div>
+        </div>
     </li>
 </ul>
 
 
 <div class="tab-content">
     <div class="tab-pane active" id="editor_pane">
-
-        <div>
-            <div id="lang_sel" style="
-                   position: fixed;
-                   left:0px;
-                   top:50px;
-                   z-index: 10000;
-                   border-width:0;
-                   background-color: #ffffff99;
-                   border-radius: 5px;">
-              <button type="button" class="btn btn-primary" data-toggle="collapse"  data-target="#collapse_lang"
-                 style="background-color:#00000054;border-width: 0; ">
-                 <span class="flag-icon flag-icon-ru"></span>
-              </button>
-              <ul id="collapse_lang" class="collapse list-group" >
-                <li class="list-group-item" role="langitem" value="ru" href="#"><span class="flag-icon flag-icon-ru"></span></li>
-                <li class="list-group-item" role="langitem" value="en" href="#"><span class="flag-icon flag-icon-us"></span></li>
-                <li class="list-group-item" role="langitem" value="fr" href="#"><span class="flag-icon flag-icon-fr"></span></li>
-              </ul>
-            </div>
-        </div>
 
         <div>
             <span class="icofont-filter icofont-2x" data-toggle="collapse" data-target=".filter_div"
@@ -409,7 +411,7 @@
                                                 </script>
                                                 <span>
                                                     <a id="map_link" name="map_link" target="_blank" href="" onclick="copyLink(this);return false;"
-                                                        data-toggle="tooltip" data-placement="top" title="Ссылка скопирована!">Скопировать ссылку на олайн магазин</a>
+                                                        data-toggle="tooltip" data-placement="top"  title="Ссылка скопирована!" data-translate="265963d8bab475a3e5ff9e55ac7d5f76"></a>
                                                 </span>
                                             </label>
 

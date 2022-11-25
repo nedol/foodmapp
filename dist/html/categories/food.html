@@ -1,533 +1,1159 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Title</title>
-</head>
-<body>
-<div id="cat_incl">
-    <style>
-        .mp_open{
-            margin-right:10px;
-            min-width:25px;
-            color: rgb(57,137,206);
-            border-width: 0;
-            background-color: transparent;
+  </head>
+  <body>
+    <div id="cat_incl">
+      <style>
+        .mp_open {
+          margin-right: 10px;
+          min-width: 25px;
+          color: rgb(57, 137, 206);
+          border-width: 0;
+          background-color: transparent;
         }
-        .mp_open[type=deliver]{
-            transform: scale(1.6,2);
+        .mp_open[type='deliver'] {
+          transform: scale(1.6, 2);
         }
         .tooltip {
-            font-family: Georgia;
-            font-size: 20px;
+          font-family: Georgia;
+          font-size: 20px;
         }
         .tooltip-inner {
-            max-width: 500px !important;
+          max-width: 500px !important;
         }
-        #cat_incl{
-            position: absolute;
-            width:100%;
-            bottom:0px;
-        }
-
-
-        #categories{
-            position: absolute;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 10px;
-            padding-left: 35px;
-            width: 100%;
-            bottom:-7px;
-            background-color: rgba(243, 243, 243, 1.0);
-            white-space: nowrap;
-            z-index:1000;
-        }
-        .main_category{
-
-            /*margin-left: 25px;*/
-            /*margin-right: 25px;*/
-            /*padding-left: 10px;*/
-            /*padding-right: 10px;*/
-            height: 45px;
-            width: 45px;
-        }
-        .category{
-            margin-left: 25px;
-            margin-right: 25px;
-            /*padding-left: 10px;*/
-            /*padding-right: 10px;*/
-            height: 45px;
-            width: 45px;
-            border-width: 0;
+        #cat_incl {
+          position: absolute;
+          width: 100%;
+          bottom: 0px;
         }
 
-        .category:hover{
-            /*height: 50px;*/
-            /*width: 50px;*/
+        #categories {
+          position: absolute;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          padding: 10px;
+          padding-left: 35px;
+          width: 100%;
+          bottom: -7px;
+          background-color: rgba(243, 243, 243, 1);
+          white-space: nowrap;
+          z-index: 1000;
         }
-        .dropup{
-            display: inline-block !important;
-            position: relative;
-            margin-right:30px;
-            margin-left: 30px;
-
+        .main_category {
+          /*margin-left: 25px;*/
+          /*margin-right: 25px;*/
+          /*padding-left: 10px;*/
+          /*padding-right: 10px;*/
+          height: 45px;
+          width: 45px;
         }
-        .sub_cat{
-            /*width: 350px;*/
-            height: 125%;
-            transform: translate3d(0px, -7px, 0px) !important;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            background-color: #8f8f8f;
-            white-space: nowrap;
-        }
-        .title{
-            position: absolute;
-            bottom:0px;
-            left: 0;
-            right:0;
-            color: #273be6;
-            background-color: rgba(243, 243, 243, .0);
-            font-size: small;
-            /*-webkit-text-stroke: .5px #ffffff;*/
-            pointer-events: none;
-            margin:auto;
-            text-align: center;
-            line-height: 12px;
-        }
-        .cat_div{
-            display: inline-block;
-            position: relative;
-        }
-        .badge{
-            position: absolute;
-            top: 0;
-            right: 0px;
-
-        }
-        input{
-            cursor:pointer
+        .category {
+          margin-left: 25px;
+          margin-right: 25px;
+          /*padding-left: 10px;*/
+          /*padding-right: 10px;*/
+          height: 45px;
+          width: 45px;
+          border-width: 0;
         }
 
-       button[disabled] span{
-            color: #6c757d !important;
-       }
+        .dropup {
+          display: inline-block !important;
+          position: relative;
+          margin-right: 30px;
+          margin-left: 30px;
+        }
+        .sub_cat {
+          /*width: 350px;*/
+          height: 125%;
+          transform: translate3d(0px, -7px, 0px) !important;
+          overflow-x: auto;
+          -webkit-overflow-scrolling: touch;
+          background-color: #8f8f8f;
+          white-space: nowrap;
+        }
+        .title {
+          position: absolute;
+          bottom: 0px;
+          left: 0;
+          right: 0;
+          color: #273be6;
+          background-color: rgba(243, 243, 243, 0);
+          font-size: small;
+          /*-webkit-text-stroke: .5px #ffffff;*/
+          pointer-events: none;
+          margin: auto;
+          text-align: center;
+          line-height: 12px;
+        }
+        .cat_div {
+          display: inline-block;
+          position: relative;
+        }
+        .badge {
+          position: absolute;
+          top: 0;
+          right: 0px;
+        }
+        input {
+          cursor: pointer;
+        }
 
-       .cat_menu{
-            margin-left:10px;
-            margin-right: 10px;
-       }
+        button[disabled] span {
+          color: #6c757d !important;
+        }
 
-    </style>
+        .cat_menu {
+          margin-left: 10px;
+          margin-right: 10px;
+        }
+      </style>
 
-    <div class="d-inline-flex justify-content-start" style="min-width:20px;max-width:100%;background-color:white;border-radius: 5px;">
-        <div class="word_ig p-2" style="min-width:25px;color: rgb(57,137,206); ">
-            <div class="cat_menu input-group-prepend">
-                <i class="icofont-apple icofont-2x"></i>
-            </div>
+      <div
+        class="d-inline-flex justify-content-start"
+        style="
+          min-width: 20px;
+          max-width: 100%;
+          background-color: white;
+          border-radius: 5px;
+        "
+      >
+        <div
+          class="word_ig p-2"
+          style="min-width: 25px; color: rgb(57, 137, 206)"
+        >
+          <div class="cat_menu input-group-prepend">
+            <i class="icofont-apple icofont-2x"></i>
+          </div>
 
-            <style>
-                ::placeholder {
-                    color: #b21312 !important;
-                    font-weight: normal;
-                    font-size:large;
-                    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
-                }
-
-            </style>
+          <style>
+            ::placeholder {
+              color: #b21312 !important;
+              font-weight: normal;
+              font-size: large;
+              font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            }
+          </style>
         </div>
         <div class="p-2">
-            <input type="text" class="word_input form-control p-2" placeholder="#" style="display: none;max-width:100px;">
-
+          <input
+            type="text"
+            class="word_input form-control p-2"
+            placeholder="#"
+            style="display: none; max-width: 100px"
+          />
         </div>
-        <div class="word_tmplt p-2" style="display: none;">
-            <div class="input-group-prepend">
-                <button class="word_btn btn btn-primary" type="button">Basic Button</button>
-                <button class="word_rmv btn-sm btn-danger" type="button">X</button>
+        <div class="word_tmplt p-2" style="display: none">
+          <div class="input-group-prepend">
+            <button class="word_btn btn btn-primary" type="button">
+              Basic Button
+            </button>
+            <button class="word_rmv btn-sm btn-danger" type="button">X</button>
+          </div>
+        </div>
+
+        <button type="button" class="mp_open word_ig p-2" user_type="marketer">
+          <span
+            class="icofont-food-cart icofont-2x"
+            style="color: rgb(57, 137, 206); font-size: 2em"
+          ></span>
+        </button>
+        <button type="button" class="mp_open word_ig p-2" user_type="deliver">
+          <span
+            class="icofont-fast-delivery icofont-2x"
+            style="color: rgb(57, 137, 206); font-size: 2em"
+          ></span>
+        </button>
+      </div>
+
+      <div id="categories" data-toggle="tooltip" data-placement="top">
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Еда"
+            src="https://delivery-angels.store/fm/dist/images/ic_0.0.png"
+            state="0"
+          />
+          <i
+            class="title text-center"
+            data-translate="c2c465fbfcf2b204659075fbd42ca3a9"
+            >Street<br />Food</i
+          >
+          <span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_0">
+              <img
+                id="0"
+                class="category"
+                extra="true"
+                cat="Pizza"
+                src="https://delivery-angels.store/fm/dist/images/ic_0.png"
+                state="0"
+              />
+              <i class="title" data-translate="c6586b2e09d0ed0ee6431a1bb280657f"
+                >Pizza</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
             </div>
-        </div>
-
-         <button type="button" class="mp_open word_ig p-2" user_type="marketer">
-            <span class="icofont-food-cart icofont-2x" style="color: rgb(57,137,206);font-size:2em"></span>
-          </button>
-          <button type="button" class="mp_open word_ig p-2" user_type="deliver">
-            <span class="icofont-fast-delivery icofont-2x" style="color: rgb(57,137,206);font-size:2em"></span>
-          </button>
-
-    </div>
-
-    <div id="categories"  data-toggle="tooltip" data-placement="top" >
-        <div  class="dropup   text-center">
-            <img class="main_category" data-toggle="dropdown" title="Еда" src="https://delivery-angels.ru/d2d/dist/images/ic_0.0.png" state="0"/>
-            <i class="title text-center" data-translate="c2c465fbfcf2b204659075fbd42ca3a9">Street<br>Food</i>
-            <span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_0">
-                    <img id="0" class="category" extra="true" cat="Pizza"  src="https://delivery-angels.ru/d2d/dist/images/ic_0.png" state="0" />
-                    <i class="title" data-translate="c6586b2e09d0ed0ee6431a1bb280657f">Pizza</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_1">
-                    <img id="1" class="category"  extra="true" cat="Sushi"  src="https://delivery-angels.ru/d2d/dist/images/ic_1.png" state="0" />
-                    <i class="title" data-translate="c121700b935ccf14f1274e006d859ee0">Sushi</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_2">
-                    <img id="2" class="category"  extra="true" cat="StreetFood" src="https://delivery-angels.ru/d2d/dist/images/ic_2.png" state="0" />
-                    <i class="title" data-translate="c2c465fbfcf2b204659075fbd42ca3a9">Street<br>Food</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_3">
-                    <img id="3" class="category"  extra="true" cat="Restaurant" src="https://delivery-angels.ru/d2d/dist/images/ic_3.png" state="0" />
-                    <i class="title" data-translate="e197a9ccf40b776f31368105d1aa8c4b">From<br>Rest</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_9">
-                    <img  class="category" cat="Ice-cream" id="9" src="https://delivery-angels.ru/d2d/dist/images/ic_9.png" state="0" />
-                    <i class="title" data-translate="22322b2b47dab77cb37cda3ae584c36a">Ice cream</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-
-        <div  class="dropup  text-center">
-            <img   class="main_category" data-toggle="dropdown"  title="Veggies" src="https://delivery-angels.ru/d2d/dist/images/ic_10.png"/>
-            <i class="title" data-translate="95ae59f9bd12719f5e5d799e58022505">Veggies</i>
-            <span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_10">
-                    <img id="10" class="category" cat="Veggies" title="Veggies" src="https://delivery-angels.ru/d2d/dist/images/ic_10.png" state="0"/>
-                    <i class="title" data-translate="95ae59f9bd12719f5e5d799e58022505">Veggies</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_14">
-                    <img id="14" class="category"  cat="Greens" title="Greens" src="https://delivery-angels.ru/d2d/dist/images/ic_14.png" state="0"/>
-                    <i class="title" data-translate="1dd1c5b63d654fcb61bc0be7fc41bbf0">Greens</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div  text-center" data-toggle="tab" href="#tab_15">
-                    <img id="15" class="category  stretched-link"  cat="Mushrooms" title="Mushrooms" src="https://delivery-angels.ru/d2d/dist/images/ic_15.png" state="0"/>
-                    <i class="title" data-translate="8c76e09a7a292cc2a857d4ceafe5d6ea">Mushrooms</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_19">
-                    <img id="19" class="category"  cat="Pickles" title="Pickles" src="https://delivery-angels.ru/d2d/dist/images/ic_19.png" state="0"/>
-                    <i class="title" data-translate="f8e51e2a65b49f5b11db199d05530576">Pickles</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup  text-center">
-            <img id="30" class="main_category" data-toggle="dropdown"   title="Fruits" src="https://delivery-angels.ru/d2d/dist/images/ic_30.png" state="0"/>
-            <i class="title" data-translate="a36ef47851e2b0fce36c1148d152749a">Fruits</i>
-            <span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_31">
-                    <img class="category" cat="Fruits" id="31" title="Fruits" src="https://delivery-angels.ru/d2d/dist/images/ic_30.png" state="0"/>
-                    <i class="title" data-translate="a36ef47851e2b0fce36c1148d152749a">Fruits</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_32">
-                    <img class="category" cat="Berries" id="32" title="Berries" src="https://delivery-angels.ru/d2d/dist/images/ic_32.png" state="0"/>
-                    <i class="title" data-translate="c89f71156fb3b129973d288f48c1a0a2">Berries</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_33">
-                    <img class="category" cat="Gourds" id="33" title="Gourds" src="https://delivery-angels.ru/d2d/dist/images/ic_33.png" state="0"/>
-                    <i class="title" data-translate="2f55164fcab5c973d2359ce21cfa9048">Gourds</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_34">
-                    <img class="category" cat="Exotic" id="34" title="Exotic" src="https://delivery-angels.ru/d2d/dist/images/ic_34.png" state="0"/>
-                    <i class="title" data-translate="e4120fc5cb9df630d2f54ee644faafa7">Exotic<br>Fruits</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup  text-center">
-            <img class="main_category" data-toggle="dropdown"  title="Dairy" src="https://delivery-angels.ru/d2d/dist/images/ic_20.0.png" state="0" />
-            <i class="title" data-translate="4b02a5b8da403b36083763c143a56854">Dairy<br>Eggs</i>
-            <span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_20">
-                    <img class="category" cat="Milk" id="20" title="Milk" src="https://delivery-angels.ru/d2d/dist/images/ic_20.png" state="0"/>
-                    <i class="title" data-translate="4b02a5b8da403b36083763c143a56854">Milk</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_21">
-                    <img class="category" cat="SourCream" id="21" title="Sour Cream,Yogurts" src="https://delivery-angels.ru/d2d/dist/images/ic_21.png" state="0"/>
-                    <i class="title" data-translate="5b591bad6d9ce5c8c7494834ade42132">Sour Cream<br/>Yogurts</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_22">
-                    <img class="category" cat="CottageCheese" id="22" title="Cottage Cheese" src="https://delivery-angels.ru/d2d/dist/images/ic_22.png" state="0"/>
-                    <i class="title" data-translate="cf1dfd60d1e931e52ec346bc376e9602">Cottage<br/>Cheese</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_24">
-                    <img class="category" cat="Cheese" id="24" title="Cheese" src="https://delivery-angels.ru/d2d/dist/images/ic_24.png" state="0"/>
-                    <i class="title" data-translate="a67778b3dcc82bfaace0f8bc0061f20e">Cheese</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_29">
-                    <img class="category" cat="Eggs" id="29" title="Eggs" src="https://delivery-angels.ru/d2d/dist/images/ic_23.png" state="0"/>
-                    <i class="title" data-translate="9890f06976131702b942e59eda2f750a">Eggs</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup  text-center">
-            <img  class="main_category" data-toggle="dropdown" title="Мясо" src="https://delivery-angels.ru/d2d/dist/images/ic_40.png" state="0"/>
-            <i class="title" data-translate="e4b662d3892f8c0c86801919f979467f">Meat</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_40">
-                    <img class="category" cat="Beef" id="40" title="Beef" src="https://delivery-angels.ru/d2d/dist/images/ic_40.png" state="0"/>
-                    <i class="title" data-translate="8f1f76515c4ee9a16594eda002337134">Beef</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_41">
-                    <img class="category" cat="Pork" id="41" title="Pork" src="https://delivery-angels.ru/d2d/dist/images/ic_41.png" state="0"/>
-                    <i class="title" data-translate="34e3f440dad631cf8d085c8c3eca894b">Pork</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_42">
-                    <img class="category" cat="Lamb" id="42" title="Lamb" src="https://delivery-angels.ru/d2d/dist/images/ic_42.png" state="0"/>
-                    <i class="title" data-translate="07e1e19a2e90a9d843d02cbdb445fa69">Lamb</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_45">
-                    <img class="category" cat="Semifinished" id="45" title="Semifinished" src="https://delivery-angels.ru/d2d/dist/images/ic_45.png" state="0"/>
-                    <i class="title" data-translate="810771055916119e41dea16330c4d834">Semifinished</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_46">
-                    <img class="category" cat="Sausages" id="46" title="Sausages" src="https://delivery-angels.ru/d2d/dist/images/ic_46.png" state="0"/>
-                    <i class="title" data-translate="bf9cee6ef204cf043be970dcd4837fa4">Sausages</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup  text-center">
-            <img  class="main_category dropdown-toggle" data-toggle="dropdown" title="Рыба" src="https://delivery-angels.ru/d2d/dist/images/ic_50.png" state="0"/>
-            <i class="title" data-translate="071642fa72ba780ee90ed36350d82745">Fish</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_50">
-                    <img class="category" cat="Fish" id="50" title="Fish" src="https://delivery-angels.ru/d2d/dist/images/ic_50.png" state="0"/>
-                    <i class="title" data-translate="071642fa72ba780ee90ed36350d82745">Fish</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_52">
-                    <img class="category" cat="SeaFood" id="52" title="Sea Food" src="https://delivery-angels.ru/d2d/dist/images/ic_52.png" state="0"/>
-                    <i class="title" data-translate="479d57d583cc7e26f8c8b244c20729eb">Sea<br>Food</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-        
-        <div  class="dropup  text-center">
-            <img  cat="Птица"  title="Птица" class="main_category dropdown-toggle" data-toggle="dropdown" src="https://delivery-angels.ru/d2d/dist/images/ic_60.png" state="0">
-            <i class="title" data-translate="c45c974fa258e5d8cd30f0f7d0f9827d">Poultry</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_60">
-                    <img class="category" cat="Chicken" id="60" src="https://delivery-angels.ru/d2d/dist/images/ic_60.png" state="0"/>
-                    <i class="title" data-translate="a9514f8884af954749b66932d8a95a76">Chicken</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_61">
-                    <img class="category" cat="Turkey" id="61" src="https://delivery-angels.ru/d2d/dist/images/ic_61.png" state="0"/>
-                    <i class="title" data-translate="221cdfb73049678e244380b45872cbb2">Turkey</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_62">
-                    <img class="category" cat="Duck" id="62" src="https://delivery-angels.ru/d2d/dist/images/ic_62.png" state="0"/>
-                    <i class="title" data-translate="f97ca8decb3a5f04d11d0e3c6ff3f0cd">Duck</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_1">
+              <img
+                id="1"
+                class="category"
+                extra="true"
+                cat="Sushi"
+                src="https://delivery-angels.store/fm/dist/images/ic_1.png"
+                state="0"
+              />
+              <i class="title" data-translate="c121700b935ccf14f1274e006d859ee0"
+                >Sushi</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_2">
+              <img
+                id="2"
+                class="category"
+                extra="true"
+                cat="StreetFood"
+                src="https://delivery-angels.store/fm/dist/images/ic_2.png"
+                state="0"
+              />
+              <i class="title" data-translate="c2c465fbfcf2b204659075fbd42ca3a9"
+                >Street<br />Food</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_3">
+              <img
+                id="3"
+                class="category"
+                extra="true"
+                cat="Restaurant"
+                src="https://delivery-angels.store/fm/dist/images/ic_3.png"
+                state="0"
+              />
+              <i class="title" data-translate="e197a9ccf40b776f31368105d1aa8c4b"
+                >From<br />Rest</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_9">
+              <img
+                class="category"
+                cat="Ice-cream"
+                id="9"
+                src="https://delivery-angels.store/fm/dist/images/ic_9.png"
+                state="0"
+              />
+              <i class="title" data-translate="22322b2b47dab77cb37cda3ae584c36a"
+                >Ice cream</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
         </div>
 
         <div class="dropup text-center">
-            <img cat="Drinks" class="main_category dropdown-toggle"  data-toggle="dropdown" src="https://delivery-angels.ru/d2d/dist/images/ic_70.0.png">
-            <i class="title" data-translate="636d2370c523f2b2f49a568b6485f1f5">Beverage</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div  text-center" data-toggle="tab" href="#tab_70">
-                    <img class="category" cat="Water" id="70" src="https://delivery-angels.ru/d2d/dist/images/ic_70.png" state="0"/>
-                    <i class="title" data-translate="27634ff8002b12e75d98e07ccd005d18">Water</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div  text-center" data-toggle="tab" href="#tab_73">
-                    <img class="category" cat="Limonade" id="73"  src="https://delivery-angels.ru/d2d/dist/images/ic_73.png" state="0"/>
-                    <i class="title" data-translate="d49929af79e93ff191fb7495478c7fd4">Cola<br/>Limonade</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_75">
-                    <img class="category" cat="Juice" id="75" src="https://delivery-angels.ru/d2d/dist/images/ic_75.png" state="0"/>
-                    <i class="title" data-translate="8754016bce09674b1796cd2cc062d7da">Juice</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_76">
-                    <img class="category" cat="Energetic" id="76" title="Energetics" src="https://delivery-angels.ru/d2d/dist/images/ic_76.png" state="0"/>
-                    <i class="title" data-translate="b0e2e27703cfc8b5155f0c66d861d798">Energetic</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_78">
-                    <img class="category" cat="Brewery" id="78" src="https://delivery-angels.ru/d2d/dist/images/ic_78.png" state="0"/>
-                    <i class="title" data-translate="5d594c716a198cb3d05d1b560ac35b39">Brewery</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_79">
-                    <img class="category" cat="Winery" id="79"  src="https://delivery-angels.ru/d2d/dist/images/ic_79.png" state="0"/>
-                    <i class="title" data-translate="3064efd2f260970799cd652a5ed4d875">Winery</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Veggies"
+            src="https://delivery-angels.store/fm/dist/images/ic_10.png"
+          />
+          <i class="title" data-translate="95ae59f9bd12719f5e5d799e58022505"
+            >Veggies</i
+          >
+          <span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_10">
+              <img
+                id="10"
+                class="category"
+                cat="Veggies"
+                title="Veggies"
+                src="https://delivery-angels.store/fm/dist/images/ic_10.png"
+                state="0"
+              />
+              <i class="title" data-translate="95ae59f9bd12719f5e5d799e58022505"
+                >Veggies</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_14">
+              <img
+                id="14"
+                class="category"
+                cat="Greens"
+                title="Greens"
+                src="https://delivery-angels.store/fm/dist/images/ic_14.png"
+                state="0"
+              />
+              <i class="title" data-translate="1dd1c5b63d654fcb61bc0be7fc41bbf0"
+                >Greens</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_15">
+              <img
+                id="15"
+                class="category stretched-link"
+                cat="Mushrooms"
+                title="Mushrooms"
+                src="https://delivery-angels.store/fm/dist/images/ic_15.png"
+                state="0"
+              />
+              <i class="title" data-translate="8c76e09a7a292cc2a857d4ceafe5d6ea"
+                >Mushrooms</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_19">
+              <img
+                id="19"
+                class="category"
+                cat="Pickles"
+                title="Pickles"
+                src="https://delivery-angels.store/fm/dist/images/ic_19.png"
+                state="0"
+              />
+              <i class="title" data-translate="f8e51e2a65b49f5b11db199d05530576"
+                >Pickles</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
         </div>
 
-
-        <div  class="dropup  text-center">
-            <img  class="main_category dropdown-toggle" src="https://delivery-angels.ru/d2d/dist/images/ic_90.png" state="0"
-                   data-toggle="dropdown" />
-            <i class="title" data-translate="499c0d6995ceb5168b42962b149a4aee">Confectionery</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_91">
-                    <img class="category" cat="Cakes" id="91" src="https://delivery-angels.ru/d2d/dist/images/ic_90.png" state="0"/>
-                    <i class="title" data-translate="7481b14989ab4298a3e0437d5b45b3b3">Cakes</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_92">
-                    <img class="category" cat="Cookies" id="92" src="https://delivery-angels.ru/d2d/dist/images/ic_92.png" state="0"/>
-                    <i class="title" data-translate="597b56e53847cd6a4712ac183f61fa68">Cookies<br/>Crackers</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_93">
-                    <img class="category" cat="Marshmallow" id="93"  src="https://delivery-angels.ru/d2d/dist/images/ic_93.png" state="0"/>
-                    <i class="title" data-translate="fdc1de159925cd627c263e9e74171901">Marshmallow<br/>Marmelade</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_94">
-                    <img class="category" cat="Candies" id="94" src="https://delivery-angels.ru/d2d/dist/images/ic_94.png" state="0"/>
-                    <i class="title" data-translate="139148c3293387bb780412df0e4c3d94">Candies</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_95">
-                    <img class="category" cat="Chokolate" id="95" title="Chokolate" src="https://delivery-angels.ru/d2d/dist/images/ic_95.png" state="0"/>
-                    <i class="title" data-translate="a17ee33bdc0cb98cfacd0436c6b7f497">Chokolate</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_96">
-                    <img class="category" cat="Sweets" id="96" title="Sweets" src="https://delivery-angels.ru/d2d/dist/images/ic_96.png" state="0"/>
-                    <i class="title" data-translate="96d4794680bf112fa539807c0b454d25">Sweets</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_98">
-                    <img  class="category" cat="Jams" id="98" src="https://delivery-angels.ru/d2d/dist/images/ic_98.png" state="0" />
-                    <i class="title" data-translate="9fbdf5756851e77880327f5e86212a27">Jams</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
+        <div class="dropup text-center">
+          <img
+            id="30"
+            class="main_category"
+            data-toggle="dropdown"
+            title="Fruits"
+            src="https://delivery-angels.store/fm/dist/images/ic_30.png"
+            state="0"
+          />
+          <i class="title" data-translate="a36ef47851e2b0fce36c1148d152749a"
+            >Fruits</i
+          >
+          <span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_31">
+              <img
+                class="category"
+                cat="Fruits"
+                id="31"
+                title="Fruits"
+                src="https://delivery-angels.store/fm/dist/images/ic_30.png"
+                state="0"
+              />
+              <i class="title" data-translate="a36ef47851e2b0fce36c1148d152749a"
+                >Fruits</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_32">
+              <img
+                class="category"
+                cat="Berries"
+                id="32"
+                title="Berries"
+                src="https://delivery-angels.store/fm/dist/images/ic_32.png"
+                state="0"
+              />
+              <i class="title" data-translate="c89f71156fb3b129973d288f48c1a0a2"
+                >Berries</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_33">
+              <img
+                class="category"
+                cat="Gourds"
+                id="33"
+                title="Gourds"
+                src="https://delivery-angels.store/fm/dist/images/ic_33.png"
+                state="0"
+              />
+              <i class="title" data-translate="2f55164fcab5c973d2359ce21cfa9048"
+                >Gourds</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_34">
+              <img
+                class="category"
+                cat="Exotic"
+                id="34"
+                title="Exotic"
+                src="https://delivery-angels.store/fm/dist/images/ic_34.png"
+                state="0"
+              />
+              <i class="title" data-translate="e4120fc5cb9df630d2f54ee644faafa7"
+                >Exotic<br />Fruits</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
         </div>
 
-        <div  class="dropup  text-center">
-            <img  class="main_category " data-toggle="dropdown"  src="https://delivery-angels.ru/d2d/dist/images/ic_80.png" state="0"
-                   class="dropdown-toggle" data-toggle="dropdown" />
-            <i class="title" data-translate="ac66e4e8ee28fd48b2041c7d8a04ba15">Grocery</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_81">
-                    <img class="category" cat="Pasta" id="81" title="Pasta" src="https://delivery-angels.ru/d2d/dist/images/ic_81.png" state="0"/>
-                    <i class="title" data-translate="e09813f8015339fc445f3a84bb8c4023">Pasta</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div  text-center" data-toggle="tab" href="#tab_82">
-                    <img class="category" cat="Cereals" id="82"  src="https://delivery-angels.ru/d2d/dist/images/ic_82.png" state="0"/>
-                    <i class="title" data-translate="e7468686d6c07e4dbbd075cf56788ab3">Cereals</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div   text-center"  data-toggle="tab"  href="#tab_83">
-                    <img class="category" cat="Орехи" id="83" src="https://delivery-angels.ru/d2d/dist/images/ic_83.png" state="0"/>
-                    <i class="title" data-translate="d68dc362fa9881c817391eb28687a17a">Nuts</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div   text-center"  data-toggle="tab"  href="#tab_84">
-                    <img class="category" cat="Сухофрукты" id="84" src="https://delivery-angels.ru/d2d/dist/images/ic_84.png" state="0"/>
-                    <i class="title" data-translate="08ab74e466ffeaf9ab0bc6320d2bde63">Dried fuits</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_85">
-                    <img class="category" cat="Oil" id="85" title="Oil" src="https://delivery-angels.ru/d2d/dist/images/ic_85.png" state="0"/>
-                    <i class="title" data-translate="2e69df5961f20aee0897cf1905156344">Oil</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_87">
-                    <img class="category" cat="Sauces" id="87"  src="https://delivery-angels.ru/d2d/dist/images/ic_87.png" state="0"/>
-                    <i class="title" data-translate="5db98fd5955482197423a2a4760f38c7">Sauces<br/>Spices</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-                <div class="cat_div text-center" data-toggle="tab" href="#tab_86">
-                    <img class="category" cat="Canned" id="86"  src="https://delivery-angels.ru/d2d/dist/images/ic_86.png" state="0"/>
-                    <i class="title" data-translate="dd73af2f986b24be74bfc13572d8350a">Canned</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-
-
-            </ol>
-        </div>
-        <div  class="dropup  text-center">
-            <img  class="main_category " data-toggle="dropdown"  title="Чай Кофе" src="https://delivery-angels.ru/d2d/dist/images/ic_130.png" state="0"/>
-            <i class="title" data-translate="c7214ae3ca3ce705c683e7dbe362c9a2">Tea<br>Coffee</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_130">
-                    <img class="category" cat="Tea" id="130"  src="https://delivery-angels.ru/d2d/dist/images/ic_88.png" state="0"/>
-                    <i class="title" data-translate="1ba89dab5315d1fc2b43bf84402ff1b3">Tea</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_135">
-                    <img class="category" cat="Coffee" id="135" title="Coffee" src="https://delivery-angels.ru/d2d/dist/images/ic_89.png?v=1" state="0"/>
-                    <i class="title" data-translate="e1ee03705b4c13620480e601b40a993f">Coffee</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-
-        <div  class="dropup  text-center">
-            <img  class="main_category " data-toggle="dropdown"  src="https://delivery-angels.ru/d2d/dist/images/ic_110.png" state="0"/>
-            <i class="title" data-translate="a11e3d7212c369ba1a229ea7a8ae65de">Baking</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_111">
-                    <img class="category" cat="Baking" id="111" title="Baking" src="https://delivery-angels.ru/d2d/dist/images/ic_111.png" state="0"/>
-                    <i class="title" data-translate="a11e3d7212c369ba1a229ea7a8ae65de">Baking</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_112">
-                    <img class="category" cat="Bread" id="112"  src="https://delivery-angels.ru/d2d/dist/images/ic_112.png" state="0"/>
-                    <i class="title" data-translate="1296fcaab5ec71496d1ecb176f176bdf">Bread</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
-        </div>
-        <div  class="dropup  text-center">
-            <img class="main_category " data-toggle="dropdown" src="https://delivery-angels.ru/d2d/dist/images/ic_120.png" state="0"/>
-            <i class="title" data-translate="713a01ab419f96cb320352765e8791d4">Bio</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu">
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_120">
-                    <img class="category" cat="Bio" id="120" src="https://delivery-angels.ru/d2d/dist/images/ic_120.png" state="0"/>
-                    <i class="title" data-translate="713a01ab419f96cb320352765e8791d4">Bio</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_121">
-                    <img class="category" cat="HealthyFood" id="121" title="Healthy Food" src="https://delivery-angels.ru/d2d/dist/images/ic_121.png" state="0"/>
-                    <i class="title" data-translate="4f05c9929f41c38e6177b6c4c58e2a27">Healthy<br>Food</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_122">
-                    <img class="category" cat="Vegan" id="122" title="Vegan" src="https://delivery-angels.ru/d2d/dist/images/ic_122.png" state="0"/>
-                    <i class="title" data-translate="71a731effc43ac8bab7455c5e4ce9cc5">Vegan</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div    text-center" data-toggle="tab" href="#tab_123">
-                    <img class="category" cat="Gluten" id="123"  src="https://delivery-angels.ru/d2d/dist/images/ic_123.png" state="0"/>
-                    <i class="title" data-translate="11abe4c0e9461f5627594d5ac9b3d1bc">Out of<br>Gluten</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Dairy"
+            src="https://delivery-angels.store/fm/dist/images/ic_20.png"
+            state="0"
+          />
+          <i class="title" data-translate="4b02a5b8da403b36083763c143a56854"
+            >Dairy<br />Eggs</i
+          >
+          <span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_20">
+              <img
+                class="category"
+                cat="Milk"
+                id="20"
+                title="Milk"
+                src="https://delivery-angels.store/fm/dist/images/ic_20.png"
+                state="0"
+              />
+              <i class="title" data-translate="4b02a5b8da403b36083763c143a56854"
+                >Milk</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_21">
+              <img
+                class="category"
+                cat="SourCream"
+                id="21"
+                title="Sour Cream,Yogurts"
+                src="https://delivery-angels.store/fm/dist/images/ic_21.png"
+                state="0"
+              />
+              <i class="title" data-translate="5b591bad6d9ce5c8c7494834ade42132"
+                >Sour Cream<br />Yogurts</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_22">
+              <img
+                class="category"
+                cat="CottageCheese"
+                id="22"
+                title="Cottage Cheese"
+                src="https://delivery-angels.store/fm/dist/images/ic_22.png"
+                state="0"
+              />
+              <i class="title" data-translate="cf1dfd60d1e931e52ec346bc376e9602"
+                >Cottage<br />Cheese</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_24">
+              <img
+                class="category"
+                cat="Cheese"
+                id="24"
+                title="Cheese"
+                src="https://delivery-angels.store/fm/dist/images/ic_24.png"
+                state="0"
+              />
+              <i class="title" data-translate="a67778b3dcc82bfaace0f8bc0061f20e"
+                >Cheese</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_29">
+              <img
+                class="category"
+                cat="Eggs"
+                id="29"
+                title="Eggs"
+                src="https://delivery-angels.store/fm/dist/images/ic_23.png"
+                state="0"
+              />
+              <i class="title" data-translate="9890f06976131702b942e59eda2f750a"
+                >Eggs</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
         </div>
 
-        <div  class="dropup  text-center">
-            <img class="main_category " data-toggle="dropdown" title="Essentials" src="https://delivery-angels.ru/d2d/dist/images/ic_150.png" state="0"/>
-            <i class="title" data-translate="4d55f77f062bf48891bd0f749c36a36d">Essentials</i><span class="cat_cnt badge badge-pill badge-light">0</span>
-            <ol class="sub_cat dropdown-menu ">
-                 <div class="cat_div   text-center"   data-toggle="tab" href="#tab_152">
-                    <img id="152" class="category" cat="Toiletries" title="Toiletries" src="https://delivery-angels.ru/d2d/dist/images/ic_152.png" state="0" />
-                    <i class="title" data-translate="1249b7768dd419e434d70123a0d7fc5e">Toiletries</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-                <div class="cat_div   text-center" data-toggle="tab" href="#tab_153">
-                    <img id="153" class="category" cat="Medicines" title="Medicines" src="https://delivery-angels.ru/d2d/dist/images/ic_153.png" state="0" />
-                    <i class="title" data-translate="04ce9cc0739f4ba9ef31132de3e78cfa">Medicines</i>
-                    <span class="cat_cnt badge badge-pill badge-light">0</span>
-                </div>
-            </ol>
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Мясо"
+            src="https://delivery-angels.store/fm/dist/images/ic_40.png"
+            state="0"
+          />
+          <i class="title" data-translate="e4b662d3892f8c0c86801919f979467f"
+            >Meat</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_40">
+              <img
+                class="category"
+                cat="Beef"
+                id="40"
+                title="Beef"
+                src="https://delivery-angels.store/fm/dist/images/ic_40.png"
+                state="0"
+              />
+              <i class="title" data-translate="8f1f76515c4ee9a16594eda002337134"
+                >Beef</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_41">
+              <img
+                class="category"
+                cat="Pork"
+                id="41"
+                title="Pork"
+                src="https://delivery-angels.store/fm/dist/images/ic_41.png"
+                state="0"
+              />
+              <i class="title" data-translate="34e3f440dad631cf8d085c8c3eca894b"
+                >Pork</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_42">
+              <img
+                class="category"
+                cat="Lamb"
+                id="42"
+                title="Lamb"
+                src="https://delivery-angels.store/fm/dist/images/ic_42.png"
+                state="0"
+              />
+              <i class="title" data-translate="07e1e19a2e90a9d843d02cbdb445fa69"
+                >Lamb</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_45">
+              <img
+                class="category"
+                cat="Semifinished"
+                id="45"
+                title="Semifinished"
+                src="https://delivery-angels.store/fm/dist/images/ic_45.png"
+                state="0"
+              />
+              <i class="title" data-translate="810771055916119e41dea16330c4d834"
+                >Semifinished</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_46">
+              <img
+                class="category"
+                cat="Sausages"
+                id="46"
+                title="Sausages"
+                src="https://delivery-angels.store/fm/dist/images/ic_46.png"
+                state="0"
+              />
+              <i class="title" data-translate="bf9cee6ef204cf043be970dcd4837fa4"
+                >Sausages</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
         </div>
 
+        <div class="dropup text-center">
+          <img
+            class="main_category dropdown-toggle"
+            data-toggle="dropdown"
+            title="Рыба"
+            src="https://delivery-angels.store/fm/dist/images/ic_50.png"
+            state="0"
+          />
+          <i class="title" data-translate="071642fa72ba780ee90ed36350d82745"
+            >Fish</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_50">
+              <img
+                class="category"
+                cat="Fish"
+                id="50"
+                title="Fish"
+                src="https://delivery-angels.store/fm/dist/images/ic_50.png"
+                state="0"
+              />
+              <i class="title" data-translate="071642fa72ba780ee90ed36350d82745"
+                >Fish</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_52">
+              <img
+                class="category"
+                cat="SeaFood"
+                id="52"
+                title="Sea Food"
+                src="https://delivery-angels.store/fm/dist/images/ic_52.png"
+                state="0"
+              />
+              <i class="title" data-translate="479d57d583cc7e26f8c8b244c20729eb"
+                >Sea<br />Food</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            cat="Птица"
+            title="Птица"
+            class="main_category dropdown-toggle"
+            data-toggle="dropdown"
+            src="https://delivery-angels.store/fm/dist/images/ic_60.png"
+            state="0"
+          />
+          <i class="title" data-translate="c45c974fa258e5d8cd30f0f7d0f9827d"
+            >Poultry</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_60">
+              <img
+                class="category"
+                cat="Chicken"
+                id="60"
+                src="https://delivery-angels.store/fm/dist/images/ic_60.png"
+                state="0"
+              />
+              <i class="title" data-translate="a9514f8884af954749b66932d8a95a76"
+                >Chicken</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_61">
+              <img
+                class="category"
+                cat="Turkey"
+                id="61"
+                src="https://delivery-angels.store/fm/dist/images/ic_61.png"
+                state="0"
+              />
+              <i class="title" data-translate="221cdfb73049678e244380b45872cbb2"
+                >Turkey</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_62">
+              <img
+                class="category"
+                cat="Duck"
+                id="62"
+                src="https://delivery-angels.store/fm/dist/images/ic_62.png"
+                state="0"
+              />
+              <i class="title" data-translate="f97ca8decb3a5f04d11d0e3c6ff3f0cd"
+                >Duck</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_65">
+              <img
+                class="category"
+                cat="Pate"
+                id="65"
+                src="https://delivery-angels.store/fm/dist/images/ic_65.png"
+                state="0"
+              />
+              <i class="title" data-translate="b69d8ad1c1f2abfcbcb1972cdba2192e"
+                >Pate</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            cat="Drinks"
+            class="main_category dropdown-toggle"
+            data-toggle="dropdown"
+            src="https://delivery-angels.store/fm/dist/images/ic_70.0.png"
+          />
+          <i class="title" data-translate="636d2370c523f2b2f49a568b6485f1f5"
+            >Beverage</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_70">
+              <img
+                class="category"
+                cat="Water"
+                id="70"
+                src="https://delivery-angels.store/fm/dist/images/ic_70.png"
+                state="0"
+              />
+              <i class="title" data-translate="27634ff8002b12e75d98e07ccd005d18"
+                >Water</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_73">
+              <img
+                class="category"
+                cat="Limonade"
+                id="73"
+                src="https://delivery-angels.store/fm/dist/images/ic_73.png"
+                state="0"
+              />
+              <i class="title" data-translate="d49929af79e93ff191fb7495478c7fd4"
+                >Cola<br />Limonade</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_75">
+              <img
+                class="category"
+                cat="Juice"
+                id="75"
+                src="https://delivery-angels.store/fm/dist/images/ic_75.png"
+                state="0"
+              />
+              <i class="title" data-translate="8754016bce09674b1796cd2cc062d7da"
+                >Juice</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_76">
+              <img
+                class="category"
+                cat="Energetic"
+                id="76"
+                title="Energetics"
+                src="https://delivery-angels.store/fm/dist/images/ic_76.png"
+                state="0"
+              />
+              <i class="title" data-translate="b0e2e27703cfc8b5155f0c66d861d798"
+                >Energetic</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_78">
+              <img
+                class="category"
+                cat="Brewery"
+                id="78"
+                src="https://delivery-angels.store/fm/dist/images/ic_78.png"
+                state="0"
+              />
+              <i class="title" data-translate="5d594c716a198cb3d05d1b560ac35b39"
+                >Brewery</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_79">
+              <img
+                class="category"
+                cat="Winery"
+                id="79"
+                src="https://delivery-angels.store/fm/dist/images/ic_79.png"
+                state="0"
+              />
+              <i class="title" data-translate="3064efd2f260970799cd652a5ed4d875"
+                >Winery</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            class="main_category dropdown-toggle"
+            src="https://delivery-angels.store/fm/dist/images/ic_90.png"
+            state="0"
+            data-toggle="dropdown"
+          />
+          <i class="title" data-translate="499c0d6995ceb5168b42962b149a4aee"
+            >Confectionery</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_91">
+              <img
+                class="category"
+                cat="Cakes"
+                id="91"
+                src="https://delivery-angels.store/fm/dist/images/ic_90.png"
+                state="0"
+              />
+              <i class="title" data-translate="7481b14989ab4298a3e0437d5b45b3b3"
+                >Cakes</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_92">
+              <img
+                class="category"
+                cat="Cookies"
+                id="92"
+                src="https://delivery-angels.store/fm/dist/images/ic_92.png"
+                state="0"
+              />
+              <i class="title" data-translate="597b56e53847cd6a4712ac183f61fa68"
+                >Cookies<br />Crackers</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_93">
+              <img
+                class="category"
+                cat="Marshmallow"
+                id="93"
+                src="https://delivery-angels.store/fm/dist/images/ic_93.png"
+                state="0"
+              />
+              <i class="title" data-translate="fdc1de159925cd627c263e9e74171901"
+                >Marshmallow<br />Marmelade</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_94">
+              <img
+                class="category"
+                cat="Candies"
+                id="94"
+                src="https://delivery-angels.store/fm/dist/images/ic_94.png"
+                state="0"
+              />
+              <i class="title" data-translate="139148c3293387bb780412df0e4c3d94"
+                >Candies</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_95">
+              <img
+                class="category"
+                cat="Chokolate"
+                id="95"
+                title="Chokolate"
+                src="https://delivery-angels.store/fm/dist/images/ic_95.png"
+                state="0"
+              />
+              <i class="title" data-translate="a17ee33bdc0cb98cfacd0436c6b7f497"
+                >Chokolate</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_96">
+              <img
+                class="category"
+                cat="Sweets"
+                id="96"
+                title="Sweets"
+                src="https://delivery-angels.store/fm/dist/images/ic_96.png"
+                state="0"
+              />
+              <i class="title" data-translate="96d4794680bf112fa539807c0b454d25"
+                >Sweets</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_98">
+              <img
+                class="category"
+                cat="Jams"
+                id="98"
+                src="https://delivery-angels.store/fm/dist/images/ic_98.png"
+                state="0"
+              />
+              <i class="title" data-translate="9fbdf5756851e77880327f5e86212a27"
+                >Jams</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            src="https://delivery-angels.store/fm/dist/images/ic_80.png"
+            state="0"
+            class="dropdown-toggle"
+            data-toggle="dropdown"
+          />
+          <i class="title" data-translate="ac66e4e8ee28fd48b2041c7d8a04ba15"
+            >Grocery</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_81">
+              <img
+                class="category"
+                cat="Pasta"
+                id="81"
+                title="Pasta"
+                src="https://delivery-angels.store/fm/dist/images/ic_81.png"
+                state="0"
+              />
+              <i class="title" data-translate="e09813f8015339fc445f3a84bb8c4023"
+                >Pasta</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_82">
+              <img
+                class="category"
+                cat="Cereals"
+                id="82"
+                src="https://delivery-angels.store/fm/dist/images/ic_82.png"
+                state="0"
+              />
+              <i class="title" data-translate="e7468686d6c07e4dbbd075cf56788ab3"
+                >Cereals</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_83">
+              <img
+                class="category"
+                cat="Орехи"
+                id="83"
+                src="https://delivery-angels.store/fm/dist/images/ic_83.png"
+                state="0"
+              />
+              <i class="title" data-translate="d68dc362fa9881c817391eb28687a17a"
+                >Nuts</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_84">
+              <img
+                class="category"
+                cat="Сухофрукты"
+                id="84"
+                src="https://delivery-angels.store/fm/dist/images/ic_84.png"
+                state="0"
+              />
+              <i class="title" data-translate="08ab74e466ffeaf9ab0bc6320d2bde63"
+                >Dried fuits</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_85">
+              <img
+                class="category"
+                cat="Oil"
+                id="85"
+                title="Oil"
+                src="https://delivery-angels.store/fm/dist/images/ic_85.png"
+                state="0"
+              />
+              <i class="title" data-translate="2e69df5961f20aee0897cf1905156344"
+                >Oil</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_87">
+              <img
+                class="category"
+                cat="Sauces"
+                id="87"
+                src="https://delivery-angels.store/fm/dist/images/ic_87.png"
+                state="0"
+              />
+              <i class="title" data-translate="5db98fd5955482197423a2a4760f38c7"
+                >Sauces<br />Spices</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_86">
+              <img
+                class="category"
+                cat="Canned"
+                id="86"
+                src="https://delivery-angels.store/fm/dist/images/ic_86.png"
+                state="0"
+              />
+              <i class="title" data-translate="dd73af2f986b24be74bfc13572d8350a"
+                >Canned</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Чай Кофе"
+            src="https://delivery-angels.store/fm/dist/images/ic_130.png"
+            state="0"
+          />
+          <i class="title" data-translate="c7214ae3ca3ce705c683e7dbe362c9a2"
+            >Tea<br />Coffee</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_130">
+              <img
+                class="category"
+                cat="Tea"
+                id="130"
+                src="https://delivery-angels.store/fm/dist/images/ic_88.png"
+                state="0"
+              />
+              <i class="title" data-translate="1ba89dab5315d1fc2b43bf84402ff1b3"
+                >Tea</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_135">
+              <img
+                class="category"
+                cat="Coffee"
+                id="135"
+                title="Coffee"
+                src="https://delivery-angels.store/fm/dist/images/ic_89.png?v=1"
+                state="0"
+              />
+              <i class="title" data-translate="e1ee03705b4c13620480e601b40a993f"
+                >Coffee</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            src="https://delivery-angels.store/fm/dist/images/ic_110.png"
+            state="0"
+          />
+          <i class="title" data-translate="a11e3d7212c369ba1a229ea7a8ae65de"
+            >Baking</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_111">
+              <img
+                class="category"
+                cat="Baking"
+                id="111"
+                title="Baking"
+                src="https://delivery-angels.store/fm/dist/images/ic_111.png"
+                state="0"
+              />
+              <i class="title" data-translate="a11e3d7212c369ba1a229ea7a8ae65de"
+                >Baking</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_112">
+              <img
+                class="category"
+                cat="Bread"
+                id="112"
+                src="https://delivery-angels.store/fm/dist/images/ic_112.png"
+                state="0"
+              />
+              <i class="title" data-translate="1296fcaab5ec71496d1ecb176f176bdf"
+                >Bread</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            src="https://delivery-angels.store/fm/dist/images/ic_120.png"
+            state="0"
+          />
+          <i class="title" data-translate="713a01ab419f96cb320352765e8791d4"
+            >Bio</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_120">
+              <img
+                class="category"
+                cat="Bio"
+                id="120"
+                src="https://delivery-angels.store/fm/dist/images/ic_120.png"
+                state="0"
+              />
+              <i class="title" data-translate="713a01ab419f96cb320352765e8791d4"
+                >Bio</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_121">
+              <img
+                class="category"
+                cat="HealthyFood"
+                id="121"
+                title="Healthy Food"
+                src="https://delivery-angels.store/fm/dist/images/ic_121.png"
+                state="0"
+              />
+              <i class="title" data-translate="4f05c9929f41c38e6177b6c4c58e2a27"
+                >Healthy<br />Food</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_122">
+              <img
+                class="category"
+                cat="Vegan"
+                id="122"
+                title="Vegan"
+                src="https://delivery-angels.store/fm/dist/images/ic_122.png"
+                state="0"
+              />
+              <i class="title" data-translate="71a731effc43ac8bab7455c5e4ce9cc5"
+                >Vegan</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_123">
+              <img
+                class="category"
+                cat="Gluten"
+                id="123"
+                src="https://delivery-angels.store/fm/dist/images/ic_123.png"
+                state="0"
+              />
+              <i class="title" data-translate="11abe4c0e9461f5627594d5ac9b3d1bc"
+                >Out of<br />Gluten</i
+              ><span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+
+        <div class="dropup text-center">
+          <img
+            class="main_category"
+            data-toggle="dropdown"
+            title="Essentials"
+            src="https://delivery-angels.store/fm/dist/images/ic_150.png"
+            state="0"
+          />
+          <i class="title" data-translate="4d55f77f062bf48891bd0f749c36a36d"
+            >Essentials</i
+          ><span class="cat_cnt badge badge-pill badge-light">0</span>
+          <ol class="sub_cat dropdown-menu">
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_152">
+              <img
+                id="152"
+                class="category"
+                cat="Toiletries"
+                title="Toiletries"
+                src="https://delivery-angels.store/fm/dist/images/ic_152.png"
+                state="0"
+              />
+              <i class="title" data-translate="1249b7768dd419e434d70123a0d7fc5e"
+                >Toiletries</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+            <div class="cat_div text-center" data-toggle="tab" href="#tab_153">
+              <img
+                id="153"
+                class="category"
+                cat="Medicines"
+                title="Medicines"
+                src="https://delivery-angels.store/fm/dist/images/ic_153.png"
+                state="0"
+              />
+              <i class="title" data-translate="04ce9cc0739f4ba9ef31132de3e78cfa"
+                >Medicines</i
+              >
+              <span class="cat_cnt badge badge-pill badge-light">0</span>
+            </div>
+          </ol>
+        </div>
+      </div>
     </div>
-
-</div>
-</body>
+  </body>
 </html>
