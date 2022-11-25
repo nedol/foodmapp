@@ -1,9 +1,9 @@
 
-import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
+// import { NativeEventSource, EventSourcePolyfill } from 'event-source-polyfill';
 
-const EventSource = NativeEventSource || EventSourcePolyfill;
-// OR: may also need to set as global property
-window.EventSource =  NativeEventSource || EventSourcePolyfill;
+// const EventSource = NativeEventSource || EventSourcePolyfill;
+// // OR: may also need to set as global property
+// window.EventSource =  NativeEventSource || EventSourcePolyfill;
 
 $(document).on('readystatechange', function () {
 

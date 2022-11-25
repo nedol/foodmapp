@@ -42,6 +42,7 @@ html, body {
     z-index: 2;
 }
 
+
 .deliver_but {
     display: block;
     /*position: absolute;*/
@@ -246,9 +247,7 @@ div.sticky {
     /*border-radius: 5px;*/
 }
 
-.nav-link {
-    /*height: 40px*/
-}
+
 
 .modal-content {
     position: absolute;
@@ -296,10 +295,6 @@ li a {
     text-align: center;
     padding: 14px 16px;
     text-decoration: none;
-}
-
-li a:hover, .dropdown:hover .dropbtn {
-
 }
 
 .dropdown {
@@ -435,8 +430,7 @@ li.active a {
 }
 
 .notoday {
-    display: none;
-!important;
+    display: none !important;
 }
 
 
@@ -455,22 +449,6 @@ li.active a {
     border-radius: 5px;
 }
 
-.loader {
-    display: none;
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    z-index: 1;
-    margin: -75px 0 0 -75px;
-    vertical-align: middle;
-    border: 16px solid #f3f3f3;
-    border-radius: 50%;
-    border-top: 16px solid #3498db;
-    width: 120px;
-    height: 120px;
-    -webkit-animation: spin 2s linear infinite; /* Safari */
-    animation: spin 2s linear infinite;
-}
 
 /* Safari */
 @-webkit-keyframes spin {
@@ -659,8 +637,8 @@ li.active a {
     border: 16px solid #f3f3f3;
     border-radius: 50%;
     border-top: 16px solid #3498db;
-    width: 120px;
-    height: 120px;
+    width: 60px;
+    height: 60px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
 }
@@ -764,7 +742,7 @@ li.active a {
         position: absolute;
         height: auto;
         width: 40%;
-        margin: 120px;
+        /* margin: 120px; */
     }
 }
 

@@ -104,10 +104,6 @@ li a {
     text-decoration: none;
 }
 
-li a:hover, .dropdown:hover .dropbtn {
-
-}
-
 .dropdown {
     display: inline-block;
 }
@@ -259,21 +255,20 @@ li.active a{
     margin: 0 auto;
 }
 
-
+/* 
 .item_price{
     display:block;
     position:relative;
     bottom:5px;
-    /*left:5%;*/
     background-color:transparent;
     -webkit-text-stroke: 1px white;
-    font-family: 'Montserrat', serif;/*Constantia;*/
+    font-family: 'Montserrat', serif;
     font-weight: bold;
     font-size:2.5em;
     color: #bb0209;
     white-space: nowrap;
     z-index: 1000;
-}
+} */
 
 .actual_price{
     position: absolute;
@@ -351,7 +346,7 @@ li.active a{
     z-index: 50;
 }
 .notoday{
-    display:none;!important;
+    display:none !important;
 }
 
 .pack_btn{
@@ -432,8 +427,8 @@ li.active a{
     border: 16px solid #f3f3f3;
     border-radius: 50%;
     border-top: 16px solid #3498db;
-    width: 120px;
-    height: 120px;
+    width: 60px;
+    height: 60px;
     -webkit-animation: spin 2s linear infinite; /* Safari */
     animation: spin 2s linear infinite;
 }

@@ -2,7 +2,8 @@
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
+// require('jquery-ui');
+// require('jquery-ui-touch-punch');
 
 import {Categories} from "../../src/categories/categories.js"
 

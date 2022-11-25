@@ -8,11 +8,11 @@
 
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
 
-    <meta name="description" content="Food Map">
+    <meta name="description" content="FoodMapp.Supplier">
     <META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
     <meta http-equiv="Expires" content="0"/>
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <title>FoodMap</title>
+    <title>FoodMapp</title>
 </head>
 
 <!-- for datetimepicker-->
@@ -23,7 +23,7 @@
 <link rel="stylesheet" href="https://openlayers.org/en/v4.6.5/css/ol.css" type="text/css">
 <link href="assets/vendor/icofont/icofont.min.css" rel="stylesheet">
 <!--link rel="stylesheet" href="../lib/style.css"  type='text/css'-->
-<link id="cus_link" rel="stylesheet" href="./css/supplier.css" type='text/css'>
+<!-- <link id="cus_link" rel="stylesheet" href="./css/supplier.css" type='text/css'> -->
 
 <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.0/jquery.min.js"></script>-->
 <!--<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>-->
@@ -31,7 +31,7 @@
  <script src="https://openlayers.org/en/v4.6.5/build/ol.js"></script>
 
 
-<script type="text/javascript" src="./version.js?v=36"></script>
+<script type="text/javascript" src="./version.js"></script>
 <script type="text/javascript" src="./host.js"></script>
 
 <script>
@@ -222,24 +222,49 @@ window.onload = function () {
 <body>
 
 
-<div id="splash" style="position: absolute;background-color: white;text-align: center;width: 100%;height: 100%;z-index: 50;">
-    <label for="splash_img" style="position: absolute;top: 100px;right: 50%;font-family: 'Roboto';font-size: xx-large">FoodMap</label>
-    <img src="./images/pineapple-food-globe.png" id="splash_img" align="middle"
-        style="
-        position: absolute;
-        max-height:50%;
-        margin: auto;
-        top: 200px;
-        left: 0;
-        right:0">
+<div>
+    <div id="splash" style="position: absolute;background-color: white;text-align: center;width: 100%;height: 100%;z-index: 50;">
+        <label for="splash_img" style="position: absolute;top: 100px;right: 50%;font-family: 'Roboto';font-size: xx-large">FoodMap</label>
+
+        <div id="qr_div" style="position:absolute;
+            z-index: 10;
+            max-height:50%;
+            top: 310px;
+            left: 15px;
+            right:0;
+            -ms-transform: rotate(45deg); 
+            transform: rotate(45deg);">
+            <canvas id="qr_canvas"></canvas>
+            <img src="./images/pineapple-food-globe.png" id="splash_img"
+                style="
+                position: absolute;
+                max-height:50%;
+                margin: auto;
+                top: 200px;
+                left: 0;
+                right:0">
+        </div>
+    </div>
 </div>
+
+
+<!-- 
+<div id="qr_div" style="position:absolute;z-index: 10;">
+<canvas id="qr_canvas"></canvas>
+</div> -->
 
 
 <div id="map" class="map"></div>
 
+<textarea id="adr_text" cols="10" rows="2"  placeholder="c6c0914deb2bca834b0faba62016256f"  data-translate
+    style="position: absolute; bottom:0; width: 50%; left:0;right: 0; margin: auto;    
+    white-space: break-spaces;
+    font-size: medium;
+    text-align: center;"></textarea>
+
 
 <!--<section id="marker" title="kolobot">-->
-<!--<img  src="https://delivery-angels.ru/d2d/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
+<!--<img  src="https://delivery-angels.store/dist/images/marker/kolobot.png" height="57px" width="50px"/>-->
 <!--</section>-->
 
 
@@ -248,7 +273,7 @@ window.onload = function () {
 
         <div class="d-inline-block">
             <input type="date" class="d-inline-block dt_val btn btn-block"
-                style="background-color:white;text-align:center;float:left;font-size: small"></input>
+                style="background-color:white;text-align:center;float:left; font-size: small"></input>
         </div>
     </div>
     <style>
@@ -291,16 +316,16 @@ window.onload = function () {
 
 <div>
     <iframe id="supplier_frame"
-            src=""
-            style="
-                display:none;
-                z-index:1000;
-                position:absolute;
-                overflow: hidden;
-                width:100%;
-                height: 100%;
-                top:0";
-                >
+        src=""
+        style="
+            display:none;
+            z-index:1000;
+            position:absolute;
+            overflow: hidden;
+            width:100%;
+            height: 100%;
+            top:0";
+            >
     </iframe>
 </div>
 
@@ -336,11 +361,11 @@ window.onload = function () {
     <iframe class="browser"  style="position:absolute;overflow: hidden;z-index: 10; width:100%; height: 100%;"></iframe>
 </div>
 
-<img id="search_but"  src="https://delivery-angels.ru/d2d/dist/images/ic_map_search.png" title="Search">
+<img id="search_but"  src="../dist/images/ic_map_search.png" title="Search">
 
 <section id="loc_ctrl"  title="Моё местоположение">
-    <img id="location_img"  draggable="true" src="https://delivery-angels.ru/d2d/dist/images/ic_location.png">
-    <img id="pin" src="https://delivery-angels.ru/d2d/dist/images/ic_pin.png">
+    <img id="location_img"  draggable="true" src="../dist/images/ic_location.png">
+    <img id="pin" src="../dist/images/ic_pin.png">
 </section>
 
 <h1 id="zoom_but" title="Zoom">

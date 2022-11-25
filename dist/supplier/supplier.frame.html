@@ -79,13 +79,29 @@
     </a>
     </li>
     <li class="nav-item">
-        <a data-toggle="tab" class="nav-link icofont-ui-user icofont-1x" href="#profile_pane"
-            style="font-size: 1.8em">
+        <a data-toggle="tab" class="nav-link icofont-user-alt-3 icofont-1x" href="#profile_pane"
+            style="font-size: 1.8em; color:rgb(50, 50, 50)">
         </a>
     </li>
 
     <li class="nav-item">
         <div style="display: flex;justify-content: center;">
+            <div>
+            <div id="lang_sel" style="    
+                   left:0px;
+                   top:50px;
+                   z-index: 10000;
+                   border-width:0;
+                   background-color: #ffffff99;
+                   border-radius: 5px;">
+              <button type="button" class="btn btn-primary" data-toggle="collapse" data-target="#collapse_lang" style="background-color:transparent;border-width: 0; "><span class="flag-icon flag-icon-us"></span></button>
+              <ul id="collapse_lang" class="collapse list-group" style="position:absolute; z-index: 10000;">
+                <li class="list-group-item" role="langitem" value="" href="#"><span class="flag-icon flag-icon-ua"></span></li>
+                <li class="list-group-item" role="langitem" value="en" href="#"><span class="flag-icon flag-icon-us"></span></li>
+                <li class="list-group-item" role="langitem" value="fr" href="#"><span class="flag-icon flag-icon-fr"></span></li>
+              </ul>
+            </div>
+        </div>
             <a id="" class="nav-link call_but_placeholder" data-toggle="tab" href="#kolmi_pane"
                 title="Kolmi" style="position: relative;height: 50px">
             </a>
@@ -103,7 +119,7 @@
 
 <div class="tab-content">
     <div class="tab-pane active" id="editor_pane">
-        <div>
+        <!-- <div>
             <div id="lang_sel" style="
                    position: fixed;
                    left:0px;
@@ -122,7 +138,7 @@
                 <li class="list-group-item" role="langitem" value="fr" href="#"><span class="flag-icon flag-icon-fr"></span></li>
               </ul>
             </div>
-        </div>
+        </div> -->
 
         <div>
             <span class="icofont-filter icofont-2x" data-toggle="collapse" data-target=".filter_div"
@@ -143,11 +159,9 @@
         </div>
 
       <div id="menu_item_tmplt">
-            <div class="item_body_coll"   data-toggle="collapse" data-target=".item_body" style="position: absolute; top: 20px; right: 10px; color: grey; font-size: 1.5em; z-index: 1001; visibility: visible;">
-                 <i class="icofont-collapse icofont-1x"></i>
-            </div>
+  
             <div class="content_div">
-                <div class="d-flex p-3 "  style="height: 70px">
+                <div class="d-inline-flex p-3"  style="height: 70px">
                     <label class="item_cb" title="Publish" style="position: relative;visibility: visible;left: -20px;">
                         <input type="checkbox" class="publish checkbox-inline" style="display: none;" title="" id="item_cb_0" pos="0">
                         <i class="fa fa-square-o fa-2x"></i>
@@ -158,16 +172,20 @@
                     </label>
 
                     <textarea class="item_title form-control" aria-required="true" spellcheck="false"  contenteditable
-                              data-translate  placeholder="0ad4f20d1443d9529ab35534c1ba505b"></textarea>
+                              data-translate  placeholder="0ad4f20d1443d9529ab35534c1ba505b" rows="2"></textarea>              
 
+                    <div class="brand">
+                        &trade;
+                        <img class="brand_img brand" src="">
+                    </div>
+                
+                    <div class="item_body_coll"   data-toggle="collapse" data-target=".item_body" style="position: absolute; top: 20px; right: 10px; color: grey; font-size: 1.5em; z-index: 1001; visibility: visible;">
+                        <i class="icofont-ui-v-card icofont-1x"></i>
+                    </div>
                 </div>
 
                 <div class="item_body collapse" style="position:relative; top:-2px; width: 100%; text-align: left">
-                    <div class="brand">
-                            &trade;
-                        <img class="brand_img brand" style="position:absolute;right:0;pointer-events: none;image-orientation:from-image;border-width: 0; max-height:40px;max-width:40px;z-index: 1002;" src="">
-                    </div>
-
+               
                     <div class="row">
                         <div class="col-sm-6">
                             <i class="fa fa-image fa-3x" style="position:absolute; z-index:10;top:40%; right: 50%; left: 50%; color:grey; background-color: white"></i>
@@ -177,11 +195,15 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-sm-6" style="margin-top: 40px;">
+                        <div class="col-sm-6" style="margin-top: 40px; margin-left: -9px;">
                             <div style="margin: 0 auto;">
                                 <div class="prop container">
                                     <div class="row prop_tmplt">
-                                        <div class="add_prop_div" style="position:absolute;right:0px;top:0px;z-index: 1000;width:50px">
+                                        <div class="add_prop_div" style="position: absolute;
+                                                                        right: 12px;
+                                                                        top: 0px;
+                                                                        z-index: 1000;
+                                                                        width: 50px;">
                                             <span class="add_prop fa fa-plus-circle"></span>
                                         </div>
                                         <div class="prop_key_div">
@@ -243,7 +265,7 @@
                             <textarea class="form-control extra_title"   rows="1"   contenteditable="true" data-translate placeholder="965e50ebcd495ec52ff7e9faf58bf020"></textarea>
                         </div>
 
-                        <div class="add_price_div" style="width:33%;">
+                        <div class="add_price_div" style="width:34%;">
                             <textarea class="form-control extra_price"  rows="1" contenteditable="true"  data-translate placeholder="252d601fadd75eba972d2dc0bfb22e67"></textarea>
                         </div>
                         <div class="add_extra_div">

@@ -1,5 +1,5 @@
 ::-webkit-scrollbar {
-    /*display:none ;*/
+    display:none ;
 }
 
 html, body{
@@ -84,9 +84,7 @@ li a {
     text-decoration: none;
 }
 
-li a:hover, .dropdown:hover .dropbtn {
 
-}
 
 .dropdown {
     display: inline-block;
@@ -185,9 +183,7 @@ textarea:focus {
     z-index: 100;
 }
 
-.content_div{
 
-}
 
 ::placeholder {
     font-weight: lighter;
@@ -258,12 +254,15 @@ textarea{
     padding: 1px;
 }
 .notoday{
-    display:none;!important;
+    display:none !important;
 }
+
 [contenteditable=true]:empty:not(:focus):before{
     content:attr(placeholder);
     color: #c8c8c8;
 }
+
+
 
 .carousel-inner {
     position: relative;

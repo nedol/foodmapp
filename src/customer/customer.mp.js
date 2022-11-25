@@ -58,7 +58,7 @@ export class MPCustomer {
 
     this.path = 'http://localhost:5500/d2d/server';
     if (host_port.includes('nedol.ru'))
-      this.path = 'https://delivery-angels.store/server';
+      this.path = 'https://delivery-angels.ru/server';
     else this.path = host_port;
 
     this.image_path = image_path;
@@ -1012,8 +1012,8 @@ export class MPCustomer {
 
           that.SetSlider();
 
-          $('.tr_item', $('.mp'))[0].scrollIntoView();
-          $('.mp_categories')[0].scrollIntoView();
+          if ($('thead', $('.mp'))[0]) $('thead', $('.mp'))[0].scrollIntoView();
+          if ($('.mp_categories')[0]) $('.mp_categories')[0].scrollIntoView();
         });
       }
     );
@@ -1149,7 +1149,7 @@ export class MPCustomer {
 
     try {
       if ($('#slider')[0] && noUiSlider) {
-        //     $('#slider')[0].noUiSlider.destroy();
+        if ($('#slider')[0].noUiSlider) $('#slider')[0].noUiSlider.destroy();
 
         noUiSlider.create($('#slider')[0], {
           start: [min, max],
@@ -1157,34 +1157,19 @@ export class MPCustomer {
           tooltips: [true, wNumb({ decimals: min < 100 ? 2 : 0 })],
           step: 1,
           range: {
-            min: min - 10 * step,
+            min: min - 10 < 0 ? min : (min - 10) * step,
             max: max + 10 * step,
           },
         });
 
         $('#slider')[0].noUiSlider.on('change', function (ev) {
+          $('.tr_item', $('.mp')).css('display', '');
           $('tr .item_price', $('.mp')).map(function () {
             if (
               parseFloat(this.innerText) < parseFloat(ev[0]) ||
               parseFloat(this.innerText) > parseFloat(ev[1])
             )
-              $(this)
-                .closest('tr')
-                .appendTo($('.thidden', $('#popup')));
-          });
-
-          $(
-            '.tr_item[category=' + that.start_cat + '] .item_price',
-            $('.thidden')
-          ).map(function () {
-            if (
-              parseFloat(this.innerText) >= parseFloat(ev[0]) &&
-              parseFloat(this.innerText) <= parseFloat(ev[1])
-            )
-              $(this)
-                .closest('tr')
-                .prependTo($('tbody', $('.mp')))
-                .css('display', '');
+              $(this).closest('tr').css('display', 'none');
           });
         });
       } else {
@@ -1258,3 +1243,9 @@ export class MPCustomer {
 // ./src/customer/customer.mp.js
 // module id = 595
 // module chunks = 0 1
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/customer/customer.mp.js
+// module id = 567
+// module chunks = 2 3

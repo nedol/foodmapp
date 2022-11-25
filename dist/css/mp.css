@@ -1,0 +1,28 @@
+
+.title_div{
+    position: absolute;
+    min-width: 100px;
+    left:0;
+    bottom: 0;
+    text-align: center;
+    margin:10px;
+    /* height: 32px; */
+    /* background-image: linear-gradient(white, #c5c5c5,transparent); */
+    /* font-family: 'Roboto', 'fallback font 2', 'fallback font 2', sans-serif; */
+    /* font-weight: bold; */
+    font-size: large;
+    color: #666667;
+    /* -webkit-text-stroke: 1px #868686; */
+    white-space: normal;
+    z-index: 100;
+}
+
+#address_loc{
+    position: absolute;
+    top: 0;
+    right: 0;
+    z-index: 100;
+    border-width: 0;
+    height: 100%;
+    background-color: transparent
+}

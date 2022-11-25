@@ -1,1033 +1,1235 @@
 {
-  "4d55f77f062bf48891bd0f749c36a36d":{
-    "en":"Essentials",
-    "ru":"Повседнев.<br>спрос",
-    "fr": "Essentiels"
+  "4d55f77f062bf48891bd0f749c36a36d": {
+    "en": "Essentials",
+    "ua": "Повседнев.<br>спрос",
+    "fr": "Essentiels",
+    "nl": "Essentieel",
+    "de": "Grundlegende"
   },
-  "1249b7768dd419e434d70123a0d7fc5e":{
-    "en":"Toiletries",
-    "fr":"Toiletries",
-    "ru":"Для<br>туалета"
+  "1249b7768dd419e434d70123a0d7fc5e": {
+    "en": "Toiletries",
+    "fr": "Toiletries",
+    "ua": "Для<br>туалета",
+    "nl": "Toiletartikelen"
   },
-  "04ce9cc0739f4ba9ef31132de3e78cfa":{
-    "en":"Medicines",
-    "fr":"Médicaments",
-    "ru":"Медикаменты"
+  "04ce9cc0739f4ba9ef31132de3e78cfa": {
+    "en": "Medicines",
+    "fr": "Médicaments",
+    "ua": "Медикаменты",
+    "nl": "Medicatie"
   },
-  "a2c465fbfcf2b204659075fbd42ca3a9":{
-    "en":"Meal",
-    "fr":"Repas",
-    "ru":"Еда"
+  "a2c465fbfcf2b204659075fbd42ca3a9": {
+    "en": "Meal",
+    "fr": "Repas",
+    "ua": "Еда",
+    "nl": "Voedsel",
+    "de": "Lebensmittel"
   },
-  "c2c465fbfcf2b204659075fbd42ca3a9":{
-    "en":"Fast Food",
-    "fr":"Fast Food",
-    "ru":"Фаст фуд"
+  "c2c465fbfcf2b204659075fbd42ca3a9": {
+    "en": "Fast Food",
+    "fr": "Fast Food",
+    "ua": "Фаст фуд",
+    "nl": "Fast Food",
+    "de": "Fastfood"
   },
-
-  "c6586b2e09d0ed0ee6431a1bb280657f":{
-    "en":"Pizza",
-    "fr":"Pizza",
-    "ru":"Пицца"
+  "c6586b2e09d0ed0ee6431a1bb280657f": {
+    "en": "Pizza",
+    "fr": "Pizza",
+    "ua": "Пицца",
+    "nl": "Pizza",
+    "de": "Pizza"
   },
-
-  "c121700b935ccf14f1274e006d859ee0":{
-    "en":"Sushi",
-    "fr":"Sushi",
-    "ru":"Суши"
+  "c121700b935ccf14f1274e006d859ee0": {
+    "en": "Sushi",
+    "fr": "Sushi",
+    "ua": "Суши",
+    "nl": "Sushi",
+    "de": "Susshi"
   },
-
-  "e197a9ccf40b776f31368105d1aa8c4b":{
-    "en":"Takeout",
-    "fr":"A Emporter",
-    "ru":"На вынос"
+  "e197a9ccf40b776f31368105d1aa8c4b": {
+    "en": "Takeaway",
+    "fr": "A Emporter",
+    "ua": "На вынос",
+    "nl": "Takeaway",
+    "de": "Zum<br>Mitnehmen"
   },
-
-  "22322b2b47dab77cb37cda3ae584c36a":{
-    "en":"Ice-cream",
-    "fr":"Glacée",
-    "ru":"Мороженое"
+  "22322b2b47dab77cb37cda3ae584c36a": {
+    "en": "Ice-cream",
+    "fr": "Glacée",
+    "ua": "Мороженое",
+    "nl": "IJs",
+    "de": "Eiscreme"
   },
-  "95ae59f9bd12719f5e5d799e58022505":{
-    "en":"Veggies",
-    "fr":"Végétaux",
-    "ru":"Овощи"
+  "95ae59f9bd12719f5e5d799e58022505": {
+    "en": "Veggies",
+    "fr": "Végétaux",
+    "ua": "Овощи",
+    "nl": "Groenten",
+    "de": "Gemüse"
   },
-  "1dd1c5b63d654fcb61bc0be7fc41bbf0":{
-    "en":"Greens",
-    "fr":"Verts",
-    "ru":"Зелень"
+  "1dd1c5b63d654fcb61bc0be7fc41bbf0": {
+    "en": "Greens",
+    "fr": "Verts",
+    "ua": "Зелень",
+    "nl": "Groenen",
+    "de": "Gemüse"
   },
-
-  "8c76e09a7a292cc2a857d4ceafe5d6ea":{
-    "en":"Mushrooms",
-    "fr":"Champignons",
-    "ru":"Грибы"
+  "8c76e09a7a292cc2a857d4ceafe5d6ea": {
+    "en": "Mushrooms",
+    "fr": "Champignons",
+    "ua": "Грибы",
+    "nl": "Paddestoelen",
+    "de": "Pilze"
   },
-  "f8e51e2a65b49f5b11db199d05530576":{
-    "en":"Pickles",
-    "fr":"Cornichons",
-    "ru":"Соленья"
+  "f8e51e2a65b49f5b11db199d05530576": {
+    "en": "Pickles",
+    "fr": "Cornichons",
+    "ua": "Соленья",
+    "nl": "Pickles",
+    "de": "Pickles"
   },
-  "a36ef47851e2b0fce36c1148d152749a":{
-    "en":"Fruits",
-    "fr":"Fruits",
-    "ru":"Фрукты"
+  "a36ef47851e2b0fce36c1148d152749a": {
+    "en": "Fruits",
+    "fr": "Fruits",
+    "ua": "Фрукты",
+    "nl": "Fruit",
+    "de": "Frucht"
   },
-  "c89f71156fb3b129973d288f48c1a0a2":{
-    "en":"Berries",
-    "fr":"Baies",
-    "ru":"Ягоды"
+  "c89f71156fb3b129973d288f48c1a0a2": {
+    "en": "Berries",
+    "fr": "Baies",
+    "ua": "Ягоды",
+    "nl": "Berries",
+    "de": "Beeren"
   },
-  "2f55164fcab5c973d2359ce21cfa9048":{
-    "en":"Gourds",
-    "fr":"Gourdes",
-    "ru":"Бахчевые"
+  "2f55164fcab5c973d2359ce21cfa9048": {
+    "en": "Gourds",
+    "fr": "Gourdes",
+    "ua": "Бахчевые",
+    "nl": "Kelken",
+    "de": "Kürbisse"
   },
-  "e4120fc5cb9df630d2f54ee644faafa7":{
-    "en":"Exotic",
-    "fr":"Exotic",
-    "ru":"Экзотика"
+  "e4120fc5cb9df630d2f54ee644faafa7": {
+    "en": "Tropical",
+    "fr": "Tropicaux",
+    "ua": "Тропика",
+    "nl": "Tropisch",
+    "de": "Tropisch"
   },
-  "4b02a5b8da403b36083763c143a56854":{
-    "en":"Dairy<br>Eggs",
-    "fr":"Laitiers<br>Œufs",
-    "ru":"Молочка<br>Яйца"
+  "4b02a5b8da403b36083763c143a56854": {
+    "en": "Dairy<br>Eggs",
+    "fr": "Laitiers<br>Œufs",
+    "ua": "Молочка<br>Яйца",
+    "nl": "Zuivel",
+    "de": "Molkerei<br>Eier"
   },
-  "5b591bad6d9ce5c8c7494834ade42132":{
-    "en":"Sour Cream<br/>Yogurts",
-    "fr":"Crème sure<br/>Yogourts",
-    "ru":"Сметана<br>Йогурты"
+  "5b591bad6d9ce5c8c7494834ade42132": {
+    "en": "Sour Cream<br/>Yogurts",
+    "fr": "Crème sure<br/>Yogourts",
+    "ua": "Сметана<br>Йогурты",
+    "nl": "Zure room",
+    "de": "Yogourts"
   },
-  "cf1dfd60d1e931e52ec346bc376e9602":{
-    "en":"Cottage<br/>Cheese",
-    "fr":"Cottage<br/>Fromage",
-    "ru":"Творог"
+  "cf1dfd60d1e931e52ec346bc376e9602": {
+    "en": "Cottage<br/>Cheese",
+    "fr": "Cottage<br/>Fromage",
+    "ua": "Творог",
+    "nl": "Kwark",
+    "de": "Frischkäse"
   },
-  "a67778b3dcc82bfaace0f8bc0061f20e":{
-    "en":"Cheese",
-    "fr":"Fromage",
-    "ru":"Сыр"
+  "a67778b3dcc82bfaace0f8bc0061f20e": {
+    "en": "Cheese",
+    "fr": "Fromage",
+    "ua": "Сыр",
+    "nl": "Kaas",
+    "de": "Käse"
   },
-  "9890f06976131702b942e59eda2f750a":{
-    "en":"Eggs",
-    "fr":"Œufs",
-    "ru":"Яйца"
+  "9890f06976131702b942e59eda2f750a": {
+    "en": "Eggs",
+    "fr": "Œufs",
+    "ua": "Яйца",
+    "nl": "Kaas",
+    "de": "Eier"
   },
-  "e4b662d3892f8c0c86801919f979467f":{
-    "en":"Meat",
-    "fr":"Viande",
-    "ru":"Мясо"
+  "e4b662d3892f8c0c86801919f979467f": {
+    "en": "Meat",
+    "fr": "Viande",
+    "ua": "Мясо",
+    "nl": "Vlees"
   },
-  "8f1f76515c4ee9a16594eda002337134":{
-    "en":"Beef",
-    "fr":"Bœuf",
-    "ru":"Говядина"
+  "8f1f76515c4ee9a16594eda002337134": {
+    "en": "Beef",
+    "fr": "Bœuf",
+    "ua": "Говядина",
+    "nl": "Rundvlees",
+    "de": "Fleisch"
   },
-  "34e3f440dad631cf8d085c8c3eca894b":{
-    "en":"Pork",
-    "fr":"Porc",
-    "ru":"Свинина"
+  "34e3f440dad631cf8d085c8c3eca894b": {
+    "en": "Pork",
+    "fr": "Porc",
+    "ua": "Свинина",
+    "nl": "Varken"
   },
-  "07e1e19a2e90a9d843d02cbdb445fa69":{
-    "en":"Lamb",
-    "fr":"Agneau",
-    "ru":"Баранина"
+  "07e1e19a2e90a9d843d02cbdb445fa69": {
+    "en": "Lamb",
+    "fr": "Agneau",
+    "ua": "Баранина",
+    "nl": "Lamb",
+    "de": "Schwein"
   },
-
-  "810771055916119e41dea16330c4d834":{
-    "en":"Semi-<br>finished",
-    "fr":"Semi-<br>fini",
-    "ru":"Полу<br>фабрикат"
+  "810771055916119e41dea16330c4d834": {
+    "en": "Semi-<br>finished",
+    "fr": "Semi-<br>fini",
+    "ua": "Полу<br>фабрикат",
+    "nl": "Halfproduct",
+    "de": "Halbzeug"
   },
-
-  "bf9cee6ef204cf043be970dcd4837fa4":{
-    "en":"Sausages",
-    "fr":"Saucisses",
-    "ru":"Колбасы"
+  "bf9cee6ef204cf043be970dcd4837fa4": {
+    "en": "Sausages",
+    "fr": "Saucisses",
+    "ua": "Колбасы",
+    "nl": "Worstjes",
+    "de": "Würste"
   },
-
-  "071642fa72ba780ee90ed36350d82745":{
-    "en":"SeaFood",
-    "fr":"SeaFood",
-    "ru":"Море<br>продукты"
+  "071642fa72ba780ee90ed36350d82745": {
+    "en": "SeaFood",
+    "fr": "SeaFood",
+    "ua": "Море<br>продукты",
+    "nl": "SeaFood",
+    "de": "SeaFood"
   },
-
-  "c45c974fa258e5d8cd30f0f7d0f9827d":{
-    "en":"Poultry",
-    "fr":"Volaille",
-    "ru":"Птица"
+  "c45c974fa258e5d8cd30f0f7d0f9827d": {
+    "en": "Poultry",
+    "fr": "Volaille",
+    "ua": "Птица",
+    "nl": "Pluimvee"
   },
-
-  "a9514f8884af954749b66932d8a95a76":{
-    "en":"Chicken",
-    "fr":"Poulet",
-    "ru":"Курица"
+  "a9514f8884af954749b66932d8a95a76": {
+    "en": "Chicken",
+    "fr": "Poulet",
+    "ua": "Курица",
+    "nl": "Kip",
+    "de": "Vogel"
   },
-  "221cdfb73049678e244380b45872cbb2":{
-    "en":"Turkey",
-    "fr":"Turquie",
-    "ru":"Индейка"
+  "221cdfb73049678e244380b45872cbb2": {
+    "en": "Turkey",
+    "fr": "Turquie",
+    "ua": "Индейка",
+    "nl": "Turkey",
+    "de": "Türkei"
   },
-
-  "f97ca8decb3a5f04d11d0e3c6ff3f0cd":{
-    "en":"Duck",
-    "fr":"Canard",
-    "ru":"Утка"
+  "f97ca8decb3a5f04d11d0e3c6ff3f0cd": {
+    "en": "Duck",
+    "fr": "Canard",
+    "ua": "Утка",
+    "nl": "Eend",
+    "de": "Ente"
   },
-
-  "636d2370c523f2b2f49a568b6485f1f5":{
-    "en":"Beverage",
-    "fr":"Boissons",
-    "ru":"Напитки"
+  "b69d8ad1c1f2abfcbcb1972cdba2192e": {
+    "en": "Pate<br>Mousse",
+    "fr": "Pâté<br>Mousse",
+    "ua": "Паштет<br>Мусс",
+    "nl": "Pate<br>Mousse",
+    "de": "Pastete<br>Mousse"
   },
-
-  "27634ff8002b12e75d98e07ccd005d18":{
-    "en":"Water",
-    "fr":"Eau",
-    "ru":"Вода"
+  "636d2370c523f2b2f49a568b6485f1f5": {
+    "en": "Beverage",
+    "fr": "Boissons",
+    "ua": "Напитки",
+    "nl": "Drank",
+    "de": "Getränke"
   },
-
-  "d49929af79e93ff191fb7495478c7fd4":{
-    "en":"Cola<br>Limonade",
-    "fr":"Cola<br>Limonade",
-    "ru":"Кола<br>Лимонад"
+  "27634ff8002b12e75d98e07ccd005d18": {
+    "en": "Water",
+    "fr": "Eau",
+    "ua": "Вода",
+    "nl": "Water",
+    "de": "Wasser"
   },
-
-  "8754016bce09674b1796cd2cc062d7da":{
-    "en":"Juice",
-    "fr":"Juice",
-    "ru":"Сок"
+  "d49929af79e93ff191fb7495478c7fd4": {
+    "en": "Cola<br>Limonade",
+    "fr": "Cola<br>Limonade",
+    "ua": "Кола<br>Лимонад",
+    "nl": "Cola<br>Limonade",
+    "de": "Cola<br>Limonade"
   },
-  "b0e2e27703cfc8b5155f0c66d861d798":{
-    "en":"Energetic",
-    "fr":"Énergique",
-    "ru":"Энергетик"
+  "8754016bce09674b1796cd2cc062d7da": {
+    "en": "Juice",
+    "fr": "Juice",
+    "ua": "Сок",
+    "nl": "Sap",
+    "de": "Saft"
   },
-
-  "5d594c716a198cb3d05d1b560ac35b39":{
-    "en":"Brewery",
-    "fr":"Brasserie",
-    "ru":"Пиво"
+  "b0e2e27703cfc8b5155f0c66d861d798": {
+    "en": "Energetic",
+    "fr": "Énergique",
+    "ua": "Энергетик",
+    "nl": "Energiek"
   },
-  "3064efd2f260970799cd652a5ed4d875":{
-    "en":"Winery",
-    "fr":"Vin",
-    "ru":"Вина"
+  "5d594c716a198cb3d05d1b560ac35b39": {
+    "en": "Brewery",
+    "fr": "Brasserie",
+    "ua": "Пиво",
+    "nl": "Bier",
+    "de": "Energetisch"
   },
-
-
-  "7481b14989ab4298a3e0437d5b45b3b3":{
-    "en":"Cakes",
-    "fr":"Gâteaux",
-    "ru":"Торты"
+  "3064efd2f260970799cd652a5ed4d875": {
+    "en": "Winery",
+    "fr": "Vin",
+    "ua": "Вино",
+    "nl": "Wijn",
+    "de": "Wein"
   },
-  "597b56e53847cd6a4712ac183f61fa68":{
-    "en":"Cookies<br/>Crackers",
-    "fr":"Cookies<br/>Crackers",
-    "ru":"Печенье<br/>Крекеры"
+  "7481b14989ab4298a3e0437d5b45b3b3": {
+    "en": "Cakes",
+    "fr": "Gâteaux",
+    "ua": "Торты",
+    "nl": "Cakes",
+    "de": "Torten"
   },
-  "fdc1de159925cd627c263e9e74171901":{
-    "en":"Marshmallow<br/>Marmelade",
-    "fr":"Guimauve<br/>Marmelade",
-    "ru":"Пастила<br/>Мармелад"
+  "597b56e53847cd6a4712ac183f61fa68": {
+    "en": "Cookies<br/>Crackers",
+    "fr": "Cookies<br/>Crackers",
+    "ua": "Печенье<br/>Крекеры",
+    "nl": "Koekjes<br/>Krackers",
+    "de": "Kekse<br/>Cracker"
   },
-  "139148c3293387bb780412df0e4c3d94":{
-    "en":"Candies",
-    "fr":"Bonbons",
-    "ru":"Конфеты"
+  "fdc1de159925cd627c263e9e74171901": {
+    "en": "Marshmallow<br/>Marmelade",
+    "fr": "Guimauve<br/>Marmelade",
+    "ua": "Пастила<br/>Мармелад",
+    "nl": "Pastila<br/>Marmelade",
+    "de": "Pastille<br/>Marmelade"
   },
-  "a17ee33bdc0cb98cfacd0436c6b7f497":{
-    "en":"Chokolate",
-    "fr":"Chokolate",
-    "ru":"Шоколад"
+  "139148c3293387bb780412df0e4c3d94": {
+    "en": "Candies",
+    "fr": "Bonbons",
+    "ua": "Конфеты",
+    "nl": "Snoep",
+    "de": "Bonbons"
   },
-  "96d4794680bf112fa539807c0b454d25":{
-    "en":"Sweets",
-    "fr":"Sweets",
-    "ru":"Сладости"
+  "a17ee33bdc0cb98cfacd0436c6b7f497": {
+    "en": "Chokolate",
+    "fr": "Chokolate",
+    "ua": "Шоколад",
+    "nl": "Chocolate",
+    "de": "Schokolade"
   },
-  "9fbdf5756851e77880327f5e86212a27":{
-    "en":"Jams",
-    "fr":"Jams",
-    "ru":"Варенье<br>Джемы"
+  "96d4794680bf112fa539807c0b454d25": {
+    "en": "Sweets",
+    "fr": "Sweets",
+    "ua": "Сладости",
+    "nl": "Sweets",
+    "de": "Süßigkeiten"
   },
-  "ac66e4e8ee28fd48b2041c7d8a04ba15":{
-    "en":"Grocery",
-    "fr":"Épicerie",
-    "ru":"Бакалея"
+  "9fbdf5756851e77880327f5e86212a27": {
+    "en": "Jams",
+    "fr": "Jams",
+    "ua": "Варенье<br>Джемы",
+    "nl": "Jams",
+    "de": "Konfitüre"
   },
-  "e09813f8015339fc445f3a84bb8c4023":{
-    "en":"Pasta",
-    "fr":"Pasta",
-    "ru":"Макароны"
+  "ac66e4e8ee28fd48b2041c7d8a04ba15": {
+    "en": "Grocery",
+    "fr": "Épicerie",
+    "ua": "Бакалея",
+    "nl": "Kruidenier",
+    "de": "Lebensmittel<br>geschäft"
   },
-  "e7468686d6c07e4dbbd075cf56788ab3":{
-    "en":"Cereals",
-    "fr":"Céréales",
-    "ru":"Крупы"
+  "e09813f8015339fc445f3a84bb8c4023": {
+    "en": "Pasta",
+    "fr": "Pasta",
+    "ua": "Макароны",
+    "nl": "Pasta",
+    "de": "Nudeln"
+  },
+  "e7468686d6c07e4dbbd075cf56788ab3": {
+    "en": "Cereals",
+    "fr": "Céréales",
+    "ua": "Крупы",
+    "nl": "Granen",
+    "de": "Getreide"
   },
   "d68dc362fa9881c817391eb28687a17a": {
-      "en":"Nuts",
-      "fr":"Noix",
-      "ru":"Орехи"
+    "en": "Nuts",
+    "fr": "Noix",
+    "ua": "Орехи",
+    "nl": "Nuts",
+    "de": "Nüsse"
   },
   "08ab74e466ffeaf9ab0bc6320d2bde63": {
-    "en":"Dried fruit",
-    "fr":"Fruits secs",
-    "ru":"Сухофрукты"
+    "en": "Dried fruit",
+    "fr": "Fruits secs",
+    "ua": "Сухофрукты",
+    "nl": "Gedroogd<br>fruit",
+    "de": "Getrocknete<br>früchte"
   },
-  "2e69df5961f20aee0897cf1905156344":{
-    "en":"Oil",
-    "fr":"Huile",
-    "ru":"Масло"
+  "2e69df5961f20aee0897cf1905156344": {
+    "en": "Oil",
+    "fr": "Huile",
+    "ua": "Масло",
+    "nl": "Olie",
+    "de": "Öl"
   },
-  "5db98fd5955482197423a2a4760f38c7":{
-    "en":"Sauces<br>Spices",
-    "fr":"Sauces<br>Épices",
-    "ru":"Соусы<br>Приправы"
+  "5db98fd5955482197423a2a4760f38c7": {
+    "en": "Sauces<br>Spices",
+    "fr": "Sauces<br>Épices",
+    "ua": "Соусы<br>Приправы",
+    "nl": "Sauzen<br>Specerijen",
+    "de": "Saucen<br>Gewürze"
   },
-  "c7214ae3ca3ce705c683e7dbe362c9a2":{
-    "en":"Tea<br>Coffe",
-    "fr":"Thé<br>Coffe",
-    "ru":"Чай<br>Кофе"
+  "c7214ae3ca3ce705c683e7dbe362c9a2": {
+    "en": "Tea<br>Coffe",
+    "fr": "Thé<br>Coffe",
+    "ua": "Чай<br>Кофе",
+    "nl": "Thee<br>Koffie",
+    "de": "Tee<br>Kaffee"
   },
-  "1ba89dab5315d1fc2b43bf84402ff1b3":{
-    "en":"Tea",
-    "fr":"Thé",
-    "ru":"Чай"
+  "1ba89dab5315d1fc2b43bf84402ff1b3": {
+    "en": "Tea",
+    "fr": "Thé",
+    "ua": "Чай",
+    "nl": "Thee",
+    "de": "Tee"
   },
-  "e1ee03705b4c13620480e601b40a993f":{
-    "en":"Coffeе",
-    "fr":"Coffe",
-    "ru":"Кофе"
+  "e1ee03705b4c13620480e601b40a993f": {
+    "en": "Coffeе",
+    "fr": "Coffe",
+    "ua": "Кофе",
+    "nl": "Coffeе",
+    "de": "Kaffee"
   },
-  "a11e3d7212c369ba1a229ea7a8ae65de":{
-    "en":"Baking",
-    "fr":"Baking",
-    "ru":"Выпечка"
+  "a11e3d7212c369ba1a229ea7a8ae65de": {
+    "en": "Baking",
+    "fr": "Baking",
+    "ua": "Выпечка",
+    "nl": "Bakken"
   },
-  "1296fcaab5ec71496d1ecb176f176bdf":{
-    "en":"Bread",
-    "fr":"Pain",
-    "ru":"Хлеб"
+  "1296fcaab5ec71496d1ecb176f176bdf": {
+    "en": "Bread",
+    "fr": "Pain",
+    "ua": "Хлеб",
+    "nl": "Brood",
+    "de": "Backen"
   },
-  "713a01ab419f96cb320352765e8791d4":{
-    "en":"Bio",
-    "fr":"Bio",
-    "ru":"Био"
+  "713a01ab419f96cb320352765e8791d4": {
+    "en": "Bio",
+    "fr": "Bio",
+    "ua": "Био",
+    "nl": "Bio",
+    "de": "Bio"
   },
-  "4f05c9929f41c38e6177b6c4c58e2a27":{
-    "en":"Health<br>Food",
-    "fr":"Santé<br>Alimentation",
-    "ru":"Здоровое<br>питание"
+  "4f05c9929f41c38e6177b6c4c58e2a27": {
+    "en": "Health<br>Food",
+    "fr": "Santé<br>Alimentation",
+    "ua": "Здоровое<br>питание",
+    "nl": "Gezondheid<br>Voeding",
+    "de": "Gesundes<br>Essen"
   },
-  "71a731effc43ac8bab7455c5e4ce9cc5":{
-    "en":"Vegan",
-    "fr":"Vegan",
-    "ru":"Веган"
+  "71a731effc43ac8bab7455c5e4ce9cc5": {
+    "en": "Vegan",
+    "fr": "Vegan",
+    "ua": "Веган",
+    "nl": "Vegan",
+    "de": "Vegan"
   },
-  "11abe4c0e9461f5627594d5ac9b3d1bc":{
-    "en":"Out of<br>Gluten",
-    "fr":"Sans<br>Gluten",
-    "ru":"Без<br>глютена"
+  "11abe4c0e9461f5627594d5ac9b3d1bc": {
+    "en": "Out of<br>Gluten",
+    "fr": "Sans<br>Gluten",
+    "ua": "Без<br>глютена",
+    "nl": "Glutenvrij",
+    "de": "Gluten<br>frei"
   },
-  "b44ec9b4d991fc4bbaf7e1707de5fb0c":{
-    "ru": "Ассортимент",
-    "en": "Product Catalog",
-    "de": "Produkt-Katalog",
-    "fr":"Catalogue de produits"
+  "b44ec9b4d991fc4bbaf7e1707de5fb0c": {
+    "ua": "Ассортимент",
+    "en": "Assortment",
+    "de": "Sortiment",
+    "fr": "Assortiment",
+    "nl": "Assortment"
   },
-  "a46c372347e02010f5ef45fe441e4349":{
-    "ru": "Профиль",
+  "a46c372347e02010f5ef45fe441e4349": {
+    "ua": "Профиль",
     "en": "Profile",
     "de": "Profil",
-    "fr":"Profil"
+    "fr": "Profil",
+    "nl": "Profil"
   },
-  "ec136b444eede3bc85639fac0dd06229":{
-    "ru": "Поставщик",
+  "ec136b444eede3bc85639fac0dd06229": {
+    "ua": "Поставщик",
     "en": "Supplier",
-    "de": "Der Lieferant"
-    ,
-   "fr":""
+    "de": "Der Lieferant",
+    "fr": "Fournisseur",
+    "nl": "Supplier"
   },
-  "ce26601dac0dea138b7295f02b7620a7":{
-    "ru": "Покупатель",
+  "ce26601dac0dea138b7295f02b7620a7": {
+    "ua": "Покупатель",
     "en": "Customer",
     "de": "Käufer",
-    "fr":""
+    "fr": "Acheteur",
+    "nl": "Koper"
   },
-  "03870ff3038eb6709c2c0ab02bac5563":{
-    "ru": "Ошибка сохранения. Проверьте интернет соединение.",
+  "03870ff3038eb6709c2c0ab02bac5563": {
+    "ua": "Ошибка сохранения. Проверьте интернет соединение.",
     "en": "Saving Error. Check up connection.",
-    "de":"Fehler beim Speichern. Überprüfen Sie die Internetverbindung.",
-    "fr":"Erreur de sauvegarde. Vérifiez la connexion Internet."
+    "de": "Fehler beim Speichern. Überprüfen Sie die Internetverbindung.",
+    "fr": "Erreur de sauvegarde. Vérifiez la connexion Internet.",
+    "nl": "Bewaar fout. Controleer de internetverbinding"
   },
-  "f6039d44b29456b20f8f373155ae4973":{
-    "ru": "название",
+  "f6039d44b29456b20f8f373155ae4973": {
+    "ua": "название",
     "en": "title",
     "de": "titel",
-    "fr": "title"
+    "fr": "title",
+    "nl": "titel"
   },
-  "02aa853964a1542a8ee08c71a95bbf64":{
-    "ru": "имя",
+  "02aa853964a1542a8ee08c71a95bbf64": {
+    "ua": "имя",
     "en": "name",
     "de": "namen",
-    "fr": "nom"
+    "fr": "nom",
+    "nl": "naam"
   },
-  "96c7b6402b3c977daed27d8692d472fc":{
-    "ru": "эл.почта",
+  "96c7b6402b3c977daed27d8692d472fc": {
+    "ua": "эл.почта",
     "en": "email",
     "de": "e-mail",
-    "fr": "l'email"
+    "fr": "l'email",
+    "nl": "e-mail"
   },
-
-  "6dce6334729d3d5162fe0d7e96b74c17":{
-    "ru": "номер заказа",
+  "6dce6334729d3d5162fe0d7e96b74c17": {
+    "ua": "номер заказа",
     "en": "order number",
     "de": "bestellnummer",
-    "fr": "numéro d'ordre"
+    "fr": "numéro d'ordre",
+    "nl": "ordernummer"
   },
-
-  "9fdc3f131f7923e7bdd4ec60d465ae87":{
-    "ru": "номер телефона",
+  "9fdc3f131f7923e7bdd4ec60d465ae87": {
+    "ua": "номер телефона",
     "en": "phone num.",
     "de": "rufnummer",
-    "fr": "téléphone"
+    "fr": "téléphone",
+    "nl": "telefoonnummer"
   },
-  "8415c877021660e753563991449242cf":{
-    "ru": "введите номер телефона",
+  "8415c877021660e753563991449242cf": {
+    "ua": "введите номер телефона",
     "en": "input phone num.",
     "de": "rufnummer eingeben",
-    "fr": "entrez le numéro de téléphone"
+    "fr": "entrez le numéro de téléphone",
+    "nl": "telefoonnummer invoeren"
   },
-
-  "7bf10d2530ee3d26d16cbe0e4b6152b1":{
-    "ru": "доставка",
+  "7bf10d2530ee3d26d16cbe0e4b6152b1": {
+    "ua": "доставка",
     "en": "delivery",
     "de": "lieferpreis",
-    "fr": "livraison"
+    "fr": "livraison",
+    "nl": "levering"
   },
-  "c1ddbc83a4c932f915f50d509a60bee0":{
-    "ru": "стоимость доставки за км",
+  "c1ddbc83a4c932f915f50d509a60bee0": {
+    "ua": "стоимость доставки за км",
     "en": "delivery price per km",
     "de": "lieferpreis pro km",
-    "fr": "prix de livraison par km"
+    "fr": "prix de livraison par km",
+    "nl": "leveringskosten per km"
   },
-  "911ed573e704044ec9e3c9c697011d4c":{
-    "ru": "сумма заказа не менее",
+  "911ed573e704044ec9e3c9c697011d4c": {
+    "ua": "сумма заказа не менее",
     "en": "order value no less than",
     "de": "auftragswert nicht kleiner als",
-    "fr": "valeur de la commande non inférieure à"
+    "fr": "valeur de la commande non inférieure à",
+    "nl": "orderwaarde ten minste"
   },
-  "99dea78007133396a7b8ed70578ac6ae":{
-    "ru": "Логин",
+  "99dea78007133396a7b8ed70578ac6ae": {
+    "ua": "Логин",
     "en": "Login",
-    "de": "Login"    ,
-    "fr":""
+    "de": "Login",
+    "fr": "",
+    "nl": "Login"
   },
-  "a38a2e843b153d64253d762e23696e17":{
-    "ru": "Оставить комментарий к заказу",
+  "a38a2e843b153d64253d762e23696e17": {
+    "ua": "Оставить комментарий к заказу",
     "en": "Put a comment to the order",
     "de": "Hinterlasse einen Kommentar zur Bestellung",
-    "fr": "Laissez un commentaire sur votre commande"
+    "fr": "Laissez un commentaire sur votre commande",
+    "nl": "Laat een commentaar achter op uw bestelling"
   },
-  "23d285609698e41e54306c4189c90569":{
-    "en":"share",
-    "ru":"опубл",
-    "de":"Veröffentlichen",
-   "fr":"publier"
+  "23d285609698e41e54306c4189c90569": {
+    "en": "share",
+    "ua": "опубл",
+    "de": "Veröffentlichen",
+    "fr": "publier",
+    "nl": "aandeel"
   },
-  "f479ee0428deb391dacad49e70199eb4":{
-    "en":"Delete The Offer",
-    "ru":"Удалить предложение",
-    "de":"Angebot löschen"
-    ,
-   "fr":""
+  "f479ee0428deb391dacad49e70199eb4": {
+    "en": "Delete The Offer",
+    "ua": "Удалить предложение",
+    "de": "Angebot löschen",
+    "fr": "",
+    "nl": "Zin schrappen"
   },
   "ef6f6a1c0e002ecd1063b3ee0ac9302d": {
-    "ru": "описание продукта",
+    "ua": "описание продукта",
     "en": "product description",
     "de": "Produktbeschreibung",
-    "fr":"description"
+    "fr": "description",
+    "nl": "productomschrijving"
   },
-  "97d0437651ce07ca06f97bece11e313d":{
-    "ru": "Дата доставки",
+  "97d0437651ce07ca06f97bece11e313d": {
+    "ua": "Дата доставки",
     "en": "Delivery Date",
     "de": "Liefertermin",
-    "fr": "Date de livraison"
+    "fr": "Date de livraison",
+    "nl": "Datum levering"
   },
   "4b310a8f25bcb1082f21fa8cde0b28e9": {
     "en": "Choose a region for delivery",
-    "ru": "Выберите регион для доставки",
-    "de":"Region für die Lieferung auswählen",
-    "fr":""
+    "ua": "Выберите регион для доставки",
+    "de": "Region für die Lieferung auswählen",
+    "fr": "",
+    "nl": "Kies een regio voor bezorging"
   },
-  "2b1bb9b86845c33c0e1dc289a714e9ac":{
-    "ru": "ждем подтверждения",
+  "2b1bb9b86845c33c0e1dc289a714e9ac": {
+    "ua": "ждем подтверждения",
     "en": "waiting for approvement",
     "de": "warten auf freigabe",
-    "fr": "en attente d'approbation"
+    "fr": "en attente d'approbation",
+    "nl": "wacht op bevestiging"
   },
-  "c5db61ffb92f10e3e72921a57b3ec421":{
+  "c5db61ffb92f10e3e72921a57b3ec421": {
     "en": "input delivery address",
-    "ru": "введите адрес доставки",
+    "ua": "введите адрес доставки",
     "de": "geben Sie die Lieferadresse ein",
-    "fr": "saisir une adresse de livraison"
+    "fr": "saisir une adresse de livraison",
+    "nl": "voer een afleveradres in"
   },
   "c9cc8cce247e49bae79f15173ce97354": {
     "en": "Save & Close",
-    "ru": "Сохранить и закрыть",
-    "de":"Speichern und schließen"
-    ,
-   "fr":""
+    "ua": "Сохранить и закрыть",
+    "de": "Speichern und schließen",
+    "fr": "",
+    "nl": "Opslaan en sluiten"
   },
   "3e68ad9b7ced9994b62721c5af7c5fbc": {
     "en": "Input url for image or press Cancel to upload the image from your device",
-    "ru": "Введите адрес изображения в интернете или нажмите Отмена для загрузки с компьютера",
-    "de":"Geben Sie die Adresse des Bildes im Internet ein oder klicken Sie auf Abbrechen, um es von Ihrem Computer herunterzuladen"
-    ,
-   "fr":""
+    "ua": "Введите адрес изображения в интернете или нажмите Отмена для загрузки с компьютера",
+    "de": "Geben Sie die Adresse des Bildes im Internet ein oder klicken Sie auf Abbrechen, um es von Ihrem Computer herunterzuladen",
+    "fr": "",
+    "nl": ""
   },
   "110a4b01beabd53b661a47d4b44bd7a8": {
     "en": "Release",
-    "ru": "Опубликовать",
-    "de":" ",
-    "fr":""
+    "ua": "Опубликовать",
+    "fr": "",
+    "nl": "Release"
   },
   "44ec8d4ee84b681847b88ee0c5b3b790": {
     "en": "released",
-    "ru": "опубликовано",
-    "de":"veröffentlichen",
-    "fr":"publié par"
+    "ua": "опубликовано",
+    "de": "veröffentlichen",
+    "fr": "publié par",
+    "nl": ""
   },
-
   "4ffcfc797d41cdb9e9b5a8ec2e936308": {
     "en": "non released",
-    "ru": "не опублик.",
-    "de":"",
-    "fr":"non publié"
+    "ua": "не опублик.",
+    "de": "",
+    "fr": "non publié",
+    "nl": ""
   },
-
-  "57ed5ecde6919ca32c4905100a06125e":{
-    "ru":"Блюда",
-    "en":"Dishes",
-    "de":"Gerichte"
-    ,
-   "fr":""
+  "57ed5ecde6919ca32c4905100a06125e": {
+    "ua": "Блюда",
+    "en": "Dishes",
+    "de": "Gerichte",
+    "fr": "",
+    "nl": ""
   },
   "9894ba007958648fbb95dab79f5c49b8": {
     "en": "Fruits",
-    "ru": "Фрукты",
-    "de":"Früchte"
-    ,
-   "fr":""
+    "ua": "Фрукты",
+    "de": "Früchte",
+    "fr": "",
+    "nl": ""
   },
   "5204a8300227b12b9344514e31658a57": {
     "en": "Veges",
-    "ru": "Овощи",
-    "de":"Gemüse"
-    ,
-   "fr":""
+    "ua": "Овощи",
+    "de": "Gemüse",
+    "fr": "",
+    "nl": ""
   },
   "936beb3789addd4616f024f2cd2caac8": {
     "en": "Milk & Butter",
-    "ru": "Молоко-масло",
-    "de":"Молоко-масло"
-    ,
-   "fr":""
+    "ua": "Молоко-масло",
+    "de": "Молоко-масло",
+    "fr": "",
+    "nl": ""
   },
   "3fb5a1fd02693fe2959220f291b05f19": {
     "en": "Cheese",
-    "ru": "Сыр",
-    "de":" "
-    ,
-   "fr":""
+    "ua": "Сыр",
+    "fr": "",
+    "nl": ""
   },
   "f3d5840c5a17c2fabec8c07d8a993272": {
     "en": "Meat",
-    "ru": "Мясо",
-    "de":"Käse"
-    ,
-   "fr":""
+    "ua": "Мясо",
+    "de": "Käse",
+    "fr": "",
+    "nl": ""
   },
   "b9d8d413b50edbd26d34cbd4a5a5f8e7": {
     "en": "Fish",
-    "ru": "Рыба",
-    "de":"Fisch"
-    ,
-   "fr":""
+    "ua": "Рыба",
+    "de": "Fisch",
+    "fr": "",
+    "nl": ""
   },
   "54a790c38eed762e354f16fb664c53de": {
     "en": "Mushrooms",
-    "ru": "Грибы",
-    "de":"Pilze"
-    ,
-   "fr":""
+    "ua": "Грибы",
+    "de": "Pilze",
+    "fr": "",
+    "nl": "Paddestoelen"
   },
-
-  "dd73af2f986b24be74bfc13572d8350a":{
-    "en":"Preserves",
-    "fr":"Conserves",
-    "ru":"Консервы"
+  "dd73af2f986b24be74bfc13572d8350a": {
+    "en": "Preserves",
+    "fr": "Conserves",
+    "ua": "Консервы",
+    "nl": "Conserven"
   },
   "c6bf07b78f27ac92bbb2e4ca345735ea": {
     "en": "Pinckles",
-    "ru": "Соленья",
-    "de":"Solenya"
-    ,
-   "fr":""
+    "ua": "Соленья",
+    "de": "Solenya",
+    "fr": "",
+    "nl": "Pickles"
   },
   "c1680e5a5622cdeebcf7d4e8795f3569": {
     "en": "Chicken",
-    "ru": "Птица",
-    "de":"Vogel"
-    ,
-   "fr":""
+    "ua": "Птица",
+    "de": "Vogel",
+    "fr": "",
+    "nl": "Vogel"
   },
   "da038785869c3814a23870b267e613e4": {
-      "en":"Confect-ry",
-      "fr":"Confiserie",
-      "ru":"Кондитерка"
+    "en": "Confect-ry",
+    "fr": "Confiserie",
+    "ua": "Кондитерка",
+    "nl": "Confiserie"
   },
   "161af5daa71abf18b8ad2c9593678e78": {
     "en": "Ice-cream",
-    "ru": "Мороженное",
-    "de":"Eiscreme",
-    "fr":"Glace"
+    "ua": "Мороженое",
+    "de": "Eiscreme",
+    "fr": "Glace",
+    "nl": "IJs"
   },
   "710cabd76238783bc3ebd5dc4ddf91bc": {
     "en": "Bread",
-    "ru": "Хлеб",
-    "de":"Brot",
-    "fr":"Pain"
+    "ua": "Хлеб",
+    "de": "Brot",
+    "fr": "Pain",
+    "nl": "Brood"
   },
   "54976a99e9bea2b1c5ca1b04cfcca910": {
     "en": "Bio",
-    "ru": "Био",
-    "de":"Bio"    ,
-    "fr":"Bio"
+    "ua": "Био",
+    "de": "Bio",
+    "fr": "Bio",
+    "nl": "Bio"
   },
-
-
   "0ad4f20d1443d9529ab35534c1ba505b": {
-    "ru": "название",
+    "ua": "название",
     "en": "title",
-    "de":" ",
-    "fr":"titre"
+    "fr": "titre",
+    "nl": "titel"
   },
-  "93473a7344419b15c4219cc2b6c64c6f":{
-    "ru": "импорт",
+  "93473a7344419b15c4219cc2b6c64c6f": {
+    "ua": "импорт",
     "en": "import",
     "de": "import",
-    "fr": "import"
+    "fr": "import",
+    "nl": "import"
   },
   "965e50ebcd495ec52ff7e9faf58bf020": {
-    "ru": "название дополнения",
+    "ua": "название дополнения",
     "en": "'extra title",
-    "de":" ",
-    "fr":"supplement titre"
+    "fr": "supplement titre",
+    "nl": "add-on naam",
+    "de": "add-on-name"
   },
   "3b935849d7d685dcae614a220bd7887a": {
-    "ru": "свойство",
+    "ua": "свойство",
     "en": "feature",
-    "de":" ",
-    "fr":"propriété"
+    "fr": "propriété",
+    "nl": "eigendom"
   },
   "901230d2433ff88d55fcef8c20b0f428": {
-    "ru": "значение",
+    "ua": "значение",
     "en": "value",
-    "de":" ",
-    "fr":"valeur"
+    "fr": "valeur",
+    "nl": "waarde",
+    "de": "wert"
   },
-  "1545c78dc94617fdcf969b057ece6372":{
-    "ru": "Заказать",
-    "en": "Order",
-    "de":""    ,
-    "fr":"Commander"
+  "1545c78dc94617fdcf969b057ece6372": {
+    "ua": "Заказать доставку",
+    "en": "Delivery order",
+    "de": "Lieferung<br>bestellen",
+    "fr": "Ordre livraison",
+    "nl": "Levering order"
   },
-  "b41e026d993eee7ba620c2177c4fa0e0":{
-    "ru": "Доставка",
+  "4f1bdd3b94ec13226f52e448d126d7c1": {
+    "ua": "Зарезервировать",
+    "en": "Reserve pickup",
+    "de": "Abholung reservieren",
+    "fr": "Réserve pickup",
+    "nl": "Reserve pickup"
+  },
+  "b41e026d993eee7ba620c2177c4fa0e0": {
+    "ua": "Доставка",
     "en": "Delivery",
-    "de":" "    ,
-    "fr":"Livraison"
+    "fr": "Livraison",
+    "nl": "Levering",
+    "de": "Lieferung"
   },
-  "3492b62254e3625dee5ff96208e0e9d9":{
-    "ru": "Предложение на",
+  "3492b62254e3625dee5ff96208e0e9d9": {
+    "ua": "Предложение на",
     "en": "Offer for ",
-    "de":"Lieferung",
-    "fr":"Offre"
+    "de": "Vorschlag für",
+    "fr": "Offre",
+    "nl": "Voorstel voor"
   },
-  "21e6c471bf5fa31fa235b6669e8943ca":{
-    "ru": "Общедоступная информация",
+  "21e6c471bf5fa31fa235b6669e8943ca": {
+    "ua": "Общедоступная информация",
     "en": "Shared Data",
-    "de":" ",
-    "fr":"Informations publiques"
+    "fr": "Informations publiques",
+    "nl": "Openbaar beschikbare informatie",
+    "de": "Öffentliche Informationen"
   },
-  "ebf76e067cabfab88118b3420289af42":{
-    "ru": "Дата и время доставки",
+  "ebf76e067cabfab88118b3420289af42": {
+    "ua": "Дата и время доставки",
     "en": "Delivery Date and Time",
-    "de":"Öffentliche Informationen",
-    "fr":""
+    "de": "Datum und Uhrzeit der Lieferung",
+    "fr": "",
+    "nl": "Datum en tijd van levering"
   },
-
-  "5c0c182f1e55e5bda0e95835c934489e":{
-    "ru": "другие условия доставки",
+  "5c0c182f1e55e5bda0e95835c934489e": {
+    "ua": "другие условия доставки",
     "en": "another delivery terms",
-    "de":"lieferbedingungen",
-    "fr":"autres conditions de livraison"
+    "de": "lieferbedingungen",
+    "fr": "autres conditions de livraison",
+    "nl": "overige leveringsvoorwaarden"
   },
-
-  "fb9cb7294abb5843f6529d5400f5a7ed":{
-    "ru": "время работы:",
+  "fb9cb7294abb5843f6529d5400f5a7ed": {
+    "ua": "время работы:",
     "en": "opening hours:",
-    "de":"Öffentliche Informationen:",
-    "fr":"heures d'ouverture:"
+    "de": "betriebszeit:",
+    "fr": "heures d'ouverture:",
+    "nl": "bedieningstijd:"
   },
-  "7442e29d7d53e549b78d93c46b8cdcfc":{
-    "ru": "Заказы",
+  "7442e29d7d53e549b78d93c46b8cdcfc": {
+    "ua": "Заказы",
     "en": "Orders",
-    "de": "",
-    "fr": ""
+    "de": "Bestellungen",
+    "fr": "",
+    "nl": "Заказы"
   },
-
-  "a418d4e3c6f2636a0adc2e26975c3073":{
-    "ru": "Язык",
+  "a418d4e3c6f2636a0adc2e26975c3073": {
+    "ua": "Язык",
     "en": "Language",
-    "de": "",
-    "fr": "Langue"
+    "de": "Sprache",
+    "fr": "Langue",
+    "nl": "Taal"
   },
-
-  "03489ebf8a5647ae07ac6b10408a5084":{
-    "ru": "Указанный адрес не входит в зону обслуживания сервиса доставки",
+  "03489ebf8a5647ae07ac6b10408a5084": {
+    "ua": "Указанный адрес не входит в зону обслуживания сервиса доставки",
     "en": "The address is not in the service area of the delivery service",
     "de": "Angegebene Adresse ist nicht im Zustellbereich enthalten",
-    "fr": "L'adresse spécifiée n'est pas comprise dans la zone de service de livraison"
+    "fr": "L'adresse spécifiée n'est pas comprise dans la zone de service de livraison",
+    "nl": "Dit adres maakt geen deel uit van het leveringsgebied."
   },
-
-  "54a228ac1da8df4602aa2052461c1349":{
-    "ru":"Показать заказы",
+  "54a228ac1da8df4602aa2052461c1349": {
+    "ua": "Показать заказы",
     "en": "Show Orders",
-    "de":"Bestellungen"    ,
-    "fr":""
+    "de": "Aufträge anzeigen",
+    "fr": "",
+    "nl": "Toon orders"
   },
-  "46534fd998c8f508d0bc9d15f134a68a":{
-    "ru": "Опубликовать предложение?",
+  "46534fd998c8f508d0bc9d15f134a68a": {
+    "ua": "Опубликовать предложение?",
     "en": "Do publish the offer?",
-    "de":"Ein Angebot veröffentlichen?",
-    "fr":"Publier la proposition?"
+    "de": "Ein Angebot veröffentlichen?",
+    "fr": "Publier la proposition?",
+    "nl": "Een voorstel uitbrengen?"
   },
-  "6c7a42eaf1426625858250105dd12f86":{
-    "ru": "Удалить предложение?",
+  "6c7a42eaf1426625858250105dd12f86": {
+    "ua": "Удалить предложение?",
     "en": "Do delete the offer?",
-    "de":"Das Angebot löschen?",
-    "fr":"Supprimer l'offre ?"
+    "de": "Das Angebot löschen?",
+    "fr": "Supprimer l'offre?",
+    "nl": ""
   },
-  "884d9804999fc47a3c2694e49ad2536a":{
-    "ru": "Aдрес доставки",
+  "884d9804999fc47a3c2694e49ad2536a": {
+    "ua": "Aдрес доставки",
     "en": "Delivery Address",
-    "de":" ",
-    "fr":"Adresse de livraison"
+    "fr": "Adresse de livraison",
+    "nl": "Aдрес доставки",
+    "de": "Lieferadresse"
   },
-  "bec946b0e151ea413af70bbc0f36ab98":{
-    "ru": "адрес",
+  "bec946b0e151ea413af70bbc0f36ab98": {
+    "ua": "адрес",
     "en": "address",
-    "de":" ",
-    "fr":"adresse"
+    "fr": "adresse",
+    "nl": "adres",
+    "de": "adresse"
   },
-  "a96cf03d806d1058b0a45d78422b3e32":{
-    "ru": "продавец",
+  "a96cf03d806d1058b0a45d78422b3e32": {
+    "ua": "продавец",
     "en": "seller",
-    "de":" ",
-    "fr":"vendeur"
+    "fr": "vendeur",
+    "nl": "verkoper",
+    "de": "verkäufer"
   },
-  "d7af43ed249c913363a7e57380e1a231":{
-    "ru": "период",
+  "d7af43ed249c913363a7e57380e1a231": {
+    "ua": "период",
     "en": "time",
-    "de":" ",
-    "fr":"temps"
+    "fr": "temps",
+    "nl": "periode",
+    "de": "periode"
   },
-  "c944d745b377880c6e3a2f851bb3510a":{
-    "ru": "продукты",
+  "c944d745b377880c6e3a2f851bb3510a": {
+    "ua": "продукты",
     "en": "food",
-    "de":" ",
-    "fr":"produit"
+    "fr": "produit",
+    "nl": "voedsel",
+    "de": "lebensmittel"
   },
-  "cc52dc21eb25996e8feaf3939d1f3ffe":{
-    "ru": "единица",
+  "cc52dc21eb25996e8feaf3939d1f3ffe": {
+    "ua": "единица",
     "en": "unit",
-    "de":" ",
-    "fr":"unité"
+    "fr": "unité",
+    "nl": "unit",
+    "de": "einheit"
   },
-  "b7bb52d46441267cf30ffd51668e311e":{
-    "ru": "кол-во",
+  "b7bb52d46441267cf30ffd51668e311e": {
+    "ua": "кол-во",
     "en": "qnty",
-    "de":" ",
-    "fr":"quantité"
+    "fr": "quantité",
+    "nl": "qnty",
+    "de": "menge"
   },
-  "252d601fadd75eba972d2dc0bfb22e67":{
-    "ru": "цена",
+  "252d601fadd75eba972d2dc0bfb22e67": {
+    "ua": "цена",
     "en": "price",
-    "de":" ",
-    "fr":"prix"
+    "fr": "prix",
+    "nl": "prijs",
+    "de": "preis"
   },
-  "52f584c59900f50d69e49c005e2c0fe5":{
-    "ru": "наценка",
+  "52f584c59900f50d69e49c005e2c0fe5": {
+    "ua": "наценка",
     "en": "markup",
-    "de":" ",
-    "fr":"markup"
+    "fr": "markup",
+    "nl": "opslag",
+    "de": "aufschlag"
   },
-  "e8c474b931743c08626ae5b9bb152a87":{
-    "ru": "торг",
+  "e8c474b931743c08626ae5b9bb152a87": {
+    "ua": "торг",
     "en": "bargain",
-    "de":" ",
-    "fr":"march"
+    "fr": "march",
+    "nl": "koopje",
+    "de": "schnäppchen"
   },
-  "6a42473d299c5b4e9b76478e65fae58d":{
-    "ru": "удалить",
+  "6a42473d299c5b4e9b76478e65fae58d": {
+    "ua": "удалить",
     "en": "remove",
-    "de":" ",
-    "fr":"supprimer"
+    "fr": "supprimer",
+    "nl": "verwijder",
+    "de": "löschen"
   },
-  "e1d5b1300ba50971b358cf96de8f3348":{
-    "ru": "Заказать",
+  "e1d5b1300ba50971b358cf96de8f3348": {
+    "ua": "Заказать",
     "en": "Order",
-    "de":" ",
-    "fr":"Commander"
+    "fr": "Commander",
+    "nl": "Bestel bij",
+    "de": "Bestellung von"
   },
-  "0d4dcaae2d0b66e2f7480f4d53243a7e":{
-    "ru": "подтверждается",
+  "0d4dcaae2d0b66e2f7480f4d53243a7e": {
+    "ua": "подтверждается",
     "en": "approving",
-    "de":" ",
-    "fr":"en approuvant"
+    "fr": "en approuvant",
+    "nl": "confirmed by",
+    "de": "bestätigt von"
   },
-  "2940beae8a09ec93aadb2bddf21cee7d":{
-    "ru":"Indiquer l'adresse de livraison",
+  "2940beae8a09ec93aadb2bddf21cee7d": {
+    "ua": "Введите адрес доставки",
     "en": "Input Delivery Address",
-    "de":"Adresse für die Zustellung",
-    "fr":""
+    "de": "Adresse für die Zustellung",
+    "fr": "Indiquer l'adresse de livraison",
+    "nl": "Leveringsadres invoeren"
   },
-  "a74ec9c5b6882f79e32a8fbd8da90c1b":{
-    "ru": "Расстояние до",
+  "a74ec9c5b6882f79e32a8fbd8da90c1b": {
+    "ua": "Расстояние до",
     "en": "Distance",
-    "de":"Entfernung zu",
-    "fr":"Distance de"
+    "de": "Entfernung zu",
+    "fr": "Distance de",
+    "nl": "Afstand tot"
   },
-  "a0acfa46d86f7610b2c73dbb28f64701":{
-    "ru": "Период",
+  "a0acfa46d86f7610b2c73dbb28f64701": {
+    "ua": "Период",
     "en": "Period",
-    "de":" ",
-    "fr":"Période"
+    "fr": "Période",
+    "nl": "Periode",
+    "de": "Periode"
   },
-  "3601146c4e948c32b6424d2c0a7f0118":{
-    "ru": "Цена:",
+  "3601146c4e948c32b6424d2c0a7f0118": {
+    "ua": "Цена:",
     "en": "Price:",
-    "de":"Zeitraum",
-    "fr":"Prix"
+    "de": "Zeitraum",
+    "fr": "Prix",
+    "nl": "Prijs:"
   },
-  "31d1b8ef5ed469f7618d76144fffaa06":{
-    "ru": "Кол-во",
+  "31d1b8ef5ed469f7618d76144fffaa06": {
+    "ua": "Кол-во",
     "en": "Amount",
-    "de":" ",
-    "fr":""
+    "fr": "Qty",
+    "nl": "Bedrag",
+    "de": "Betrag"
   },
-  "ee4a528dce8d6fa440db5ab1cf78f939":{
-    "ru": "Кол-во: ",
+  "ee4a528dce8d6fa440db5ab1cf78f939": {
+    "ua": "Кол-во: ",
     "en": "Amount: ",
-    "de":"Nummer",
-    "fr":"Qty"
+    "de": "Nummer",
+    "fr": "Qty:",
+    "nl": "Bedrag:"
   },
-  "41b0e839c21e82f25bffdb9dc82848fa":{
-    "ru": "Расфасовка:",
+  "41b0e839c21e82f25bffdb9dc82848fa": {
+    "ua": "Расфасовка:",
     "en": "Pack:",
-    "de": " ",
-    "fr":"Unité"
+    "fr": "Unité",
+    "nl": "Verpakking:",
+    "de": "Verpackung"
   },
-  "a5d491060952aa8ad5fdee071be752de":{
-    "ru": "комментарии",
+  "a5d491060952aa8ad5fdee071be752de": {
+    "ua": "комментарии",
     "en": "comments",
-    "de":"verpackung",
-    "fr":"commentaires"
+    "de": "verpackung",
+    "fr": "commentaires",
+    "nl": "opmerkingen"
   },
-  "9f121d1bcc2b246d18ba60b3390f8f4e":{
-    "ru": "голосовая связь",
+  "9f121d1bcc2b246d18ba60b3390f8f4e": {
+    "ua": "голосовая связь",
     "en": "voice connection",
-    "de":"sprachkommunikation",
-    "fr":"la communication vocale"
+    "de": "sprachkommunikation",
+    "fr": "la communication vocale",
+    "nl": "spraakcommunicatie"
   },
-  "25ae4884275a34b33820d6e17013bed1":{
-    "ru": "Лояльность",
+  "25ae4884275a34b33820d6e17013bed1": {
+    "ua": "Лояльность",
     "en": "Loyalty",
     "de": "Treue",
-    "fr":""
+    "fr": "Loyauté",
+    "nl": "Loyaliteit"
   },
-  "6f8063417ab31f38d864c28302f3de2f":{
-    "ru": "Подтверждено",
+  "6f8063417ab31f38d864c28302f3de2f": {
+    "ua": "Подтверждено",
     "en": "Approved",
-    "de":"Bestätigt durch.",
-    "fr":""
+    "de": "Bestätigt durch.",
+    "fr": "",
+    "nl": "Goedgekeurd"
   },
-  "07ca5050e697392c9ed47e6453f1453f":{
-    "ru": "Выполнено",
+  "07ca5050e697392c9ed47e6453f1453f": {
+    "ua": "Выполнено",
     "en": "Completed",
-    "de":"Geschehen zu.",
-    "fr":""
+    "de": "Geschehen zu.",
+    "fr": "Terminé",
+    "nl": "Voltooid"
   },
-  "1c3fea01a64e56bd70c233491dd537aa":{
-    "ru": "Отзывы",
+  "1c3fea01a64e56bd70c233491dd537aa": {
+    "ua": "Отзывы",
     "en": "Reviews",
-    "de":"Rezensionen",
-    "fr":"Revues"
+    "de": "Rezensionen",
+    "fr": "Revues",
+    "nl": "Reviews"
   },
-  "c919d65bd95698af8f15fa8133bf490d":{
-    "ru": "Настройки",
+  "c919d65bd95698af8f15fa8133bf490d": {
+    "ua": "Настройки",
     "en": "Settings",
-    "de":"Einstellungen",
-    "fr":"Configuration"
+    "de": "Einstellungen",
+    "fr": "Configuration",
+    "nl": "Instellingen"
   },
-  "1c4a264d42009a94b0a83aa4076810d9":{
-    "ru":"Мои заказы",
-    "en":"My Orders",
-    "de":"Meine Befehle.",
-    "fr":""
+  "1c4a264d42009a94b0a83aa4076810d9": {
+    "ua": "Мои заказы",
+    "en": "My Orders",
+    "de": "Meine Befehle.",
+    "fr": "Mes ordres",
+    "nl": "Mijn orders"
   },
   "ee2faeed038501c1deab01c7b54f2fa9": {
-    "en":"",
-    "ru":"Москва",
-    "fr":"Agadir"
+    "en": "",
+    "ua": "Москва",
+    "fr": "Agadir",
+    "nl": "",
+    "de": "Berlin"
   },
-  "c6c0914deb2bca834b0faba62016256f":{
-    "en":"Input location address",
-    "ru":"Введите адрес"
-    ,
-   "fr":""
+  "c6c0914deb2bca834b0faba62016256f": {
+    "en": "Input location address",
+    "ua": "Введите адрес",
+    "fr": "",
+    "nl": "Adres invoeren",
+    "de": "Adresse eingeben"
   },
-  "08a9382c985908413011589c6ffbea99":{
+  "08a9382c985908413011589c6ffbea99": {
     "en": "Move POS here?",
-    "ru": "Переместить сюда торговую точку?",
-    "fr":""
+    "ua": "Переместить сюда торговую точку?",
+    "fr": "",
+    "nl": "De winkel hierheen verplaatsen?",
+    "de": "Die Verkaufsstelle hierher verlegen?"
   },
   "8f11493a45b374d08387a61c85b288ef": {
     "en": "Save and Publish",
-    "ru": "Сохранить и опубликовать?",
-    "fr":""
+    "ua": "Сохранить и опубликовать?",
+    "fr": "Enregistrer et publier",
+    "nl": "Opslaan en publiceren?",
+    "de": "Speichern und veröffentlichen"
   },
   "e3c1f39b86bb7162bddb548e2cfd6077": {
     "en": "Payment",
-    "ru": "Оплата",
-    "fr":"Paiement"
+    "ua": "Оплата",
+    "fr": "Paiement",
+    "nl": "Betaling",
+    "de": "Zahlung"
   },
-
-  "4d8ea20b4d3689b03349dbc2b2395882":{
-    "ru":"Превышен размер изображения",
-    "en":"Too large image size",
-    "fr":""
+  "4d8ea20b4d3689b03349dbc2b2395882": {
+    "ua": "Превышен размер изображения",
+    "en": "Too large image size",
+    "fr": "Taille de l'image dépassée",
+    "nl": "Beeldformaat overschreden",
+    "de": "Bildgröße überschritten"
   },
-  "a7a45eefb4e8d53933cb97fd2fd23add":{
-    "ru":"Пройдите регистрацию",
-    "en":"Sign Up",
-    "fr":""
+  "a7a45eefb4e8d53933cb97fd2fd23add": {
+    "ua": "Пройдите регистрацию",
+    "en": "Sign Up",
+    "fr": "",
+    "nl": "Schrijf je in",
+    "de": "Bitte registrieren"
   },
-  "b36e0ab3847e00a79740d2acf69d5f84":{
-    "ru":"Самовывоз",
-    "en":"Pickup",
-    "de":"",
-    "fr":"Autodistribution"
+  "b36e0ab3847e00a79740d2acf69d5f84": {
+    "ua": "Самовывоз",
+    "en": "Pickup",
+    "de": "Selbstauslieferung",
+    "fr": "Autodistribution",
+    "nl": "Zelfbediening"
   },
-  "f7e282e49aa4284c7f5eef9d325132cc":{
-    "ru":"Ошибка сохранения данных",
-    "en":"Save data error",
-    "fr":"Erreur de sauvegarde des données",
-    "de":""
+  "f7e282e49aa4284c7f5eef9d325132cc": {
+    "ua": "Ошибка сохранения данных",
+    "en": "Save data error",
+    "fr": "Erreur de sauvegarde des données",
+    "de": "Fehler beim Speichern von Daten",
+    "nl": "Fout bij gegevensopslag"
   },
   "b572fe0fb002a8c9c1601c728124bc97": {
-    "ru": "Профиль продавца",
+    "ua": "Профиль продавца",
     "en": "Retailer Profile",
     "fr": "Profil du détaillant",
-    "de": ""
+    "de": "Verkäufer-Profil",
+    "nl": "Profiel verkoper"
   },
-
   "f280062e3e80695442590e7bf637fc40": {
-    "ru": "Профиль доставки",
+    "ua": "Профиль доставки",
     "en": "Delivery Profile",
     "fr": "Profil de livraison",
-    "de": ""
+    "de": "Lieferprofil",
+    "nl": "Leveringsprofiel"
   },
-
   "9f2021284ca26bc3dc2862add9ca84c6": {
-    "ru": "Загрузить логотип...",
+    "ua": "Загрузить логотип...",
     "en": "Upload Logo",
     "fr": "Télécharger le logo...",
-    "de": ""
+    "de": "Das Logo herunterladen...",
+    "nl": "Logo downloaden..."
   },
-  "9a79d3fc44291a8d503aed1e5bf03f25":{
-    "ru":"записей",
-    "en":"rows",
-    "fr": "lignes"
+  "9a79d3fc44291a8d503aed1e5bf03f25": {
+    "ua": "записей",
+    "en": "rows",
+    "fr": "lignes",
+    "nl": "rijen",
+    "de": "zeilen"
   },
-  "48ff45523ddfc2065402fd32a000cd9e":{
-    "ru":"Удалить из заказа?",
-    "en":"Remove from orders?",
-    "fr":"Retirer des ordres?",
-    "de":"Aus Aufträgen entfernen?"
+  "48ff45523ddfc2065402fd32a000cd9e": {
+    "ua": "Удалить из заказа?",
+    "en": "Remove from orders?",
+    "fr": "Retirer des ordres?",
+    "de": "Aus Aufträgen entfernen?",
+    "nl": "Verwijderen uit de bestelling?"
   },
-  "1d23c503bc1acade83956d668bb2b943":{
-    "ru":"Сохранить заказ?",
-    "en":"Save order?",
-    "fr":"Sauver l'ordre?",
-    "de":"Bestellung speichern?"
+  "1d23c503bc1acade83956d668bb2b943": {
+    "ua": "Сохранить заказ?",
+    "en": "Save order?",
+    "fr": "Sauver l'ordre?",
+    "de": "Bestellung speichern?",
+    "nl": "Bewaar de bestelling"
   },
-  "08a34eba38f85f425f9af8f41d5d9eab":{
-  "ru":"Все",
-  "en":"All",
-  "fr":"Tous",
-  "de":"Alle"
+  "08a34eba38f85f425f9af8f41d5d9eab": {
+    "ua": "Все",
+    "en": "All",
+    "fr": "Tous",
+    "de": "Alle",
+    "nl": "Alle"
   },
-  "924a7a6fc086fb471c267fb0b8e7bdeb":{
-    "ru":"тип рынка",
-    "en":"market",
-    "fr":"marché",
-    "de":"markt"
+  "924a7a6fc086fb471c267fb0b8e7bdeb": {
+    "ua": "тип рынка",
+    "en": "market",
+    "fr": "marché",
+    "de": "markt",
+    "nl": "markt"
   },
-  "237c53c6108c8ef6cd840e62747a827c":{
-    "ru":"продукты питания",
-    "en":"foodstuff",
-    "fr":"produit de base",
-    "de":"ware"
+  "237c53c6108c8ef6cd840e62747a827c": {
+    "ua": "продукты питания",
+    "en": "foodstuff",
+    "fr": "produit de base",
+    "de": "ware",
+    "nl": "levensmiddel"
   },
-  "0b93f81293f084dbfa4dbe93a8280555":{
-    "ru":"регистрация",
-    "en":"registration",
-    "fr":"enregistrement",
-    "de":"registrierung"
+  "0b93f81293f084dbfa4dbe93a8280555": {
+    "ua": "регистрация",
+    "en": "registration",
+    "fr": "enregistrement",
+    "de": "registrierung",
+    "nl": "registratie"
   },
-  "fe50ca4a6ec9f8bcf1a8d66bad4c922d":{
-    "ru":"промо-код",
-    "en":"promo",
-    "fr":"promo",
-    "de":"promo"
+  "fe50ca4a6ec9f8bcf1a8d66bad4c922d": {
+    "ua": "промо-код",
+    "en": "promo",
+    "fr": "promo",
+    "de": "promo",
+    "nl": "promo"
   },
-  "a866bb299176fa2067efaf71e0fb7270":{
-    "ru":"указанный email адрес используется в системе",
-    "en":"the email address is used in the system",
-    "fr":"l'adresse e-mail spécifiée est utilisée dans le système",
-    "de":"die angegebene E-Mail-Adresse wird im System verwendet"
+  "a866bb299176fa2067efaf71e0fb7270": {
+    "ua": "указанный email адрес используется в системе",
+    "en": "the email address is used in the system",
+    "fr": "l'adresse e-mail spécifiée est utilisée dans le système",
+    "de": "die angegebene E-Mail-Adresse wird im System verwendet",
+    "nl": "указанный email адрес используется в системе"
   },
-  "1a82a60f6461f27f40b6596c09ade00d":{
-    "ru":"На указанный email-адрес была выслана ссылка для входа в программу",
-    "en":"A link to log in has been sent to the email address provided",
-    "fr":"Un lien de connexion a été envoyé à l'adresse électronique spécifiée.",
-    "de":"Ein Anmeldelink wurde an die angegebene E-Mail-Adresse gesendet"
+  "1a82a60f6461f27f40b6596c09ade00d": {
+    "ua": "На указанный email-адрес была выслана ссылка для входа в программу",
+    "en": "A link to log in has been sent to the email address provided",
+    "fr": "Un lien de connexion a été envoyé à l'adresse électronique spécifiée.",
+    "de": "Ein Anmeldelink wurde an die angegebene E-Mail-Adresse gesendet",
+    "nl": "Een link om in te loggen is verzonden naar het opgegeven e-mailadres"
   },
-  "2eaf1074f07aa11c39a919c930c40b88":{
-    "ru":"дата/адрес",
-    "en":"date/address",
-    "fr":"date/adresse",
-    "de":"datum/adresse"
+  "2eaf1074f07aa11c39a919c930c40b88": {
+    "ua": "комментарии",
+    "en": "comments",
+    "de": "verpackung",
+    "fr": "commentaires",
+    "nl": "opmerkingen"
   },
-  "265963d8bab475a3e5ff9e55ac7d5f76":{
-    "ru":"Скопировать ссылку на ваш онлайн магазин",
-    "en":"Click to copy the link to your online store",
-    "fr":"Cliquez pour copier le lien vers votre boutique en ligne"
+  "265963d8bab475a3e5ff9e55ac7d5f76": {
+    "ua": "Скопировать ссылку на ваш онлайн магазин",
+    "en": "Click to copy the link to your online store",
+    "fr": "Cliquez pour copier le lien vers votre boutique en ligne",
+    "nl": "Kopieer de link naar uw online shop",
+    "de": "Kopieren Sie den Link zu Ihrem Online-Shop"
   }
 }

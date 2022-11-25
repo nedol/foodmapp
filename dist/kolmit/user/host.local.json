@@ -1,0 +1,9 @@
+
+{
+	"host": "http://localhost:5173",
+	"host_port": "http://localhost:5173/kolmit/server/",
+	"host_server": "http://localhost:5173/server/",
+	"host_ws": "ws://localhost:3000/server"
+}
+
+

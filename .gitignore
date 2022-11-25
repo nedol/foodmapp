@@ -7,3 +7,6 @@ docs
 server/demo
 website
 .idea
+dist/assets
+lib
+src/html/libs

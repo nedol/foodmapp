@@ -154,7 +154,7 @@ module.exports = class Supplier extends D2D{
             if (result.length > 0) {
                 let profile,values, sql;
 
-                if(!q.profile.avatar || fs.existsSync(path.join(__dirname, '../images/' + q.profile.avatar))){
+                if(!q.profile.avatar || (q.profile.avatar &&  !q.profile.avatar.includes('base64'))){
                     values = [q.profile.email.toLowerCase(), JSON.stringify(q.profile), result[0].tariff, q.promo, q.uid, q.psw];
                     sql = "UPDATE "+q.user.toLowerCase()+ " SET email=?, profile=?, tariff=?, promo=? WHERE uid=? AND psw=?";
 
@@ -170,7 +170,7 @@ module.exports = class Supplier extends D2D{
                                 profile: q.profile})));
                         });
                     },100);
-                }else if(q.profile.avatar && q.profile.avatar.length<IMG_SIZE_LIMIT) {
+                }else if(q.profile.avatar && q.profile.avatar.includes('base64') && q.profile.avatar.length<IMG_SIZE_LIMIT) {
 
                     that.replaceImg_2(q.profile.avatar, function (avatar) {
                         // if (!ws._header)
@@ -283,6 +283,50 @@ module.exports = class Supplier extends D2D{
         });
     }
 
+    UpdateLocation(q, ws){
+        let that = this;
+
+        let now = moment().format('YYYY-MM-DD h:mm:ss');
+
+        let sql =
+            "SELECT of.*, sup.uid as supuid, sup.misc as misc" +
+            " FROM   "+q.user.toLowerCase()+ " as sup, offers as of"+
+            " WHERE of.supuid=sup.uid AND sup.uid='" +q.uid+"'"+
+            " AND (of.date='"+q.date+"')" +
+            " AND of.published IS NOT NULL AND of.deleted IS NULL"+
+            " ORDER BY of.id DESC";
+
+        that.mysql_con.query(sql, function (err, sel) {
+            if (err) {
+                throw err;
+            }
+
+            if(sel.length>0 && moment(q.date).isSame(sel[0].date)) {//moment(q.date).isSame(sel[0].date)
+                if (q.location) {// && result[0].obj_data.length<q.dict.length){
+
+                    let values = [q.location[1], q.location[0],  q.radius, sel[0].id];
+                    let sql_upd = "UPDATE offers SET latitude=?, longitude=?, radius=? WHERE id=?";
+                    that.updateOfferDB(q, ws, sql_upd, values, now);
+                    if(sel[0].deliver) {
+                        //copy offer to deliver's offer
+                        //that.updateOfferDeliver(q, ws, sel[0].deliver,offer);
+                    }
+
+                }
+            }else {
+                let offer = urlencode.decode(q.offer);
+
+                let date = moment(q.date).format('YYYY-MM-DD');
+                let values = [q.uid, q.location[0],q.location[1], date, q.radius, sel[0]?sel[0]:'{}'];
+
+                sql = 'REPLACE INTO offers SET supuid=?, longitude=?, latitude=?, date=?, radius=?,data=?';
+
+                //that.updateOfferDB(q, ws, sql, values,now);
+            }
+        });
+
+    }
+
     UpdateOffer(q, ws){
         let that = this;
 
@@ -313,7 +357,7 @@ module.exports = class Supplier extends D2D{
 
                 let values;
 
-                if(sel.length>0) {
+                if(sel.length>0 && moment(q.date).isSame(sel[0].date)) {//moment(q.date).isSame(sel[0].date)
                     if (q.dict && q.offer) {// && result[0].obj_data.length<q.dict.length){
 
                         let offer = urlencode.decode(q.offer);

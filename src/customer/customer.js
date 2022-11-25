@@ -4,6 +4,8 @@ import { UtilsMap } from '../utils/utils.map.js';
 import { Dict } from '../dict/dict.js';
 import { Events } from '../map/events/events';
 import { OLMap } from '../map/map';
+import extent from 'ol/extent';
+import condition from 'ol/events/condition';
 
 import { Profile } from '../profile/profile';
 import { Import } from '../import/import';
@@ -241,20 +243,36 @@ export class Customer {
       event.pixel,
       function (feature, layer) {
         // that.map.ol_map.getFeaturesAtPixel(event.pixel, null, function (feature, layer) {
+        let features = feature.values_.features;
+        features = _.orderBy(
+          feature.values_.features,
+          function (f) {
+            return new moment(f.values_.object.date).format('YYYYMMDD');
+          },
+          ['asc']
+        );
+        feature = features[0];
 
         let closest = feature.getGeometry().getClosestPoint(event.pixel);
 
         if (feature) {
-          if (feature.features && feature.features.length > 1) {
+          if (feature.values_.object.profile.type === 'foodtruck') {
+            features = [feature];
+          }
+          if (features && features.length > 1) {
             //cluster
 
             var coordinates = [];
-            $.each(feature.features, function (key, feature) {
+            $.each(features, function (key, feature) {
               coordinates.push(feature.getGeometry().flatCoordinates);
             });
 
-            var extent = extent.boundingExtent(coordinates);
-            var buf_extent = extent.buffer(extent, 5);
+            // const ext = new Extent({
+            //   condition: condition.platformModifierKeyOnly,
+            // });
+
+            var ext = extent.boundingExtent(coordinates);
+            var buf_extent = extent.buffer(ext, 5);
             //ol.extent.applyTransform(extent, transformFn, opt_extent)
             that.map.ol_map
               .getView()
@@ -269,13 +287,12 @@ export class Customer {
             );
           } else {
             if (
-              (feature.values_.features &&
-                (!feature.values_.features[0].values_.object ||
-                  !moment(
-                    feature.values_.features[0].values_.object.date
-                  ).isSame(that.date))) ||
-              (feature.values_.object &&
-                !moment(feature.values_.object.date).isSame(that.date))
+              (features &&
+                (!feature.values_.object ||
+                  !moment(feature.values_.object.date).isSame(that.date))) ||
+              (features.values_ &&
+                features.values_.object &&
+                !moment(features.values_.object.date).isSame(that.date))
             ) {
               return;
               if (that.map.ol_map.getLayers().array_) {
@@ -355,7 +372,7 @@ export class Customer {
 
       if (that.import) that.import.GetApprovedCustomer(that.uid);
 
-      that.SetOrdCnt();
+      that.SetOrders(() => {});
 
       if (that.map) {
         that.map.EmptyMap();
@@ -455,8 +472,10 @@ export class Customer {
     obj.status = 'deleted';
 
     window.network.SendMessage(obj, function (data) {
-      if (data.result.affectedRows > 0) {
-        cb(data);
+      if (data.result && data.result.affectedRows > 0) {
+        cb(); //заказ удален
+      } else if (data.ords && data.ords.length === 0) {
+        cb(); //заказа в базе нет
       }
     });
   }
@@ -641,9 +660,3 @@ export class Customer {
     });
   }
 }
-
-//////////////////
-// WEBPACK FOOTER
-// ./src/customer/customer.js
-// module id = 744
-// module chunks = 2

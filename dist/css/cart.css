@@ -10,6 +10,8 @@ td{
     white-space: normal;
 }
 
+
+
 /* Extra selectors needed to override the default styling */
 table.tablesorter tbody tr.odd {
     background: #838383;
@@ -25,37 +27,131 @@ table.tablesorter tbody tr.supuid {
     background: darkgrey;
     color: #4b4b4b;
 }
+
 table.tablesorter tbody tr.pay_supuid {
     background: white;
     color: #6b86dc;
 }
 
-input::placeholder,textarea::placeholder, div::placeholder {
-    position: absolute;
-    color: #9c9c9c !important;
-    opacity: 1;
-    font-weight: 200;
-    font-size: smaller;
-    bottom: 0;
-    right:0;
-    /*font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;*/
-    /*-webkit-text-stroke: 0px #d51312;*/
+table.tablesorter tr {
+    border-bottom: 3px solid rgb(255, 255, 255) !important;
+}
+
+table.tablesorter tr:last-child {
+    border-bottom: none;
+}
+::-webkit-input-placeholder {
+    font-weight: lighter;
+    font-size: small;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+::placeholder {
+    font-weight: lighter;
+    font-size: small;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+::-webkit-input-placeholder {
+    color: grey;
 }
 
 ::placeholder {
     color: grey;
+}
+
+.close_browser {
+    color: darkcyan;
+    font-size: xx-large;
+    font-weight: 500;
+    opacity: 1;
+    z-index: 1000;
+}
+
+.loader {
+    display: none;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    z-index: 1;
+    width: 150px;
+    height: 150px;
+    margin: -75px 0 0 -75px;
+    vertical-align: middle;
+    border: 16px solid #f3f3f3;
+    border-radius: 50%;
+    border-top: 16px solid #3498db;
+    width: 60px;
+    height: 60px;
+    -webkit-animation: spin 2s linear infinite;
+    /* Safari */
+    animation: spin 2s linear infinite;
+}
+
+.delivery_adr::-webkit-input-placeholder{
     font-weight: lighter;
     font-size: small;
     font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.delivery_adr::placeholder {
+    font-weight: lighter;
+    font-size: small;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+.delivery_adr::-webkit-input-placeholder {
+    color: red !important
+}
+
+.delivery_adr::placeholder {
+    color: red !important
+}
+
+.order{
+    display: inline-block;
+    border: 0.1em solid #2b2b2b;
+    margin: 0 0.3em 0.3em 0;
+    border-radius: 0.12em;
+    box-sizing: border-box;
+    text-decoration: none;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 700;
+    font-size: small;
+    color: #1e1d1d;
+    text-align: center;
+    transition: all 0.2s;
+    height: 60px;
+    width: min-content;
+}
+
+.order_delivery{
+    font-size: 1.2em;
+    white-space:  break-spaces;
+    width: min-content;
+}
+
+
+.publish_order{
+    padding: 5px;
+    word-wrap: normal;
+
 }
 
 .item_cb{
     width: 4%;
 }
 
-.notoday{
-    display:none;!important;
+.item_title{
+    font-family: "FontAwesome";
+    font-weight: 700;
+    min-width: 200px;
 }
+
+.notoday{
+    display:none !important;
+}
+
 [contentEditable=true]:empty:not(:focus):before{
     content:attr(placeholder);
     color: #c8c8c8;
@@ -67,6 +163,14 @@ th{
 
 tr,td{
     text-align: center;
+}
+
+td{
+    vertical-align: middle;
+}
+
+td.price{
+    color: blueviolet;
 }
 
 .tip{

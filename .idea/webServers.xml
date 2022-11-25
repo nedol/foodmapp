@@ -27,7 +27,7 @@
         </fileTransfer>
       </webServer>
       <webServer id="5021dd25-7892-4ec9-81dc-2884ae0501f1" name="beget.nedol.ru" url="http://193.200.74.37">
-        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/nedol/web/nedol.ru" accessType="SFTP">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/nedol" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
@@ -35,7 +35,7 @@
         </fileTransfer>
       </webServer>
       <webServer id="77fa8274-ef65-45ef-a22e-292f718af719" name="beget.d2d" url="http://193.200.74.37">
-        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/admin/web/delivery-angels.ru" accessType="SFTP">
+        <fileTransfer host="193.200.74.37" port="22" rootFolder="/home/admin/web" accessType="SFTP">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>

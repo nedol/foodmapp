@@ -2,7 +2,7 @@
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
+// require('jquery-ui-touch-punch');
 
 import {MPCustomer} from "../customer/customer.mp.js";
 import {Utils} from "../utils/utils";

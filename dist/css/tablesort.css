@@ -3,6 +3,7 @@ th[role=columnheader]:not(.no-sort) {
 }
 
 th[role=columnheader]:not(.no-sort):after {
+	display: none;
 	content: '';
 	float: right;
 	margin-top: 7px;
@@ -31,3 +32,340 @@ th[role=columnheader]:not(.no-sort):hover:after {
 	visibility: visible;
 	opacity: 1;
 }
+
+tr{
+	background-color: white;
+}
+
+
+
+.tablesorter-bootstrap thead .tablesorter-headerUnSorted:not(.sorter-false),
+.tablesorter-bootstrap thead .tablesorter-headerAsc,
+.tablesorter-bootstrap thead .tablesorter-headerDesc  {
+	background-image: none !important;
+}
+
+.tablesorter-bootstrap thead .tablesorter-headerDesc{
+	background-image: none;
+}
+
+.tablesorter-bootstrap thead .tablesorter-headerAsc {
+	background-image: none;
+}
+
+table.tablesorter tbody tr.normal-row td {
+	background: rgb(230, 230, 230);
+	color: #fff;
+}
+
+table.tablesorter tbody tr.alt-row td {
+	background: rgb(190, 190, 190);
+	color: #fff;
+}
+
+.tablesorter-materialize thead .tablesorter-headerUnSorted{
+	background-image: none !important;
+}
+
+.tablesorter-materialize thead .tablesorter-headerSorted {
+	background-image: none !important;
+}
+
+.table-borderless>tbody>tr>td,
+		        .table-borderless>tbody>tr>th,
+		        .table-borderless>tfoot>tr>td,
+		        .table-borderless>tfoot>tr>th,
+		        .table-borderless>thead>tr>td,
+		        .table-borderless>thead>tr>th {
+		        	border: none;
+		        }
+		
+		        .description {
+		        	display: none;
+		        	position: absolute;
+		        	top: 0px;
+		        	left: 5px;
+		        	color: rgb(157, 160, 164);
+		        	z-index: 101;
+		        	border-width: 0;
+		        	margin: 10px;
+		        	background-color: transparent;
+		        }
+		
+		        .item_price {
+		        	left: 2%;
+		        	font-family: 'Montserrat', serif;
+		        	font-weight: bold;
+		        	color: blueviolet;
+		        	font-size: 2em;
+		        	white-space: nowrap;
+		        	z-index: 1000;
+		        }
+		
+		        .pack_btn {
+	
+		        	color: gray;
+		        	background-color: transparent;
+		        	border-style: solid;
+		        	border-width: 0px;
+		        	padding-left: 1px;
+		        }
+		
+		        .content_text {
+		        	position: absolute;
+		        	top: 0;
+		        	color: grey;
+		        	height: 100%;
+		        	width: 100%;
+		        	line-height: 20px;
+		        	overflow-y: scroll;
+		        	font-family: 'Constantia';
+		        	font-size: medium;
+		        	padding: 20px;
+		        	margin: 0px;
+		        	background-color: rgba(255, 255, 255, 0.8);
+		        	border-width: 0;
+		        	appearance: textarea;
+		        	-webkit-appearance: textarea;
+		        	-webkit-box-sizing: border-box;
+		        	/* Safari/Chrome, other WebKit */
+		        	-moz-box-sizing: border-box;
+		        	/* Firefox, other Gecko */
+		        	box-sizing: border-box;
+		        	/* IE 8+ */
+		        	white-space: pre-wrap;
+		        }
+		
+		        div[role=dialog] {
+		        	background-color: #e3e3e3;
+		        	z-index: 20;
+		        }
+		
+		        /* pager wrapper, div */
+		        .pager {
+		        	top:-20px;
+		        	left:0;
+		        	margin: 0;
+		        	font-size: medium;
+		        }
+		
+		        .pager img {
+		        	width: 20px;
+		        }
+		
+		        .pager input,
+		        .pager select {
+		        	border: 1px solid transparent;
+		        	background-color: transparent;
+		        }
+		
+
+		
+		        /* pager wrapper, in thead/tfoot */
+		        td.tablesorter-pager {
+		        	background-color: #e6eeee;
+		        	margin: 0;
+		        	/* needed for bootstrap .pager gets a 18px bottom margin */
+		        }
+		
+		        /* pager navigation arrows */
+		        .tablesorter-pager img {
+		        	vertical-align: middle;
+		        	margin-right: 2px;
+		        	cursor: pointer;
+		        }
+		
+		        /* pager output text */
+		        .tablesorter-pager .pagedisplay {
+		        	padding: 0 5px 0 5px;
+		        	width: 50px;
+		        	text-align: center;
+		        }
+		
+		        /* pager element reset (needed for bootstrap) */
+		        .tablesorter-pager select {
+		        	margin: 0;
+		        	padding: 0;
+		        }
+		
+		        /*** css used when "updateArrows" option is true ***/
+		        /* the pager itself gets a disabled class when the number of rows is less than the size */
+		        .tablesorter-pager.disabled {
+		        	display: none;
+		        }
+		
+		        /* hide or fade out pager arrows when the first or last row is visible */
+		        .tablesorter-pager .disabled {
+		        	/* visibility: hidden */
+		        	opacity: 0.5;
+		        	filter: alpha(opacity=50);
+		        	cursor: default;
+		        }
+		
+		        .pagesize {
+		        	width: 42px
+		        }
+		
+		        /* Extra selectors needed to override the default styling */
+		        table.tablesorter tbody tr.normal-row {
+		        	background: #e3e3e3;
+		        	color: #fff;
+		        }
+		
+		        table.tablesorter tbody tr.alt-row {
+		        	background: #acacac;
+		        	color: #fff;
+		        }
+		
+		        /* Extra selectors needed to override the default styling */
+		        table.tablesorter tbody tr.odd {
+		        	background: #838383;
+		        	color: #fff;
+		        }
+		
+		        table.tablesorter tbody tr.even {
+		        	background: #acacac;
+		        	color: #fff;
+		        }
+		
+		        table.tablesorter .tablesorter-filter {
+		        	width: 150px;
+		        }
+
+				table.tablesorter .tablesorter-filter::placeholder {
+					position: absolute;
+					color: #9c9c9c !important;
+					opacity: 1;
+					font-weight: 200;
+					font-size: smaller;
+					bottom: 1px;
+					right: 1px;
+				}
+
+				tr:not([role='search']) td {
+					padding-bottom: 1em;
+					background-color: transparent;
+					border-bottom: 1em solid #e3e3e3;
+				}
+
+				.tablesorter-bootstrap tfoot td,
+				.tablesorter-bootstrap tfoot th,
+				.tablesorter-bootstrap thead td,
+				.tablesorter-bootstrap thead th {
+					font-weight: 200;
+					padding: 0px;
+				}
+		
+		        .pack_list {
+		        	width: auto;
+		        }
+		
+		        input[type=search] {
+		        	border-width: 0;
+		        }
+		
+		        .form-check-input {
+		        	position: relative;
+		        }
+		
+		        .noUi-connect {
+		        	background-color: transparent !important;
+		        }
+		
+		        .cat_div.active {
+		        	background-color: darkgrey;
+		        }
+		
+		        .ord_amount {
+		        	font-size: large !important;
+		        	border-width: 0;
+		        	padding-left: 1px;
+		        	padding-right: 1px;
+		        }
+		
+		        .ordered .ord_amount {
+		        	color: white;
+		        	background-color: red;
+					min-width: 25px;
+		        	padding-left: 5px;
+		        	padding-right: 5px;
+		        	font-weight: bold;
+		        	font-size: x-large !important;
+		        }
+		
+		        .checked .ord_amount {
+		        	color: white;
+		        	background-color: darkgrey;
+		        	padding-left: 5px;
+		        	padding-right: 5px;
+		        	font-weight: bold;
+		        	font-size: x-large !important;
+		        }
+		
+		        .mp_ord_cnt {
+		        	top: 34px !important;
+		        	position: absolute;
+		        }
+		
+		        .mp_appr_cnt {
+		        	top: 20px !important;
+		        	position: absolute;
+		        }
+		
+		        .approved .ord_amount {
+		        	color: white;
+		        	background-color: green;
+		        	padding-left: 5px;
+		        	padding-right: 5px;
+		        	font-weight: bold;
+		        	font-size: x-large !important;
+		        }
+
+				.pack_btn{
+					font-size: 1.2em !important;
+					font-weight: 500;
+				}
+		
+		        ::-webkit-scrollbar {
+		        	/*display:none ;*/
+		        	border-width: thin;
+		        }
+		
+		        @media screen and (min-width: 120px) {
+		        	.content_text {
+		        		font-size: smaller
+		        	}
+		        }
+		
+		        @media screen and (min-width: 320px) {
+		        	.content_text {
+		        		font-size: small
+		        	}
+		        }
+		
+		        @media screen and (min-width: 480px) {
+		        	.content_text {
+		        		font-size: medium
+		        	}
+		        }
+		
+		        @media screen and (min-width: 960px) {
+		        	.content_text {
+		        		font-size: large;
+		        		line-height: 30px;
+		        	}
+		        }
+		
+		        @media screen and (min-width: 1200px) {
+		        	.content_text {
+		        		font-size: x-large;
+		        		line-height: 40px;
+		        	}
+		        }
+		
+		        @media screen and (min-width: 1600px) {
+		        	.content_text {
+		        		font-size: larger
+		        	}
+		        }
+
