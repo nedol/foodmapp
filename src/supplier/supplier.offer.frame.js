@@ -379,10 +379,6 @@ export class SupplierOffer {
       $('#delivery').prop('checked');
     }
 
-    window.parent.db.GetSupApproved(this.uid, function (res) {
-      that.appr = res;
-    });
-
     window.parent.dict.set_lang(window.parent.sets.lang, this.body[0]);
 
     this.dict = window.parent.dict;
@@ -530,8 +526,11 @@ export class SupplierOffer {
       for (let i in that.offer[tab]) {
         $('#add_item').css('display', 'block');
 
-        if (i === '0') openOffer(tab, i);
-        else {
+        if (i === '0') {
+          openOffer(tab, i);
+          $('.category[id=' + tab + ']')
+            .attr('state', '1').trigger('click')
+        } else {
           setTimeout(
             function (i) {
               openOffer(tab, i);
@@ -1208,7 +1207,15 @@ export class SupplierOffer {
           let total = 0,
             qnty = 0;
 
+          let appr = '';
+
           for (let k in kAr) {
+            _.forEach(res, (val) => {
+              if (val.status['approved']) {
+                appr = 'checked';
+              }
+            });
+
             let tr =
               "<tr class='cus_head' style='text-align: center;'  cusuid=" +
               res[i].cusuid +
@@ -1344,35 +1351,6 @@ export class SupplierOffer {
                 $('.marketer').css('display', 'none');
                 $('.complete').attr('disabled', 'true');
               }
-              window.parent.db.GetApproved(
-                new Date(that.date),
-                window.parent.user.uid,
-                res[i].cusuid,
-                function (appr) {
-                  if (
-                    appr &&
-                    appr.data[kAr[k]].ordlist[o].qnty ===
-                      res[i].data[kAr[k]].ordlist[o].qnty &&
-                    appr.data[kAr[k]].ordlist[o].price ===
-                      res[i].data[kAr[k]].ordlist[o].price
-                  ) {
-                    $(
-                      '.cus_foot[cusuid=' +
-                        res[i].cusuid +
-                        "] .approve[title='" +
-                        kAr[k] +
-                        "']"
-                    ).prop('checked', true);
-                    $(
-                      '.cus_foot[cusuid=' +
-                        res[i].cusuid +
-                        "] .approve[title='" +
-                        kAr[k] +
-                        "']"
-                    ).attr('disabled', 'true');
-                  }
-                }
-              );
             }
 
             for (let e in data[kAr[k]].extralist) {
@@ -1413,7 +1391,9 @@ export class SupplierOffer {
               new Date(that.date).getDate() +
               '</td>' +
               "<td style='text-align: center;'>" +
-              "<input type='checkbox'  class='checkbox-inline approve' title='" +
+              "<input type='checkbox'  class='checkbox-inline approve' " +
+              appr +
+              " title='" +
               kAr[k] +
               "' cusuid=" +
               res[i].cusuid +

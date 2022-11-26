@@ -95,58 +95,75 @@
     <!-- KOLMI-->
 
     <!-- Nav tabs -->
-    <ul id="top_nav" class="nav nav-tabs nav-justified">
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          data-toggle="tab"
-          href="#order_pane"
-          title="Ассортимент"
-        >
-          <img
-            id="range_img"
-            src="../images/product_range.png"
-            style="height: 30px"
-            alt="Ассортимент"
-          />
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link"
-          data-toggle="tab"
-          href="#profile_pane"
-          title="Профиль"
-        >
-          <img id="profile_img" alt="Профиль" src="" />
-        </a>
-      </li>
-      <li class="nav-item">
-        <a
-          class="nav-link call_but_placeholder"
-          data-toggle="tab"
-          href="#kolmit_pane"
-          data-translate=""
-          title="Kolmit"
-          style="position: relative; height: 50px"
-        >
-          <iframe
-            class="kolmit_tmplt"
-            frameborder="0"
-            scrolling="no"
-            style="
-              display: none;
-              position: absolute;
-              top: 0;
-              right: 0;
-              z-index: 100;
-            "
+    <div style="overflow-x: scroll;white-space: nowrap;">
+      <ul
+        id="top_nav"
+        class="nav nav-tabs nav-justified"  
+        style="position: relative; width:100%;"
+      >
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            data-toggle="tab"
+            href="#order_pane"
+            title="Ассортимент"
           >
-          </iframe>
-        </a>
-      </li>
-    </ul>
+            <img
+              id="range_img"
+              src="../images/product_range.png"
+              style="height: 30px"
+              alt="Ассортимент"
+            />
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            data-toggle="tab"
+            href="#profile_pane"
+            title="Профиль"
+          >
+            <img id="profile_img" alt="Профиль" src="" />
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link call_but_placeholder"
+            data-toggle="tab"
+            href="#kolmit_pane"
+            data-translate=""
+            title="Kolmit"
+            style="position: relative; height: 50px"
+          >
+            <iframe
+              class="kolmit_tmplt"
+              frameborder="0"
+              scrolling="no"
+              style="
+                display: none;
+                position: absolute;
+                top: 0;
+                right: -40px;
+                z-index: 100;
+              "
+            >
+            </iframe>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="icofont-comment nav-link"
+            style="font-size:2em; color: grey;-webkit-text-stroke: 1px white;"
+            data-toggle="tab"
+            href="#comment_pane"
+            title="Комменты"
+          >
+          </a>
+        </li>
+      </ul>
+    </div>
 
+    <div>
     <div class="tab-content">
       <div class="tab-pane" id="order_pane">
         <div>
@@ -324,6 +341,7 @@
                     display: none;
                     position: absolute;
                     left: 45%;
+                    top: 23px;
                     text-align: center;
                     z-index: 100;
                   "
@@ -378,16 +396,16 @@
             <div style="display: none">
               <div
                 class="row tmplt align-items-center"
-                style="background-color: #cbced2"
+                style="flex-wrap: nowrap;background-color: #cbced2"
               >
                 <div
-                  class="add_div col"
+                  class="add_div col-sm-10"
                   style="vertical-align: middle; text-align: left"
                 >
                   <a class="extra_title"></a>
                 </div>
 
-                <div class="add_price_div" style="text-align: center">
+                <div class="add_price_div col" style="text-align: center">
                   <a
                     class="extra_price"
                     style="
@@ -426,14 +444,14 @@
 
             <div class="extras collapse"></div>
 
-            <div class="row tmplt_extra" style="visibility: hidden; height: 0">
+            <div class="row tmplt_extra" style="flex-wrap: nowrap; visibility: hidden; height: 0">
               <div
-                class="add_div col"
-                style="vertical-align: middle; text-align: left"
+                class="add_div col-sm-10"
+                style="text-align: center"
               >
-                <a class="extra_title"></a>
+                <a class="extra_title" style="vertical-align: middle;"></a>
               </div>
-              <div class="add_price_div" style="text-align: center">
+              <div class="add_price_div col" style="text-align: center">
                 <a
                   class="extra_price"
                   style="
@@ -446,9 +464,11 @@
                   >0.3</a
                 >
               </div>
-              <div class="col">
+ 
                 <div
+                  class="col"
                   style="
+                    right: 10px;
                     text-align: center;
                     white-space: nowrap;
                     color: #273be6;
@@ -478,7 +498,6 @@
                   </span>
                 </div>
               </div>
-            </div>
           </div>
 
           <div
@@ -511,24 +530,9 @@
             data-empty="fa fa-star-o fa-3  custom-star"
           />
         </div>
-        <div class="nav nav-tabs nav-justified">
-          <div
-            data-toggle="tab"
-            href="#profile"
-            data-translate="a46c372347e02010f5ef45fe441e4349"
-          ></div>
 
-          <div
-            data-toggle="tab"
-            href="#comments"
-            data-translate="1c3fea01a64e56bd70c233491dd537aa"
-          ></div>
-
-          <!--<li><a data-toggle="tab" href="#settings" data-translate="c919d65bd95698af8f15fa8133bf490d">Настройки</a></li-->
-        </div>
         <div class="tab-content container">
           <!--nput type="hidden" id="supuid" class="form-control" name="supuid"-->
-          <div class="tab-pane" id="profile">
             <div class="row">
               <div class="col-sm-3 text-center">
                 <img
@@ -640,14 +644,8 @@
                 <div style="height: 200px; visibility: hidden"></div>
               </div>
             </div>
-          </div>
-          <div
-            class="tab-pane fade"
-            id="comments"
-            style="overflow-y: auto; height: auto"
-          >
-            <div id="comments-container" style="overflow-y: hidden"></div>
-          </div>
+          
+
           <div class="tab-pane" id="settings">
             <div style="margin: 20px"></div>
             <div class="row">
@@ -660,6 +658,20 @@
         </div>
       </div>
       <!--/tab-pane-->
+
+      <div
+        id="comment_pane" class="tab-pane"
+        style="width: 100%; margin: 0 auto"
+      >
+          <div id="comments-container" style="overflow-y: hidden">
+            <div
+              class="tab-pane fade"
+              id="comments"
+              style="overflow-y: auto; height: auto"
+            >            
+          </div>
+        </div>
+      </div>
 
       <div
         id="kolmit_pane"

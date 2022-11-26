@@ -69,6 +69,9 @@ export class Supplier {
 
       this.DateTimePickerEvents();
       $('.dt_val').val(this.date);
+      if (!moment(sup.date).isSame(moment())) {
+        $('.dt_val').css('color', 'red');
+      }
 
       this.map = new OLMap();
       setTimeout(() => {
@@ -96,6 +99,10 @@ export class Supplier {
 
     $('.dt_val').on('change', this, function (ev) {
       that.date = moment($(this).val()).format('YYYY-MM-DD');
+
+      if (moment(that.date).isSame(moment(), 'day')) {
+        $(this).css('color', 'black');
+      }
 
       that.offer.stobj.date = that.date;
 
