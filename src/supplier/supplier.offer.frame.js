@@ -110,6 +110,8 @@ export class SupplierOffer {
 
     this.date = window.parent.user.date;
 
+    this.changed = false;
+
     this.body = $('body');
 
     $('#splash', $(window.parent.document).contents()).css('display', 'none');
@@ -179,6 +181,17 @@ export class SupplierOffer {
       }
     });
 
+    this.body.find('#save_offer').off();
+    this.body.find('#save_offer').on('click touchstart', this, function (ev) {
+      ev.preventDefault();
+      ev.stopPropagation();
+
+      that.saveFrame('#editor_pane');
+      that.saveFrame('#profile_pane');
+      that.saveFrame('#orders_pane');
+      $('#save_offer').css('color', '#0088BB');
+    });
+
     this.body.find('.show_map').off();
     this.body.find('.show_map').on('click touchstart', this, function (ev) {
       ev.preventDefault();
@@ -235,7 +248,7 @@ export class SupplierOffer {
       // if($(ev.relatedTarget).attr('pane_hash') === md5($(rel_href)[0].innerHTML))
       //     return;
 
-      that.saveFrame(rel_href);
+      //that.saveFrame(rel_href);
     });
   }
 
@@ -518,8 +531,8 @@ export class SupplierOffer {
       $('textarea, input:not(input:file), :checkbox, .form-control')
         .not('.dt_val')
         .not('#cb_copy_next_week')
-        .on('change', function (ev) {
-          that.saveFrame($('.nav-link.active').attr('href'));
+        .on('change', (ev) => {
+          $('#save_offer').css('color', 'red');
         });
 
       $('#cb_copy_next_week').on('change', function (ev) {
@@ -1871,8 +1884,8 @@ export class SupplierOffer {
     //window.parent.dict.set_lang(window.parent.sets.lang, $(menu_item));
     $('textarea, input, :checkbox, .form-control', menu_item).on(
       'change',
-      function (ev) {
-        that.saveFrame($('.nav-link.active').attr('href'));
+      (ev) => {
+        $('#save_offer').css('color', 'red');
       }
     );
   }
