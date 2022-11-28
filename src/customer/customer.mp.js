@@ -549,7 +549,11 @@ export class MPCustomer {
         }
         let cnt = 0;
         for (let f in features) {
-          if (features[f].profile.type !== that.type) {
+          if (
+            (features[f].profile.type === 'foodtruck'
+              ? 'marketer'
+              : features[f].profile.type) !== that.type
+          ) {
             if (f == features.length - 1) resolve(that.start_cat);
             continue;
           }

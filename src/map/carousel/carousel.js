@@ -208,10 +208,13 @@ export class Carousel {
       for (let tab in features[f].data) {
         if ($(".category[state='1'][id=" + tab + ']').length === 0) continue;
 
-        $('.mp_open[user_type="' + features[f].profile.type + '"]').prop(
-          'disabled',
-          false
-        );
+        $(
+          '.mp_open[user_type="' +
+            (features[f].profile.type === 'foodtruck'
+              ? 'marketer'
+              : features[f].profile.type) +
+            '"]'
+        ).prop('disabled', false);
 
         for (let i in features[f].data[tab]) {
           i = parseInt(i);
