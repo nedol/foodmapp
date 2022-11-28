@@ -397,7 +397,7 @@ export class MPCustomer {
           $('tr .icofont-food-cart')
             .addClass('icofont-fast-delivery')
             .removeClass('icofont-food-cart');
-        } else if (that.type === 'marketer') {
+        } else if (that.type === 'marketer' || that.type === 'foodtruck') {
           $('tr .icofont-fast-delivery')
             .addClass('icofont-food-cart')
             .removeClass('icofont-fast-delivery');
@@ -1076,7 +1076,10 @@ export class MPCustomer {
 
       obj[supuid]['period'] = $(window.document).find('.sel_period').text();
 
-      if ($(el).attr('type') === 'marketer') {
+      if (
+        $(el).attr('type') === 'marketer' ||
+        $(el).attr('type') === 'foodtruck'
+      ) {
         obj[supuid]['address'] = $(el).attr('pickup');
       } else if ($(el).attr('type') === 'deliver') {
         obj[supuid]['address'] = window.user.profile.profile.address;
