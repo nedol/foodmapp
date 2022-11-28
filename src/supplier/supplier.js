@@ -462,6 +462,42 @@ export class Supplier {
     }
   }
 
+  CopyNextWeek() {
+    const that = this;
+    return new Promise(function (resolve, reject) {
+      let data_obj = {
+        proj: 'd2d',
+        user: window.user.constructor.name.toLowerCase(),
+        func: 'copynextweek',
+        host: window.location.origin,
+        uid: that.uid,
+        psw: that.psw,
+        date: that.date,
+      };
+
+      $('.loader').css('display', 'block');
+
+      window.network.SendMessage(data_obj, (res) => {
+        if (res) {
+          $('.loader').css('display', 'none');
+          for (let o in res['supplier']) {
+            res['supplier'][o].data = JSON.parse(
+              urlencode.decode(res['supplier'][o].data)
+            );
+            res['supplier'][o].date = moment(res['supplier'][o].date).format(
+              'YYYY-MM-DD'
+            );
+
+            window.db.SetObject('offerStore', res['supplier'][o], () => {});
+          }
+          resolve(res);
+        } else {
+          reject();
+        }
+      });
+    });
+  }
+
   PickRegion() {
     let that = this;
     alert($('#choose_region').text());

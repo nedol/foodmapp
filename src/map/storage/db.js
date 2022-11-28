@@ -555,6 +555,28 @@ class DB {
     } catch (ex) {}
   }
 
+  GetOfferPromise(date) {
+    return new Promise((resolve, reject) => {
+      try {
+        var tx = DB.prototype.DBcon.transaction([this.offerStore], 'readonly');
+        var objectStore = tx.objectStore(this.offerStore);
+        if (!date) return;
+        try {
+          let index = objectStore.index('date');
+          var request = index.get([date]);
+          request.onerror = this.logerr;
+          request.onsuccess = function (ev) {
+            resolve(this.result);
+          };
+        } catch (ex) {
+          reject(ex);
+        }
+      } catch (ex) {
+        reject(ex);
+      }
+    });
+  }
+
   IsOffer(key, cb) {
     var tx = DB.prototype.DBcon.transaction([this.offerStore], 'readonly');
     var objectStore = tx.objectStore(this.offerStore);

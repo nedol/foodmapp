@@ -14,7 +14,9 @@ body {
 
 .brand {
     position: absolute;
-    right: 70px;
+    right: 49px;
+    max-width: 50px;
+    max-height: 50px;
     color: red;
     font-size: 2em;
     font-weight:700;

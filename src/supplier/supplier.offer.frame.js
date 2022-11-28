@@ -272,6 +272,7 @@ export class SupplierOffer {
       window.parent.user.offer.stobj.dict = window.parent.dict;
 
       //window.parent.user.offer.stobj.published = obj.published;
+
       window.parent.user.offer.stobj.data = items['remote'];
       let local = {
         data: window.parent.user.offer.stobj.data,
@@ -302,6 +303,10 @@ export class SupplierOffer {
         }
       );
     }
+  }
+
+  async copyNextWeek() {
+    const res = await window.parent.user.CopyNextWeek();
   }
 
   addTab(cat_tab, state) {
@@ -484,6 +489,9 @@ export class SupplierOffer {
 
     $('.empty_div').append($('#add_item'));
 
+    if (window.parent.user.profile.profile.type === 'foodtruck')
+      $('#cb_copy_next_week').closest('div').css('display', 'block');
+
     for (let t in that.offer) {
       //
       // let img = $(".category#"+t,window.parent.document).attr('src');
@@ -503,21 +511,27 @@ export class SupplierOffer {
         md5($('#editor_pane')[0].innerHTML)
       );
 
-      //$('#' + $($('.menu_item')[0]).attr('cat')).trigger('click');
+      $('#' + $($('.menu_item')[0]).attr('cat')).trigger('click');
 
       // $('.category#'+$($('.menu_item')[0]).attr('cat')).siblings('.cat_cnt').text($('.category#'+$('.menu_item')).length);
+
       $('textarea, input:not(input:file), :checkbox, .form-control')
         .not('.dt_val')
+        .not('#cb_copy_next_week')
         .on('change', function (ev) {
           that.saveFrame($('.nav-link.active').attr('href'));
         });
+
+      $('#cb_copy_next_week').on('change', function (ev) {
+        that.copyNextWeek();
+      });
 
       $('input:file').on('change', function (ev) {
         setTimeout(function () {
           that.saveFrame($('.nav-link.active').attr('href'));
         }, 500);
       });
-    }, 500);
+    }, 300);
 
     // $($('.cat_div')[0]).addClass('active');
     // $($($('.cat_div')[0]).attr('href')).addClass('active');
@@ -528,8 +542,6 @@ export class SupplierOffer {
 
         if (i === '0') {
           openOffer(tab, i);
-          $('.category[id=' + tab + ']')
-            .attr('state', '1').trigger('click')
         } else {
           setTimeout(
             function (i) {
