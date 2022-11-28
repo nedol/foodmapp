@@ -3,6 +3,7 @@
 import { UtilsMap } from '../../utils/utils.map.js';
 import { Dict } from '../../dict/dict.js';
 import proj from 'ol/proj';
+import moment from 'moment';
 
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
@@ -206,7 +207,11 @@ export class Carousel {
       let dict = new Dict(supplier.dict.dict);
       let active = 'active';
       for (let tab in features[f].data) {
-        if ($(".category[state='1'][id=" + tab + ']').length === 0) continue;
+        if (
+          $(".category[state='1'][id=" + tab + ']').length === 0 ||
+          features[f].date !== window.user.date
+        )
+          continue;
 
         $(
           '.mp_open[user_type="' +
