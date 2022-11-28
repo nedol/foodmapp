@@ -11,11 +11,11 @@ module.exports = {
     NODE_ENV === 'development' ? 'cheap-inline-module-source-map' : false,
 
   entry: {
-    //   supplier: __dirname + '/src/supplier/supplier.entry.js',
-    //   supplier_offer: __dirname + '/src/supplier/supplier.offer.frame.js',
+    supplier: __dirname + '/src/supplier/supplier.entry.js',
+    supplier_offer: __dirname + '/src/supplier/supplier.offer.frame.js',
     // supplier_profile: __dirname + '/src/profile/profile.supplier.js',
     // supplier_settings: __dirname + '/src/supplier/supplier.settings.js',
-    // supplier_customer_frame: __dirname + '/src/supplier/customer.frame.js',
+    supplier_customer_frame: __dirname + '/src/supplier/customer.frame.js',
     // ,
     // 'deliver': __dirname+'/src/deliver/deliver.entry.js'
     //  ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'
@@ -24,12 +24,12 @@ module.exports = {
     //  ,'deliver_customer_frame': __dirname+'/src/deliver/customer.frame.js'
     //  ,'deliver_supplier_frame': __dirname+'/src/deliver/supplier.offer.frame.js',
 
-    customer: __dirname + '/src/customer/customer.entry.js',
+    // customer: __dirname + '/src/customer/customer.entry.js',
     // customer_order: __dirname + '/src/customer/customer.order.frame.js',
     // customer_profile: __dirname + '/src/profile/profile.customer.js',
     // // customer_settings: __dirname + '/src/customer/customer.settings.js',
     // customer_cart: __dirname + '/src/customer/customer.cart.js',
-    customer_mp: __dirname + '/src/customer/customer.mp.js',
+    // customer_mp: __dirname + '/src/customer/customer.mp.js',
 
     // 'store_init': __dirname+'/src/store/init.store.js',
     // 'store_order': __dirname+'/src/store/store.order.js',
