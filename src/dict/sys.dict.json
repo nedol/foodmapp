@@ -1231,5 +1231,19 @@
     "fr": "Cliquez pour copier le lien vers votre boutique en ligne",
     "nl": "Kopieer de link naar uw online shop",
     "de": "Kopieren Sie den Link zu Ihrem Online-Shop"
+  },
+  "ea6677e3b8628af3e1b214ca784daa9c": {
+    "ua": "Промо-код",
+    "en": "Promo",
+    "fr": "Promo",
+    "nl": "Promo",
+    "de": "Promo"
+  },
+  "2db2c89d51941215cddd6b6145ba50e4": {
+    "ua": "Копировать на сл.неделю",
+    "en": "Copy to the next week",
+    "fr": "Copie à la semaine suivante",
+    "nl": "Kopie naar de volgende week",
+    "de": "Kopie für die nächste Woche"
   }
 }
