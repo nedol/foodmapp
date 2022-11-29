@@ -15,7 +15,7 @@ module.exports = {
     supplier_offer: __dirname + '/src/supplier/supplier.offer.frame.js',
     // supplier_profile: __dirname + '/src/profile/profile.supplier.js',
     // supplier_settings: __dirname + '/src/supplier/supplier.settings.js',
-    supplier_customer_frame: __dirname + '/src/supplier/customer.frame.js',
+    // supplier_customer_frame: __dirname + '/src/supplier/customer.frame.js',
     // ,
     // 'deliver': __dirname+'/src/deliver/deliver.entry.js'
     //  ,'deliver_offer': __dirname+'/src/deliver/deliver.offer.frame.js'

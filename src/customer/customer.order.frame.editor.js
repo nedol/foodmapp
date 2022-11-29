@@ -854,6 +854,8 @@ export class CustomerOrderFrameEditor {
                   price: price,
                 })
               );
+
+            $(menu_item).find('.extras').collapse('show');
           });
         $(menu_item)
           .find('.reduce_ord')
@@ -869,6 +871,8 @@ export class CustomerOrderFrameEditor {
 
               if (!price)
                 price = $(menu_item).find('.item_price').attr('placeholder');
+
+              if (amnt === 0) $(menu_item).find('.extras').collapse('hide');
 
               $(menu_item)
                 .add('checked')
