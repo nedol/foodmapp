@@ -147,6 +147,8 @@ export class SupplierOffer {
       $('.dt_val', $(window.parent.document).contents())
     );
 
+    $('.dt_val').on('change', this, function (ev) {});
+
     $('.file-upload').on('change', function (e) {
       let el = this;
       try {
@@ -1191,11 +1193,15 @@ export class SupplierOffer {
       $('.notoday').removeClass('notoday');
     }
 
+    $('#orders_pane').find('tbody').empty();
+
     window.parent.db.GetSupOrders(
       moment(that.date).format('YYYY-MM-DD'),
       window.parent.user.uid,
       function (res) {
         $.each(res, function (i, item) {
+          $("a[href='#orders_pane']").trigger('click');
+
           let data = res[i].data;
           let inv_period = '',
             inv_qnty = '',
@@ -1459,26 +1465,26 @@ export class SupplierOffer {
 
     $("a[href='#editor_pane']").off('click touchstart');
     $("a[href='#editor_pane']").on('click touchstart', this, function (ev) {
-      window.parent.user.PublishOffer(
-        ev.data.GetOfferItems(ev.data.lang, true)['remote'],
-        that.date,
-        ev.data,
-        function (obj, data_obj) {
-          try {
-            window.parent.user.offer.stobj.published = obj.published;
-            window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
-            let local = {
-              data: JSON.parse(obj.offer),
-              date: window.parent.user.offer.stobj.date,
-              longitude: data_obj.longitude,
-              latitude: data_obj.latitude,
-            };
-            window.parent.user.offer.SetOfferDB(local);
-          } catch (ex) {
-            console.log(ex);
-          }
-        }
-      );
+      // window.parent.user.PublishOffer(
+      //   ev.data.GetOfferItems(ev.data.lang, true)['remote'],
+      //   that.date,
+      //   ev.data,
+      //   function (obj, data_obj) {
+      //     try {
+      //       window.parent.user.offer.stobj.published = obj.published;
+      //       window.parent.user.offer.stobj.data = JSON.parse(obj.offer);
+      //       let local = {
+      //         data: JSON.parse(obj.offer),
+      //         date: window.parent.user.offer.stobj.date,
+      //         longitude: data_obj.longitude,
+      //         latitude: data_obj.latitude,
+      //       };
+      //       window.parent.user.offer.SetOfferDB(local);
+      //     } catch (ex) {
+      //       console.log(ex);
+      //     }
+      //   }
+      // );
     });
 
     $('[data-toggle="popover"]').popover();
