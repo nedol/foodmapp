@@ -505,7 +505,9 @@ export class SupplierOffer {
     $('.empty_div').append($('#add_item'));
 
     if (window.parent.user.profile.profile.type === 'foodtruck')
-      $('#cb_copy_next_week').closest('div').css('display', 'block');
+      $('#cb_copy_next_week')
+        .closest('#div_copy_next_week')
+        .css('display', 'block');
 
     for (let t in that.offer) {
       //
@@ -538,7 +540,7 @@ export class SupplierOffer {
         });
 
       $('#cb_copy_next_week').on('change', function (ev) {
-        that.copyNextWeek();
+        if ($('#cb_copy_next_week').prop('checked')) that.copyNextWeek();
       });
 
       $('input:file').on('change', function (ev) {
@@ -547,9 +549,6 @@ export class SupplierOffer {
         }, 500);
       });
     }, 300);
-
-    // $($('.cat_div')[0]).addClass('active');
-    // $($($('.cat_div')[0]).attr('href')).addClass('active');
 
     function openTab(tab) {
       for (let i in that.offer[tab]) {
