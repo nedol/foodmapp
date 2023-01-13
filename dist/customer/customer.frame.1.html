@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1.0, user-scalable=no, width=device-width"
+    />
+    <meta name="description" content="" />
+    <meta name="author" content="nedol" />
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <title>FoodMap Consumer</title>
+    <!-- Bootstrap core CSS -->
+
+    <!-- Latest compiled and minified CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="../../lib/jquery-comments-master/css/jquery-comments.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+    />
+    <link href="../assets/vendor/icofont/icofont.min.css" rel="stylesheet" />
+    <!--link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-select/1.12.2/css/bootstrap-select.min.css"-->
+    <link
+      rel="stylesheet"
+      href="../../lib/bootstrap-rating/bootstrap-rating.css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Roboto:400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css?family=Montserrat:400,700"
+      rel="stylesheet"
+      type="text/css"
+    />
+
+    <link rel="stylesheet" href="../css/order.3.css" type="text/css" />
+
+    <!-- Custom styles for this template -->
+    <script type="text/javascript" src="../host.js"></script>
+    <script src="../customer_order.js"></script>
+    <!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
+    <script type="application/javascript">
+      document.addEventListener('touchstart', function () {}, false);
+    </script>
+  </head>
+
+  <body>
+    <!-- KOLMI-->
+    <script>
+      function listener(event) {
+        if (
+          event.origin !== 'https://delivery-angels.ru' &&
+          event.origin !== 'http://localhost:63342'
+        ) {
+          return;
+        }
+
+        if (JSON.parse(event.data)['append']) {
+          let obj = JSON.parse(event.data)['append'];
+          document.body.insertAdjacentHTML('beforeend', obj);
+          document.getElementById('user_profile').style.display = 'block';
+        }
+        if (JSON.parse(event.data)['remove']) {
+          document.getElementById(JSON.parse(event.data)['remove']).remove();
+          let arr = document.getElementsByClassName('kolmit');
+          for (let fr in arr) {
+            if (arr[fr].tagName && arr[fr].tagName.toLowerCase() === 'iframe') {
+              arr[fr].contentWindow.postMessage(
+                JSON.stringify({ onclose: 'profile' }),
+                '*'
+              );
+            }
+          }
+        }
+      }
+
+      if (window.addEventListener) {
+        window.addEventListener('message', listener);
+      }
+    </script>
+    <!-- KOLMI-->
+
+    <!-- Nav tabs -->
+    <div style="overflow-x: scroll;white-space: nowrap;">
+      <ul
+        id="top_nav"
+        class="nav nav-tabs nav-justified"  
+        style="position: relative; width:100%;"
+      >
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            data-toggle="tab"
+            href="#order_pane"
+            title="Ассортимент"
+          >
+            <img
+              id="range_img"
+              src="../images/product_range.png"
+              style="height: 30px"
+              alt="Ассортимент"
+            />
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link"
+            data-toggle="tab"
+            href="#profile_pane"
+            title="Профиль"
+          >
+            <img id="profile_img" alt="Профиль" src="" />
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="nav-link call_but_placeholder"
+            data-toggle="tab"
+            href="#kolmit_pane"
+            data-translate=""
+            title="Kolmit"
+            style="position: relative; height: 50px"
+          >
+            <iframe
+              class="kolmit_tmplt"
+              frameborder="0"
+              scrolling="no"
+              style="
+                display: none;
+                position: absolute;
+                top: 0;
+                right: -40px;
+                z-index: 100;
+              "
+            >
+            </iframe>
+          </a>
+        </li>
+        <li class="nav-item">
+          <a
+            class="icofont-comment nav-link"
+            style="font-size:2em; color: grey;-webkit-text-stroke: 1px white;"
+            data-toggle="tab"
+            href="#comment_pane"
+            title="Комменты"
+          >
+          </a>
+        </li>
+      </ul>
+    </div>
+
+    <div>
+    <div class="tab-content">
+      <div class="tab-pane" id="order_pane">
+        <div>
+          <span
+            class="icofont-filter"
+            data-toggle="collapse"
+            data-target=".filter_div"
+            style="
+              position: fixed;
+              font-size: 1.7em;
+              top: 60px;
+              right: 0;
+              z-index: 100;
+              visibility: hidden;
+            "
+          >
+          </span>
+        </div>
+        <div
+          class="categories"
+          id="menu_tabs"
+          style="overflow-x: auto; white-space: nowrap"
+        >
+          <div class="text-center" id="add_tab_li" title="add tab">
+            <span
+              id="add_tab"
+              class="add_tab fa fa-plus"
+              style="display: none"
+            ></span>
+          </div>
+          <a class="actual_price"></a>
+        </div>
+
+        <div
+          class="address_div input-group"
+          style="display: none; position: relative; width: 100%"
+        >
+          <input
+            type="address"
+            class="form-control"
+            id="delivery_address"
+            placeholder="введите адрес доставки"
+            style="width: 100%"
+          />
+          <button
+            type="button"
+            id="address_loc"
+            style="
+              position: absolute;
+              top: 0;
+              right: 0;
+              z-index: 100;
+              border-width: 0;
+              height: 100%;
+              background-color: transparent;
+            "
+          >
+            <i class="icofont-map icofont-2x"></i>
+          </button>
+        </div>
+
+        <div
+          class="tab-content tab-pane"
+          style="
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+          "
+        >
+          <div id="add_tab_div" style="height: 200px"></div>
+
+          <div
+            style="
+              display: inline-block;
+              position: fixed;
+              bottom: 0;
+              margin-left: 50%;
+              color: white;
+              z-index: 10000;
+            "
+          >
+            <span
+              id="save_frame"
+              class="save fa fa-save"
+              style="display: none; color: #0088bb; margin: 10px"
+              title="Save"
+            ></span>
+          </div>
+        </div>
+        <!--/tab-pane-->
+
+        <div
+          id="menu_item_tmplt"
+          class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-3"
+        >
+          <div>
+            <button class="item_desc" data-target="">
+              <i
+                class="icofont-justify-center icofont-2x"
+                style="-webkit-text-stroke: 3px white"
+              ></i>
+            </button>
+            <div
+              class="cert_container carousel carousel-fade"
+              data-interval="5000"
+            >
+              <div class="carousel-inner"></div>
+
+              <div
+                class="item_title"
+                data-translate="d5e5823df2f959ac4de5e4ae8a35e625"
+                rows="2"
+                readonly
+              ></div>
+              <i
+                class="fa fa-spinner fa-spin"
+                style="
+                  display: none;
+                  position: absolute;
+                  right: 50%;
+                  top: 50%;
+                  font-size: 24px;
+                "
+              ></i>
+
+              <div>
+                <div class="item_price"></div>
+                <div
+                  class="dscnt_price"
+                  style="display: inline-block; visibility: hidden"
+                ></div>
+              </div>
+              <div class="discount" style="display: none"></div>
+            </div>
+
+            <div class="item_content collapse">
+              <div class="row prop_tmplt">
+                <div class="prop_name col"></div>
+                <div class="prop_val col"></div>
+              </div>
+              <textarea class="content_text" readonly> </textarea>
+            </div>
+
+            <div class="order_container">
+              <div class="dropup pack_container">
+                <div
+                  class="pack_btn btn"
+                  type="button"
+                  packlist='{"d110e6f496dc9562e23ffad766b5d0ef":{"qnty":"","price":"30"}}'
+                  data-translate="d110e6f496dc9562e23ffad766b5d0ef"
+                  pack="d110e6f496dc9562e23ffad766b5d0ef"
+                >
+                  375ml
+                </div>
+
+                <div
+                  class="pack_list input dropdown-menu"
+                  style="font-size: x-large; white-space: nowrap"
+                >
+                  <a
+                    class="dropdown-item"
+                    role="packitem"
+                    pack="d110e6f496dc9562e23ffad766b5d0ef"
+                    data-translate="d110e6f496dc9562e23ffad766b5d0ef"
+                    >375ml</a
+                  >
+                </div>
+              </div>
+
+              <div>
+                <div
+                  class="extra_collapse"
+                  style="
+                    display: none;
+                    position: absolute;
+                    left: 45%;
+                    top: 23px;
+                    text-align: center;
+                    z-index: 100;
+                  "
+                >
+                  <button
+                    type="button"
+                    data-toggle="collapse"
+                    data-target=".extras"
+                    style="
+                      color: grey;
+                      border-width: 0;
+                      background-color: transparent;
+                    "
+                  >
+                    <!--i style="position:relative;color:grey; bottom:2px;">en outre</i-->
+                    <i
+                      class="fa fa-2x fa-plus-circle"
+                      aria-hidden="true"
+                      style="background-color: white"
+                    ></i>
+                  </button>
+                </div>
+              </div>
+              <div style="flex-grow: 1; padding-right: 21px; right: 23px">
+                <div
+                  style="text-align: right; white-space: nowrap; color: #273be6"
+                >
+                  <span
+                    class="reduce_ord ctrl"
+                    style="vertical-align: middle; font-size: x-large"
+                    ><i class="fa fa-minus"></i>
+                  </span>
+                  <button
+                    class="ord_amount btn btn-outline-secondary"
+                    value="0"
+                  >
+                    0
+                  </button>
+                  <span
+                    class="increase_ord ctrl"
+                    style="
+                      vertical-align: middle;
+                      font-size: x-large;
+                      color: #d51312;
+                    "
+                    ><i class="fa fa-plus"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display: none">
+              <div
+                class="row tmplt align-items-center"
+                style="flex-wrap: nowrap;background-color: #cbced2"
+              >
+                <div
+                  class="add_div col-sm-10"
+                  style="vertical-align: middle; text-align: left"
+                >
+                  <a class="extra_title"></a>
+                </div>
+
+                <div class="add_price_div col" style="text-align: center">
+                  <a
+                    class="extra_price"
+                    style="
+                      color: darkgrey;
+                      font-family: 'Montserrat', serif;
+                      font-weight: bold;
+                      vertical-align: middle;
+                    "
+                  ></a>
+                </div>
+
+                <div
+                  class="col"
+                  style="text-align: right; white-space: nowrap; color: #273be6"
+                >
+                  <span
+                    class="reduce ctrl"
+                    style="vertical-align: middle; font-size: x-large"
+                    ><i class="fa fa-minus"></i>
+                  </span>
+                  <button class="extra_amount btn btn-outline-secondary">
+                    0
+                  </button>
+                  <span
+                    class="increase ctrl"
+                    style="
+                      vertical-align: middle;
+                      font-size: x-large;
+                      color: #d51312;
+                    "
+                    ><i class="fa fa-plus"></i>
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            <div class="extras collapse"></div>
+
+            <div class="row tmplt_extra" style="flex-wrap: nowrap; visibility: hidden; height: 0">
+              <div
+                class="add_div col-sm-10"
+                style="text-align: center"
+              >
+                <a class="extra_title" style="vertical-align: middle;"></a>
+              </div>
+              <input type="checkbox" class="cb_extra">
+              <!-- <div class="add_price_div col" style="text-align: center">
+                <a
+                  class="extra_price"
+                  style="
+                    color: #333;
+                    font-weight: normal;
+                    font-family: 'Montserrat', serif;
+                    font-size: x-large;
+                    vertical-align: middle;
+                  "
+                  >0.3</a
+                >
+              </div> -->
+<!--  
+                <div
+                  class="col"
+                  style="
+                    right: 10px;
+                    text-align: center;
+                    white-space: nowrap;
+                    color: #273be6;
+                  "
+                >
+                  <span
+                    class="reduce ctrl"
+                    style="vertical-align: middle; font-size: x-large"
+                  >
+                    <i class="fa fa-minus"></i>
+                  </span>
+                  <button
+                    class="extra_amount btn btn-outline-secondary"
+                    value="0"
+                  >
+                    0
+                  </button>
+                  <span
+                    class="increase ctrl"
+                    style="
+                      vertical-align: middle;
+                      font-size: x-large;
+                      color: #d51312;
+                    "
+                  >
+                    <i class="fa fa-plus"></i>
+                  </span>
+                </div> -->
+              </div>
+          </div>
+
+          <div
+            style="
+              display: inline-block;
+              position: fixed;
+              bottom: 0;
+              margin-left: 50%;
+              color: white;
+              z-index: 10000;
+            "
+          >
+            <span
+              id="save_frame"
+              class="save fa fa-save"
+              style="display: none; color: #0088bb; margin: 10px"
+              title="Save"
+            ></span>
+          </div>
+        </div>
+        <!--/tab-pane-->
+      </div>
+
+      <div id="profile_pane" class="tab-pane">
+        <div class="rating_div">
+          <input
+            type="hidden"
+            class="rating"
+            data-filled="fa fa-star fa-3  custom-star"
+            data-empty="fa fa-star-o fa-3  custom-star"
+          />
+        </div>
+
+        <div class="tab-content container">
+          <!--nput type="hidden" id="supuid" class="form-control" name="supuid"-->
+            <div class="row">
+              <div class="col-sm-3 text-center">
+                <img
+                  src=""
+                  id="sup_avatar"
+                  class="img-circle img-thumbnail"
+                  alt="avatar"
+                />
+                <input
+                  type="file"
+                  class="center-block file-upload"
+                  style="display: none"
+                />
+              </div>
+              <div
+                class="col-sm-9"
+                style="display: flex; flex-direction: column"
+              >
+                <div>
+                  <label
+                    for="sup_name"
+                    data-translate="f6039d44b29456b20f8f373155ae4973"
+                    >Имя</label
+                  >
+                  <input
+                    type="text"
+                    disabled
+                    id="sup_name"
+                    class="form-control"
+                    name="name"
+                  />
+                </div>
+
+                <div>
+                  <label
+                    for="sup_email"
+                    data-translate="96c7b6402b3c977daed27d8692d472fc"
+                    >Email</label
+                  >
+                  <input
+                    type="email"
+                    id="sup_email"
+                    disabled
+                    class="form-control"
+                    name="email"
+                    data-toggle="tooltip"
+                  />
+                </div>
+
+                <div>
+                  <div>
+                    <label
+                      for="sup_mobile"
+                      data-translate="9fdc3f131f7923e7bdd4ec60d465ae87"
+                      >Телефон</label
+                    >
+                    <input
+                      type="phone"
+                      id="sup_mobile"
+                      disabled
+                      class="form-control"
+                      name="mobile"
+                    />
+                  </div>
+                  <div>
+                    <label
+                      for="sup_place"
+                      data-translate="bec946b0e151ea413af70bbc0f36ab98"
+                      >Адрес торговой точки</label
+                    >
+                    <input
+                      type="text"
+                      id="sup_place"
+                      required
+                      disabled
+                      class="form-control"
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label
+                    for="sup_worktime"
+                    data-translate="fb9cb7294abb5843f6529d5400f5a7ed"
+                    >Часы работы</label
+                  >
+                  <textarea
+                    id="sup_worktime"
+                    type="text"
+                    class="sel_period form-control"
+                    disabled
+                    placeholder="08:00 - 20:00"
+                    title="часы работы"
+                  >
+                  </textarea>
+                </div>
+                <div style="display: none">
+                  <label
+                    for="sup_delivery"
+                    data-translate="5c0c182f1e55e5bda0e95835c934489e"
+                    >Условия доставки</label
+                  >
+                  <textarea
+                    id="sup_delivery"
+                    class="delivery_opt form-control"
+                    disabled
+                  >
+                  </textarea>
+                </div>
+                <div style="height: 200px; visibility: hidden"></div>
+              </div>
+            </div>
+          
+
+          <div class="tab-pane" id="settings">
+            <div style="margin: 20px"></div>
+            <div class="row">
+              <div class="form-group dropdown">
+                <div class="col-xs-6"></div>
+                <div class="col-xs-6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!--/tab-pane-->
+
+      <div
+        id="comment_pane" class="tab-pane"
+        style="width: 100%; margin: 0 auto"
+      >
+          <div id="comments-container" style="overflow-y: hidden">
+            <div
+              class="tab-pane fade"
+              id="comments"
+              style="overflow-y: auto; height: auto"
+            >            
+          </div>
+        </div>
+      </div>
+
+      <div
+        id="kolmit_pane"
+        class="tab-pane"
+        style="width: 100%; margin: 0 auto"
+      ></div>
+    </div>
+
+    <div
+      style="
+        display: inline-block;
+        position: fixed;
+        bottom: 35px;
+        right: 0;
+        color: white;
+        z-index: 5000;
+      "
+    >
+      <span
+        id="close_frame"
+        class="close fa fa-map-o"
+        style="color: #0088bb; margin: 10px"
+        title="Publier"
+      ></span>
+    </div>
+    <!-- /.container -->
+
+    <div class="loader"></div>
+  </body>
+</html>

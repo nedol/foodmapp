@@ -2,9 +2,9 @@
 
 import proj from 'ol/proj';
 
-require('bootstrap');
-// require('bootstrap-select');
-import 'bootstrap/dist/css/bootstrap.css';
+// require('bootstrap');
+// // require('bootstrap-select');
+// import 'bootstrap/dist/css/bootstrap.css';
 // import 'tablesorter/dist/css/theme.default.min.css';
 // import 'tablesorter/dist/css/theme.blue.css';
 // import 'tablesorter/dist/css/dragtable.mod.min.css';
@@ -34,7 +34,7 @@ window.InitCartCustomer = function () {
 export class CartCustomerStore extends CartCustomer {
   constructor() {
     super();
-    let that = this;
+    const that = this;
     window.user = this;
     // $('#menu_item_style').load('./customer.frame.'+window.parent.sets.lang+'.html #menu_item_style', function (response, status, xhr) {
     //
@@ -42,7 +42,7 @@ export class CartCustomerStore extends CartCustomer {
   }
 
   async FillOrders() {
-    let that = this;
+    const that = this;
 
     this.path = 'http://localhost:5500/d2d/server';
     if (host_port.includes('delivery-angels'))
@@ -536,7 +536,7 @@ export class CartCustomerStore extends CartCustomer {
   }
 
   DeleteOrder(supuid) {
-    let that = this;
+    const that = this;
 
     $('tbody').empty();
     $('.ord_cnt').text(0);

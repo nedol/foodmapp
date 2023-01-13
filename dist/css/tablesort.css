@@ -37,6 +37,9 @@ tr{
 	background-color: white;
 }
 
+.tablesorter-header-inner{
+	width:200px
+}
 
 
 .tablesorter-bootstrap thead .tablesorter-headerUnSorted:not(.sorter-false),
@@ -103,14 +106,15 @@ table.tablesorter tbody tr.alt-row td {
 		        }
 		
 		        .pack_btn {
-	
-		        	color: gray;
-		        	background-color: transparent;
-		        	border-style: solid;
-		        	border-width: 0px;
-		        	padding-left: 1px;
-		        }
-		
+					font-size: 1.7em !important;
+					font-weight: 500;
+					color: gray;
+					background-color: transparent;
+					border-style: solid;
+					border-width: 0px;
+					padding-left: 1px;
+				}
+						
 		        .content_text {
 		        	position: absolute;
 		        	top: 0;
@@ -138,15 +142,16 @@ table.tablesorter tbody tr.alt-row td {
 		
 		        div[role=dialog] {
 		        	background-color: #e3e3e3;
-		        	z-index: 20;
+		        	z-index: 2000;
 		        }
 		
 		        /* pager wrapper, div */
 		        .pager {
-		        	top:-20px;
-		        	left:0;
-		        	margin: 0;
+		        	margin: -3px;
 		        	font-size: medium;
+		        	font-family: 'Roboto';
+		        	background-color: white;
+		        	/* 		        	transform: scale(1.5); */
 		        }
 		
 		        .pager img {
@@ -155,7 +160,7 @@ table.tablesorter tbody tr.alt-row td {
 		
 		        .pager input,
 		        .pager select {
-		        	border: 1px solid transparent;
+		        	border: 2px solid #ccc;
 		        	background-color: transparent;
 		        }
 		
@@ -229,7 +234,11 @@ table.tablesorter tbody tr.alt-row td {
 		        }
 		
 		        table.tablesorter .tablesorter-filter {
-		        	width: 150px;
+		        	width: 100%;
+		        	height: 25px;
+		        	border-width: 0;
+		        	background-color: #dee2e654;
+		        	margin: 5px;
 		        }
 
 				table.tablesorter .tablesorter-filter::placeholder {
@@ -257,12 +266,19 @@ table.tablesorter tbody tr.alt-row td {
 				}
 		
 		        .pack_list {
-		        	width: auto;
-		        }
+					width: auto;
+					/* display: flex !important; */
+					/* flex-wrap: wrap; */
+					}
+		        
 		
-		        input[type=search] {
-		        	border-width: 0;
-		        }
+				.search_word{
+						border-width: 0;
+						position: absolute;
+						left: 0;
+						width: 50%;
+						top: 105px;
+						}
 		
 		        .form-check-input {
 		        	position: relative;
@@ -275,7 +291,16 @@ table.tablesorter tbody tr.alt-row td {
 		        .cat_div.active {
 		        	background-color: darkgrey;
 		        }
-		
+
+				.increase_ord {
+					vertical-align: middle;
+				    font-size: large;
+				    color: #d51312;
+				    background-color: transparent;
+				    border: 0;
+				    outline: none;
+				}
+						
 		        .ord_amount {
 		        	font-size: large !important;
 		        	border-width: 0;
@@ -321,13 +346,10 @@ table.tablesorter tbody tr.alt-row td {
 		        	font-size: x-large !important;
 		        }
 
-				.pack_btn{
-					font-size: 1.2em !important;
-					font-weight: 500;
-				}
+
 		
 		        ::-webkit-scrollbar {
-		        	/*display:none ;*/
+		        	display:none;
 		        	border-width: thin;
 		        }
 		

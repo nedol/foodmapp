@@ -6,11 +6,11 @@ th {
     padding-left: 30px;
     color: #c4e3f3;
 }
-td{
-    white-space: normal;
+
+
+.ord_num{
+    position:absolute
 }
-
-
 
 /* Extra selectors needed to override the default styling */
 table.tablesorter tbody tr.odd {
@@ -40,6 +40,20 @@ table.tablesorter tr {
 table.tablesorter tr:last-child {
     border-bottom: none;
 }
+
+.ts_date{
+    width:100%;
+    border-width: 0px;
+    border-bottom-width: 1px;
+    text-align:center;
+}
+
+.sel_period{
+    background-color:white;
+    font-size: normal;
+    text-align:center;
+}
+
 ::-webkit-input-placeholder {
     font-weight: lighter;
     font-size: small;
@@ -67,6 +81,8 @@ table.tablesorter tr:last-child {
     opacity: 1;
     z-index: 1000;
 }
+
+.close_browser_div{display: block;position: fixed;left: 0%;bottom: 0;font-size: xx-large;z-index: 100;}
 
 .loader {
     display: none;
@@ -126,9 +142,10 @@ table.tablesorter tr:last-child {
 }
 
 .order_delivery{
-    font-size: 1.2em;
+    font-size: 2.5em;
     white-space:  break-spaces;
     width: min-content;
+    line-height: 2;
 }
 
 
@@ -195,8 +212,20 @@ td.price{
     text-align: center;
 }
 .tacomment{
+    width: 95%;
+    max-height: 120px;
     background-color:transparent;
     border-color: transparent;
+    font-style: italic;
+}
+.tacomment::placeholder{
+    position: absolute;
+    color: #9c9c9c !important;
+    opacity: 1;
+    font-weight: 200;
+    font-size: smaller;
+    bottom: 0;
+    right: 0;
     font-style: italic;
 }
 

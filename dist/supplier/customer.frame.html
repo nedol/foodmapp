@@ -53,7 +53,7 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 
     <!-- Custom styles for this template -->
-    <script type="text/javascript" src="../host.js"></script>
+
     <script src="../supplier_customer_frame.js?v=2"></script>
     <!--<script src="../../lib/jquery.ui.touch-punch.min.js"></script>-->
 
@@ -514,8 +514,8 @@
       style="
         display: block;
         position: fixed;
-        bottom: 50%;
-        right: 1%;
+        bottom: 0%;
+        left: 0%;
         margin: 10px;
         color: white;
         background-color: #ffc955;
@@ -523,11 +523,14 @@
         z-index: 10000;
       "
     >
-      <span
-        class="close fa fa-map-o"
-        style="color: #0088bb"
-        title="Publish"
-      ></span>
+      <span class="close" style="color: #0088bb" title="Publish">
+        <img
+          src="../images/foodmapp.svg"
+          width="50"
+          height="50"
+          alt="FoodMapp"
+        />
+      </span>
     </div>
 
     <div class="loader"></div>

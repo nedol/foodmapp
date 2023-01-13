@@ -1,5 +1,4 @@
-ChangeLog
----------
+## ChangeLog
 
 ### 1.12.2
 
@@ -52,7 +51,6 @@ ChangeLog
 
 - feat(js): add `toggleOn` and `toggleOff` icons instead `toggle` icon
 
-
 ### 1.11.1
 
 - fix(js): fix #2439, `filterBy` cannot filter array keys
@@ -90,7 +88,6 @@ ChangeLog
 #### Breaking changes in 1.11.1
 
 - **Filter-Control extension**: deleted the inline-style and now this extension is using a separated css file.
-
 
 ### 1.11.0
 
@@ -135,7 +132,6 @@ ChangeLog
 - refactor(filter-control extension): adding all unique values to select control and performance improvements
 - refactor(extension): refactor filter cookies extension to avoid dbcalls
 - docs(filter-control extension): add documentation for filterData
-
 
 ### 1.10.1
 
@@ -259,7 +255,7 @@ ChangeLog
 - [enh] Added `onClickCell` and `onDblClickCell` events.
 - [bug] Fix #672: Column Fixed Width in Percentage bug.
 - [bug] Fix row state field value bug when there are disabled rows.
-- [bug] Fix #762: save tr's data-* attributes.
+- [bug] Fix #762: save tr's data-\* attributes.
 - [bug] Fix #823, #850: break rowspan bug, data-attribute bug.
 
 ### 1.7.0
@@ -426,7 +422,7 @@ ChangeLog
 ### 1.1.2
 
 - Add switchable column option.
-- Add `data-toggle` attribute.
+- Add `data-bs-toggle` attribute.
 - Add support for number search.
 - Use html function instead of text in header th.
 

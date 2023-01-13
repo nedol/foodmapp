@@ -122,7 +122,7 @@ $(document).on('readystatechange', function () {
 
 export class DeliverOffer {
   constructor() {
-    let that = this;
+    const that = this;
 
     this.path = 'http://localhost:5500/d2d/server';
     if (host_port.includes('nedol.ru'))
@@ -246,7 +246,7 @@ export class DeliverOffer {
   }
 
   saveFrame(rel_href) {
-    let that = this;
+    const that = this;
     if (rel_href === '#orders_pane') {
       $.each($('.cus_foot :checked'), function (i, el) {
         window.parent.db.GetOrder(
@@ -311,7 +311,7 @@ export class DeliverOffer {
   }
 
   addTab(cat_tab, state) {
-    let that = this;
+    const that = this;
     let cat_str = '';
     if (state === '0') return;
     if (
@@ -357,7 +357,7 @@ export class DeliverOffer {
   }
 
   OpenOffer() {
-    let that = this;
+    const that = this;
 
     if ($('.kolmit').length === 0) {
       let kolmit = $('iframe.kolmit_tmplt').clone();
@@ -491,7 +491,7 @@ export class DeliverOffer {
     $('.menu_item').remove();
     $('.tab_inserted').remove();
 
-    let that = this;
+    const that = this;
     let isEditable = true;
     $('.empty_div').append($('#add_item'));
 
@@ -1091,7 +1091,7 @@ export class DeliverOffer {
   }
 
   InitTabsByCategories(cb) {
-    let that = this;
+    const that = this;
     let market = 'food';
 
     $('#menu_tabs').load(
@@ -1424,7 +1424,7 @@ export class DeliverOffer {
   }
 
   fillPacklist(menu_item, tab, i) {
-    let that = this;
+    const that = this;
     let pl = '';
     if (that.offer[tab][i].packlist)
       pl = utils.ReverseObject(that.offer[tab][i].packlist);
@@ -1597,7 +1597,7 @@ export class DeliverOffer {
 
   OnClickPack(ev) {
     let menu_item = ev.data.mi;
-    let that = ev.data.that;
+    const that = ev.data.that;
 
     let pl = JSON.parse($(menu_item).find('.item_pack').attr('packlist'));
     let price = pl[$(ev.target).text()].price;
@@ -1611,7 +1611,7 @@ export class DeliverOffer {
   }
 
   AddOfferItem(ev) {
-    let that = ev.data;
+    const that = ev.data;
 
     // if($('.menu_item').length>=parseInt($('#items_limit').val())) {
     //    return true;
@@ -1731,7 +1731,7 @@ export class DeliverOffer {
     });
 
     // menu_item.find('.item_pack').on('focusout', that, function (ev) {
-    //     let that = ev.data;
+    //     const that = ev.data;
     //     let pack = menu_item.find('.item_pack').attr('pack');
     //     if ($(this).val() === '') {
     //         menu_item.find('a:contains(' + pack + ')').remove();
@@ -2015,7 +2015,7 @@ export class DeliverOffer {
   }
 
   RedrawOrder(obj) {
-    let that = this;
+    const that = this;
     window.parent.db.GetOrder(
       new Date(this.date),
       obj.uid,
@@ -2104,7 +2104,7 @@ export class DeliverOffer {
   }
 
   GetOfferItems(lang) {
-    let that = this;
+    const that = this;
     let offerObj = { remote: {} };
     that.arCat = [];
 
@@ -2342,7 +2342,7 @@ export class DeliverOffer {
   }
 
   SaveProfile(cb) {
-    let that = this;
+    const that = this;
 
     if ($('.avatar')[0].src.includes('base64')) {
       let k = 200 / $('.avatar').height();

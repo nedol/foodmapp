@@ -72,6 +72,9 @@ module.exports = class D2D {
         case 'updateofferitem':
           this.UpdateOfferItem(q, ws);
           break;
+        case 'deleteoffer':
+          this.DeleteOffer(q, ws);
+          break;
         case 'translate':
           //this.translate(q, ws);
           break;

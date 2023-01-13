@@ -2,7 +2,7 @@
 
 require('bootstrap');
 // require('bootstrap-select');
-import 'bootstrap/dist/css/bootstrap.css';
+// import 'bootstrap/dist/css/bootstrap.css';
 // import 'tablesorter/dist/css/theme.default.min.css';
 // import 'tablesorter/dist/css/theme.blue.css';
 // import 'tablesorter/dist/css/dragtable.mod.min.css';
@@ -25,13 +25,13 @@ import { Utils } from '../utils/utils';
 let utils = new Utils();
 
 window.InitCartCustomer = function () {
-  if (!window.cart_cus) window.cart_cus = new CartCustomer();
+  window.cart_cus = new CartCustomer();
   window.cart_cus.InitUserOrders();
 };
 
 export class CartCustomer {
   constructor(tab) {
-    let that = this;
+    const that = this;
     window.user = this;
     // $('#menu_item_style').load('./customer.frame.'+window.parent.sets.lang+'.html #menu_item_style', function (response, status, xhr) {
     //
@@ -40,7 +40,7 @@ export class CartCustomer {
 
   Close(cb) {
     window.user.SaveOrderItems(function () {
-      $('tbody').empty();
+      $(window).empty();
       cb();
     });
 
@@ -50,12 +50,12 @@ export class CartCustomer {
   }
 
   InitUserOrders() {
-    let that = this;
+    const that = this;
     $('tbody').empty();
-    that.path = 'https://nedol.ru/server/';
-    if (host_port.includes('nedol.ru')) that.path = host_port;
 
-    that.image_path = image_path;
+    this.path = window.parent.con_param.host_port;
+
+    this.image_path = window.parent.con_param.image_path;
 
     $('#menu_item_tmplt').load(
       './customer.frame.html #menu_item_tmplt',
@@ -64,6 +64,14 @@ export class CartCustomer {
         that.FillOrders();
       }
     );
+  }
+
+  UpdateCartOrder(order) {
+    if (order.status['approved']) {
+      $('.order_delivery', $("tr.pay_supuid[supuid='" + order.supuid + "']"))
+        .addClass('fa fa-handshake-o')
+        .removeClass('icofont-sand-clock');
+    }
   }
 
   CheckDeliverAddress(adr) {
@@ -99,7 +107,7 @@ export class CartCustomer {
   }
 
   async FillOrders() {
-    let that = this;
+    const that = this;
 
     $('.tablesorter').tablesorter({
       theme: 'bootstrap',
@@ -119,14 +127,14 @@ export class CartCustomer {
       },
     });
 
-    let date = window.parent.user.date;
+    this.date = window.parent.user.date;
     that.sum = 0;
 
     function defineAddressTextarea(sup) {
       let val = '';
 
       if (sup.profile.type === 'marketer') {
-        val = sup.profile.place;
+        val = sup.address;
         //sup.profile.place !== ''
         //   ? sup.profile.place
         //   : sup.latitude + ';' + sup.longitude;
@@ -140,7 +148,7 @@ export class CartCustomer {
           : '';
       }
 
-      if (!order.status.checked) {
+      if (order.status && !order.status.checked) {
         val = order.address;
       }
 
@@ -161,7 +169,13 @@ export class CartCustomer {
     for (let i in window.parent.user.orders) {
       if (!Object.keys(window.parent.user.orders[i].data)[0]) continue;
       order = window.parent.user.orders[i];
-      if (order.status && order.status.deleted) continue;
+      if (
+        order.status &&
+        order.status.deleted &&
+        !order.status.ordered &&
+        !order.status.approved
+      )
+        continue;
       let dict;
 
       let element = $(that).find('td.title');
@@ -177,26 +191,62 @@ export class CartCustomer {
 
       let promise = new Promise((resolve, reject) => {
         window.parent.db.GetSupplier(
-          window.parent.user.date,
+          order.date,
           order.supuid,
           async function (sup) {
+            let wt;
+            if (typeof sup.profile.worktime === 'object') {
+              wt = _.values(
+                _.find(sup.profile.worktime, (item) => {
+                  const day = moment(window.parent.user.date).weekday();
+                  if (item['w_' + day]) {
+                    return item;
+                  }
+                })
+              )[0];
+
+              if (!wt) wt = Object.values(sup.profile.worktime[0])[0];
+            } else if (typeof sup.profile.worktime === 'string') {
+              const ar = sup.profile.worktime.split(' - ');
+              wt = [parseInt(ar[0]), parseInt(ar[1])];
+            } else {
+              wt = ['', ''];
+            }
+
+            let ddar = '';
             let sel_period =
               "<div style='margin-right: 10px; margin-left: 10px;'>" +
-              "<input type='date' id='ts_date' style='width:100%;border-width: 0px;border-bottom-width: 1px;text-align:center;'>" +
-              "<div class='dropdown'  style='width:100%;'>" +
-              "<div class='sel_period btn btn-block dropdown-toggle' data-toggle='dropdown'" +
-              "    style='float:left;background-color:white;font-size: normal'>06:00 - 22:00" +
-              '</div>' +
-              "<div class='period_list dropdown-menu'>" +
-              "<a class='dropdown-item' href='#'>06:00 - 08:00</a>" +
-              "<a class='dropdown-item' href='#'>08:00 - 10:00</a>" +
-              "<a class='dropdown-item' href='#'>10:00 - 12:00</a>" +
-              "<a class='dropdown-item' href='#'>12:00 - 14:00</a>" +
-              "<a class='dropdown-item' href='#'>14:00 - 16:00</a>" +
-              "<a class='dropdown-item' href='#'>16:00 - 18:00</a>" +
-              "<a class='dropdown-item' href='#'>18:00 - 20:00</a>" +
-              "<a class='dropdown-item' href='#'>20:00 - 22:00</a>" +
-              '</div></div></div>';
+              "<span class='ts_date' style=''></span>" +
+              "<div class='dropdown'  style='width:100%;'>";
+
+            if (wt[0] && wt[1]) {
+              for (let i = 8; i < 22; i = i + 2) {
+                if (i < wt[0] || i + 2 > wt[1]) continue;
+
+                ddar +=
+                  "<a class='dropdown-item' href='#'>" +
+                  i +
+                  ':00 - ' +
+                  (i + 2) +
+                  ':00</a>';
+              }
+
+              sel_period +=
+                (order.period
+                  ? "<div class='sel_period'>" + order.period + '</div>'
+                  : "<div class='sel_period btn btn-block dropdown-toggle' data-toggle='dropdown'>" +
+                    wt[0] +
+                    ':00' +
+                    ' - ' +
+                    wt[1] +
+                    ':00' +
+                    '</div>' +
+                    "<div class='period_list dropdown-menu'>" +
+                    ddar +
+                    '</div>') +
+                '</div>' +
+                '</div> ';
+            }
 
             let adr = defineAddressTextarea(sup);
 
@@ -236,7 +286,7 @@ export class CartCustomer {
                         "<tr class='supuid " +
                           order.supuid +
                           "' style='font-weight: bold;'>" +
-                          "<td class='ord_num tablesorter-no-sort'></td>" +
+                          "<td class='tablesorter-no-sort'></td>" +
                           '<td></td>' +
                           "<td class='qnty'></td>" +
                           "<td class='price'></td>" +
@@ -249,29 +299,14 @@ export class CartCustomer {
                           "' profile_type='" +
                           sup.profile.type +
                           "'  tyle='text-align: center;'>" +
-                          "<td colspan='1' style='display: inline-flex;'>" +
+                          "<td colspan='1' style='display: inline-flex; position:relative'>" +
+                          "<div class='ord_num'></div>" +
                           "<i class='order_delivery' style='display:none;'>" +
                           window.parent.sysdict.getDictValue(
                             window.parent.sets.lang,
                             'ждем подтверждения'
                           ) +
                           '</i>' +
-                          '<button type="button" class="pickup_order order" onclick="window.cart_cus.OnClickPickup(this)"' +
-                          ' style="display:none;">' +
-                          window.parent.sysdict.getDictValue(
-                            window.parent.sets.lang,
-                            'Зарезервировать'
-                          ) +
-                          '' +
-                          '</button>' +
-                          '<button type="button" class="delivery_order order" onclick="window.cart_cus.OnClickDelivery(this)"' +
-                          ' style="display:none;">' +
-                          window.parent.sysdict.getDictValue(
-                            window.parent.sets.lang,
-                            'Заказать доставку'
-                          ) +
-                          '' +
-                          '</button>' +
                           '</td>' +
                           "<td  class='address tablesorter-no-sort' style='color: #0033cc; " +
                           "align-content: center;justify-content: flex-start;align-items: flex-start;'>" +
@@ -281,6 +316,24 @@ export class CartCustomer {
                           sel_period +
                           '</td > ' +
                           "<td class='ord_sum tablesorter-no-sort'>0</td>" +
+                          '<td>' +
+                          // '<button type="button" class="delivery_order order" onclick="window.cart_cus.OnClickDelivery(this)"' +
+                          // ' style="display:none;">' +
+                          // window.parent.sysdict.getDictValue(
+                          //   window.parent.sets.lang,
+                          //   'Заказать доставку'
+                          // ) +
+                          // '' +
+                          // '</button>' +
+                          '<button type="button" class="pickup_order order" onclick="window.cart_cus.OnClickPickup(this)"' +
+                          ' style="display:none;">' +
+                          window.parent.sysdict.getDictValue(
+                            window.parent.sets.lang,
+                            'Зарезервировать'
+                          ) +
+                          '' +
+                          '</button>' +
+                          '</td> ' +
                           '</tr>'
                       ).appendTo($('tbody'));
                     }
@@ -309,15 +362,15 @@ export class CartCustomer {
                         "'>" +
                         "<td class='tablesorter-no-sort'>" +
                         '<div>' +
-                        "<img class='col' src='" +
+                        "<img src='" +
                         that.image_path +
                         src +
-                        "' style='width: auto; max-height: 80px'>" +
+                        "' style='width: auto; max-height: 75px'>" +
                         '</div>' +
                         '</td>' +
                         '</td>' +
-                        "<td class='row'>" +
-                        "<div class='col'>" +
+                        '<td>' +
+                        '<div>' +
                         '<div class="item_title">' +
                         dict.getValByKey(window.parent.sets.lang, item) +
                         '</div>' +
@@ -351,10 +404,10 @@ export class CartCustomer {
                         '</div>' +
                         '</td>' +
                         "<td class='price'>" +
-                        ord.price +
+                        parseFloat(ord.price).toFixed(2) +
                         '</td>' +
                         "<td class='comments tablesorter-no-sort'>" +
-                        "<textarea  class='tacomment' rows='4' style='width: 95%' placeholder='" +
+                        "<textarea  class='tacomment' rows='3' style='width: 95%' placeholder='" +
                         window.parent.sysdict.getDictValue(
                           window.parent.sets.lang,
                           'комментарии'
@@ -370,11 +423,11 @@ export class CartCustomer {
 
                     if (order.data[item].status) {
                       if (
-                        order.data[item].status === 'ordered' ||
-                        order.data[item].status === 'approved'
+                        order.data[item].status['ordered'] ||
+                        order.data[item].status['approved']
                       )
                         insert.insertAfter($('tr.supuid.' + order.supuid));
-                      else if (order.data[item].status === 'checked')
+                      else if (order.data[item].status['checked'])
                         insert.insertBefore(
                           $("tr.pay_supuid[supuid='" + order.supuid + "']")
                         );
@@ -442,28 +495,35 @@ export class CartCustomer {
 
               $('tr[supuid="' + order.supuid + '"]:first .comments').attr(
                 'rowspan',
-                $('tr[supuid="' + order.supuid + '"]').length
+                1
               );
 
-              $(
-                'tr[supuid="' + order.supuid + '"]:not(:first) .tacomment'
-              ).remove();
-              $('tr[supuid="' + order.supuid + '"] .tacomment').css(
-                'height',
-                $('tr[supuid="' + order.supuid + '"] .tacomment')
-                  .parent()
-                  .css('height')
-              );
+              // $(
+              //   'tr[supuid="' + order.supuid + '"]:not(:first) .tacomment'
+              // ).remove();
+              // $('tr[supuid="' + order.supuid + '"] .tacomment').css(
+              //   'height',
+              //   $('tr[supuid="' + order.supuid + '"] .tacomment')
+              //     .parent()
+              //     .css('height')
+              // );
 
-              if (order.status && order.status.approved) {
+              if (
+                order.status &&
+                (order.status.approved || order.status.ordered)
+              ) {
                 $(
                   '.order_delivery',
                   $("tr.pay_supuid[supuid='" + order.supuid + "']")
                 )
                   .css('display', '')
-                  .addClass('fa fa-handshake-o')
+                  .addClass(
+                    order.status.approved
+                      ? 'fa fa-handshake-o'
+                      : 'icofont-sand-clock'
+                  )
                   .text('');
-                $('tr.' + order.supuid)
+                $("tr.pay_supuid[supuid='" + order.supuid + "']")
                   .find('.ord_num')
                   .text(order.number);
               }
@@ -575,11 +635,11 @@ export class CartCustomer {
               await del_prom;
             }
 
-            $('.sel_period').text(
-              sup.profile.worktime ? sup.profile.worktime : '06:00 - 22:00'
-            );
+            // $('.sel_period').text(
+            //   sup.profile.worktime ? sup.profile.worktime : '06:00 - 22:00'
+            // );
 
-            if (order.period) $('.sel_period').text(order.period);
+            // if (order.period) $('.sel_period').text(order.period);
 
             $('.dropdown-item').on('click', function (ev) {
               $(ev.target)
@@ -589,8 +649,8 @@ export class CartCustomer {
             });
 
             $("tr[supuid='" + order.supuid + "']")
-              .find('input#ts_date')
-              .val(moment(window.parent.user.date).format('YYYY-MM-DD'));
+              .find('.ts_date')
+              .text(moment(window.parent.user.date).format('YYYY-MM-DD'));
 
             resolve();
           }
@@ -610,7 +670,7 @@ export class CartCustomer {
 
   OnChangePeriod(ev) {}
 
-  OnClickPickup(but) {
+  async OnClickPickup(but) {
     let supuid = $(but).closest('tr').attr('supuid');
     if (
       $(but).closest('tr').attr('profile_type') === 'deliver' &&
@@ -631,10 +691,7 @@ export class CartCustomer {
     order.comments = $('.order_item[supuid="' + supuid + '"] .tacomment').val();
     order.status = { ordered: window.parent.user.date };
 
-    _.forEach(order.data, async function (value, key) {
-      if (order.status.checked)
-        order.status = { ordered: window.parent.user.date };
-
+    _.forEach(order.data, function (value, key) {
       for (let p in order.data) {
         let key = $('[title="' + p + '"] .qnty').attr('unit');
         //let key = _.findKey(order.data[p].ordlist,'qnty');
@@ -644,22 +701,29 @@ export class CartCustomer {
           );
         }
       }
-      let promise = new Promise((resolve, reject) => {
-        window.parent.user.PublishOrder(order, (data) => {
-          resolve(data);
-        });
-      });
-      let data = await promise;
-      window.parent.user.UpdateOrderLocal(data, () => {});
 
-      $('.order', $('tr.pay_supuid[supuid="' + supuid + '"]')).css(
+      $('.order_delivery', $("tr.pay_supuid[supuid='" + order.supuid + "']"))
+        .css('display', '')
+        .addClass('icofont-sand-clock')
+        .text('');
+
+      $('.pickup_order', $("tr.pay_supuid[supuid='" + order.supuid + "']")).css(
         'display',
         'none'
       );
+
       $('.loader').css('display', 'none');
       $(but).siblings('.order_delivery').css('display', '');
       $('th[tabindex="0"]')[0].scrollIntoView();
     });
+
+    let promise = new Promise((resolve, reject) => {
+      window.parent.user.PublishOrder(order, (data) => {
+        resolve(data);
+      });
+    });
+    let data = await promise;
+    window.parent.user.UpdateOrderLocal(data, () => {});
   }
 
   async OnClickDelivery(but) {
@@ -700,20 +764,16 @@ export class CartCustomer {
       return;
     }
 
-    let promise = new Promise((resolve, reject) => {
-      window.parent.user.PublishOrder(order, (data) => {
-        resolve(data);
-      });
-    });
-
-    let data = await promise;
-
-    window.parent.user.UpdateOrderLocal(data, () => {});
-
     $(
-      '.pickup_order, .delivery_order',
+      '.pickup_order, ._delivery_order',
       $('tr.pay_supuid[supuid="' + supuid + '"]')
     ).css('display', 'none');
+
+    $('.order_delivery', $("tr.pay_supuid[supuid='" + order.supuid + "']"))
+      .css('display', '')
+      .addClass('icofont-sand-clock')
+      .text('');
+
     $('.loader').css('display', 'none');
     $(but).siblings('.order_delivery').css('display', '');
     $('th[tabindex="0"]')[0].scrollIntoView();
@@ -739,10 +799,7 @@ export class CartCustomer {
     order.comments = $('.order_item[supuid="' + supuid + '"] .tacomment').val();
     order.status = { ordered: window.parent.user.date };
 
-    _.forEach(order.data, async function (value, key) {
-      if (order.status.checked)
-        order.status = { ordered: window.parent.user.date };
-
+    _.forEach(order.data, function (value, key) {
       for (let p in order.data) {
         let key = $('[title="' + p + '"] .qnty').attr('unit');
         //let key = _.findKey(order.data[p].ordlist,'qnty');
@@ -752,13 +809,6 @@ export class CartCustomer {
           );
         }
       }
-      let promise = new Promise((resolve, reject) => {
-        window.parent.user.PublishOrder(order, (data) => {
-          resolve(data);
-        });
-      });
-      let data = await promise;
-      window.parent.user.UpdateOrderLocal(data, () => {});
 
       $('.pickup_order', $('tr.pay_supuid[supuid="' + supuid + '"]')).css(
         'display',
@@ -768,6 +818,14 @@ export class CartCustomer {
       $(but).siblings('.order_delivery').css('display', '');
       $('th[tabindex="0"]')[0].scrollIntoView();
     });
+
+    let promise = new Promise((resolve, reject) => {
+      window.parent.user.PublishOrder(order, (data) => {
+        resolve(data);
+      });
+    });
+    let data = await promise;
+    window.parent.user.UpdateOrderLocal(data, () => {});
   }
 
   onIncreaseClick(el, supuid, order) {
@@ -852,7 +910,7 @@ export class CartCustomer {
   }
 
   DeleteOrder(el) {
-    let that = this;
+    const that = this;
     if (
       confirm(
         window.parent.sysdict.getDictValue(
@@ -861,22 +919,21 @@ export class CartCustomer {
         )
       )
     ) {
-      window.parent.user.DeleteOrder(
-        that.date,
-        $(el).closest('tr').attr('title'),
-        function () {
-          $(el).closest('tr').find('.qnty').text('0');
-          that.SaveOrderItems(() => {
-            $('tbody').empty();
-            that.FillOrders();
+      $(el).closest('tr').find('.qnty').text('0');
+      that.SaveOrderItems(async (order) => {
+        let promise = new Promise((resolve, reject) => {
+          window.parent.user.PublishOrder(order, (data) => {
+            resolve(data);
           });
-          return;
-        }
-      );
+        });
+        let data = await promise;
+        $('tbody').empty();
+        that.FillOrders();
+      });
     }
   }
 
-  async SaveOrderItems(cb) {
+  SaveOrderItems(cb) {
     for (let o in window.parent.user.orders) {
       let order = window.parent.user.orders[o];
       for (let p in order.data) {
@@ -896,11 +953,11 @@ export class CartCustomer {
       // order.address = $('.delivery_adr').val();
 
       window.parent.db.SetObject('orderStore', order, function (res) {});
+
+      if (cb) cb(order);
     }
 
     window.parent.user.SetOrdCnt();
-
-    if (cb) cb();
   }
 }
 

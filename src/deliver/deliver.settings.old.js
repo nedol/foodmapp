@@ -34,7 +34,7 @@ class DeliverSettings {
   }
 
   Open() {
-    let that = this;
+    const that = this;
 
     $('input').on('change', function (ev) {
       $(this).attr('changed', true);
@@ -43,7 +43,7 @@ class DeliverSettings {
 
   OnSubmit(form) {
     var urlencode = require('urlencode');
-    let that = this;
+    const that = this;
     if (!$(form).find('#email').val()) {
       $(form).find('#email').focus();
       return;
@@ -168,7 +168,7 @@ class DeliverSettings {
   }
 
   GetProfileItems() {
-    let that = this;
+    const that = this;
     $('.tab-pane').each(function (i, tab) {
       if ($(tab).attr('id') === 'profile') {
         that.db.GetSettings(function (data) {

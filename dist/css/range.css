@@ -1,0 +1,179 @@
+        .mp_open {
+            margin-right: 10px;
+            min-width: 25px;
+            color: rgb(57, 137, 206);
+            border-width: 0;
+            background-color: transparent;
+        }
+
+        .mp_open[type='deliver'] {
+            transform: scale(1.6, 2);
+        }
+
+        .tooltip {
+            font-family: Georgia;
+            font-size: 20px;
+        }
+
+        .tooltip-inner {
+            max-width: 500px !important;
+        }
+
+        #cat_incl {
+            position: absolute;
+            width: 100%;
+            bottom: 0px;
+        }
+
+        .sub_cat {
+            position: absolute;
+            transform: translate3d(0px, -66px, 0px);
+            top: -25px;
+            left: 0px;
+            will-change: transform;
+        }
+
+        .categories {
+            display: flex;
+            position: relative;
+            overflow-x: auto;
+            overflow-y: clip;
+            -webkit-overflow-scrolling: touch;
+            padding: 2px;
+            padding-left: 30px;
+            width: 100%;
+            /* bottom: auto; */
+            background-color: white;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        .cat_container{
+              display: flex;
+              position: relative;
+              top: 0px;
+              height: 50px;
+              width: 169%;
+              background-color: white;
+              z-index: 1001;
+        }
+
+        .main_category {
+            /*margin-left: 25px;*/
+            /*margin-right: 25px;*/
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 45px;
+            width: 45px;
+        }
+
+        .category {
+            margin-left: 25px;
+            margin-right: 25px;
+            /*padding-left: 10px;*/
+            /*padding-right: 10px;*/
+            height: 40px;
+            width: 40px;
+            position: relative;
+            top: 1px;
+            border-width: 0;
+        }
+
+
+        .dropup {
+            display: inline-block !important;
+            position: relative;
+            margin-right: 10px;
+            margin-left: 5px;
+            /* text-align: center; */
+        }
+
+        .cat_container>div {
+            display: inline-block !important;
+            position: relative;
+            margin-right: 20px;
+            margin-left: 20px;
+            /* text-align: center; */
+        }
+
+        .dropdown-menu{
+            /* width: 350px; */
+            /* display: flex !important; */
+            position: absolute;
+            top: 13px !important;
+            inset: auto auto 47px 0px;
+            margin: 11px !important;
+            /* transform: translate3d(0px, -42px, 0px); */
+            /* height: 125%; */
+            transform: translate3d(-19px, -28px, 25px) !important;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            background-color: #ccc !important;
+            white-space: nowrap;
+        }
+        ul[data-popper-placement="top-start"]{
+            margin: -17px !important;
+            height: 68px;
+            position: absolute;
+            inset: auto auto 0px 0px;
+            margin: 0px;
+            transform: translate3d(0px, -47px, 0px);
+        }
+        
+        ::placeholder {
+            color: #b21312 !important;
+            font-weight: normal;
+            font-size: large;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+        }
+
+        .title {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            right: 0;
+            color: #273be6;
+            background-color: rgba(243, 243, 243, 0);
+            font-size: small;
+            /*-webkit-text-stroke: .5px #ffffff;*/
+            pointer-events: none;
+            margin: auto;
+            text-align: center;
+            line-height: 6px;
+        }
+
+        .cat_div {
+            display: inline-block;
+            background-color: #cccccc !important;
+            position: relative;
+            top: 0px;
+            border-radius: 3px;
+        }
+
+        .badge {
+            position: absolute;
+            top: 0;
+            right: 0px;
+            --bs-badge-color: blue !important;
+
+        }
+        .order_amnt {
+                position: absolute;
+            top: 0;
+            right: 0px;
+            --bs-badge-color: blue !important;
+            color: white !important;
+        }
+
+        input {
+            cursor: pointer;
+        }
+
+        button[disabled] span {
+            color: #6c757d !important;
+        }
+
+        .cat_menu {
+            margin-left: 10px;
+            margin-right: 10px;
+        }

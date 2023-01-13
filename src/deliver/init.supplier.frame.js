@@ -17,7 +17,7 @@ import { utils } from '../utils/utils';
 
 class OfferOrder {
   constructor() {
-    let that = this;
+    const that = this;
     this.changed = false;
     this.offer;
 
@@ -35,7 +35,7 @@ class OfferOrder {
   }
 
   InitSupplierOffer(obj, targ_title) {
-    let that = this;
+    const that = this;
     $('.loader').css('display', 'block');
 
     if (this.supplier_frame[0].contentWindow.InitCustomerOrder) {

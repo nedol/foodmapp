@@ -397,7 +397,7 @@ export class Utils {
   HandleFileSelect(evt, files, cb) {
     evt.stopPropagation();
     evt.preventDefault();
-    let that = this;
+    const that = this;
     this.reader = new FileReader();
 
     if (!files && evt.originalEvent.dataTransfer)

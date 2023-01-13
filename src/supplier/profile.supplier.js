@@ -1,10 +1,12 @@
 'use strict';
 
-require('webpack-jquery-ui');
-require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
-require('../../lib/jquery-comments-master/js/jquery-comments.js');
-require('../../lib/bootstrap-rating/bootstrap-rating.min.js');
+// require('webpack-jquery-ui');
+// require('webpack-jquery-ui/css');
+// require('jquery-ui-touch-punch');
+// require('../../lib/jquery-comments-master/js/jquery-comments.js');
+// require('../../lib/bootstrap-rating/bootstrap-rating.min.js');
+
+var validate = require('validate-vat');
 
 // global.jQuery = require('jquery');
 $.getScript(
@@ -182,7 +184,7 @@ export class ProfileSupplier {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
     $('input.rating').on('change', function (ev) {
       let data_obj = {
         proj: 'd2d',
@@ -214,11 +216,34 @@ export class ProfileSupplier {
     $('.rating').attr('data-readonly', 'true');
   }
 
-  SaveProfile(uid, psw) {
+  async SaveProfile(uid, psw) {
     let _ = require('lodash');
-    let that = this;
+    const that = this;
     // if(!this.changed)//TODO:test uncomment
     //     return;
+    const vat = $('#vat').val();
+    if (vat) {
+      let promise = new Promise(function (resolve, reject) {
+        validate(
+          vat.substring(0, 2),
+          vat.substring(2, 8),
+          function (err, validationInfo) {
+            resolve(validationInfo.valid);
+          }
+        );
+      });
+      if (!(await promise)) {
+        alert('VAT number is not valid');
+        return;
+      } else {
+        if (
+          validationInfo.name.toLowerCase() !== $('#name').val().toLowerCase()
+        )
+          alert('VAT number is not valid');
+        return;
+      }
+    }
+
     utils.createThumb_1($('.avatar')[0], 70, 70, function (thmb) {
       let data_post = '';
       data_post = {
@@ -236,6 +261,7 @@ export class ProfileSupplier {
           name: $('#name').val(),
           worktime: $('#worktime').val(),
           mobile: $('#mobile').val(),
+          vat: $('#vat').val(),
           place: $('#place').val(),
         },
       };

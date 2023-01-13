@@ -21,7 +21,7 @@ export class OfferSupplier {
   }
 
   InitSupplierOffer() {
-    let that = this;
+    const that = this;
 
     this.off_frame.css('display', 'block');
     if (that.off_frame[0].contentWindow.InitSupplierOffer) {
@@ -74,7 +74,7 @@ export class OfferSupplier {
   }
 
   AddOfferItem(ev) {
-    let that = ev.data;
+    const that = ev.data;
 
     // if($('.menu_item').length>=parseInt($('#items_limit').val())) {
     //    return true;
@@ -288,7 +288,7 @@ export class OfferSupplier {
   }
 
   GetOfferItems(lang) {
-    let that = this;
+    const that = this;
     let offerObj = { local: {}, remote: {} };
     that.arCat = [];
 
@@ -458,7 +458,7 @@ export class OfferSupplier {
   }
 
   CloseMenu(ev) {
-    let that = ev.data;
+    const that = ev.data;
     //if(ev.data.changed)
     let items = that.SaveOffer(ev, window.sets.lang);
 

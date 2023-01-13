@@ -1,0 +1,5 @@
+{
+    "host_port": "https://delivery-angels.store/",
+    "host_ws": "wss://nedol.ru/web-socket",
+    "image_path": "https://nedol.ru/server/images/"
+}

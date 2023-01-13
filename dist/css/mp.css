@@ -1,11 +1,13 @@
-
+.mp{
+    width: 100%;
+}
 .title_div{
     position: absolute;
     min-width: 100px;
     left:0;
     bottom: 0;
     text-align: center;
-    margin:10px;
+    margin: 15px;
     /* height: 32px; */
     /* background-image: linear-gradient(white, #c5c5c5,transparent); */
     /* font-family: 'Roboto', 'fallback font 2', 'fallback font 2', sans-serif; */
@@ -17,6 +19,12 @@
     z-index: 100;
 }
 
+.mp_categories{
+    overflow-x: auto;
+    white-space: nowrap;
+    height: 58px;
+}
+
 #address_loc{
     position: absolute;
     top: 0;
@@ -26,3 +34,50 @@
     height: 100%;
     background-color: transparent
 }
+
+#slider{
+    height: 3px;
+}
+
+.noUi-horizontal .noUi-handle {
+    width: 30px;
+    height: 30px;
+    right: -17px;
+    top: -15px;
+    border-radius: 50%;
+}
+
+
+.cat_div.active {
+    background-color: darkgrey;
+    /* width: 10%; */
+}
+#add_tab_li{
+    visibility: hidden;
+}
+
+.accicon{
+    position: absolute;
+    right: 20px;
+    top: 30px;
+    /* margin: 12px; */
+}
+
+.search_div{
+    position: relative;
+    height: 157px;
+    top: 5px;
+    overflow-x: scroll;
+    width: 963px;
+    /* white-space: nowrap; */
+    z-index: 3000;
+    background-color: aqua;
+}
+
+#slider{
+    position: relative;
+    max-width: 75%;
+    margin: 0 auto;
+    /* right: 12%; */
+}
+

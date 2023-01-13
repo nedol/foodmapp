@@ -27,7 +27,7 @@ export class OfferDeliver {
   }
 
   InitDeliverOffer(obj) {
-    let that = this;
+    const that = this;
 
     this.location = window.user.offer.stobj.location;
     $('#deliver_frame_container').css('display', 'block');

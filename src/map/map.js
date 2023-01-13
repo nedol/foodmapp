@@ -11,11 +11,13 @@ require('jquery-ui-touch-punch');
 let moment = require('moment/moment');
 // let shortHash = require('shorthash');
 // let md5 = require('md5');
+import BingMaps from 'ol/source/BingMaps.js';
 
 import Map from 'ol/map';
 import View from 'ol/view';
 import Layer from 'ol/layer/layer';
 import Tile from 'ol/layer/tile';
+import TileLayer from 'ol/layer/tile';
 import Cluster from 'ol/source/cluster';
 
 import XYZ from 'ol/source/xyz';
@@ -61,11 +63,11 @@ export class OLMap {
     window.sets.app_mode = 'd2d';
 
     this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('delivery-angels'))
-      this.path = 'https://delivery-angels.ru/server';
-    else this.path = host_port;
+    if (window.con_param.host_port.includes('delivery-angels'))
+      this.path = 'https://delivery-angels.store/server';
+    else this.path = window.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.con_param.image_path;
 
     window.sets.app_mode = 'd2d';
 
@@ -75,19 +77,28 @@ export class OLMap {
 
     if (!this.ol_map) {
       this.ol_map = new Map({
-        // layers: [
-        //     new Tile({
-        //         source: new OSM()
-        //     })
-        // ],
         layers: [
-          new Tile({
-            preload: 4,
-            source: new XYZ({
-              url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibmVkb2wiLCJhIjoiY2s3ejJzbXViMDF1bTNvbXRzZ3ZqMnFqNCJ9.QGsoAD2JcX-6bmpbKjvmWw',
+          new TileLayer({
+            preload: Infinity,
+            source: new BingMaps({
+              key: window.sets.bing_key,
+              imagerySet: 'Road',
             }),
           }),
         ],
+        // layers: [
+        //   new Tile({
+        //     source: new OSM(),
+        //   }),
+        // ],
+        // layers: [
+        //   new Tile({
+        //     preload: 4,
+        //     source: new XYZ({
+        //       url: 'https://api.mapbox.com/styles/v1/mapbox/streets-v11/tiles/256/{z}/{x}/{y}?access_token=pk.eyJ1IjoibmVkb2wiLCJhIjoiY2s3ejJzbXViMDF1bTNvbXRzZ3ZqMnFqNCJ9.QGsoAD2JcX-6bmpbKjvmWw',
+        //     }),
+        //   }),
+        // ],
         //interactions: interaction.defaults({altShiftDragRotate: false, pinchRotate: false}),
         controls: control
           .defaults({
@@ -121,7 +132,7 @@ export class OLMap {
   }
 
   Init(lat, lon, cb) {
-    let that = this;
+    const that = this;
 
     that.lat_param = lat;
     that.lon_param = lon;
@@ -223,7 +234,7 @@ export class OLMap {
   }
 
   EmptyMap() {
-    let that = this;
+    const that = this;
     let layers = this.ol_map.getLayers();
 
     layers.forEach(function (layer, i, layers) {
@@ -260,7 +271,7 @@ export class OLMap {
   }
 
   SetFeatures(objs) {
-    let that = this;
+    const that = this;
     for (let o in objs) {
       //alert(JSON.stringify(objs[o]));
       if (objs[o].deleted) continue;
@@ -344,13 +355,43 @@ export class OLMap {
             continue;
           }
 
+          // if (objs[o].profile.type.toLowerCase() === 'foodtruck') {
+          //   var p1 = ol.proj.transform(
+          //     [103.986908, 1.353199],
+          //     'EPSG:4326',
+          //     'EPSG:3857'
+          //   );
+          //   var p2 = ol.proj.transform(
+          //     [103.986498, 1.353864],
+          //     'EPSG:4326',
+          //     'EPSG:3857'
+          //   );
+          //   var p3 = ol.proj.transform(
+          //     [103.986498, 1.353864],
+          //     'EPSG:4326',
+          //     'EPSG:3857'
+          //   );
+          //   var p4 = ol.proj.transform(
+          //     [103.988247, 1.358454],
+          //     'EPSG:4326',
+          //     'EPSG:3857'
+          //   );
+          //   feature = new ol.Feature({
+          //     geometry: new ol.geom.MultiLineString([
+          //       [p1, p2],
+          //       [p4, p3],
+          //     ]),
+          //     name: 'camera',
+          //   });
+          // }
+
           feature.id_ = objs[o].uid + objs[o].date;
           source.addFeature(feature);
 
-          let dist = 50;
+          let dist = 100;
 
           if (objs[o].profile.type.toLowerCase() === 'foodtruck') {
-            dist = 0;
+            dist = 20;
           }
           objs[o].img = './images/ic_' + tab + '.png';
           let clusterSource = new Cluster({
@@ -440,7 +481,7 @@ export class OLMap {
   }
 
   GetObjectsFromStorage(area) {
-    let that = this;
+    const that = this;
     let period = $('.sel_period').text().split(' - ');
     $('.cat_cnt').text('0');
 
@@ -482,7 +523,7 @@ export class OLMap {
               );
 
               //thomaskekeisen.de/en/blog/array-date-sort-lodash-momentjs/
-              https: that.SetFeatures(features);
+              that.SetFeatures(features);
               that.carousel.SetFeatures(features);
             }
           }
@@ -492,10 +533,14 @@ export class OLMap {
       //delivers
 
       window.db.GetAllSuppliers(window.user.date, function (features) {
-        var delivers = _.remove(features, function (f) {
-          return f.profile.type === 'deliver';
+        _.forEach(features, function (f) {
+          if (
+            f.profile.type === 'marketer' &&
+            Date(window.user.date) > Date(f.date)
+          ) {
+            // window.db.SetObject('supplierStore', f, function (cat) {});
+          }
         });
-        that.SetFeatures(delivers);
       });
     } else {
       window.db.GetAllSuppliers(window.user.date, function (features) {
@@ -505,7 +550,7 @@ export class OLMap {
   }
 
   OnItemClick(el) {
-    let that = this;
+    const that = this;
     this.geo.StopLocation();
     window.db.GetSupplier(
       moment(window.user.date).format('YYYY-MM-DD'),
@@ -549,7 +594,7 @@ export class OLMap {
   }
 
   FlyToLocation(location) {
-    let that = this;
+    const that = this;
     this.animate.flyTo(location, function () {
       //Marker.overlay.setPosition(data.data[data.data.length-1]);
       let latlon = proj.toLonLat(location);
@@ -559,7 +604,7 @@ export class OLMap {
   }
 
   MoveToLocation(location, orig, cb) {
-    let that = this;
+    const that = this;
     if (
       (window.user.constructor.name === 'Supplier' ||
         window.user.constructor.name === 'Deliver') &&
@@ -644,7 +689,7 @@ export class OLMap {
   }
 
   mapEvents() {
-    let that = this;
+    const that = this;
 
     $('#map').on('focusout', () => {
       console.log();
@@ -727,7 +772,7 @@ export class OLMap {
   }
 
   CreateOverlay(obj, cb) {
-    let that = this;
+    const that = this;
     let fd_frame = $('#fd_frame_tmplt').clone();
     $(fd_frame).attr('id', obj.uid);
     $(fd_frame).addClass('fd_frame');
@@ -780,7 +825,7 @@ export class OLMap {
   }
 
   CreateCircle(offer) {
-    let that = this;
+    const that = this;
     let layer;
     if (that.layers.circleLayer) {
       layer = that.layers.circleLayer;

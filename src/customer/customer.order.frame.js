@@ -5,7 +5,7 @@ require('webpack-jquery-ui/css');
 require('jquery-ui');
 require('jquery-ui-touch-punch');
 
-require('bootstrap');
+// require('bootstrap');
 // require('bootstrap-select');
 require('../../lib/bootstrap-rating/bootstrap-rating.js');
 require('../../lib/jquery-comments-master/js/jquery-comments.js');
@@ -24,19 +24,18 @@ var moment = require('moment/moment');
 
 import * as _ from 'lodash';
 
-$(window).on('load', () => {
-  let iOSdevice =
-    !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
-  if (iOSdevice)
-    $('[role="tablist"] .nav-link').each((i, e) => {
-      if (!$(e).attr('href')) $(e).attr('href', $(e).data('target'));
-    });
+$(window.parent).on('beforeunload', function () {
+  alert('Do you really want to close?');
 });
 
 $(document).on('readystatechange', function () {
   if (document.readyState !== 'complete') {
     return;
   }
+
+  document.addEventListener('DOMContentLoaded', (event) => {
+    console.log('DOM fully loaded and parsed');
+  });
 
   // if(window.parent && window.parent.sets.css)
   //     $('#cus_link').attr('href', '../css/' + window.parent.sets.css+'.css?v='+window.parent.v);
@@ -58,12 +57,9 @@ $(document).on('readystatechange', function () {
 
 export class CustomerOrder {
   constructor() {
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru'))
-      this.path = 'https://delivery-angels.store/server';
-    else this.path = host_port;
+    this.path = window.parent.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.parent.con_param.image_path;
 
     this.editor = new CustomerOrderFrameEditor();
     this.editor.path = this.path;
@@ -122,10 +118,42 @@ export class CustomerOrder {
     $('input').attr('title', '');
     $('#sup_name').val(profile.name);
     $('#sup_email').val(profile.email);
-    $('#sup_mobile').val(profile.mobile);
+    if (profile.mobile) {
+      $('#sup_mobile').val(profile.mobile);
+    } else {
+      $('#sup_mobile').css('display', 'none');
+      $('#sup_mobile').siblings('label').css('display', 'none');
+    }
     $('#sup_address').val(profile.address);
     $('#sup_place').val(obj.address ? obj.address : profile.address);
-    $('#sup_worktime').val(profile.worktime);
+
+    let wt =
+      '<div  class="grid-item"></div>' +
+      '<div  class="grid-item">from:</div>' +
+      '<div  class="grid-item">to:</div>';
+    $('#sup_worktime').append(wt);
+
+    _.forEach(profile.worktime, (val) => {
+      if (val[Object.keys(val)[0]][1] || val[Object.keys(val)[0]][1]) {
+        wt =
+          '<div class="grid-item">' +
+          window.parent.sysdict.getValByKey(
+            window.parent.sets.lang,
+            Object.keys(val)[0]
+          ) +
+          ':' +
+          '</div>' +
+          '<div class="grid-item">' +
+          val[Object.keys(val)[0]][0] +
+          ':00' +
+          '</div>' +
+          '<div class="grid-item">' +
+          val[Object.keys(val)[0]][1] +
+          ':00' +
+          '</div>';
+        $('#sup_worktime').append(wt);
+      }
+    });
   }
 
   InitSupplierReview(sup) {
@@ -253,7 +281,7 @@ export class CustomerOrder {
   }
 
   InitRating() {
-    let that = this;
+    const that = this;
     let data_obj = {
       proj: 'd2d',
       user: window.parent.user.constructor.name.toLowerCase(),
@@ -269,7 +297,7 @@ export class CustomerOrder {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
 
     $('input.rating').on('change', function (ev) {
       let data_obj = {

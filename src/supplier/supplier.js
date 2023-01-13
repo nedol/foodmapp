@@ -3,8 +3,6 @@
 import { Utils } from '../utils/utils';
 let utils = new Utils();
 
-import 'tablesorter/dist/css/theme.default.min.css';
-
 import { OLMap } from '../map/map';
 
 import proj from 'ol/proj';
@@ -31,23 +29,25 @@ import { longTab, doubleTap } from '../utils/utils';
 
 let moment = require('moment/moment');
 
+const dict_data = require('../dict/sys.dict.json');
+
 require('../../lib/DragDropTouch.js');
 require('../../lib/blueimp-load-image/js/load-image.all.min.js');
 
 export class Supplier {
   constructor(set, sup) {
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru')) this.path = 'https://nedol.ru/server';
-    else this.path = host_port;
+    this.path = window.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.con_param.image_path;
 
-    this.date = moment(sup.date).format('YYYY-MM-DD');
+    this.date = sup
+      ? moment(sup.date).format('YYYY-MM-DD')
+      : moment().format('YYYY-MM-DD');
 
     this.user_ovl;
 
     if (sup) {
-      let that = this;
+      const that = this;
 
       this.editor = new OfferSupplier(); //offer editor
 
@@ -68,17 +68,15 @@ export class Supplier {
       });
 
       this.DateTimePickerEvents();
-      $('.dt_val').val(this.date);
-      if (!moment(sup.date).isSame(moment())) {
-        $('.dt_val').css('color', 'red');
-      }
 
       this.map = new OLMap();
+
+      this.InitUser(function () {});
+
       setTimeout(() => {
         this.map.Init(sup.latitude, sup.longitude, () => {});
         this.import = new Import(this.map);
         this.events = new Events(this.map);
-        this.InitUser(function () {});
       }, 300);
 
       this.isShare_loc = false;
@@ -86,118 +84,125 @@ export class Supplier {
   }
 
   DateTimePickerEvents() {
-    let that = this;
+    const that = this;
 
     setTimeout(function () {
-      $('.dt_val').trigger('change');
+      that.ChangeDatePicker(that.date);
+
       that.map.Init(
         that.offer.stobj.latitude,
         that.offer.stobj.longitude,
         () => {}
       );
     }, 1000);
+  }
 
-    $('.dt_val').on('change', this, function (ev) {
-      that.date = moment($(this).val()).format('YYYY-MM-DD');
+  ChangeDatePicker(date) {
+    const that = this;
 
-      if (moment(that.date).isSame(moment(), 'day')) {
-        $(this).css('color', 'black');
-      }
+    that.date = date ? date : moment($(datepicker).val()).format('YYYY-MM-DD');
 
-      that.offer.stobj.date = that.date;
+    that.offer.stobj.date = that.date;
 
-      let layers = that.map.ol_map.getLayers();
-      layers.forEach(function (layer, i, layers) {
-        if (layer.type === 'VECTOR') {
-          if (layer.getSource()) layer.getSource().clear(true);
-          if (layer.getSource().source) {
-            layer.getSource().source.clear(true);
-          }
+    let layers = that.map.ol_map.getLayers();
+    layers.forEach(function (layer, i, layers) {
+      if (layer.type === 'VECTOR') {
+        if (layer.getSource()) layer.getSource().clear(true);
+        if (layer.getSource().source) {
+          layer.getSource().source.clear(true);
         }
-      });
-
-      if (that.map.layers && that.map.layers.circleLayer) {
-        let source = that.map.layers.circleLayer.getSource();
-        source.clear();
       }
-
-      $('#user').css('visibility', 'visible');
-
-      if (that.user_ovl) {
-        that.user_ovl.RemoveOverlay();
-        that.user_ovl = '';
-      }
-
-      //that.map.GetObjectsFromStorage();
-
-      window.db.GetAllOffers(function (res) {
-        let obj = _.find(res, { date: that.date });
-        if (obj) {
-          obj.date = that.date;
-
-          that.offer.stobj = obj;
-
-          window.db.SetObject('offerStore', obj, function (res) {
-            getOfferData();
-          });
-        } else {
-          getOfferData();
-        }
-      });
-
-      function getOfferData() {
-        if (that.offer.stobj.data) {
-          let not_empty = $.grep(that.offer.stobj.data, function (el, i) {
-            return el && !_.isEmpty(el.data);
-          });
-
-          setTimeout(function () {
-            if (that.offer.stobj.longitude && that.offer.stobj.latitude)
-              that.map.MoveToLocation(
-                proj.fromLonLat([
-                  that.offer.stobj.longitude,
-                  that.offer.stobj.latitude,
-                ]),
-                null,
-                function () {}
-              );
-          }, 100);
-        }
-
-        window.user.editor.InitSupplierOffer();
-
-        that.offer.stobj.profile = that.profile.profile;
-        // that.offer.stobj.profile.type = 'marketer';
-        that.offer.stobj.profile.lang = window.sets.lang;
-
-        if (!that.offer.stobj.latitude && !that.offer.stobj.longitude) {
-          that.offer.stobj.latitude = 0.1;
-          that.offer.stobj.longitude = 0.1;
-          that.offer.stobj.location = proj.fromLonLat([0.1, 0.1]);
-          $('#loc_ctrl').trigger('click');
-        }
-
-        $('#user_container')
-          .find('img')
-          .attr('src', that.image_path + that.profile.profile.avatar);
-        $('#user_container').on('click', function () {
-          $(that.editor.off_frame).css('height', '100%');
-          $('#add_item', $(that.editor.off_frame).contents()).css(
-            'display',
-            ''
-          );
-          $('.close_frame', $(that.editor.off_frame).contents())
-            .parent()
-            .css('display', '');
-        });
-      }
-
-      that.import.GetOrderSupplier(function () {});
     });
+
+    if (that.map.layers && that.map.layers.circleLayer) {
+      let source = that.map.layers.circleLayer.getSource();
+      source.clear();
+    }
+
+    $('#user').css('visibility', 'visible');
+
+    if (that.user_ovl) {
+      that.user_ovl.RemoveOverlay();
+      that.user_ovl = '';
+    }
+
+    //that.map.GetObjectsFromStorage();
+
+    window.db.GetAllOffers((res) => {
+      let obj = _.find(res, { date: moment(that.date).format('YYYY-MM-DD') });
+      if (obj) {
+        obj.date = moment(that.date).format('YYYY-MM-DD');
+
+        that.offer.stobj = obj;
+
+        window.db.SetObject('offerStore', obj, function (res) {
+          getOfferData();
+        });
+      } else {
+        getOfferData();
+
+        //if (moment(that.date).isSame(moment(), 'day')) {
+        $('#datepicker', document.activeElement.contentDocument).css(
+          'color',
+          'red'
+        );
+        $('#save_offer', document.activeElement.contentDocument).css(
+          'color',
+          'red'
+        ); //iframe context
+        //}
+      }
+    });
+
+    function getOfferData() {
+      if (that.offer.stobj.data) {
+        let not_empty = $.grep(that.offer.stobj.data, function (el, i) {
+          return el && !_.isEmpty(el.data);
+        });
+
+        setTimeout(function () {
+          if (that.offer.stobj.longitude && that.offer.stobj.latitude)
+            that.map.MoveToLocation(
+              proj.fromLonLat([
+                that.offer.stobj.longitude,
+                that.offer.stobj.latitude,
+              ]),
+              null,
+              function () {}
+            );
+        }, 100);
+      }
+
+      that.import.GetOrderSupplier(function () {
+        window.user.editor.InitSupplierOffer();
+      });
+
+      that.offer.stobj.profile = that.profile.profile;
+      // that.offer.stobj.profile.type = 'marketer';
+      that.offer.stobj.profile.lang = window.sets.lang;
+
+      if (!that.offer.stobj.latitude && !that.offer.stobj.longitude) {
+        that.offer.stobj.latitude = 0.1;
+        that.offer.stobj.longitude = 0.1;
+        that.offer.stobj.location = proj.fromLonLat([0.1, 0.1]);
+        $('#loc_ctrl').trigger('click');
+      }
+
+      $('#user_container')
+        .find('img')
+        .attr('src', that.image_path + that.profile.profile.avatar);
+      $('#user_container').on('click', function () {
+        $(that.editor.off_frame).css('height', '100%');
+        $('#add_item', $(that.editor.off_frame).contents()).css('display', '');
+        $('.close_frame', $(that.editor.off_frame).contents())
+          .parent()
+          .css('display', '');
+      });
+    }
   }
 
   InitUser(cb) {
-    let that = this;
+    const that = this;
 
     let market = 'food';
     if (utils.getParameterByName('market'))
@@ -209,20 +214,13 @@ export class Supplier {
     //
     // });
 
-    $.getJSON(
-      '../src/dict/sys.dict.json?v=' + new Date().valueOf(),
-      function (data) {
-        window.sysdict = new Dict(data);
-        window.sysdict.set_lang(window.sets.lang, $('body'));
-        window.sysdict.set_lang(window.sets.lang, $('#categories'));
+    window.sysdict = new Dict(dict_data);
+    window.sysdict.set_lang(window.sets.lang, $('body'));
+    window.sysdict.set_lang(window.sets.lang, $('.categories'));
 
-        window.db.GetStorage('dictStore', function (rows) {
-          window.dict = new Dict(rows);
-        });
-
-        cb();
-      }
-    );
+    window.db.GetStorage('dictStore', function (rows) {
+      window.dict = new Dict(rows);
+    });
 
     //$('.open_off_editor').on('click', this, this.editor.OpenOffer);
 
@@ -258,8 +256,8 @@ export class Supplier {
           '}'
       );
 
-      if (!event.loc_mode && $('#categories').is(':visible'))
-        $('#categories').slideToggle('slow', function () {
+      if (!event.loc_mode && $('.categories').is(':visible'))
+        $('.categories').slideToggle('slow', function () {
           $('.dropdown-menu').removeClass('show');
         });
 
@@ -371,7 +369,7 @@ export class Supplier {
       }
     } else {
       sup = {
-        date: window.user.date,
+        date: moment(window.user.date).format('YYYY-MM-DD'),
         period: $('.sel_period').text(),
         latitude: loc[0],
         longitude: loc[1],
@@ -399,7 +397,7 @@ export class Supplier {
   }
 
   async PublishOffer(menu, date, data, cb) {
-    let that = this;
+    const that = this;
     if (
       window.user.constructor.name === 'Customer' &&
       !this.offer.stobj.latitude &&
@@ -421,7 +419,7 @@ export class Supplier {
         categories: data.arCat,
         date: date,
         location: [this.offer.stobj.longitude, this.offer.stobj.latitude],
-        address: $('#adr_text', $(document).contents()).text(),
+        address: $('#adr_text').val(),
         offer: urlencode.encode(JSON.stringify(menu)),
         dict: JSON.stringify(window.dict),
       };
@@ -462,10 +460,50 @@ export class Supplier {
     }
   }
 
+  DeleteOffer() {
+    const that = this;
+
+    const data_obj = {
+      proj: 'd2d',
+      user: window.user.constructor.name.toLowerCase(),
+      func: 'deleteoffer',
+      host: window.location.origin,
+      uid: that.uid,
+      psw: that.psw,
+      date: moment(that.date).format('YYYY-MM-DD'),
+    };
+
+    return new Promise(function (resolve, reject) {
+      window.network.SendMessage(data_obj, (res) => {
+        if (res.res.affectedRows === 1) {
+          window.db.DeleteOffer(
+            moment(data_obj.date).format('YYYY-MM-DD'),
+            () => {
+              window.db.GetAllOffers((res) => {
+                if (that.profile.profile.type === 'foodtruck') {
+                  const ar = _.filter(res, function (offer) {
+                    return moment(offer.date).isSameOrAfter(
+                      moment().format('YYYY-MM-DD')
+                    );
+                  });
+                  that.offer.data = ar[0];
+                  that.offer.date = ar[0].date;
+                  resolve(that.offer.date);
+                }
+              });
+            }
+          );
+        } else {
+          resolve();
+        }
+      });
+    });
+  }
+
   CopyNextWeek() {
     const that = this;
     return new Promise(function (resolve, reject) {
-      let data_obj = {
+      const data_obj = {
         proj: 'd2d',
         user: window.user.constructor.name.toLowerCase(),
         func: 'copynextweek',
@@ -499,7 +537,7 @@ export class Supplier {
   }
 
   PickRegion() {
-    let that = this;
+    const that = this;
     alert($('#choose_region').text());
     $('[data-dismiss=modal]').trigger('click');
 
@@ -535,12 +573,8 @@ export class Supplier {
     window.network.SendMessage(data_obj, function (resp) {
       if (resp['err']) {
       } else {
-        delete data_obj.proj;
-        delete data_obj.func;
-        delete data_obj.psw;
-        delete data_obj.user;
-        data_obj.status = 'approved';
-        window.db.SetObject('approvedStore', data_obj, function (res) {});
+        obj.status['approved'] = moment().format('YYYY-MM-DD');
+        window.db.SetObject('orderStore', obj, function (res) {});
       }
     });
   }

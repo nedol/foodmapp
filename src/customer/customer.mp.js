@@ -1,22 +1,13 @@
 'use strict';
 
-require('webpack-jquery-ui');
-// require('webpack-jquery-ui/css');
-require('jquery-ui');
-// require('webpack-jquery-ui/css');
-require('jquery-ui-touch-punch');
-import 'bootstrap';
-
 // require('bootstrap-select');
 import proj from 'ol/proj';
 
 // import 'tablesorter/dist/css/theme.dropbox.min.css';
-import 'tablesorter/dist/css/theme.materialize.min.css';
-// import 'tablesorter/dist/css/theme.default.min.css';
-// import 'tablesorter/dist/css/theme.blue.css';
-// import 'tablesorter/dist/css/theme.jui.min.css';
+import 'tablesorter/dist/css/theme.blue.css';
+import 'tablesorter/dist/css/jquery.tablesorter.pager.min.css';
 
-// import 'tablesorter/dist/css/theme.bootstrap_2.min.css';
+import 'tablesorter/dist/css/theme.bootstrap_4.min.css';
 import 'tablesorter/dist/css/theme.default.min.css';
 // import 'tablesorter/dist/css/widget.grouping.min.css';
 
@@ -24,8 +15,6 @@ require('tablesorter/dist/js/jquery.tablesorter.js');
 require('tablesorter/dist/js/jquery.tablesorter.widgets.js');
 require('tablesorter/dist/js/widgets/widget-filter.min.js');
 require('tablesorter/dist/js/widgets/widget-pager.min.js');
-import 'tablesorter/dist/css/jquery.tablesorter.pager.min.css';
-
 // require ('tablesorter/dist/js/widgets/widget-scroller.min.js');
 // require('tablesorter/dist/js/extras/jquery.tablesorter.pager.min.js');
 // require('tablesorter/dist/js/widgets/widget-stickyHeaders.min.js');
@@ -37,8 +26,15 @@ import 'tablesorter/dist/css/jquery.tablesorter.pager.min.css';
 // var slider = require('bootstrap-slider');
 // import 'bootstrap-slider/dist/css/bootstrap-slider.css';
 
+import 'bootstrap';
+
+require('webpack-jquery-ui');
+require('webpack-jquery-ui/css');
+// require('webpack-jquery-ui/css');
+require('jquery-ui-touch-punch');
+
 import noUiSlider from 'nouislider';
-import 'nouislider/distribute/nouislider.css';
+import './../../dist/css/nouislider.min.css';
 
 import { OfferOrder } from './init.frame';
 import { Dict } from '../dict/dict.js';
@@ -48,20 +44,18 @@ let utils = new Utils();
 import { UtilsMap } from '../utils/utils.map.js';
 
 import wNumb from 'wnumb';
+import moment from 'moment';
 
 let _ = require('lodash');
 let md5 = require('md5');
 
 export class MPCustomer {
   constructor(type) {
-    let that = this;
+    const that = this;
 
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru'))
-      this.path = 'https://delivery-angels.ru/server';
-    else this.path = host_port;
+    this.path = window.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.con_param.image_path;
 
     this.type = type;
     this.items = {};
@@ -147,10 +141,8 @@ export class MPCustomer {
                       'order',
                       JSON.stringify(ord)
                     );
-                    tr.find('.ord_amount')
-                      .text(ord.qnty)
-                      .val(ord.qnty)
-                      .css('background-color', 'red');
+                    tr.find('.ord_amount').text(ord.qnty).val(ord.qnty);
+                    //.css('background-color', 'red');
                     tr.addClass(res.data[title].status);
                     tr.prependTo(tr.parent());
 
@@ -213,7 +205,7 @@ export class MPCustomer {
                 },
                 widthFixed: true,
                 headerTemplate: '{content} {icon}', // Add icon for various themes
-                widgets: ['columns', /*'zebra',*/ 'filter', 'pager'],
+                widgets: ['columns', 'filter', 'pager' /* 'zebra', */],
                 widgetOptions: {
                   zebra: ['normal-row', 'alt-row'],
                   // ** NOTE: All default ajax options have been removed from this demo,
@@ -409,7 +401,7 @@ export class MPCustomer {
   }
 
   async Close(cb) {
-    let that = this;
+    const that = this;
 
     let items = this.GetOrderItems();
 
@@ -505,7 +497,7 @@ export class MPCustomer {
   }
 
   InitOffers(resolve) {
-    let that = this;
+    const that = this;
 
     that.sum = 0;
     let inv_period = '',
@@ -1024,7 +1016,7 @@ export class MPCustomer {
   }
 
   GetOrderItems() {
-    let that = this;
+    const that = this;
 
     let obj = {};
     $('tr[supuid]').each(function (i, el) {
@@ -1038,7 +1030,7 @@ export class MPCustomer {
         let ord = JSON.parse($(ddi[i]).attr('order'));
         ordlist[ddi[i].text] = {
           qnty: parseInt(ord.qnty),
-          price: ord.price,
+          price: parseFloat(ord.price),
         };
       }
 
@@ -1062,7 +1054,8 @@ export class MPCustomer {
       if (!obj[supuid]) obj[supuid] = { data: {} };
 
       let status = '';
-      if ($(el).find('button.ord_amount').text() > 0) status = 'checked';
+      if ($(el).find('button.ord_amount').text() > 0)
+        status = { checked: moment().format('YYYY-MM-DD') };
       if ($(el).hasClass('ordered')) status = 'ordered';
       if ($(el).hasClass('approved')) status = 'approved';
 
@@ -1072,7 +1065,7 @@ export class MPCustomer {
           image: $(el).find('.img_container img')[0].src,
           ordlist: ordlist,
           extralist: extralist,
-          status: status,
+          status: { checked: window.parent.user.date },
           email: window.user.profile.profile.email,
           mobile: window.user.profile.profile.mobile,
         };
@@ -1094,13 +1087,14 @@ export class MPCustomer {
       obj[supuid]['supuid'] = $(el).attr('supuid');
       obj[supuid]['cusuid'] = window.user.uid;
       obj[supuid]['date'] = window.user.date;
+      obj[supuid]['status'] = { checked: window.parent.user.date };
     });
 
     return obj;
   }
 
   DeleteOrder(el) {
-    let that = this;
+    const that = this;
     if (
       confirm(
         window.sysdict.getDictValue(window.sets.lang, 'Удалить из заказа?')
@@ -1116,7 +1110,7 @@ export class MPCustomer {
   }
 
   SaveOrders(items, cb) {
-    let that = this;
+    const that = this;
 
     $('.loader').css('display', 'block');
     let keys = Object.keys(items);
@@ -1144,7 +1138,7 @@ export class MPCustomer {
   }
 
   SetSlider() {
-    let that = this;
+    const that = this;
     let ar = $('.tr_item .item_price', $('.mp')).map(function () {
       if (this.attributes['base'])
         return parseFloat(this.attributes['base'].value);
@@ -1155,7 +1149,7 @@ export class MPCustomer {
     let step = parseInt((max - min) / 100);
 
     try {
-      if ($('#slider')[0] && noUiSlider) {
+      if ($('#slider')[0]) {
         if ($('#slider')[0].noUiSlider) $('#slider')[0].noUiSlider.destroy();
 
         noUiSlider.create($('#slider')[0], {
@@ -1164,7 +1158,7 @@ export class MPCustomer {
           tooltips: [true, wNumb({ decimals: min < 100 ? 2 : 0 })],
           step: 1,
           range: {
-            min: min - 10 < 0 ? min : (min - 10) * step,
+            min: min - 10 < 0 ? min - 1 : (min - 10) * step,
             max: max + 10 * step,
           },
         });
@@ -1204,7 +1198,7 @@ export class MPCustomer {
   }
 
   SetSlider_() {
-    let that = this;
+    const that = this;
     let ar = $('.tr_item .item_price', $('.mp')).map(function () {
       if (this.attributes['base'])
         return parseFloat(this.attributes['base'].value);
@@ -1226,16 +1220,44 @@ export class MPCustomer {
 
     console.log();
   }
+  updateUI_new() {
+    $('.mp_categories').insertBefore($('.ui-dialog-titlebar')[0]);
+    $('.pager').insertBefore($('.ui-dialog-titlebar')[0]);
+    $('.address_div').insertBefore($('.ui-dialog-titlebar')[0]);
+    $('.ui-dialog-titlebar').css('display', 'none');
+    $('td[data-column="1"] input').css('display', 'none');
+    // $('#slider_place').replaceWith($('#slider')[0]);
+    $('td[data-column="2"] input').replaceWith($('#slider')[0]);
+
+    $('td[data-column="0"] input')
+      .addClass('search_word')
+      .attr('placeholder', 'input key word');
+    setTimeout(() => {
+      $('#search_place').replaceWith($('.search_word')[0]);
+      $('tr[role="search"]').css('height', '0');
+    }, 1000);
+  }
+
   updateUI() {
     $('.mp_categories').insertBefore($('.ui-dialog-titlebar')[0]);
     $('.pager').insertBefore($('.ui-dialog-titlebar')[0]);
     $('.address_div').insertBefore($('.ui-dialog-titlebar')[0]);
     $('.ui-dialog-titlebar').css('display', 'none');
-    $('td[data-column="0"] input')
-      .css('height', '30px')
-      .attr('placeholder', 'input key word');
+
     $('td[data-column="1"] input').css('display', 'none');
     $('td[data-column="2"] input').replaceWith($('#slider')[0]);
+
+    setTimeout(() => {
+      // $('#search_place').replaceWith($('.search_word')[0]);
+      $('tr[role="search"]').css('display', 'none');
+    }, 100);
+
+    $('.collapse').on('show.bs.collapse', function () {
+      $('tr[role="search"]').css('display', '');
+    });
+    $('.collapse').on('hide.bs.collapse', function () {
+      $('tr[role="search"]').css('display', 'none');
+    });
   }
 }
 

@@ -34,7 +34,7 @@ class OfferEditor {
   }
 
   InitSupplierOffer() {
-    let that = this;
+    const that = this;
 
     this.location = window.user.offer.stobj.location;
 
@@ -88,7 +88,7 @@ class OfferEditor {
   }
 
   AddOfferItem(ev) {
-    let that = ev.data;
+    const that = ev.data;
 
     // if($('.menu_item').length>=parseInt($('#items_limit').val())) {
     //    return true;
@@ -302,7 +302,7 @@ class OfferEditor {
   }
 
   GetOfferItems(lang) {
-    let that = this;
+    const that = this;
     let offerObj = { local: {}, remote: {} };
     that.arCat = [];
 
@@ -473,7 +473,7 @@ class OfferEditor {
   }
 
   CloseMenu(ev) {
-    let that = ev.data;
+    const that = ev.data;
     //if(ev.data.changed)
     let items = that.SaveOffer(ev, window.sets.lang);
 

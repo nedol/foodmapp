@@ -8,19 +8,19 @@ let moment = require('moment');
 
 export class CustomerOrderFrameEditor {
   constructor() {}
+
   openFrame(obj, targ_title, cb) {
-    let that = this;
+    const that = this;
 
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru')) this.path = 'https://nedol.ru/server';
-    else this.path = host_port;
+    this.path = window.parent.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.parent.con_param.image_path;
 
     this.ovc = $('body');
     this.uid = obj.uid;
     this.profile = obj.profile;
     this.offer = obj.data;
+    this.address = obj.address;
     obj.supuid = obj.uid;
     this.rating = obj.rating;
     let latlon = [obj.latitude, obj.longitude];
@@ -102,7 +102,7 @@ export class CustomerOrderFrameEditor {
 
     this.ovc.find('.save').off();
     this.ovc.find('.save').on('click touchstart', this, function (ev) {
-      let that = ev.data;
+      const that = ev.data;
 
       ev.preventDefault();
       ev.stopPropagation();
@@ -134,10 +134,12 @@ export class CustomerOrderFrameEditor {
     this.ovc
       .find('#close_frame')
       .on('click touchstart', this, async function (ev) {
-        let that = ev.data;
+        const that = ev.data;
 
         ev.preventDefault();
         ev.stopPropagation();
+
+        $('#sup_worktime').empty();
 
         let res = _.find($('.ord_amount'), function (el) {
           return parseInt($(el).text()) > 0;
@@ -243,7 +245,21 @@ export class CustomerOrderFrameEditor {
         //$('#customer_frame',window.parent.document).css('height','100%');
         $('#locator', window.parent.document).css('display', 'none');
         //
-        if (md5(JSON.stringify(that.items)) !== md5(JSON.stringify(items))) {
+
+        function close() {
+          $('.filter_div').remove();
+          if (
+            $('.kolmit')[0].contentWindow &&
+            $('.kolmit')[0].contentWindow.CloseFrame
+          )
+            $('.kolmit')[0].contentWindow.CloseFrame();
+          $('.loader').css('display', 'none');
+          $(frameElement).css('display', 'none');
+          $(window).empty();
+          $('#customer_frame', window.parent.document).css('display', 'none');
+        }
+
+        function save() {
           let lang = window.parent.sets.lang;
           items.status = { checked: window.parent.user.date };
           that.SaveOrder(items, function (res) {
@@ -258,18 +274,22 @@ export class CustomerOrderFrameEditor {
                 'none'
               );
               $('#cart_but', window.parent.document).trigger('click');
+              $(window).empty();
             }
           });
+        }
+        if (md5(JSON.stringify(that.items)) !== md5(JSON.stringify(items))) {
+          if (_.find(window.parent.user.orders, { supuid: that.uid })) {
+            if (!confirm('Existed order will be canceled. Continue?')) {
+              close();
+            } else {
+              save();
+            }
+          } else {
+            save();
+          }
         } else {
-          $('.filter_div').remove();
-          if (
-            $('.kolmit')[0].contentWindow &&
-            $('.kolmit')[0].contentWindow.CloseFrame
-          )
-            $('.kolmit')[0].contentWindow.CloseFrame();
-          $('.loader').css('display', 'none');
-          $(frameElement).css('display', 'none');
-          $('#customer_frame', window.parent.document).css('display', 'none');
+          close();
         }
       }); //close
 
@@ -332,12 +352,6 @@ export class CustomerOrderFrameEditor {
           .attr('id');
         $('[href="#' + tab + '"]').trigger('click');
         //$(".item_title:contains('"+dict_val+"')").closest('.menu_item').prependTo('#'+tab);
-        if (
-          $(".item_title:contains('" + dict_val + "')").closest('.menu_item')[0]
-        )
-          $(".item_title:contains('" + dict_val + "')")
-            .closest('.menu_item')[0]
-            .scrollIntoView();
       } else {
         $('[href="#order_pane"]').trigger('click');
         $($('.cat_div')[0]).trigger('click');
@@ -619,7 +633,7 @@ export class CustomerOrderFrameEditor {
             $(menu_item).find('.pack_btn').text(p);
             $(menu_item).find('.pack_btn').attr('pack', p);
 
-            data = parseFloat(data).toString();
+            // data = data.toFixed(2);
             let price = data ? data : '';
 
             if (that.offer[cat_tab][i].bargain === 'true') {
@@ -708,24 +722,17 @@ export class CustomerOrderFrameEditor {
                 $(this)
                   .closest('.menu_item')
                   .find('.item_price')
-                  .attr(
-                    'placeholder',
-                    parseFloat(price.price ? price.price : price).toString()
-                  );
+                  .attr('placeholder', price.price ? price.price : price);
                 $(menu_item).find('.item_price').removeAttr('placeholder');
                 $(this)
                   .closest('.menu_item')
                   .find('.item_price')
-                  .text(
-                    parseFloat(price.price ? price.price : price).toString()
-                  );
+                  .text(price.price ? price.price : price);
               } else {
                 $(this)
                   .closest('.menu_item')
                   .find('.item_price')
-                  .text(
-                    parseFloat(price.price ? price.price : price).toString()
-                  );
+                  .text(price.price ? price.price : price);
               }
               if (prev_pl)
                 CheckDiscount(pl, prev_pl, $(ev.target).attr('pack'));
@@ -855,7 +862,7 @@ export class CustomerOrderFrameEditor {
                 })
               );
 
-            $(menu_item).find('.extras').collapse('show');
+            $('#close_frame').addClass('updated');
           });
         $(menu_item)
           .find('.reduce_ord')
@@ -871,8 +878,6 @@ export class CustomerOrderFrameEditor {
 
               if (!price)
                 price = $(menu_item).find('.item_price').attr('placeholder');
-
-              if (amnt === 0) $(menu_item).find('.extras').collapse('hide');
 
               $(menu_item)
                 .add('checked')
@@ -949,7 +954,8 @@ export class CustomerOrderFrameEditor {
         if (arObj.length > 0) {
           for (let o in arObj) {
             let order = arObj[o];
-            that.address = window.parent.user.profile.profile.address;
+
+            // that.address = window.parent.user.profile.profile.address;
 
             // if (!that.address) {
             //   window.parent.user.map.geo.SearchPlace(
@@ -996,7 +1002,7 @@ export class CustomerOrderFrameEditor {
                       ].qnty
                     )
                     .css('color', 'white')
-                    .css('background-color', 'red');
+                    .css('background-color', '#ccc');
                 }
               }
             }
@@ -1026,15 +1032,37 @@ export class CustomerOrderFrameEditor {
 
     initOrder(targ_title);
 
+    setTimeout(() => {
+      that.items = that.GetOrderItems();
+    }, 1000);
+
+    if (!$('.nav-link[href]').hasClass('active')) {
+      $('[href="#order_pane"]').trigger('click');
+    }
+
     setTimeout(
       function (targ_title) {
+        if (targ_title) {
+          let dict_val = that.dict.getValByKey(
+            window.parent.sets.lang,
+            targ_title,
+            that.profile.lang
+          );
+          if (
+            $(".item_title:contains('" + dict_val + "')").closest(
+              '.menu_item'
+            )[0]
+          ) {
+            $(".item_title:contains('" + dict_val + "')")
+              .closest('.menu_item')[0]
+              .scrollIntoView();
+          }
+        }
+
         $('.loader', $(window.parent.document).contents()).css(
           'display',
           'none'
         );
-        that.items = that.GetOrderItems();
-        if (!$('[href]').hasClass('active'))
-          $('[href="#order_pane"]').trigger('click');
 
         $('.filter_div .prop_check').on('click touchstart', function (ev) {
           ev.preventDefault();
@@ -1064,7 +1092,7 @@ export class CustomerOrderFrameEditor {
   }
 
   RedrawOrder(obj) {
-    let that = this;
+    const that = this;
     window.parent.db.GetOrder(
       new Date(this.date),
       obj.uid,
@@ -1153,7 +1181,7 @@ export class CustomerOrderFrameEditor {
   }
 
   addTab(cat_tab, cat_img) {
-    let that = this;
+    const that = this;
     let cat_str = '';
     if (
       $(window.parent.document)
@@ -1197,7 +1225,7 @@ export class CustomerOrderFrameEditor {
   }
 
   GetOrderItems() {
-    let that = this;
+    const that = this;
 
     let obj = { data: {} };
     $('.menu_item').each(function (i, el) {
@@ -1240,7 +1268,7 @@ export class CustomerOrderFrameEditor {
           cat: tab.split('_')[1],
           ordlist: ordlist,
           extralist: extralist,
-          status: 'checked',
+          status: { checked: window.parent.user.date },
           email: window.parent.user.profile.profile.email,
           mobile: window.parent.user.profile.profile.mobile,
         };
@@ -1255,15 +1283,25 @@ export class CustomerOrderFrameEditor {
       //   that.profile.type === 'foodtruck'
       //     ? moment().add(30, 'm').format('HH:mm')
       //     : $(window.parent.document).find('.sel_period').text();
-      obj['address'] =
-        that.profile.type === 'deliver' ? $('#delivery_address').val() : '';
     });
+
+    switch (that.profile.type) {
+      case 'deliver':
+        obj['address'] = $('#delivery_address').val();
+        break;
+      case 'marketer':
+        obj['address'] = that.address;
+        break;
+      case 'foodtruck':
+        obj['address'] = that.address;
+        break;
+    }
 
     return obj;
   }
 
   SaveOrder(items, cb) {
-    let that = this;
+    const that = this;
 
     $('.loader').css('display', 'block');
 
@@ -1293,3 +1331,9 @@ export class CustomerOrderFrameEditor {
 // ./src/customer/customer.order.frame.editor.js
 // module id = 747
 // module chunks = 4
+
+//////////////////
+// WEBPACK FOOTER
+// ./src/customer/customer.order.frame.editor.js
+// module id = 697
+// module chunks = 1

@@ -13,12 +13,9 @@ require('bootstrap');
 
 export class Carousel {
   constructor() {
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru'))
-      this.path = 'https://delivery-angels.ru/server';
-    else this.path = host_port;
+    this.path = window.con_param.host_port;
 
-    this.image_path = image_path;
+    this.image_path = window.con_param.image_path;
 
     this.shuffled = {};
 
@@ -26,7 +23,7 @@ export class Carousel {
   }
 
   CarouselEvents(map) {
-    let that = this;
+    const that = this;
 
     try {
       map.ol_map.on('moveend', function (event) {
@@ -107,7 +104,7 @@ export class Carousel {
   }
 
   async SetFeatures(features) {
-    let that = this;
+    const that = this;
 
     $('#items_carousel').carousel({ interval: 2000 });
     $('#items_carousel').carousel('dispose');
@@ -266,25 +263,35 @@ export class Carousel {
           }
 
           let price = '';
-          try {
-            price = //(!window.sets.currency ? '' : window.sets.currency) +
-              parseFloat(
-                Object.values(item.packlist)[0].price
-                  ? Object.values(item.packlist)[0].price
-                  : Object.values(item.packlist)[0]
-              );
-          } catch (ex) {}
+          if (!item.packlist) continue;
 
-          let prev_price = '';
-          try {
-            prev_price = parseFloat(Object.values(item.prev_packlist)[0].price);
-          } catch (ex) {}
-
-          //TODO:let font_size = ((Math.round(100/title.length)+.2)>2?2:(Math.round(100/title.length)+.2)) +"em";
+          let keys = Object.keys(item.packlist);
 
           let promise = new Promise((resolve, reject) => {
             $('<div/>').load('./html/carousel.item.html', function (data) {
-              let html = $(data).clone();
+              resolve($(data).clone());
+            });
+          });
+
+          let html = await promise;
+
+          for (let k in keys) {
+            try {
+              price = parseFloat(item.packlist[keys[k]].price);
+            } catch (ex) {
+              continue;
+            }
+
+            let prev_price = '';
+            try {
+              prev_price = parseFloat(item.prev_packlist[keys[k]].price);
+            } catch (ex) {
+              continue;
+            }
+
+            //TODO:let font_size = ((Math.round(100/title.length)+.2)>2?2:(Math.round(100/title.length)+.2)) +"em";
+
+            promise = new Promise((resolve, reject) => {
               $(html).attr('title', item.title);
               $(html).attr('tab', tab);
               $(html).attr('supuid', features[f].uid);
@@ -312,9 +319,11 @@ export class Carousel {
 
               resolve(that.htmlAr);
             });
-          });
 
-          let res = await promise;
+            let res = await promise;
+
+            break;
+          }
         }
       }
     }
@@ -407,7 +416,7 @@ export class Carousel {
   }
 
   MakeDraggableCarousel(el) {
-    let that = this;
+    const that = this;
 
     let carus_pos = JSON.parse(localStorage.getItem('carousel_pos'));
     if (carus_pos) $(el).offset({ top: carus_pos.top, left: carus_pos.left });

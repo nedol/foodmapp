@@ -5,7 +5,6 @@ import { Dict } from '../dict/dict.js';
 import { Events } from '../map/events/events';
 import { OLMap } from '../map/map';
 import extent from 'ol/extent';
-import condition from 'ol/events/condition';
 
 import { Profile } from '../profile/profile';
 import { Import } from '../import/import';
@@ -76,7 +75,7 @@ export class Customer {
   }
 
   async InitUser() {
-    let that = this;
+    const that = this;
 
     let promise = new Promise((resolve, reject) => {
       $.getJSON('../src/dict/sys.dict.json?v=' + v, function (data) {
@@ -119,7 +118,7 @@ export class Customer {
       () => {
         this.categories = new CategoriesMap(this);
         $('#category_include').css('display', 'block');
-        window.sysdict.set_lang(window.sets.lang, $('#categories'));
+        window.sysdict.set_lang(window.sets.lang, $('.categories'));
       }
     );
 
@@ -137,6 +136,7 @@ export class Customer {
     });
 
     $('.cart_frame').attr('src', './customer/cart.customer.html?v=' + v);
+
     $('.cart_frame').on('load', function () {
       window.sysdict.set_lang(
         window.sets.lang,
@@ -191,7 +191,7 @@ export class Customer {
   // }
 
   OnMapClick(event) {
-    let that = this;
+    const that = this;
     if (!event.loc_mode) {
       that.map.geo.StopLocation();
       window.user.isShare_loc = false;
@@ -228,8 +228,8 @@ export class Customer {
         '}'
     );
 
-    if (!event.loc_mode && $('#categories').is(':visible'))
-      $('#categories').slideToggle('slow', function () {
+    if (!event.loc_mode && $('.categories').is(':visible'))
+      $('.categories').slideToggle('slow', function () {
         $('.dropdown-menu').removeClass('show');
       });
     if (!event.loc_mode && $('.sup_menu').is(':visible')) {
@@ -365,7 +365,7 @@ export class Customer {
   }
 
   DateTimePickerEvents() {
-    let that = this;
+    const that = this;
 
     $('.dt_val').on('change', this, function (ev) {
       that.date = moment($(this).val()).format('YYYY-MM-DD');
@@ -386,7 +386,7 @@ export class Customer {
   }
 
   UpdateOrderLocal(obj, cb) {
-    let that = this;
+    const that = this;
     obj.date = moment(obj.date).format('YYYY-MM-DD');
     window.db.SetObject('orderStore', obj, (res) => {
       this.SetOrders(function () {
@@ -438,12 +438,13 @@ export class Customer {
   }
 
   PublishOrder(obj, cb) {
-    let that = this;
+    const that = this;
 
     obj.proj = 'd2d';
     obj.user = window.user.constructor.name.toLowerCase();
     obj.func = 'updateorder';
     obj.psw = that.psw;
+    obj.uid = that.uid;
     obj.cusuid = that.uid;
     obj.supuid = obj.supuid;
     obj.date = moment(obj.date).format('YYYY-MM-DD');
@@ -459,7 +460,7 @@ export class Customer {
   }
 
   DeleteOrder(date, title, cb) {
-    let that = this;
+    const that = this;
 
     let obj = {};
     obj.proj = 'd2d';
@@ -535,7 +536,7 @@ export class Customer {
   }
 
   OnMessage(data) {
-    let that = this;
+    const that = this;
     if (data.func === 'approved') {
       data.order.date = moment(data.order.date).format('YYYY-MM-DD');
       window.db.GetOrder(
@@ -629,7 +630,7 @@ export class Customer {
   }
 
   SetOrdCnt() {
-    let that = this;
+    const that = this;
 
     let cnt = 0;
     let num = 0;
@@ -648,14 +649,15 @@ export class Customer {
     }
   }
 
-  SetOrders(cb) {
+  SetOrders(cb, obj) {
     window.db.GetCusOrders(window.user.date, (res) => {
-      this.orders = [];
-      for (let i in res) {
-        this.orders.push(res[i]);
-      }
+      this.orders = res;
 
       this.SetOrdCnt();
+
+      if ($('.cart_frame')[0].contentWindow.cart_cus && obj) {
+        $('.cart_frame')[0].contentWindow.cart_cus.UpdateCartOrder(obj);
+      }
       cb();
     });
   }

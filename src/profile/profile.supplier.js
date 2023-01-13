@@ -189,7 +189,7 @@ export class ProfileSupplier {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
     $('input.rating').on('change', function (ev) {
       let data_obj = {
         proj: 'd2d',
@@ -223,7 +223,7 @@ export class ProfileSupplier {
 
   SaveProfile(uid, psw) {
     let _ = require('lodash');
-    let that = this;
+    const that = this;
     // if(!this.changed)//TODO:test uncomment
     //     return;
     utils.createThumb_1($('.avatar')[0], 70, 70, function (thmb) {

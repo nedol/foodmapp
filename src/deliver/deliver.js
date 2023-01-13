@@ -52,7 +52,7 @@ export class Deliver {
     this.user_ovl;
 
     if (uObj) {
-      let that = this;
+      const that = this;
 
       this.editor = new OfferDeliver(); //offer editor
 
@@ -87,13 +87,13 @@ export class Deliver {
   }
 
   async InitUser(cb) {
-    let that = this;
+    const that = this;
 
     let data = await (await fetch('../src/dict/sys.dict.json?v=2')).json();
 
     window.sysdict = new Dict(data);
     window.sysdict.set_lang(window.sets.lang, $('body'));
-    window.sysdict.set_lang(window.sets.lang, $('#categories'));
+    window.sysdict.set_lang(window.sets.lang, $('.categories'));
 
     window.db.GetStorage('dictStore', function (rows) {
       window.dict = new Dict(rows);
@@ -134,7 +134,7 @@ export class Deliver {
       //     "\"lat\":" + lonlat[1] + ", \"time\":" + time + "}");
 
       // if (!event.loc_mode && $('#categories').is(':visible'))
-      //     $('#categories').slideToggle('slow', function () {
+      //     $('.categories').slideToggle('slow', function () {
       //         $('.dropdown-menu').removeClass('show');
       //     });
 
@@ -219,7 +219,7 @@ export class Deliver {
   }
 
   DateTimePickerEvents() {
-    let that = this;
+    const that = this;
 
     let layers = that.map.ol_map.getLayers();
     layers.forEach(function (layer, i, layers) {
@@ -468,7 +468,7 @@ export class Deliver {
   }
 
   async PublishOffer(menu, date, data, cb) {
-    let that = this;
+    const that = this;
     if (
       window.user.constructor.name === 'Deliver' &&
       (!this.offer.stobj.latitude ||

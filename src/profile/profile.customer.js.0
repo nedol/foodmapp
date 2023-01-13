@@ -47,7 +47,7 @@ window.InitProfileUser = function () {
 
 class ProfileCustomer{
     constructor(tab){
-        let that = this;
+        const that = this;
         window.user = this;
 
         that.InitUserOrders();
@@ -96,7 +96,7 @@ class ProfileCustomer{
     }
 
     fillProfileForm(){
-        let that = this;
+        const that = this;
         window.parent.db.GetSettings(function (data) {
             if(data[0] && data[0].profile) {
                 that.uid = data[0].uid;
@@ -130,7 +130,7 @@ class ProfileCustomer{
     }
 
     GetProfileItems(){
-        let that  = this;
+        const that  = this;
         $('.tab-pane').each(function (i, tab) {
             if($(tab).attr('id')==='profile') {
                 window.parent.db.GetSettings(function (data) {
@@ -160,7 +160,7 @@ class ProfileCustomer{
     }
 
     OnSubmit(cb){
-        let that = this;
+        const that = this;
         try {
         let k = 50/ $('.avatar').height();
 
@@ -227,7 +227,7 @@ class ProfileCustomer{
     }
 
     InitUserOrders(tab_active){
-        let that = this;
+        const that = this;
 
         $('#menu_item_style').load('./customer.frame.'+window.parent.sets.lang+'.html #menu_item_style', function (response, status, xhr) {
 
@@ -244,7 +244,7 @@ class ProfileCustomer{
     }
 
     FillOrders(){
-        let that = this;
+        const that = this;
         let date = window.parent.user.date;
         that.sum = 0;
         window.parent.db.GetCusOrders(window.parent.user.date,(res)=> {
@@ -391,7 +391,7 @@ class ProfileCustomer{
     }
 
     DeleteOrder(el) {
-        let that = this;
+        const that = this;
         if(confirm({'ru':"Удалить из заказа?",'en':'Remove from order?'}[window.parent.sets.lang])){
             $(el).closest('tr').remove();
             that.SaveOrderItems(function () {

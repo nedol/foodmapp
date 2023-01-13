@@ -16,7 +16,7 @@ import { utils } from '../utils/utils';
 
 class OfferOrder {
   constructor() {
-    let that = this;
+    const that = this;
     this.changed = false;
     this.offer;
 
@@ -36,7 +36,7 @@ class OfferOrder {
     this.ord_frame
       .find('.publish_order')
       .on('click touchstart', this, function (ev) {
-        let that = ev.data;
+        const that = ev.data;
         let items = ev.data.GetOrderItems(ev.data.lang, true);
         window.user.PublishOrder(items, (data) => {
           let status = window.dict.getDictValue(
@@ -58,7 +58,7 @@ class OfferOrder {
   }
 
   InitCustomerOrder(obj, targ_title) {
-    let that = this;
+    const that = this;
     let client_frame = $('.client_frame_tmplt').clone();
     $(client_frame).attr(
       'src',

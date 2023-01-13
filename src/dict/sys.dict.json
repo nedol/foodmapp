@@ -1,7 +1,7 @@
 {
   "4d55f77f062bf48891bd0f749c36a36d": {
     "en": "Essentials",
-    "ua": "Повседнев.<br>спрос",
+    "ua": "Повседнев.-спрос",
     "fr": "Essentiels",
     "nl": "Essentieel",
     "de": "Grundlegende"
@@ -9,7 +9,7 @@
   "1249b7768dd419e434d70123a0d7fc5e": {
     "en": "Toiletries",
     "fr": "Toiletries",
-    "ua": "Для<br>туалета",
+    "ua": "Для-туалета",
     "nl": "Toiletartikelen"
   },
   "04ce9cc0739f4ba9ef31132de3e78cfa": {
@@ -51,7 +51,7 @@
     "fr": "A Emporter",
     "ua": "На вынос",
     "nl": "Takeaway",
-    "de": "Zum<br>Mitnehmen"
+    "de": "Zum-Mitnehmen"
   },
   "22322b2b47dab77cb37cda3ae584c36a": {
     "en": "Ice-cream",
@@ -117,22 +117,22 @@
     "de": "Tropisch"
   },
   "4b02a5b8da403b36083763c143a56854": {
-    "en": "Dairy<br>Eggs",
-    "fr": "Laitiers<br>Œufs",
-    "ua": "Молочка<br>Яйца",
+    "en": "Dairy",
+    "fr": "Laitiers",
+    "ua": "Молочка",
     "nl": "Zuivel",
-    "de": "Molkerei<br>Eier"
+    "de": "Molkerei"
   },
   "5b591bad6d9ce5c8c7494834ade42132": {
-    "en": "Sour Cream<br/>Yogurts",
-    "fr": "Crème sure<br/>Yogourts",
-    "ua": "Сметана<br>Йогурты",
+    "en": "Yogurts",
+    "fr": "Yogourts",
+    "ua": "Йогурты",
     "nl": "Zure room",
     "de": "Yogourts"
   },
   "cf1dfd60d1e931e52ec346bc376e9602": {
-    "en": "Cottage<br/>Cheese",
-    "fr": "Cottage<br/>Fromage",
+    "en": "Cottage Cheese",
+    "fr": "Cottage Fromage",
     "ua": "Творог",
     "nl": "Kwark",
     "de": "Frischkäse"
@@ -148,7 +148,7 @@
     "en": "Eggs",
     "fr": "Œufs",
     "ua": "Яйца",
-    "nl": "Kaas",
+    "nl": "Eieren",
     "de": "Eier"
   },
   "e4b662d3892f8c0c86801919f979467f": {
@@ -178,9 +178,9 @@
     "de": "Schwein"
   },
   "810771055916119e41dea16330c4d834": {
-    "en": "Semi-<br>finished",
-    "fr": "Semi-<br>fini",
-    "ua": "Полу<br>фабрикат",
+    "en": "Semi--finished",
+    "fr": "Semi--fini",
+    "ua": "Полу-фабрикат",
     "nl": "Halfproduct",
     "de": "Halbzeug"
   },
@@ -191,18 +191,26 @@
     "nl": "Worstjes",
     "de": "Würste"
   },
-  "071642fa72ba780ee90ed36350d82745": {
+  "c45c974fa258e5d8cd30f0f7d0f9827d": {
     "en": "SeaFood",
     "fr": "SeaFood",
-    "ua": "Море<br>продукты",
+    "ua": "Морепродукты",
     "nl": "SeaFood",
     "de": "SeaFood"
   },
-  "c45c974fa258e5d8cd30f0f7d0f9827d": {
+  "071642fa72ba780ee90ed36350d82745": {
+    "en": "Fish",
+    "fr": "Poisson",
+    "ua": "Риба",
+    "nl": "Vis",
+    "de": "Fisch"
+  },
+  "479d57d583cc7e26f8c8b244c20729eb": {
     "en": "Poultry",
     "fr": "Volaille",
     "ua": "Птица",
-    "nl": "Pluimvee"
+    "nl": "Pluimvee",
+    "de": "Geflügel"
   },
   "a9514f8884af954749b66932d8a95a76": {
     "en": "Chicken",
@@ -226,11 +234,11 @@
     "de": "Ente"
   },
   "b69d8ad1c1f2abfcbcb1972cdba2192e": {
-    "en": "Pate<br>Mousse",
-    "fr": "Pâté<br>Mousse",
-    "ua": "Паштет<br>Мусс",
-    "nl": "Pate<br>Mousse",
-    "de": "Pastete<br>Mousse"
+    "en": "Pate-Mousse",
+    "fr": "Pâté-Mousse",
+    "ua": "Паштет-Мусс",
+    "nl": "Pate-Mousse",
+    "de": "Pastete-Mousse"
   },
   "636d2370c523f2b2f49a568b6485f1f5": {
     "en": "Beverage",
@@ -247,11 +255,11 @@
     "de": "Wasser"
   },
   "d49929af79e93ff191fb7495478c7fd4": {
-    "en": "Cola<br>Limonade",
-    "fr": "Cola<br>Limonade",
-    "ua": "Кола<br>Лимонад",
-    "nl": "Cola<br>Limonade",
-    "de": "Cola<br>Limonade"
+    "en": "Cola-Limonade",
+    "fr": "Cola-Limonade",
+    "ua": "Кола-Лимонад",
+    "nl": "Cola-Limonade",
+    "de": "Cola-Limonade"
   },
   "8754016bce09674b1796cd2cc062d7da": {
     "en": "Juice",
@@ -288,18 +296,18 @@
     "de": "Torten"
   },
   "597b56e53847cd6a4712ac183f61fa68": {
-    "en": "Cookies<br/>Crackers",
-    "fr": "Cookies<br/>Crackers",
-    "ua": "Печенье<br/>Крекеры",
-    "nl": "Koekjes<br/>Krackers",
-    "de": "Kekse<br/>Cracker"
+    "en": "Cookies",
+    "fr": "Cookies",
+    "ua": "Печенье",
+    "nl": "Koekjes",
+    "de": "Kekse"
   },
   "fdc1de159925cd627c263e9e74171901": {
-    "en": "Marshmallow<br/>Marmelade",
-    "fr": "Guimauve<br/>Marmelade",
-    "ua": "Пастила<br/>Мармелад",
-    "nl": "Pastila<br/>Marmelade",
-    "de": "Pastille<br/>Marmelade"
+    "en": "Marmelade",
+    "fr": "Marmelade",
+    "ua": "Мармелад",
+    "nl": "Marmelade",
+    "de": "Marmelade"
   },
   "139148c3293387bb780412df0e4c3d94": {
     "en": "Candies",
@@ -325,7 +333,7 @@
   "9fbdf5756851e77880327f5e86212a27": {
     "en": "Jams",
     "fr": "Jams",
-    "ua": "Варенье<br>Джемы",
+    "ua": "Варенье-Джемы",
     "nl": "Jams",
     "de": "Konfitüre"
   },
@@ -334,7 +342,7 @@
     "fr": "Épicerie",
     "ua": "Бакалея",
     "nl": "Kruidenier",
-    "de": "Lebensmittel<br>geschäft"
+    "de": "Lebensmittel-geschäft"
   },
   "e09813f8015339fc445f3a84bb8c4023": {
     "en": "Pasta",
@@ -361,8 +369,8 @@
     "en": "Dried fruit",
     "fr": "Fruits secs",
     "ua": "Сухофрукты",
-    "nl": "Gedroogd<br>fruit",
-    "de": "Getrocknete<br>früchte"
+    "nl": "Gedroogd-fruit",
+    "de": "Getrocknete-früchte"
   },
   "2e69df5961f20aee0897cf1905156344": {
     "en": "Oil",
@@ -372,18 +380,18 @@
     "de": "Öl"
   },
   "5db98fd5955482197423a2a4760f38c7": {
-    "en": "Sauces<br>Spices",
-    "fr": "Sauces<br>Épices",
-    "ua": "Соусы<br>Приправы",
-    "nl": "Sauzen<br>Specerijen",
-    "de": "Saucen<br>Gewürze"
+    "en": "Sauces-Spices",
+    "fr": "Sauces-Épices",
+    "ua": "Соусы-Приправы",
+    "nl": "Sauzen-Specerijen",
+    "de": "Saucen-Gewürze"
   },
   "c7214ae3ca3ce705c683e7dbe362c9a2": {
-    "en": "Tea<br>Coffe",
-    "fr": "Thé<br>Coffe",
-    "ua": "Чай<br>Кофе",
-    "nl": "Thee<br>Koffie",
-    "de": "Tee<br>Kaffee"
+    "en": "Tea-Coffe",
+    "fr": "Thé-Coffe",
+    "ua": "Чай-Кофе",
+    "nl": "Thee-Koffie",
+    "de": "Tee-Kaffee"
   },
   "1ba89dab5315d1fc2b43bf84402ff1b3": {
     "en": "Tea",
@@ -420,11 +428,11 @@
     "de": "Bio"
   },
   "4f05c9929f41c38e6177b6c4c58e2a27": {
-    "en": "Health<br>Food",
-    "fr": "Santé<br>Alimentation",
-    "ua": "Здоровое<br>питание",
-    "nl": "Gezondheid<br>Voeding",
-    "de": "Gesundes<br>Essen"
+    "en": "Healthy-Food",
+    "fr": "Santé-Alimentation",
+    "ua": "Здоровое-питание",
+    "nl": "Gezondheid-Voeding",
+    "de": "Gesundes-Essen"
   },
   "71a731effc43ac8bab7455c5e4ce9cc5": {
     "en": "Vegan",
@@ -434,11 +442,11 @@
     "de": "Vegan"
   },
   "11abe4c0e9461f5627594d5ac9b3d1bc": {
-    "en": "Out of<br>Gluten",
-    "fr": "Sans<br>Gluten",
-    "ua": "Без<br>глютена",
+    "en": "Gluten free",
+    "fr": "Sans Gluten",
+    "ua": "Без глютена",
     "nl": "Glutenvrij",
-    "de": "Gluten<br>frei"
+    "de": "Gluten frei"
   },
   "b44ec9b4d991fc4bbaf7e1707de5fb0c": {
     "ua": "Ассортимент",
@@ -544,6 +552,13 @@
     "de": "Login",
     "fr": "",
     "nl": "Login"
+  },
+  "3e741d3cdf3c445925a16e77a49a4fe8": {
+    "en": "order canceled",
+    "ua": "замовлення скасовано",
+    "de": "bestellung storniert",
+    "fr": "ordre annulé",
+    "nl": "order geannuleerd"
   },
   "a38a2e843b153d64253d762e23696e17": {
     "ua": "Оставить комментарий к заказу",
@@ -666,28 +681,29 @@
   "3fb5a1fd02693fe2959220f291b05f19": {
     "en": "Cheese",
     "ua": "Сыр",
-    "fr": "",
-    "nl": ""
+    "fr": "Fromage",
+    "nl": "Kaas",
+    "de": "Käse"
   },
   "f3d5840c5a17c2fabec8c07d8a993272": {
     "en": "Meat",
     "ua": "Мясо",
-    "de": "Käse",
-    "fr": "",
-    "nl": ""
+    "de": "Fleisch",
+    "fr": "Viande",
+    "nl": "Vlees"
   },
   "b9d8d413b50edbd26d34cbd4a5a5f8e7": {
     "en": "Fish",
     "ua": "Рыба",
     "de": "Fisch",
-    "fr": "",
-    "nl": ""
+    "fr": "Poisson",
+    "nl": "Vis"
   },
   "54a790c38eed762e354f16fb664c53de": {
     "en": "Mushrooms",
     "ua": "Грибы",
     "de": "Pilze",
-    "fr": "",
+    "fr": "Champignons",
     "nl": "Paddestoelen"
   },
   "dd73af2f986b24be74bfc13572d8350a": {
@@ -773,7 +789,7 @@
   "1545c78dc94617fdcf969b057ece6372": {
     "ua": "Заказать доставку",
     "en": "Delivery order",
-    "de": "Lieferung<br>bestellen",
+    "de": "Lieferung-bestellen",
     "fr": "Ordre livraison",
     "nl": "Levering order"
   },
@@ -881,6 +897,13 @@
     "fr": "adresse",
     "nl": "adres",
     "de": "adresse"
+  },
+  "d04a4a2c8b7ac4a76c18da1a927e7aea": {
+    "ua": "VAT",
+    "en": "VAT",
+    "fr": "VAT",
+    "nl": "VAT",
+    "de": "VAT"
   },
   "a96cf03d806d1058b0a45d78422b3e32": {
     "ua": "продавец",
@@ -1245,5 +1268,68 @@
     "fr": "Copie à la semaine suivante",
     "nl": "Kopie naar de volgende week",
     "de": "Kopie für die nächste Woche"
+  },
+  "d98a07f84921b24ee30f86fd8cd85c3c": {
+    "ua": "від",
+    "en": "from",
+    "fr": "de",
+    "nl": "van",
+    "de": "von"
+  },
+  "01b6e20344b68835c5ed1ddedf20d531": {
+    "ua": "до",
+    "en": "to",
+    "fr": "à",
+    "nl": "naar",
+    "de": "zu"
+  },
+  "w_1": {
+    "ua": "Пн",
+    "en": "Mo",
+    "fr": "Lu",
+    "nl": "Ma",
+    "de": "Mo"
+  },
+  "w_2": {
+    "ua": "Вi",
+    "en": "Tu",
+    "fr": "Ma",
+    "nl": "Di",
+    "de": "Di"
+  },
+  "w_3": {
+    "ua": "Се",
+    "en": "We",
+    "fr": "Me",
+    "nl": "Wo",
+    "de": "Mi"
+  },
+  "w_4": {
+    "ua": "Чт",
+    "en": "Th",
+    "fr": "Je",
+    "nl": "Do",
+    "de": "Do"
+  },
+  "w_5": {
+    "ua": "Пт",
+    "en": "Fr",
+    "fr": "Ve",
+    "nl": "Vr",
+    "de": "Fr"
+  },
+  "w_6": {
+    "ua": "Сб",
+    "en": "Sa",
+    "fr": "Sa",
+    "nl": "Za",
+    "de": "Sa"
+  },
+  "w_7": {
+    "ua": "Не",
+    "en": "Su",
+    "fr": "Di",
+    "nl": "Zo",
+    "de": "So"
   }
 }

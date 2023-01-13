@@ -73,7 +73,7 @@ export class SupplierOffer {
   }
 
   addTab(cat_tab, cat_img, active) {
-    let that = this;
+    const that = this;
     let cat_str = '';
     if (
       $(window.parent.document)
@@ -121,7 +121,7 @@ export class SupplierOffer {
   }
 
   openFrame(obj, targ_title, cb) {
-    let that = this;
+    const that = this;
     this.uid = obj.uid;
     this.profile = obj.profile;
     this.offer = obj.data;
@@ -201,7 +201,7 @@ export class SupplierOffer {
     this.ovc
       .find('#close_frame')
       .on('click touchstart', this, async function (ev) {
-        let that = ev.data;
+        const that = ev.data;
 
         ev.preventDefault();
         ev.stopPropagation();
@@ -1147,7 +1147,7 @@ export class SupplierOffer {
   }
 
   InitRating() {
-    let that = this;
+    const that = this;
     let data_obj = {
       proj: 'd2d',
       user: window.parent.user.constructor.name.toLowerCase(),
@@ -1163,7 +1163,7 @@ export class SupplierOffer {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
 
     $('input.rating').on('change', function (ev) {
       let data_obj = {
@@ -1182,7 +1182,7 @@ export class SupplierOffer {
   }
 
   RedrawOrder(uid, menu_item) {
-    let that = this;
+    const that = this;
 
     $(menu_item)
       .find('.pack_list')
@@ -1318,7 +1318,7 @@ export class SupplierOffer {
   }
 
   ImportItems() {
-    let that = this;
+    const that = this;
 
     $('.menu_item').each(function (i, el) {
       if (!$(el).find('.publish:checkbox').prop('checked')) {
@@ -1368,7 +1368,7 @@ export class SupplierOffer {
   }
 
   SaveOrder(items, cb) {
-    let that = this;
+    const that = this;
 
     $('.loader').css('display', 'block');
 

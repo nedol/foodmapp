@@ -3,7 +3,7 @@
 require('webpack-jquery-ui');
 require('webpack-jquery-ui/css');
 require('jquery-ui-touch-punch');
-require('bootstrap');
+// require('bootstrap');
 require('../../lib/bootstrap-rating/bootstrap-rating.js');
 require('../../lib/jquery-comments-master/js/jquery-comments.js');
 
@@ -28,12 +28,11 @@ $(window).on('load', () => {
     });
 });
 
-$(document).on('readystatechange', function () {
-  if (!window.EventSource) {
-    window.alert('В этом браузере нет поддержки EventSource.');
-    return;
-  }
+$(window.parent).on('beforeunload', function () {
+  alert('Do you really want to close?');
+});
 
+$(document).on('readystatechange', function () {
   if (document.readyState !== 'complete') {
     return;
   }
@@ -82,7 +81,7 @@ export class CustomerOrder {
   }
 
   openFrame(obj, targ_title, cb) {
-    let that = this;
+    const that = this;
     this.uid = obj.uid;
     this.profile = obj.profile;
     this.offer = obj.data;
@@ -175,7 +174,7 @@ export class CustomerOrder {
 
     this.ovc.find('#close_frame').off();
     this.ovc.find('#close_frame').on('click touchstart', this, function (ev) {
-      let that = ev.data;
+      const that = ev.data;
 
       ev.preventDefault();
       ev.stopPropagation();
@@ -988,7 +987,7 @@ export class CustomerOrder {
   }
 
   InitRating() {
-    let that = this;
+    const that = this;
     let data_obj = {
       proj: 'd2d',
       user: window.parent.user.constructor.name.toLowerCase(),
@@ -1002,7 +1001,7 @@ export class CustomerOrder {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
 
     $('input.rating').on('change', function (ev) {
       let data_obj = {
@@ -1021,7 +1020,7 @@ export class CustomerOrder {
   }
 
   RedrawOrder(obj) {
-    let that = this;
+    const that = this;
     window.parent.db.GetOrder(
       new Date(this.date),
       obj.uid,
@@ -1105,7 +1104,7 @@ export class CustomerOrder {
   }
 
   GetOrderItems() {
-    let that = this;
+    const that = this;
 
     let obj = { data: {} };
     $('.menu_item').each(function (index, val) {
@@ -1145,7 +1144,7 @@ export class CustomerOrder {
   }
 
   SaveOrder(ev, lang) {
-    let that = this;
+    const that = this;
 
     if ($('#address').val()) {
       window.parent.db.GetSettings((obj) => {

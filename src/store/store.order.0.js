@@ -55,7 +55,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   openFrame(obj, targ_title, cb) {
-    let that = this;
+    const that = this;
     this.uid = obj.uid;
     this.profile = obj.profile;
     this.offer = obj.data;
@@ -104,7 +104,7 @@ export class StoreOrder extends CustomerOrder {
 
     this.ovc.find('.save').off();
     this.ovc.find('.save').on('click touchstart', this, function (ev) {
-      let that = ev.data;
+      const that = ev.data;
 
       ev.preventDefault();
       ev.stopPropagation();
@@ -918,7 +918,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   _InitRating() {
-    let that = this;
+    const that = this;
     let data_obj = {
       proj: 'd2d',
       user: window.parent.user.constructor.name.toLowerCase(),
@@ -934,7 +934,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   GetUserProfileItems() {
-    let that = this;
+    const that = this;
     $('.tab-pane').each(function (i, tab) {
       if ($(tab).attr('id') === 'user_pane') {
         window.parent.db.GetSettings(function (data) {
@@ -958,7 +958,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   _RedrawOrder(uid, menu_item) {
-    let that = this;
+    const that = this;
 
     $(menu_item)
       .find('.pack_list')
@@ -1093,7 +1093,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   _GetOrderItems() {
-    let that = this;
+    const that = this;
 
     let obj = { data: {} };
     $('.menu_item').each(function (i, el) {
@@ -1163,7 +1163,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   _SaveOrder(items, cb) {
-    let that = this;
+    const that = this;
 
     $('.loader').css('display', 'block');
 
@@ -1187,7 +1187,7 @@ export class StoreOrder extends CustomerOrder {
   }
 
   _OnClickUserProfile(ev) {
-    let that = this;
+    const that = this;
     window.parent.db.GetSettings(function (data) {
       if (data[0] && data[0].profile) {
         for (let i in data[0].profile) {

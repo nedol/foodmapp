@@ -26,7 +26,7 @@ export class CustomerSearch {
   constructor() {}
 
   OpenSearch(data) {
-    let that = this;
+    const that = this;
     let date = window.parent.user.date;
     that.sum = 0;
 

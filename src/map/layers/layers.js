@@ -9,7 +9,9 @@ import Circle from 'ol/style/circle';
 import Icon from 'ol/style/icon';
 import Fill from 'ol/style/fill';
 import Text from 'ol/style/text';
+import TextPlacement from 'ol/style/text';
 import Stroke from 'ol/style/stroke';
+import MultiLineString from 'ol/geom/multilinestring';
 
 import Observable from 'ol/observable';
 
@@ -19,22 +21,15 @@ let moment = require('moment/moment');
 class Layers {
   constructor(map) {
     this.map = map;
-    let that = this;
+    const that = this;
     this.ar = [];
     this.flag = true;
-
-    this.path = 'http://localhost:5500/d2d/server';
-    if (host_port.includes('nedol.ru'))
-      this.path = 'https://delivery-angels.store/server';
-    else this.path = host_port;
-
-    this.image_path = image_path;
-
+    this.path = window.con_param.host_port;
+    this.image_path = window.con_param.image_path;
     this.zoom = this.map.ol_map.getView().getZoom();
   }
-
   PutDeliversOnMap() {
-    let that = this;
+    const that = this;
     let source;
     if (that.circleLayer) {
       source = that.circleLayer.getSource();
@@ -166,13 +161,12 @@ class Layers {
             }
             id_str = feature.getId();
 
-            // setTimeout(function () {
-            //     id_str = '';
-            // },300);
-
             try {
               if (
-                moment(feature.values_.object.date).isBefore(window.user.date)
+                moment(feature.values_.object.date).isBefore(
+                  window.user.date
+                ) ||
+                moment(feature.values_.object.date).isAfter(window.user.date)
               ) {
                 if (clusterSource.getFeatureById(id_str)) {
                   let f = clusterSource.getFeatureById(id_str);
@@ -183,16 +177,6 @@ class Layers {
                   vectorSource.removeFeature(f);
                 }
               } else {
-                // if(window.user.constructor.name==="Supplier"){
-                //     if(feature.object.profile.type==='marketer')
-                //         return;
-                // }
-                // if(that.map.ol_map.getView().getZoom()===that.zoom){
-                //     if(feature.object.style)
-                //         cluster_feature.setStyle(feature.object.style);
-                //     return;
-                // }
-
                 that.zoom = that.map.ol_map.getView().getZoom();
 
                 let style = getObjectStyle(feature.values_.object);
@@ -234,10 +218,6 @@ class Layers {
           let ic_clust = './images/truck.png';
           let scale = 1;
           let opacity = 1;
-          // if ( obj.apprs<1)
-          //     opacity = 0.9;
-          // else
-          //     opacity = 0.5;
           let logo = obj.logo;
 
           let diff = new Date().getTime() - new Date(obj.date).getTime();
@@ -248,14 +228,32 @@ class Layers {
           // if (days >= 30)//просрочен
           //     obj.delayed = true;
           let thmb = that.image_path + obj.profile.avatar;
-
           scale = Math.pow(that.zoom, 3) / 30000;
+          let wt = _.values(
+            _.find(obj.profile.worktime, (item) => {
+              const day = moment(obj.date).weekday();
+              if (item['w_' + day]) {
+                return item;
+              }
+            })
+          )[0];
+          if (!obj.profile.worktime) {
+            wt = '08:00-20:00';
+          }
           if (obj.profile.type === 'marketer') {
-            if (that.zoom < 12 && features.length === 1)
+            if (that.zoom < 10 && features.length === 1)
               //non cluster
               return null;
-            ic_clust = obj.img;
-            scale = Math.pow(that.map.ol_map.getView().getZoom(), 4) / 200000;
+            if (that.zoom < 10 && features.length > 1) {
+              ic_clust = obj.img;
+              scale = Math.pow(that.map.ol_map.getView().getZoom(), 3) / 10000;
+            }
+            if (that.zoom >= 10 && features.length === 1) {
+              scale =
+                Math.pow(that.map.ol_map.getView().getZoom(), 5) / (5 * 1.0e6);
+            }
+
+            // if (!wt) return null;
           } else if (obj.profile.type === 'deliver') {
             // if(that.map.ol_map.getView().getZoom()<15)
             //     return;
@@ -267,9 +265,8 @@ class Layers {
             //     return;
             //thmb = that.image_path + obj.img; //obj.profile.avatar;
             //ic_clust = obj.img;
-            scale = Math.pow(that.map.ol_map.getView().getZoom(), 3) / 10000;
-
-            if (moment(obj.date).isSame(window.user.date)) {
+            scale = Math.pow(that.map.ol_map.getView().getZoom(), 5) / 4000000;
+            if (moment(obj.date).isSame(window.user.date) && wt) {
               opacity = 1;
             } else {
               opacity = 0.3;

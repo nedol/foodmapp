@@ -15,12 +15,12 @@ $(document).on('readystatechange', function () {
 
 class ProfileCustomer {
   constructor(tab) {
-    let that = this;
+    const that = this;
     window.user = this;
 
-    that.path = host_port;
+    this.path = window.parent.con_param.host_port;
 
-    that.image_path = image_path;
+    this.image_path = window.parent.con_param.image_path;
 
     that.fillProfileForm(function () {
       that.items_start = that.GetProfileItems();
@@ -63,7 +63,7 @@ class ProfileCustomer {
   }
 
   fillProfileForm(cb) {
-    let that = this;
+    const that = this;
     let data = window.parent.user.profile;
     if (data && data.profile) {
       that.uid = data.uid;
@@ -103,7 +103,7 @@ class ProfileCustomer {
   }
 
   GetProfileItems() {
-    let that = this;
+    const that = this;
 
     let profile = {};
     let arrInp = $('input').toArray();
@@ -119,7 +119,7 @@ class ProfileCustomer {
   }
 
   OnSubmit(cb) {
-    let that = this;
+    const that = this;
     try {
       let func = 'confirmem';
       if (window.parent.user.psw) {

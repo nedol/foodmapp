@@ -82,7 +82,7 @@ export class CustomerOrder {
   }
 
   openFrame(obj, targ_title, cb) {
-    let that = this;
+    const that = this;
     this.uid = obj.uid;
     this.profile = obj.profile;
     this.offer = obj.data;
@@ -174,7 +174,7 @@ export class CustomerOrder {
 
     this.ovc.find('#close_frame').off();
     this.ovc.find('#close_frame').on('click touchstart', this, function (ev) {
-      let that = ev.data;
+      const that = ev.data;
 
       ev.preventDefault();
       ev.stopPropagation();
@@ -989,7 +989,7 @@ export class CustomerOrder {
   }
 
   InitRating() {
-    let that = this;
+    const that = this;
     let data_obj = {
       proj: 'd2d',
       user: window.parent.user.constructor.name.toLowerCase(),
@@ -1003,7 +1003,7 @@ export class CustomerOrder {
   }
 
   InitRateSupplier() {
-    let that = this;
+    const that = this;
 
     $('input.rating').on('change', function (ev) {
       let data_obj = {
@@ -1022,7 +1022,7 @@ export class CustomerOrder {
   }
 
   RedrawOrder(obj) {
-    let that = this;
+    const that = this;
     window.parent.db.GetOrder(
       new Date(this.date),
       obj.uid,
@@ -1106,7 +1106,7 @@ export class CustomerOrder {
   }
 
   GetOrderItems() {
-    let that = this;
+    const that = this;
 
     let obj = { data: {} };
     $('.menu_item').each(function (index, val) {
@@ -1146,7 +1146,7 @@ export class CustomerOrder {
   }
 
   SaveOrder(ev, lang) {
-    let that = this;
+    const that = this;
 
     if ($('#address').val()) {
       window.parent.db.GetSettings((obj) => {

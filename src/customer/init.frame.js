@@ -20,7 +20,7 @@ import { utils } from '../utils/utils';
 
 class OfferOrder {
   constructor() {
-    let that = this;
+    const that = this;
     this.changed = false;
     this.offer;
 
@@ -40,7 +40,7 @@ class OfferOrder {
     this.customer_frame
       .find('.publish_order')
       .on('click touchstart', this, function (ev) {
-        let that = ev.data;
+        const that = ev.data;
         let items = ev.data.GetOrderItems(ev.data.lang, true);
         window.user.PublishOrder(items, (data) => {
           let status = window.dict.getDictValue(
@@ -62,7 +62,7 @@ class OfferOrder {
   }
 
   InitCustomerOrder(obj, targ_title) {
-    let that = this;
+    const that = this;
     $('.loader').css('display', 'block');
 
     if (this.customer_frame[0].contentWindow.InitCustomerOrder) {
@@ -74,6 +74,37 @@ class OfferOrder {
       this.customer_frame.on('load', function () {
         this.contentWindow.InitCustomerOrder(obj, targ_title);
       });
+
+      $(this.customer_frame[0].contentWindow).on('beforeunload', () => {
+        this.customer_frame[0] = null;
+      });
+
+      (function print_nav_timing_data() {
+        // Use getEntriesByType() to just get the "navigation" events
+        var perfEntries = performance.getEntriesByType('navigation');
+
+        for (var i = 0; i < perfEntries.length; i++) {
+          console.log('= Navigation entry[' + i + ']');
+          var p = perfEntries[i];
+          // dom Properties
+          console.log(
+            'DOM content loaded = ' +
+              (p.domContentLoadedEventEnd - p.domContentLoadedEventStart)
+          );
+          console.log('DOM complete = ' + p.domComplete);
+          console.log('DOM interactive = ' + p.interactive);
+
+          // document load and unload time
+          console.log('document load = ' + (p.loadEventEnd - p.loadEventStart));
+          console.log(
+            'document unload = ' + (p.unloadEventEnd - p.unloadEventStart)
+          );
+
+          // other properties
+          console.log('type = ' + p.type);
+          console.log('redirectCount = ' + p.redirectCount);
+        }
+      })();
     }
 
     $(this.customer_frame).css('display', 'inline-block');

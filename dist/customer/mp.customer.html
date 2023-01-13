@@ -1,141 +1,194 @@
+<link rel="stylesheet" href="./css/tablesort.css" type="text/css" />
+<link rel="stylesheet" href="./css/nouislider.min.css" type="text/css" />
 
-  <link
-    id="cus_link"
-    rel="stylesheet"
-    href="./css/mp.css"
-    type="text/css"
-  />
+<link id="cus_link" rel="stylesheet" href="./css/mp.css" type="text/css" />
 
-    <link
-    id="cus_link"
-    rel="stylesheet"
-    href="./css/tablesort.css"
-    type="text/css"
-  />
+<!-- <script
+  type="text/javascript"
+  src="../../node_modules/tablesorter/dist/js/jquery.tablesorter.js"
+></script>
+<script
+  type="text/javascript"
+  src="../../node_modules/tablesorter/dist/js/jquery.tablesorter.widgets.js"
+></script>
+<script
+  type="text/javascript"
+  src="../../node_modules/tablesorter/dist/js/widgets/widget-filter.min.js"
+></script>
+<script
+  type="text/javascript"
+  src="../../node_modules/tablesorter/dist/js/widgets/widget-pager.min.js"
+></script> -->
 
-   
-   <div id="popup" style="display:none">
-    
-        <div class="address_div input-group" style="display:none;position:relative;width: 100%">
-            <input type="address" id="address" class="form-control"
-                title="введите адрес доставки"
-                placeholder="введите адрес доставки"
-                style="width: 100%">
-                 <button  type="button"  id="address_loc">
-                    <i class="icofont-map icofont-2x"></i>
-                </button>
-    
-        </div>
-    
-        <div class="mp_categories" style="overflow-x: auto;white-space:nowrap">
-            <div class="cat_div text-center" id="add_tab_li" title="add tab">
-            </div>
-        </div>
-    
-         <div class="d-flex justify-content-center mb-3" style="position: relative;height:0px">
-            <div id="pager" class="pager p-2">
-                <a class="first icofont-rounded-double-left icofont-1x"/></a>
-                <a class="prev icofont-rounded-left  icofont-1x"/></a>
-    
-                <span class="pagedisplay" data-pager-output-filtered="{startRow:input} - {endRow} / {filteredRows} of {totalRows} total rows"></span>
-                <a class="next icofont-rounded-right  icofont-1x"/></a>
-                <a class="last icofont-rounded-double-right icofont-1x"/></a>
-                <select class="pagesize">
-                  <option value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="30">30</option>
-                  <option value="40">40</option>
-                  <option value="all" data-translate="08a34eba38f85f425f9af8f41d5d9eab"></option>
-                </select>
-                <select class="gotoPage" title="Select page number" aria-disabled="false">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                </select>
-            </div>
-        </div>
+<div id="popup" class="table_container" style="display: none; overflow-y: auto">
+  <div
+    class="address_div input-group"
+    style="display: none; position: relative; width: 100%"
+  >
+    <input
+      type="address"
+      id="address"
+      class="form-control"
+      title="введите адрес доставки"
+      placeholder="введите адрес доставки"
+      style="width: 100%"
+    />
+    <button type="button" id="address_loc">
+      <i class="icofont-map icofont-2x"></i>
+    </button>
+  </div>
 
-    
-        <div style="overflow-x: scroll">
-            <table  class="tablesorter mp text-nowrap" cellspacing="0" width="auto"  >
-            <thead>
-            <tr style="height:30px">
-                <!-- <th>
-                    <span class="icofont-food-cart icofont-2x nosorting"></span>
-                </th> -->
-                <th>
-                    <!-- <span span="icofont-console icofont-2x"></span> -->
+  <div class="mp_categories">
+    <div class="cat_div text-center" id="add_tab_li" title="add tab"></div>
+  </div>
 
-                </th>
-    
-                <th>
-                    <!-- <span class="icofont-image  icofont-2x nosorting"></span> -->
-                </th>
-    
-                <th>
-                    <!-- <span class="fas fa-coins fa-2x"></span> -->
-                </th>
-    
-                <!--th>
-                    <span class="icofont-copy icofont-2x nosorting"></span>
-                </!--th-->
-    
-                <!--th>
-                    <span class="icofont-square icofont-2x nosorting"></span>
-                </th-->
-    
-            </tr>
-           </thead>
-            <tfoot>
-                <tr class='tr_tmplt' style='display:none;text-align: center; font-weight: bold;'>
-                    <!-- <td type  style="position: relative">
+  <div
+    class="d-flex justify-content-center mb-3"
+    style="position: relative; height: 0px"
+  >
+    <div id="pager" class="pager p-2">
+      <span class="accicon">
+        <i
+          class="icofont-filter"
+          data-toggle="collapse"
+          data-target=".pager_div"
+        ></i>
+      </span>
+      <div class="pager_div collapse">
+        <a class="first icofont-rounded-double-left icofont-1x"></a>
+        <a class="prev icofont-rounded-left icofont-1x"></a>
+
+        <span
+          class="pagedisplay"
+          data-pager-output-filtered="{startRow:input} - {endRow} / {filteredRows} of {totalRows} total rows"
+        ></span>
+        <a class="next icofont-rounded-right icofont-1x"></a>
+        <a class="last icofont-rounded-double-right icofont-1x"></a>
+        <select class="pagesize">
+          <option value="10">10</option>
+          <option value="20">20</option>
+          <option value="30">30</option>
+          <option value="40">40</option>
+          <option
+            value="all"
+            data-translate="08a34eba38f85f425f9af8f41d5d9eab"
+          ></option>
+        </select>
+        <select
+          class="gotoPage"
+          title="Select page number"
+          aria-disabled="false"
+        >
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div style="overflow-x: scroll">
+    <table class="tablesorter mp text-nowrap" cellspacing="0" width="auto">
+      <thead>
+        <tr style="height: 30px">
+          <th>
+            <!-- <span span="icofont-console icofont-2x"></span> -->
+          </th>
+
+          <th>
+            <!-- <span class="icofont-image  icofont-2x nosorting"></span> -->
+          </th>
+
+          <th>
+            <!-- <span class="fas fa-coins fa-2x"></span> -->
+          </th>
+        </tr>
+      </thead>
+      <tfoot>
+        <tr
+          class="tr_tmplt"
+          style="display: none; text-align: center; font-weight: bold"
+        >
+          <!-- <td type  style="position: relative">
                         <div  style="position: absolute;top: 0;">
                           <img src=''  style='max-width:50px;max-height:50px'>
                         </div>
                     </td> -->
-                    <td title style="position:relative;min-width: 200px;">
-                             
-                            <div class="title_div">             
-                            </div>  
-    
-                            <div type  style="position:absolute;top: 0; left:5px">
-                                <img src='' class="profile_avatar" style='max-width:40px;max-height:40px'>
-                            </div>  
-                        
-                    </td>
-                    <td image style="position: relative">
-                        <!--button  type="button" class="description"  data-toggle="collapse">
+          <td title style="position: relative; min-width: 200px">
+            <div class="title_div"></div>
+
+            <div type style="position: absolute; top: 0; left: 5px">
+              <img
+                src=""
+                class="profile_avatar"
+                style="max-width: 40px; max-height: 40px"
+              />
+            </div>
+          </td>
+          <td image style="position: relative">
+            <!--button  type="button" class="description"  data-toggle="collapse">
                             <i class="icofont-justify-center icofont-2x"></i>
                         </button-->
-                        <div class="img_container">
-                            <img src='../dist/images/700x400.png' style='max-width:200px;max-height:150px;padding: 10px'>
-                            <div class="content_text collapse" contenteditable="false">
-                            </div>
-                        </div>
-                    </td>
-                    <td>
-                       <div class='item_price'></div>
-                       <div class='dropup pack_container'>
-                          <button class='pack_btn btn btn-outline-secondary' type='button' style="background-color: transparent"></button>
-                          <div class='pack_list input dropdown-menu' style='font-size:medium;white-space: nowrap;background-color: cornsilk;'>
-                          </div>
-                       </div>
-                       <div style="margin-top: 20px;">
-                           <button type="button" class='reduce_ord ctrl'
-                               style='vertical-align:middle; font-size: large;color: #0b22d5; background-color:transparent;border: 0;outline: none;'>
-                               <i class='icofont-minus'></i>
-                           </button>
-                           <button class='ord_amount btn btn-outline-secondary'>0
-                           </button>
-                           <button type="button" class='increase_ord ctrl'
-                               style='vertical-align: middle ; font-size: large;color: #d51312;  background-color:transparent; border: 0;outline: none;'>
-                               <i class='icofont-plus'></i>
-                           </button>
-                       </div>
-                    </td>
-                    <!-- <td>
+            <div class="img_container">
+              <img
+                src="../dist/images/700x400.png"
+                style="max-width: 200px; max-height: 150px; padding: 10px"
+              />
+              <div class="content_text collapse" contenteditable="false"></div>
+            </div>
+          </td>
+          <td>
+            <div class="item_price"></div>
+            <div class="dropup pack_container">
+              <button
+                class="pack_btn btn btn-outline-secondary"
+                type="button"
+                style="background-color: transparent"
+              ></button>
+              <div
+                class="pack_list input dropdown-menu"
+                style="
+                  font-size: medium;
+                  white-space: nowrap;
+                  background-color: cornsilk;
+                "
+              ></div>
+            </div>
+            <div style="margin-top: 20px">
+              <button
+                type="button"
+                class="reduce_ord ctrl"
+                style="
+                  vertical-align: middle;
+                  font-size: large;
+                  color: #0b22d5;
+                  background-color: transparent;
+                  border: 0;
+                  outline: none;
+                "
+              >
+                <i class="icofont-minus"></i>
+              </button>
+              <button class="ord_amount btn btn-outline-secondary">0</button>
+              <button
+                type="button"
+                class="increase_ord ctrl"
+                style="
+                  vertical-align: middle;
+                  font-size: large;
+                  color: #d51312;
+                  background-color: transparent;
+                  border: 0;
+                  outline: none;
+                "
+              >
+                <i class="icofont-plus"></i>
+              </button>
+            </div>
+          </td>
+          <!-- <td>
                         <div class='extra_collapse' style='display: none;text-align: center;'>
                             <span  data-toggle='collapse' data-target='.extras'
                               style='position: relative; top:0px;z-index: 1000;color: grey'>
@@ -151,70 +204,110 @@
                             border-radius: 5px;
                             z-index:200;'></div>
                     </td> -->
-                    <!-- <td>                    
+          <!-- <td>                    
                     </td> -->
-                </tr>
-            </tfoot>
-            <tbody>
-    
-            </tbody>
-        </table>
-        </div>
+        </tr>
+      </tfoot>
+      <tbody></tbody>
+    </table>
+  </div>
 
-        <style>
-            .noUi-handle {
-                border: 1px solid #D9D9D9;
-                border-radius: 3px;
-                background: #FFF;
-                cursor: default;
-                box-shadow: inset 0 0 1px #FFF;
-            }
-            .noUi-handle:after {
-                content: "€"; /* Add something like this */
-            }
-        </style>
+  <style>
+    .noUi-handle {
+      border: 1px solid #d9d9d9;
+      border-radius: 3px;
+      background: #fff;
+      cursor: default;
+      box-shadow: inset 0 0 1px #fff;
+    }
+    /*.noUi-handle:after {
+                content: "€"; 
+            } */
+  </style>
 
-        <div id="slider" style="min-width:200px;  margin-left: 10px;  margin-right: 10px;"></div>
-    
-    
-        <table class="thidden" style="display:none"></table>
-    
+  <div id="slider"></div>
 
-        <div style='display: none'>
-            <div class='row tmplt_extra align-items-center' style='background-color: #cbced2'>
-                <div class="carousel-item" title="" tab="" supuid="">
-                    <div class="carousel_title">  title  </div>
-                    <div class="carousel_img_div">
-                        <img class="carousel_img"  alt="slide">
-                    </div>
-                    <div>
-                        <div class="carousel_price" style="display: inline-block;">35</div>
-                        <div class="dscnt_price" style="display: inline-block; visibility: hidden"></div>
-                    </div>
-                    <div class="discount"  style="display:none">-20%</div>
-                </div>
-                <div class='add_div col'  style='vertical-align:middle; text-align:left'>
-                    <a class='extra_title'></a>
-                </div>
-                <div class='add_price_div' style='text-align:center'>
-                   <a class='extra_price' style='color:darkgrey;font-family:"Montserrat, serif;font-weight: bold;vertical-align: middle"'></a>
-                </div>
-                <div class='col'  style='text-align:right;white-space: nowrap;color:#273be6;'>
-                   <span class='reduce ctrl' style='vertical-align:middle; font-size: large;'>
-                        <i class=' fa fa-minus'></i>
-                   </span>
-                   <button class='extra_amount btn btn-outline-secondary' style='font-size: large;border-width: 0; padding-left: 1px; padding-right:1px'>0
-                   </button>
-                   <span class='increase ctrl' style='vertical-align: middle ; font-size: large;color: #d51312'>
-                        <i class=' fa fa-plus'></i>
-                   </span>
-                </div>
-            </div>
+  <table class="thidden" style="display: none"></table>
+
+  <div style="display: none">
+    <div
+      class="row tmplt_extra align-items-center"
+      style="background-color: #cbced2"
+    >
+      <div class="carousel-item" title="" tab="" supuid="">
+        <div class="carousel_title">title</div>
+        <div class="carousel_img_div">
+          <img class="carousel_img" alt="slide" />
         </div>
-        <div style="display:inline-block; position: fixed;bottom: 0; right:0; color: white; z-index: 10000">
-            <span id="close_frame" class="close fa fa-map-o" style="color:#0088BB;margin: 10px"  title=""></span>
+        <div>
+          <div class="carousel_price" style="display: inline-block">35</div>
+          <div
+            class="dscnt_price"
+            style="display: inline-block; visibility: hidden"
+          ></div>
         </div>
-        <div class="loader"></div>
+        <div class="discount" style="display: none">-20%</div>
+      </div>
+      <div class="add_div col" style="vertical-align: middle; text-align: left">
+        <a class="extra_title"></a>
+      </div>
+      <div class="add_price_div" style="text-align: center">
+        <a
+          class="extra_price"
+          style="
+            color: darkgrey;
+            font-family: 'Montserrat, serif;font-weight: bold;vertical-align: middle';
+          "
+        ></a>
+      </div>
+      <div
+        class="col"
+        style="text-align: right; white-space: nowrap; color: #273be6"
+      >
+        <span
+          class="reduce ctrl"
+          style="vertical-align: middle; font-size: large"
+        >
+          <i class="fa fa-minus"></i>
+        </span>
+        <button
+          class="extra_amount btn btn-outline-secondary"
+          style="
+            font-size: large;
+            border-width: 0;
+            padding-left: 1px;
+            padding-right: 1px;
+          "
+        >
+          0
+        </button>
+        <span
+          class="increase ctrl"
+          style="vertical-align: middle; font-size: large; color: #d51312"
+        >
+          <i class="fa fa-plus"></i>
+        </span>
+      </div>
     </div>
-    
-    
+  </div>
+  <div
+    style="
+      display: inline-block;
+      position: fixed;
+      bottom: 0%;
+      left: 0;
+      color: white;
+      z-index: 10000;
+    "
+  >
+    <span
+      id="close_frame"
+      class="close"
+      style="color: #0088bb; margin: 10px"
+      title=""
+    >
+      <img src="./images/foodmapp.svg" width="50" height="50" alt="FoodMapp" />
+    </span>
+  </div>
+  <div class="loader"></div>
+</div>

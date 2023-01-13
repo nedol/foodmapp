@@ -84,7 +84,7 @@ export class Customer {
   }
 
   InitUser(cb) {
-    let that = this;
+    const that = this;
 
     console.log(navigator.userAgent);
 
@@ -142,7 +142,7 @@ export class Customer {
         }
         if (data) {
           let processData = function (res, cb) {
-            let that = this;
+            const that = this;
             try {
               if (res.resAr) {
                 let obj = res.resAr[0];
@@ -207,7 +207,7 @@ export class Customer {
   }
 
   InitStoreOrder(obj, targ_title) {
-    let that = this;
+    const that = this;
     //$('.loader').css('display','block');
     $('#splash').css('display', 'block');
     $('#splash')
@@ -262,7 +262,7 @@ export class Customer {
   }
 
   UpdateOrderLocal(obj, cb) {
-    let that = this;
+    const that = this;
     obj.date = moment(obj.date).format('YYYY-MM-DD');
     window.db.SetObject('orderStore', obj, (res) => {
       cb();
@@ -270,7 +270,7 @@ export class Customer {
   }
 
   SaveOrder(items, cb) {
-    let that = this;
+    const that = this;
 
     $('.loader').css('display', 'block');
 
@@ -289,7 +289,7 @@ export class Customer {
   }
 
   PublishOrder(obj, cb) {
-    let that = this;
+    const that = this;
 
     obj.proj = 'd2d';
     obj.user = window.user.constructor.name.toLowerCase();
@@ -308,7 +308,7 @@ export class Customer {
   }
 
   DeleteOrder(obj, cb) {
-    let that = this;
+    const that = this;
 
     obj.proj = 'd2d';
     obj.user = window.user.constructor.name.toLowerCase();
@@ -328,7 +328,7 @@ export class Customer {
   //layers
 
   OnMessage(data) {
-    let that = this;
+    const that = this;
 
     if (data.func === 'approved') {
       window.db.GetOrder(

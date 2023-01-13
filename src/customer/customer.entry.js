@@ -1,6 +1,6 @@
 'use strict';
 
-require('../../global');
+require('../../dist/assets/global');
 
 import { Customer } from './customer';
 import { Сетка } from '../../network';
@@ -13,7 +13,7 @@ require('webpack-jquery-ui/css');
 import { Utils } from '../utils/utils';
 let utils = new Utils();
 
-(function Entry() {
+(async function Entry() {
   if (document.readyState !== 'complete') {
     return;
   }
@@ -38,7 +38,15 @@ let utils = new Utils();
     console.log();
   });
 
-  window.network = new Сетка(host_ws);
+  let promise = new Promise((resolve, reject) => {
+    $.getJSON('../src/host/host.json', function (data) {
+      window.con_param = data;
+      resolve();
+    });
+  });
+  let res = await promise;
+
+  window.network = new Сетка(window.con_param.host_ws);
 
   let uObj = {};
   window.db = new DB('Customer', function () {

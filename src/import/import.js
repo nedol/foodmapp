@@ -7,7 +7,7 @@ let moment = require('moment/moment');
 
 class Import {
   constructor() {
-    let that = this;
+    const that = this;
     this.areasAr = [];
     $('.dt_val').on('change', function (ev) {
       that.areasAr = [];
@@ -27,7 +27,7 @@ class Import {
 
   ImportSupByEmail(em) {
     let promise = new Promise((resolve, reject) => {
-      let that = this;
+      const that = this;
       try {
         let data_obj = {
           proj: 'd2d',
@@ -59,7 +59,7 @@ class Import {
   }
 
   ImportDataByLocation(event) {
-    let that = this;
+    const that = this;
     if (!window.sets.coords.cur) return;
 
     var LotLat = proj.toLonLat(window.user.map.ol_map.getView().getCenter()); //(window.sets.coords.cur);
@@ -134,7 +134,7 @@ class Import {
   }
 
   LoadDataByKey(uid, key, cb) {
-    let that = this;
+    const that = this;
     try {
       let date = window.user.date;
 
@@ -159,7 +159,7 @@ class Import {
   }
 
   LoadSupplierData(uid, cats, area, cb) {
-    let that = this;
+    const that = this;
     try {
       let date = window.user.date;
 
@@ -186,7 +186,7 @@ class Import {
   }
 
   LoadDeliverData(uid, cats, area, cb) {
-    let that = this;
+    const that = this;
     try {
       let date = window.user.date;
 
@@ -213,7 +213,7 @@ class Import {
   }
 
   processResult(res, cb) {
-    let that = this;
+    const that = this;
     try {
       if (res) {
         for (let i in res) {
@@ -365,7 +365,9 @@ class Import {
             if (obj.data) obj.data = JSON.parse(obj.data);
             // if(obj.status)
             //     obj.status = JSON.parse(obj.status);
-            window.db.SetObject('orderStore', obj, function (success) {});
+            window.db.SetObject('orderStore', obj, function (success) {
+              window.user.SetOrders(() => {}, obj);
+            });
           }
         }
       } catch (ex) {
@@ -451,7 +453,7 @@ class Import {
   }
 
   SetLead(sup, cus) {
-    let that = this;
+    const that = this;
     try {
       let date = moment().format('YYYY-MM-DD');
 

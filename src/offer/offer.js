@@ -24,7 +24,7 @@ class Offer {
   }
 
   SetOfferDB(items) {
-    let that = this;
+    const that = this;
     window.db.SetObject('offerStore', items, function (res) {});
     if (window.dict.dict) {
       for (let i in window.dict.dict) {

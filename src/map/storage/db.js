@@ -9,7 +9,7 @@ let moment = require('moment');
 class DB {
   constructor(user, f) {
     this.DBcon;
-    this.version = 56;
+    this.version = 58;
 
     if (!window.indexedDB) {
       alert(
@@ -95,6 +95,7 @@ class DB {
             keyPath: ['date', 'uid'],
           });
           vSupplierStore.createIndex('date', ['date'], { unique: false });
+          vSupplierStore.createIndex('uid', ['uid'], { unique: false });
           vSupplierStore.createIndex('dateuid', ['date', 'uid'], {
             unique: true,
           });
@@ -338,10 +339,17 @@ class DB {
           cursor.value.profile.type === 'deliver'
         )
           if (
-            moment(cursor.value.date).isAfter(date) ||
+            cursor.value.profile.type === 'marketer' &&
             moment(cursor.value.date).isSame(date)
-          )
+          ) {
             features.push(cursor.value);
+          }
+        if (
+          cursor.value.profile.type === 'foodtruck' &&
+          moment(cursor.value.date).isSameOrAfter(date)
+        ) {
+          features.push(cursor.value);
+        }
 
         cursor.continue();
       }
@@ -360,7 +368,9 @@ class DB {
     ind.openCursor().onsuccess = function (event) {
       var cursor = event.target.result;
       if (cursor) {
-        if (cursor.value.date === date) ar.push(cursor.value);
+        if (cursor.value.date <= date) {
+          ar.push(cursor.value);
+        }
       }
       try {
         cursor.continue();
@@ -403,7 +413,7 @@ class DB {
     idatesupuid.openCursor().onsuccess = function (event) {
       var cursor = event.target.result;
       if (cursor) {
-        if (cursor.value.date === date) {
+        if (moment(cursor.value.date).isSameOrAfter(date)) {
           ar.push(cursor.value);
         }
       }
@@ -427,7 +437,7 @@ class DB {
     idate.openCursor().onsuccess = function (event) {
       var cursor = event.target.result;
       if (cursor) {
-        if (cursor.value.date === date) {
+        if (moment(cursor.value.date).isSame(date)) {
           ar.push(cursor.value);
         }
         try {
@@ -553,6 +563,19 @@ class DB {
         console.log(ex);
       }
     } catch (ex) {}
+  }
+
+  DeleteOffer(date, cb) {
+    var request = DB.prototype.DBcon.transaction('offerStore', 'readwrite')
+      .objectStore('offerStore')
+      .delete([date]);
+    request.onerror = function (ev) {
+      console.log(ev);
+    };
+    request.onsuccess = function () {
+      console.log('File delete from DB:');
+      cb();
+    };
   }
 
   GetOfferPromise(date) {

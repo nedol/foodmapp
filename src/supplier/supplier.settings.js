@@ -66,7 +66,7 @@ export class SupplierSettings {
   }
 
   Open() {
-    let that = this;
+    const that = this;
 
     $('input').on('change', function (ev) {
       $(this).attr('changed', true);
@@ -75,7 +75,7 @@ export class SupplierSettings {
 
   OnSubmit(form) {
     var urlencode = require('urlencode');
-    let that = this;
+    const that = this;
     if (!$(form).find('#place').val()) {
       $(form).find('#place').focus();
       return;
@@ -205,7 +205,7 @@ export class SupplierSettings {
   }
 
   GetProfileItems() {
-    let that = this;
+    const that = this;
     $('.tab-pane').each(function (i, tab) {
       if ($(tab).attr('id') === 'profile') {
         that.db.GetSettings(function (data) {

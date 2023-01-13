@@ -124,7 +124,7 @@ export class OLMap {
   }
 
   Init(lat, lon, cb) {
-    let that = this;
+    const that = this;
 
     that.lat_param = lat;
     that.lon_param = lon;
@@ -226,7 +226,7 @@ export class OLMap {
   }
 
   EmptyMap() {
-    let that = this;
+    const that = this;
     let layers = this.ol_map.getLayers();
 
     layers.forEach(function (layer, i, layers) {
@@ -263,7 +263,7 @@ export class OLMap {
   }
 
   SetFeatures(objs) {
-    let that = this;
+    const that = this;
     for (let o in objs) {
       //alert(JSON.stringify(objs[o]));
       if (objs[o].deleted) continue;
@@ -438,7 +438,7 @@ export class OLMap {
   }
 
   GetObjectsFromStorage(area) {
-    let that = this;
+    const that = this;
     let period = $('.sel_period').text().split(' - ');
     $('.cat_cnt').text('0');
 
@@ -502,7 +502,7 @@ export class OLMap {
   }
 
   OnItemClick(el) {
-    let that = this;
+    const that = this;
     this.geo.StopLocation();
     window.db.GetSupplier(
       moment(window.user.date).format('YYYY-MM-DD'),
@@ -546,7 +546,7 @@ export class OLMap {
   }
 
   FlyToLocation(location) {
-    let that = this;
+    const that = this;
     this.animate.flyTo(location, function () {
       //Marker.overlay.setPosition(data.data[data.data.length-1]);
       let latlon = proj.toLonLat(location);
@@ -556,7 +556,7 @@ export class OLMap {
   }
 
   MoveToLocation(location, orig, cb) {
-    let that = this;
+    const that = this;
     if (
       (window.user.constructor.name === 'Supplier' ||
         window.user.constructor.name === 'Deliver') &&
@@ -641,7 +641,7 @@ export class OLMap {
   }
 
   mapEvents() {
-    let that = this;
+    const that = this;
 
     $('#map').on('focusout', () => {
       console.log();
@@ -724,7 +724,7 @@ export class OLMap {
   }
 
   CreateOverlay(obj, cb) {
-    let that = this;
+    const that = this;
     let fd_frame = $('#fd_frame_tmplt').clone();
     $(fd_frame).attr('id', obj.uid);
     $(fd_frame).addClass('fd_frame');
@@ -777,7 +777,7 @@ export class OLMap {
   }
 
   CreateCircle(offer) {
-    let that = this;
+    const that = this;
     let layer;
     if (that.layers.circleLayer) {
       layer = that.layers.circleLayer;
